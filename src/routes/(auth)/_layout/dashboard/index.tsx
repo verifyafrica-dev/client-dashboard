@@ -451,6 +451,7 @@ function DashboardPage() {
 					>
 						<ArrowClockwiseIcon
 							className={isLoading ? "animate-spin" : undefined}
+							weight="bold"
 						/>
 						Refresh
 					</Button>

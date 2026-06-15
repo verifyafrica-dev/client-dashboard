@@ -1,6 +1,10 @@
-import { HouseIcon, SquaresFourIcon } from "@phosphor-icons/react";
+import {
+	HouseIcon,
+	type IconWeight,
+	SquaresFourIcon,
+} from "@phosphor-icons/react";
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { ComponentType } from "react";
+import type { ComponentType, SVGProps } from "react";
 import {
 	Sidebar,
 	SidebarContent,
@@ -52,7 +56,7 @@ function SidebarNavItem({
 	item: {
 		title: string;
 		to: (typeof navItems)[number]["to"];
-		icon: ComponentType<{ className?: string }>;
+		icon: ComponentType<SVGProps<SVGSVGElement> & { weight?: IconWeight }>;
 		isExact?: boolean;
 	};
 }) {
@@ -76,8 +80,8 @@ function SidebarNavItem({
 					to={item.to}
 					activeOptions={item.isExact ? { exact: true } : undefined}
 				>
-					<item.icon />
-					<span>{item.title}</span>
+					<item.icon weight={isActive ? "bold" : "regular"} />
+					<span className="font-medium">{item.title}</span>
 				</Link>
 			</SidebarMenuButton>
 		</SidebarMenuItem>
