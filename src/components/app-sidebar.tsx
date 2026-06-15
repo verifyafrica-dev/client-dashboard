@@ -1,4 +1,4 @@
-import { HouseIcon } from "@phosphor-icons/react";
+import { HouseIcon, SquaresFourIcon } from "@phosphor-icons/react";
 import { Link } from "@tanstack/react-router";
 import {
 	Sidebar,
@@ -17,6 +17,11 @@ const navItems = [
 		title: "Dashboard",
 		to: "/dashboard",
 		icon: HouseIcon,
+	},
+	{
+		title: "Products",
+		to: "/products",
+		icon: SquaresFourIcon,
 	},
 ] as const;
 
