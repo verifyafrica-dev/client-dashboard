@@ -10,33 +10,50 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as authLayoutRouteImport } from './routes/(auth)/_layout'
+import { Route as authLayoutDashboardIndexRouteImport } from './routes/(auth)/_layout/dashboard/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const authLayoutRoute = authLayoutRouteImport.update({
+  id: '/(auth)/_layout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const authLayoutDashboardIndexRoute =
+  authLayoutDashboardIndexRouteImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => authLayoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard/': typeof authLayoutDashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof authLayoutDashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/(auth)/_layout': typeof authLayoutRouteWithChildren
+  '/(auth)/_layout/dashboard/': typeof authLayoutDashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/dashboard'
+  id: '__root__' | '/' | '/(auth)/_layout' | '/(auth)/_layout/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  authLayoutRoute: typeof authLayoutRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +65,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/(auth)/_layout': {
+      id: '/(auth)/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authLayoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(auth)/_layout/dashboard/': {
+      id: '/(auth)/_layout/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof authLayoutDashboardIndexRouteImport
+      parentRoute: typeof authLayoutRoute
+    }
   }
 }
 
+interface authLayoutRouteChildren {
+  authLayoutDashboardIndexRoute: typeof authLayoutDashboardIndexRoute
+}
+
+const authLayoutRouteChildren: authLayoutRouteChildren = {
+  authLayoutDashboardIndexRoute: authLayoutDashboardIndexRoute,
+}
+
+const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
+  authLayoutRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  authLayoutRoute: authLayoutRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

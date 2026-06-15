@@ -1,8 +1,8 @@
-import type { AxiosRequestConfig } from "axios";
+import type { InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
 import { COUNTRIES } from "@/lib/constants";
 import { isPlainObject } from "@/lib/validators";
-import { env } from "../config/env";
+import { env } from "../../config/env";
 
 const getBaseUrl = () => {
 	const windowUrl = window.location.host;
@@ -46,11 +46,14 @@ const clearTokensAndLogout = () => {
 	window.location.href = "/login";
 };
 
-const _client = axios.create({
+const $http = axios.create({
 	baseURL: BASE_URL,
+	timeout: 30000,
 	headers: {
 		"Content-Type": "application/json",
+		"Cache-Control": "max-age=604800, must-revalidate",
 	},
+	withCredentials: true,
 });
 
 let isRefreshing = false;
@@ -116,13 +119,11 @@ const isTokenExpiredError = (error: any) => {
 	);
 };
 
-// @ts-ignore
-_client.interceptors.request.use(
-	async (config: any) => {
+$http.interceptors.request.use(
+	async (config: InternalAxiosRequestConfig) => {
 		const { accessToken } = getTokens();
-		// @ts-ignore
-		if (accessToken && shouldUseAccessToken(config.url)) {
-			config.headers["Authorization"] = `JWT ${accessToken}`;
+		if (accessToken && shouldUseAccessToken(config.url as string)) {
+			config.headers.Authorization = `JWT ${accessToken}`;
 		}
 		return config;
 	},
@@ -132,7 +133,7 @@ _client.interceptors.request.use(
 	},
 );
 
-_client.interceptors.response.use(
+$http.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config;
@@ -152,11 +153,9 @@ _client.interceptors.response.use(
 
 					isRefreshing = false;
 					// Retry all queued requests with the new access token
-					failedRequestsQueue.forEach((req) =>
-						req.resolve(_client(req.config)),
-					);
+					failedRequestsQueue.forEach((req) => req.resolve($http(req.config)));
 					failedRequestsQueue = [];
-					return _client(originalRequest); // Retry the original failed request
+					return $http(originalRequest); // Retry the original failed request
 				} catch (refreshError) {
 					isRefreshing = false;
 					// Handle refresh token failure (e.g., logout user)
@@ -186,218 +185,4 @@ _client.interceptors.response.use(
 	},
 );
 
-const GetRequest = async function <T>(
-	url: string,
-	config: AxiosRequestConfig = {},
-): Promise<{ error: any; data: T | null }> {
-	try {
-		const response = await _client.get(url, config);
-		return {
-			error: null,
-			data: response.data as T,
-		};
-	} catch (error) {
-		console.error("Error making GET request:", error);
-		return {
-			error,
-			data: null,
-		};
-	}
-};
-
-const GetBlobRequest = async function (
-	url: string,
-	config: AxiosRequestConfig = {},
-): Promise<{ error: any; data: Blob | null }> {
-	try {
-		const response = await _client.get(url, {
-			...config,
-			responseType: "blob",
-		});
-		return {
-			error: null,
-			data: response.data as Blob,
-		};
-	} catch (error) {
-		console.error("Error making blob GET request:", error);
-		return {
-			error,
-			data: null,
-		};
-	}
-};
-
-const PostBlobRequest = async function (
-	url: string,
-	data: any,
-	config: AxiosRequestConfig = {},
-): Promise<{ error: any; data: Blob | null }> {
-	try {
-		const response = await axios.post(url, data, {
-			...config,
-			headers: {
-				"Content-Type": "application/json",
-				...(config.headers || {}),
-			},
-			responseType: "blob",
-		});
-		return {
-			error: null,
-			data: response.data as Blob,
-		};
-	} catch (error) {
-		console.error("Error making blob POST request:", error);
-		return {
-			error,
-			data: null,
-		};
-	}
-};
-
-const PostRequest = async function <T>(
-	url: string,
-	data: any,
-): Promise<{ error: any; data: T | null }> {
-	try {
-		const response = await _client.post(url, data);
-		return {
-			error: null,
-			data: response.data as T,
-		};
-	} catch (error) {
-		console.error("Error making POST request:", error);
-		return {
-			error,
-			data: null,
-		};
-	}
-};
-
-const PutRequest = async function <T>(
-	url: string,
-	data: any = {},
-	config = {},
-): Promise<{ error: any; data: T | null }> {
-	try {
-		const response = await _client.put(url, data, config);
-		return {
-			error: null,
-			data: response.data as T,
-		};
-	} catch (error) {
-		console.error("Error making POST request:", error);
-		return {
-			error,
-			data: null,
-		};
-	}
-};
-
-const PatchRequest = async function <T>(
-	url: string,
-	data: any = {},
-	config = {},
-): Promise<{ error: any; data: T | null }> {
-	try {
-		const response = await _client.patch(url, data, config);
-		return {
-			error: null,
-			data: response.data as T,
-		};
-	} catch (error) {
-		console.error("Error making POST request:", error);
-		return {
-			error,
-			data: null,
-		};
-	}
-};
-
-const DeleteRequest = async function <T>(
-	url: string,
-): Promise<{ error: any; data: T | null }> {
-	try {
-		const response = await _client.delete(url);
-		return {
-			error: null,
-			data: response.data,
-		};
-	} catch (error) {
-		console.error("Error making DELETE request:", error);
-		return {
-			error,
-			data: null,
-		};
-	}
-};
-
-/**
- * Downloads a file from the server (e.g., Excel, PDF, etc.)
- * @param url - The API endpoint URL
- * @param filename - Optional filename for the downloaded file. If not provided, extracts from Content-Disposition header
- * @returns Promise with error or success status
- */
-const DownloadFileRequest = async function (
-	url: string,
-	filename?: string,
-): Promise<{ error: any; success: boolean }> {
-	try {
-		const response = await _client.get(url, {
-			responseType: "blob", // Important: tells axios to expect binary data
-		});
-
-		// Create a blob from the response data
-		const blob = new Blob([response.data], {
-			type: response.headers["content-type"] || "application/octet-stream",
-		});
-
-		// Extract filename from Content-Disposition header if not provided
-		let downloadFilename = filename;
-		if (!downloadFilename) {
-			const contentDisposition = response.headers["content-disposition"];
-			if (contentDisposition) {
-				const filenameMatch = contentDisposition.match(
-					/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/,
-				);
-				if (filenameMatch && filenameMatch[1]) {
-					downloadFilename = filenameMatch[1].replace(/['"]/g, "");
-				}
-			}
-		}
-
-		// Fallback filename if none provided or extracted
-		if (!downloadFilename) {
-			const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-			downloadFilename = `download-${timestamp}`;
-		}
-
-		// Create a temporary URL for the blob
-		const downloadUrl = window.URL.createObjectURL(blob);
-
-		// Create a temporary anchor element and trigger the download
-		const link = document.createElement("a");
-		link.href = downloadUrl;
-		link.download = downloadFilename;
-		document.body.appendChild(link);
-		link.click();
-
-		// Clean up
-		document.body.removeChild(link);
-		window.URL.revokeObjectURL(downloadUrl);
-
-		return {
-			error: null,
-			success: true,
-		};
-	} catch (error) {
-		console.error("Error downloading file:", error);
-		return {
-			error,
-			success: false,
-		};
-	}
-};
-
-export const HttpService = {
-	apiClient: _client,
-};
+export default $http;
