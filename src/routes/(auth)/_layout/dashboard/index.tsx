@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Button } from "#/components/ui/button";
 
 export const Route = createFileRoute("/(auth)/_layout/dashboard/")({
 	component: DashboardPage,
@@ -11,6 +12,7 @@ function DashboardPage() {
 			<p className="mt-2 text-muted">
 				Welcome to your authenticated dashboard.
 			</p>
+			<Button>Click me</Button>
 		</div>
 	);
 }

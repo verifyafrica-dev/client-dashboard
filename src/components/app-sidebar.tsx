@@ -6,7 +6,6 @@ import {
 	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
 	SidebarMenuButton,
@@ -23,13 +22,25 @@ const navItems = [
 
 export function AppSidebar() {
 	return (
-		<Sidebar>
-			<SidebarHeader className="border-b border-sidebar-border px-4 py-3">
-				<span className="text-sm font-semibold">VerifyAfrica</span>
+		<Sidebar collapsible="icon">
+			<SidebarHeader className="flex min-h-14 max-h-14 items-center border-b border-sidebar-border px-4 py-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
+				<picture className="group-data-[collapsible=icon]:hidden">
+					<img
+						src="/assets/brand/logo.svg"
+						alt="VerifyAfrica"
+						className="h-12 w-auto"
+					/>
+				</picture>
+				<picture className="hidden group-data-[collapsible=icon]:block">
+					<img
+						src="/assets/brand/logo-square.svg"
+						alt="VerifyAfrica"
+						className="size-8"
+					/>
+				</picture>
 			</SidebarHeader>
 			<SidebarContent>
 				<SidebarGroup>
-					<SidebarGroupLabel>Navigation</SidebarGroupLabel>
 					<SidebarGroupContent>
 						<SidebarMenu>
 							{navItems.map((item) => (
