@@ -33,7 +33,18 @@
   --card-foreground: oklch(0.141 0.005 285.823);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.141 0.005 285.823);
-  --primary: oklch(0.21 0.006 285.885);
+  --teal-50: oklch(0.9818 0.0085 188.12);
+  --teal-100: oklch(0.9607 0.0171 187.90);
+  --teal-200: oklch(0.9247 0.0341 185.19);
+  --teal-300: oklch(0.8494 0.0651 185.02);
+  --teal-400: oklch(0.7458 0.1037 183.26);
+  --teal-500: oklch(0.6556 0.1186 178.87);
+  --teal-600: oklch(0.5826 0.1052 178.82);
+  --teal-700: oklch(0.5072 0.0914 178.78);
+  --teal-800: oklch(0.4261 0.0759 179.69);
+  --teal-900: oklch(0.3440 0.0605 179.84);
+
+  --primary: var(--teal-500);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.967 0.001 286.375);
   --secondary-foreground: oklch(0.21 0.006 285.885);
@@ -155,6 +166,16 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-teal-50: var(--teal-50);
+  --color-teal-100: var(--teal-100);
+  --color-teal-200: var(--teal-200);
+  --color-teal-300: var(--teal-300);
+  --color-teal-400: var(--teal-400);
+  --color-teal-500: var(--teal-500);
+  --color-teal-600: var(--teal-600);
+  --color-teal-700: var(--teal-700);
+  --color-teal-800: var(--teal-800);
+  --color-teal-900: var(--teal-900);
 }
 
 html,
