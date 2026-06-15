@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as authLayoutRouteImport } from './routes/(auth)/_layout'
 import { Route as authLayoutDashboardIndexRouteImport } from './routes/(auth)/_layout/dashboard/index'
+import { Route as authLayoutDashboardTeamIndexRouteImport } from './routes/(auth)/_layout/dashboard/team/index'
 import { Route as authLayoutDashboardProfileIndexRouteImport } from './routes/(auth)/_layout/dashboard/profile/index'
 import { Route as authLayoutDashboardProductsIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/index'
 import { Route as authLayoutDashboardProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/risk-assessment/index'
@@ -37,6 +38,12 @@ const authLayoutDashboardIndexRoute =
   authLayoutDashboardIndexRouteImport.update({
     id: '/dashboard/',
     path: '/dashboard/',
+    getParentRoute: () => authLayoutRoute,
+  } as any)
+const authLayoutDashboardTeamIndexRoute =
+  authLayoutDashboardTeamIndexRouteImport.update({
+    id: '/dashboard/team/',
+    path: '/dashboard/team/',
     getParentRoute: () => authLayoutRoute,
   } as any)
 const authLayoutDashboardProfileIndexRoute =
@@ -111,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof authLayoutDashboardIndexRoute
   '/dashboard/products/': typeof authLayoutDashboardProductsIndexRoute
   '/dashboard/profile/': typeof authLayoutDashboardProfileIndexRoute
+  '/dashboard/team/': typeof authLayoutDashboardTeamIndexRoute
   '/dashboard/products/address-verification/': typeof authLayoutDashboardProductsAddressVerificationIndexRoute
   '/dashboard/products/aml-screening/': typeof authLayoutDashboardProductsAmlScreeningIndexRoute
   '/dashboard/products/business-aml-screening/': typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -126,6 +134,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof authLayoutDashboardIndexRoute
   '/dashboard/products': typeof authLayoutDashboardProductsIndexRoute
   '/dashboard/profile': typeof authLayoutDashboardProfileIndexRoute
+  '/dashboard/team': typeof authLayoutDashboardTeamIndexRoute
   '/dashboard/products/address-verification': typeof authLayoutDashboardProductsAddressVerificationIndexRoute
   '/dashboard/products/aml-screening': typeof authLayoutDashboardProductsAmlScreeningIndexRoute
   '/dashboard/products/business-aml-screening': typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -143,6 +152,7 @@ export interface FileRoutesById {
   '/(auth)/_layout/dashboard/': typeof authLayoutDashboardIndexRoute
   '/(auth)/_layout/dashboard/products/': typeof authLayoutDashboardProductsIndexRoute
   '/(auth)/_layout/dashboard/profile/': typeof authLayoutDashboardProfileIndexRoute
+  '/(auth)/_layout/dashboard/team/': typeof authLayoutDashboardTeamIndexRoute
   '/(auth)/_layout/dashboard/products/address-verification/': typeof authLayoutDashboardProductsAddressVerificationIndexRoute
   '/(auth)/_layout/dashboard/products/aml-screening/': typeof authLayoutDashboardProductsAmlScreeningIndexRoute
   '/(auth)/_layout/dashboard/products/business-aml-screening/': typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/dashboard/products/'
     | '/dashboard/profile/'
+    | '/dashboard/team/'
     | '/dashboard/products/address-verification/'
     | '/dashboard/products/aml-screening/'
     | '/dashboard/products/business-aml-screening/'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dashboard/products'
     | '/dashboard/profile'
+    | '/dashboard/team'
     | '/dashboard/products/address-verification'
     | '/dashboard/products/aml-screening'
     | '/dashboard/products/business-aml-screening'
@@ -191,6 +203,7 @@ export interface FileRouteTypes {
     | '/(auth)/_layout/dashboard/'
     | '/(auth)/_layout/dashboard/products/'
     | '/(auth)/_layout/dashboard/profile/'
+    | '/(auth)/_layout/dashboard/team/'
     | '/(auth)/_layout/dashboard/products/address-verification/'
     | '/(auth)/_layout/dashboard/products/aml-screening/'
     | '/(auth)/_layout/dashboard/products/business-aml-screening/'
@@ -228,6 +241,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof authLayoutDashboardIndexRouteImport
+      parentRoute: typeof authLayoutRoute
+    }
+    '/(auth)/_layout/dashboard/team/': {
+      id: '/(auth)/_layout/dashboard/team/'
+      path: '/dashboard/team'
+      fullPath: '/dashboard/team/'
+      preLoaderRoute: typeof authLayoutDashboardTeamIndexRouteImport
       parentRoute: typeof authLayoutRoute
     }
     '/(auth)/_layout/dashboard/profile/': {
@@ -314,6 +334,7 @@ interface authLayoutRouteChildren {
   authLayoutDashboardIndexRoute: typeof authLayoutDashboardIndexRoute
   authLayoutDashboardProductsIndexRoute: typeof authLayoutDashboardProductsIndexRoute
   authLayoutDashboardProfileIndexRoute: typeof authLayoutDashboardProfileIndexRoute
+  authLayoutDashboardTeamIndexRoute: typeof authLayoutDashboardTeamIndexRoute
   authLayoutDashboardProductsAddressVerificationIndexRoute: typeof authLayoutDashboardProductsAddressVerificationIndexRoute
   authLayoutDashboardProductsAmlScreeningIndexRoute: typeof authLayoutDashboardProductsAmlScreeningIndexRoute
   authLayoutDashboardProductsBusinessAmlScreeningIndexRoute: typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -329,6 +350,7 @@ const authLayoutRouteChildren: authLayoutRouteChildren = {
   authLayoutDashboardIndexRoute: authLayoutDashboardIndexRoute,
   authLayoutDashboardProductsIndexRoute: authLayoutDashboardProductsIndexRoute,
   authLayoutDashboardProfileIndexRoute: authLayoutDashboardProfileIndexRoute,
+  authLayoutDashboardTeamIndexRoute: authLayoutDashboardTeamIndexRoute,
   authLayoutDashboardProductsAddressVerificationIndexRoute:
     authLayoutDashboardProductsAddressVerificationIndexRoute,
   authLayoutDashboardProductsAmlScreeningIndexRoute:
