@@ -29,12 +29,7 @@ import {
 } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
-import {
-	Tabs,
-	TabsContent,
-	TabsList,
-	TabsTrigger,
-} from "#/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 
 export const Route = createFileRoute("/(auth)/_layout/dashboard/profile/")({
 	component: ProfilePage,
@@ -256,7 +251,7 @@ function ProfilePage() {
 				</CardDescription>
 			</CardHeader>
 			<CardContent>
-				<Tabs defaultValue="profile" className="flex w-full flex-col gap-4">
+				<Tabs defaultValue="profile" className="flex w-full flex-col gap-6">
 					<TabsList>
 						<TabsTrigger value="profile">
 							<UserIcon />

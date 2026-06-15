@@ -4,7 +4,7 @@ import {
 	SquaresFourIcon,
 	UserCircleIcon,
 } from "@phosphor-icons/react";
-import { Link, useRouterState } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import type { ComponentType, SVGProps } from "react";
 import {
 	Sidebar,
@@ -38,24 +38,6 @@ const navItems = [
 	},
 ] as const;
 
-function normalizePath(path: string) {
-	return path.replace(/\/$/, "") || "/";
-}
-
-function isNavItemActive(
-	pathname: string,
-	item: { to: string; isExact?: boolean },
-) {
-	const currentPath = normalizePath(pathname);
-	const itemPath = normalizePath(item.to);
-
-	if (item.isExact) {
-		return currentPath === itemPath;
-	}
-
-	return currentPath === itemPath || currentPath.startsWith(`${itemPath}/`);
-}
-
 function SidebarNavItem({
 	item,
 }: {
@@ -66,28 +48,25 @@ function SidebarNavItem({
 		isExact?: boolean;
 	};
 }) {
-	const pathname = useRouterState({
-		select: (state) => state.location.pathname,
-	});
-	const isActive = isNavItemActive(pathname, item);
-
 	return (
 		<SidebarMenuItem>
 			<SidebarMenuButton
 				asChild
-				isActive={isActive}
 				className={cn(
-					isActive
-						? "bg-sidebar-accent font-medium text-sidebar-accent-foreground hover:bg-sidebar-accent"
-						: "bg-transparent hover:bg-transparent active:bg-transparent",
+					"bg-transparent hover:bg-transparent active:bg-transparent",
+					"aria-[current=page]:bg-sidebar-accent aria-[current=page]:font-medium aria-[current=page]:text-sidebar-accent-foreground aria-[current=page]:hover:bg-sidebar-accent",
 				)}
 			>
 				<Link
 					to={item.to}
 					activeOptions={item.isExact ? { exact: true } : undefined}
 				>
-					<item.icon weight={isActive ? "bold" : "regular"} />
-					<span className="font-medium">{item.title}</span>
+					{({ isActive }) => (
+						<>
+							<item.icon weight={isActive ? "bold" : "regular"} />
+							<span className="font-medium">{item.title}</span>
+						</>
+					)}
 				</Link>
 			</SidebarMenuButton>
 		</SidebarMenuItem>
