@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap');
+@import "@fontsource-variable/outfit";
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
 
@@ -17,7 +17,7 @@
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.955 0.012 178.9);
   --secondary-foreground: oklch(0.25 0.059 178.9);
-  --muted: oklch(0.57 0 0);
+  --muted: oklch(0.97 0.002 178.9);
   --muted-foreground: oklch(0.52 0.024 178.9);
   --accent: oklch(0.965 0.004 178.9);
   --accent-foreground: oklch(0.25 0.036 178.9);
@@ -39,7 +39,6 @@
   --sidebar-accent-foreground: oklch(0.25 0.036 178.9);
   --sidebar-border: oklch(0.925 0.006 178.9);
   --sidebar-ring: oklch(0.925 0.006 178.9);
-  --font-sans: "Geist", sans-serif;
   --font-heading: "Prata", sans-serif;
   --radius: 0.75rem;
   --shadow-2xs: 0 1px 0 0 oklch(0.55 0.018 178.9 / 0.05);
@@ -94,8 +93,8 @@
 }
 
 @theme inline {
-  --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
-   --color-background: var(--background);
+  --font-sans: "Outfit Variable", sans-serif;
+  --font-heading: "Prata", sans-serif;
   --color-foreground: var(--foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
@@ -136,9 +135,7 @@
   --color-teal-700: var(--teal-700);
   --color-teal-800: var(--teal-800);
   --color-teal-900: var(--teal-900);
-  --font-sans: var(--font-sans);
-  --font-heading: var(--font-heading);
-  --font-mono: var(--font-mono);
+  --color-background: var(--background);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -336,6 +333,7 @@ a {
     @apply border-border outline-ring/50;
   }
   body {
+    @apply font-sans;
     background-color: var(--background);
     color: var(--foreground);
   }
