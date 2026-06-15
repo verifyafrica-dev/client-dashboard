@@ -2,6 +2,7 @@ import {
 	HouseIcon,
 	type IconWeight,
 	SquaresFourIcon,
+	UserCircleIcon,
 } from "@phosphor-icons/react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ComponentType, SVGProps } from "react";
@@ -29,6 +30,11 @@ const navItems = [
 		title: "Products",
 		to: "/dashboard/products",
 		icon: SquaresFourIcon,
+	},
+	{
+		title: "Profile",
+		to: "/dashboard/profile",
+		icon: UserCircleIcon,
 	},
 ] as const;
 

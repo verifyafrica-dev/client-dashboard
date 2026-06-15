@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as authLayoutRouteImport } from './routes/(auth)/_layout'
 import { Route as authLayoutDashboardIndexRouteImport } from './routes/(auth)/_layout/dashboard/index'
+import { Route as authLayoutDashboardProfileIndexRouteImport } from './routes/(auth)/_layout/dashboard/profile/index'
 import { Route as authLayoutDashboardProductsIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/index'
 import { Route as authLayoutDashboardProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/risk-assessment/index'
 import { Route as authLayoutDashboardProductsKybIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/kyb/index'
@@ -36,6 +37,12 @@ const authLayoutDashboardIndexRoute =
   authLayoutDashboardIndexRouteImport.update({
     id: '/dashboard/',
     path: '/dashboard/',
+    getParentRoute: () => authLayoutRoute,
+  } as any)
+const authLayoutDashboardProfileIndexRoute =
+  authLayoutDashboardProfileIndexRouteImport.update({
+    id: '/dashboard/profile/',
+    path: '/dashboard/profile/',
     getParentRoute: () => authLayoutRoute,
   } as any)
 const authLayoutDashboardProductsIndexRoute =
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard/': typeof authLayoutDashboardIndexRoute
   '/dashboard/products/': typeof authLayoutDashboardProductsIndexRoute
+  '/dashboard/profile/': typeof authLayoutDashboardProfileIndexRoute
   '/dashboard/products/address-verification/': typeof authLayoutDashboardProductsAddressVerificationIndexRoute
   '/dashboard/products/aml-screening/': typeof authLayoutDashboardProductsAmlScreeningIndexRoute
   '/dashboard/products/business-aml-screening/': typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -117,6 +125,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof authLayoutDashboardIndexRoute
   '/dashboard/products': typeof authLayoutDashboardProductsIndexRoute
+  '/dashboard/profile': typeof authLayoutDashboardProfileIndexRoute
   '/dashboard/products/address-verification': typeof authLayoutDashboardProductsAddressVerificationIndexRoute
   '/dashboard/products/aml-screening': typeof authLayoutDashboardProductsAmlScreeningIndexRoute
   '/dashboard/products/business-aml-screening': typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -133,6 +142,7 @@ export interface FileRoutesById {
   '/(auth)/_layout': typeof authLayoutRouteWithChildren
   '/(auth)/_layout/dashboard/': typeof authLayoutDashboardIndexRoute
   '/(auth)/_layout/dashboard/products/': typeof authLayoutDashboardProductsIndexRoute
+  '/(auth)/_layout/dashboard/profile/': typeof authLayoutDashboardProfileIndexRoute
   '/(auth)/_layout/dashboard/products/address-verification/': typeof authLayoutDashboardProductsAddressVerificationIndexRoute
   '/(auth)/_layout/dashboard/products/aml-screening/': typeof authLayoutDashboardProductsAmlScreeningIndexRoute
   '/(auth)/_layout/dashboard/products/business-aml-screening/': typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard/'
     | '/dashboard/products/'
+    | '/dashboard/profile/'
     | '/dashboard/products/address-verification/'
     | '/dashboard/products/aml-screening/'
     | '/dashboard/products/business-aml-screening/'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dashboard'
     | '/dashboard/products'
+    | '/dashboard/profile'
     | '/dashboard/products/address-verification'
     | '/dashboard/products/aml-screening'
     | '/dashboard/products/business-aml-screening'
@@ -178,6 +190,7 @@ export interface FileRouteTypes {
     | '/(auth)/_layout'
     | '/(auth)/_layout/dashboard/'
     | '/(auth)/_layout/dashboard/products/'
+    | '/(auth)/_layout/dashboard/profile/'
     | '/(auth)/_layout/dashboard/products/address-verification/'
     | '/(auth)/_layout/dashboard/products/aml-screening/'
     | '/(auth)/_layout/dashboard/products/business-aml-screening/'
@@ -215,6 +228,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard/'
       preLoaderRoute: typeof authLayoutDashboardIndexRouteImport
+      parentRoute: typeof authLayoutRoute
+    }
+    '/(auth)/_layout/dashboard/profile/': {
+      id: '/(auth)/_layout/dashboard/profile/'
+      path: '/dashboard/profile'
+      fullPath: '/dashboard/profile/'
+      preLoaderRoute: typeof authLayoutDashboardProfileIndexRouteImport
       parentRoute: typeof authLayoutRoute
     }
     '/(auth)/_layout/dashboard/products/': {
@@ -293,6 +313,7 @@ declare module '@tanstack/react-router' {
 interface authLayoutRouteChildren {
   authLayoutDashboardIndexRoute: typeof authLayoutDashboardIndexRoute
   authLayoutDashboardProductsIndexRoute: typeof authLayoutDashboardProductsIndexRoute
+  authLayoutDashboardProfileIndexRoute: typeof authLayoutDashboardProfileIndexRoute
   authLayoutDashboardProductsAddressVerificationIndexRoute: typeof authLayoutDashboardProductsAddressVerificationIndexRoute
   authLayoutDashboardProductsAmlScreeningIndexRoute: typeof authLayoutDashboardProductsAmlScreeningIndexRoute
   authLayoutDashboardProductsBusinessAmlScreeningIndexRoute: typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -307,6 +328,7 @@ interface authLayoutRouteChildren {
 const authLayoutRouteChildren: authLayoutRouteChildren = {
   authLayoutDashboardIndexRoute: authLayoutDashboardIndexRoute,
   authLayoutDashboardProductsIndexRoute: authLayoutDashboardProductsIndexRoute,
+  authLayoutDashboardProfileIndexRoute: authLayoutDashboardProfileIndexRoute,
   authLayoutDashboardProductsAddressVerificationIndexRoute:
     authLayoutDashboardProductsAddressVerificationIndexRoute,
   authLayoutDashboardProductsAmlScreeningIndexRoute:
