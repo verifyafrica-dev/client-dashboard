@@ -3,7 +3,7 @@ import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { PRODUCTS } from "./-data";
 
-export const Route = createFileRoute("/(auth)/_layout/products/")({
+export const Route = createFileRoute("/(auth)/_layout/dashboard/products/")({
 	component: ProductsPage,
 });
 
@@ -34,7 +34,9 @@ function ProductsPage() {
 									</p>
 								</div>
 								<Button variant="outline" className="w-full" asChild>
-									<Link to={`/products/${product.slug}`}>Get Started</Link>
+									<Link to={`/dashboard/products/${product.slug}`}>
+										Get Started
+									</Link>
 								</Button>
 							</CardContent>
 						</Card>

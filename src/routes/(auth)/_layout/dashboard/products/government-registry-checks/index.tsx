@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ProductDetailPage } from "../-components";
 
 export const Route = createFileRoute(
-	"/(auth)/_layout/products/government-registry-checks/",
+	"/(auth)/_layout/dashboard/products/government-registry-checks/",
 )({
 	component: GovernmentRegistryChecksPage,
 });

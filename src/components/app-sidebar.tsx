@@ -1,5 +1,6 @@
 import { HouseIcon, SquaresFourIcon } from "@phosphor-icons/react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
+import type { ComponentType } from "react";
 import {
 	Sidebar,
 	SidebarContent,
@@ -11,19 +12,77 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "#/components/ui/sidebar";
+import { cn } from "#/lib/utils.ts";
 
 const navItems = [
 	{
 		title: "Dashboard",
 		to: "/dashboard",
 		icon: HouseIcon,
+		isExact: true,
 	},
 	{
 		title: "Products",
-		to: "/products",
+		to: "/dashboard/products",
 		icon: SquaresFourIcon,
 	},
 ] as const;
+
+function normalizePath(path: string) {
+	return path.replace(/\/$/, "") || "/";
+}
+
+function isNavItemActive(
+	pathname: string,
+	item: { to: string; isExact?: boolean },
+) {
+	const currentPath = normalizePath(pathname);
+	const itemPath = normalizePath(item.to);
+
+	if (item.isExact) {
+		return currentPath === itemPath;
+	}
+
+	return currentPath === itemPath || currentPath.startsWith(`${itemPath}/`);
+}
+
+function SidebarNavItem({
+	item,
+}: {
+	item: {
+		title: string;
+		to: (typeof navItems)[number]["to"];
+		icon: ComponentType<{ className?: string }>;
+		isExact?: boolean;
+	};
+}) {
+	const pathname = useRouterState({
+		select: (state) => state.location.pathname,
+	});
+	const isActive = isNavItemActive(pathname, item);
+
+	return (
+		<SidebarMenuItem>
+			<SidebarMenuButton
+				asChild
+				isActive={isActive}
+				className={cn(
+					isActive
+						? "bg-sidebar-accent font-medium text-sidebar-accent-foreground hover:bg-sidebar-accent"
+						: "bg-transparent hover:bg-transparent active:bg-transparent",
+				)}
+			>
+				<Link
+					to={item.to}
+					activeOptions={item.isExact ? { exact: true } : undefined}
+				>
+					<item.icon />
+					<span>{item.title}</span>
+				</Link>
+			</SidebarMenuButton>
+		</SidebarMenuItem>
+	);
+}
 
 export function AppSidebar() {
 	return (
@@ -49,14 +108,7 @@ export function AppSidebar() {
 					<SidebarGroupContent>
 						<SidebarMenu>
 							{navItems.map((item) => (
-								<SidebarMenuItem key={item.to}>
-									<SidebarMenuButton asChild>
-										<Link to={item.to}>
-											<item.icon />
-											<span>{item.title}</span>
-										</Link>
-									</SidebarMenuButton>
-								</SidebarMenuItem>
+								<SidebarNavItem key={item.to} item={item} />
 							))}
 						</SidebarMenu>
 					</SidebarGroupContent>

@@ -16,7 +16,7 @@ export function ProductDetailPage({ slug }: { slug: ProductSlug }) {
 	return (
 		<div className="flex flex-col gap-6">
 			<Button variant="ghost" className="w-fit px-4" asChild>
-				<Link to="/products">
+				<Link to="/dashboard/products">
 					<ArrowLeftIcon />
 					Back to Products
 				</Link>

@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ProductDetailPage } from "../-components";
 
 export const Route = createFileRoute(
-	"/(auth)/_layout/products/risk-assessment/",
+	"/(auth)/_layout/dashboard/products/risk-assessment/",
 )({
 	component: RiskAssessmentPage,
 });

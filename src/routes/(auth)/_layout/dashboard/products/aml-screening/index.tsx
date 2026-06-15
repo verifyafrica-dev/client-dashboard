@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ProductDetailPage } from "../-components";
 
-export const Route = createFileRoute("/(auth)/_layout/products/aml-screening/")({
+export const Route = createFileRoute("/(auth)/_layout/dashboard/products/aml-screening/")({
 	component: AmlScreeningPage,
 });
 

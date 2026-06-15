@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ProductDetailPage } from "../-components";
 
 export const Route = createFileRoute(
-	"/(auth)/_layout/products/document-verification/",
+	"/(auth)/_layout/dashboard/products/document-verification/",
 )({
 	component: DocumentVerificationPage,
 });
