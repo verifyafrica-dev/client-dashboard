@@ -16,6 +16,7 @@
     "check": "biome check"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
     "@posthog/react": "^1.7.0",
     "@tailwindcss/vite": "^4.1.18",
     "@tanstack/react-devtools": "latest",
@@ -29,7 +30,7 @@
     "@tanstack/router-plugin": "^1.132.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.18.0",
     "posthog-js": "^1.358.1",
     "radix-ui": "^1.5.0",
     "react": "^19.2.0",
