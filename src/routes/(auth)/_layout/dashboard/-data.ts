@@ -76,14 +76,6 @@ const typeData: Record<TimeRange, VerificationTypePoint[]> = {
 	],
 };
 
-export function getTrendData(range: TimeRange) {
-	return trendData[range];
-}
-
-export function getTypeData(range: TimeRange) {
-	return typeData[range];
-}
-
 export function getDashboardStats(range: TimeRange) {
 	const trends = getTrendData(range);
 	const types = getTypeData(range);
@@ -135,5 +127,30 @@ export function getDashboardStats(range: TimeRange) {
 		creditsUsed: creditsByRange[range],
 		refunds: refundsByRange[range],
 		typesTotal: types.reduce((sum, point) => sum + point.count, 0),
+	};
+}
+
+export type DashboardData = {
+	stats: ReturnType<typeof getDashboardStats>;
+	trendData: TrendPoint[];
+	typeData: VerificationTypePoint[];
+};
+
+export function getTrendData(range: TimeRange) {
+	return trendData[range];
+}
+
+export function getTypeData(range: TimeRange) {
+	return typeData[range];
+}
+
+export async function fetchDashboardData(
+	range: TimeRange,
+): Promise<DashboardData> {
+	// Replace with a real API call when the dashboard endpoint is available.
+	return {
+		stats: getDashboardStats(range),
+		trendData: getTrendData(range),
+		typeData: getTypeData(range),
 	};
 }

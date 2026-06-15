@@ -7,6 +7,7 @@ import {
 	LightningIcon,
 	TrendUpIcon,
 } from "@phosphor-icons/react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ComponentType } from "react";
 import { useState } from "react";
@@ -14,9 +15,10 @@ import {
 	Area,
 	AreaChart,
 	CartesianGrid,
-	Cell,
 	Pie,
 	PieChart,
+	type PieSectorShapeProps,
+	Sector,
 	XAxis,
 } from "recharts";
 import { Button } from "#/components/ui/button";
@@ -34,11 +36,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
+import { Skeleton } from "#/components/ui/skeleton";
 import { cn } from "#/lib/utils.ts";
 import {
-	getDashboardStats,
-	getTrendData,
-	getTypeData,
+	type DashboardData,
+	fetchDashboardData,
 	TIME_RANGE_OPTIONS,
 	type TimeRange,
 } from "./-data";
@@ -64,6 +66,11 @@ const typeChartConfig = {
 	faceMatch: { label: "Face Match", color: "var(--chart-3)" },
 	address: { label: "Address", color: "var(--chart-4)" },
 } satisfies ChartConfig;
+
+function VerificationTypeSector(props: PieSectorShapeProps) {
+	const type = String(props.payload?.type ?? "");
+	return <Sector {...props} fill={`var(--color-${type})`} />;
+}
 
 function formatCurrency(value: number) {
 	return new Intl.NumberFormat("en-NG", {
@@ -104,47 +111,126 @@ function MetricCard({
 	);
 }
 
-function DashboardPage() {
-	const [timeRange, setTimeRange] = useState<TimeRange>("all");
-	const [refreshKey, setRefreshKey] = useState(0);
-
-	const stats = getDashboardStats(timeRange);
-	const trendData = getTrendData(timeRange);
-	const typeData = getTypeData(timeRange);
-	const chartKey = `${timeRange}-${refreshKey}`;
-
+function MetricCardSkeleton() {
 	return (
-		<div className="flex flex-col gap-6">
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-				<div>
-					<h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-					<p className="mt-1 text-sm text-muted-foreground">
-						Welcome back! Here&apos;s your verification overview.
-					</p>
+		<Card>
+			<CardContent className="flex flex-col gap-3">
+				<Skeleton className="size-10 rounded-xl" />
+				<div className="space-y-2">
+					<Skeleton className="h-8 w-20" />
+					<Skeleton className="h-4 w-36" />
 				</div>
-				<div className="flex items-center gap-2">
-					<Select
-						value={timeRange}
-						onValueChange={(value) => setTimeRange(value as TimeRange)}
-					>
-						<SelectTrigger className="w-[160px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							{TIME_RANGE_OPTIONS.map((option) => (
-								<SelectItem key={option.value} value={option.value}>
-									{option.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					<Button onClick={() => setRefreshKey((key) => key + 1)}>
-						<ArrowClockwiseIcon />
-						Refresh
-					</Button>
-				</div>
-			</div>
+			</CardContent>
+		</Card>
+	);
+}
 
+function VerificationTrendsSkeleton() {
+	return (
+		<Card>
+			<CardHeader className="flex flex-row items-center justify-between space-y-0">
+				<Skeleton className="h-5 w-36" />
+				<div className="flex items-center gap-4">
+					<Skeleton className="h-3 w-12" />
+					<Skeleton className="h-3 w-16" />
+				</div>
+			</CardHeader>
+			<CardContent>
+				<Skeleton className="h-[280px] w-full rounded-xl" />
+			</CardContent>
+		</Card>
+	);
+}
+
+function VerificationTypesSkeleton() {
+	return (
+		<Card>
+			<CardHeader>
+				<Skeleton className="h-5 w-36" />
+			</CardHeader>
+			<CardContent>
+				<div className="mx-auto flex h-[280px] w-full max-w-[320px] items-center justify-center">
+					<Skeleton className="size-[200px] rounded-full" />
+				</div>
+				<div className="mt-4 grid grid-cols-2 gap-2">
+					{["id", "passport", "faceMatch", "address"].map((type) => (
+						<div key={type} className="flex items-center justify-between gap-2">
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-4 w-10" />
+						</div>
+					))}
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+function FinancialSummarySkeleton() {
+	return (
+		<Card>
+			<CardHeader>
+				<Skeleton className="h-5 w-52" />
+			</CardHeader>
+			<CardContent>
+				<div className="grid gap-6 sm:grid-cols-3">
+					<div className="flex flex-col items-center gap-2 text-center">
+						<Skeleton className="size-12 rounded-full" />
+						<Skeleton className="h-8 w-24" />
+						<Skeleton className="h-4 w-28" />
+						<Skeleton className="h-3 w-32" />
+					</div>
+					<div className="flex flex-col items-center gap-2 text-center">
+						<Skeleton className="size-12 rounded-full" />
+						<Skeleton className="h-8 w-16" />
+						<Skeleton className="h-4 w-24" />
+					</div>
+					<div className="flex flex-col items-center gap-2 text-center">
+						<Skeleton className="size-12 rounded-full" />
+						<Skeleton className="h-8 w-24" />
+						<Skeleton className="h-4 w-28" />
+						<Skeleton className="h-3 w-32" />
+					</div>
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+function DashboardMetricsSkeleton() {
+	return (
+		<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+			{["total", "success", "topups", "credits"].map((metric) => (
+				<MetricCardSkeleton key={metric} />
+			))}
+		</div>
+	);
+}
+
+function DashboardContentSkeleton() {
+	return (
+		<>
+			<DashboardMetricsSkeleton />
+			<div className="grid gap-4 lg:grid-cols-2">
+				<VerificationTrendsSkeleton />
+				<VerificationTypesSkeleton />
+			</div>
+			<FinancialSummarySkeleton />
+		</>
+	);
+}
+
+type DashboardContentProps = DashboardData & {
+	chartKey: string;
+};
+
+function DashboardContent({
+	stats,
+	trendData,
+	typeData,
+	chartKey,
+}: DashboardContentProps) {
+	return (
+		<>
 			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
 				<MetricCard
 					icon={ActivityIcon}
@@ -245,14 +331,8 @@ function DashboardPage() {
 									innerRadius={60}
 									outerRadius={100}
 									paddingAngle={2}
-								>
-									{typeData.map((entry) => (
-										<Cell
-											key={entry.type}
-											fill={`var(--color-${entry.type})`}
-										/>
-									))}
-								</Pie>
+									shape={VerificationTypeSector}
+								/>
 							</PieChart>
 						</ChartContainer>
 						<div className="mt-4 grid grid-cols-2 gap-2">
@@ -323,6 +403,70 @@ function DashboardPage() {
 					</div>
 				</CardContent>
 			</Card>
+		</>
+	);
+}
+
+function DashboardPage() {
+	const [timeRange, setTimeRange] = useState<TimeRange>("all");
+	const [refreshKey, setRefreshKey] = useState(0);
+
+	const { data, isPending, isFetching } = useQuery({
+		queryKey: ["dashboard", timeRange, refreshKey],
+		queryFn: () => fetchDashboardData(timeRange),
+	});
+
+	const isLoading = isPending || isFetching;
+	const chartKey = `${timeRange}-${refreshKey}`;
+
+	return (
+		<div className="flex flex-col gap-6">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+				<div>
+					<h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+					<p className="mt-1 text-sm text-muted-foreground">
+						Welcome back! Here&apos;s your verification overview.
+					</p>
+				</div>
+				<div className="flex items-center gap-2">
+					<Select
+						value={timeRange}
+						onValueChange={(value) => setTimeRange(value as TimeRange)}
+						disabled={isLoading}
+					>
+						<SelectTrigger className="w-[160px]">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{TIME_RANGE_OPTIONS.map((option) => (
+								<SelectItem key={option.value} value={option.value}>
+									{option.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<Button
+						onClick={() => setRefreshKey((key) => key + 1)}
+						disabled={isLoading}
+					>
+						<ArrowClockwiseIcon
+							className={isLoading ? "animate-spin" : undefined}
+						/>
+						Refresh
+					</Button>
+				</div>
+			</div>
+
+			{isLoading || !data ? (
+				<DashboardContentSkeleton />
+			) : (
+				<DashboardContent
+					stats={data.stats}
+					trendData={data.trendData}
+					typeData={data.typeData}
+					chartKey={chartKey}
+				/>
+			)}
 		</div>
 	);
 }
