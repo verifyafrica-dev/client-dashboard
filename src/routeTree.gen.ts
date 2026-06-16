@@ -21,8 +21,11 @@ import { Route as authAuth_layoutDashboardIndexRouteImport } from './routes/(aut
 import { Route as authAuth_layoutDashboardTeamIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/index'
 import { Route as authAuth_layoutDashboardProfileIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/profile/index'
 import { Route as authAuth_layoutDashboardProductsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/index'
+import { Route as authAuth_layoutDashboardKycIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/kyc/index'
 import { Route as authAuth_layoutDashboardBillingIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/billing/index'
 import { Route as authAuth_layoutDashboardApikeysIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/apikeys/index'
+import { Route as authAuth_layoutDashboardTeamInvitationsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/invitations/index'
+import { Route as authAuth_layoutDashboardTeamActiveUsersIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/active-users/index'
 import { Route as authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/risk-assessment/index'
 import { Route as authAuth_layoutDashboardProductsKybIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/kyb/index'
 import { Route as authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/government-registry-checks/index'
@@ -101,6 +104,12 @@ const authAuth_layoutDashboardProductsIndexRoute =
     path: '/dashboard/products/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
+const authAuth_layoutDashboardKycIndexRoute =
+  authAuth_layoutDashboardKycIndexRouteImport.update({
+    id: '/dashboard/kyc/',
+    path: '/dashboard/kyc/',
+    getParentRoute: () => authAuth_layoutRoute,
+  } as any)
 const authAuth_layoutDashboardBillingIndexRoute =
   authAuth_layoutDashboardBillingIndexRouteImport.update({
     id: '/dashboard/billing/',
@@ -111,6 +120,18 @@ const authAuth_layoutDashboardApikeysIndexRoute =
   authAuth_layoutDashboardApikeysIndexRouteImport.update({
     id: '/dashboard/apikeys/',
     path: '/dashboard/apikeys/',
+    getParentRoute: () => authAuth_layoutRoute,
+  } as any)
+const authAuth_layoutDashboardTeamInvitationsIndexRoute =
+  authAuth_layoutDashboardTeamInvitationsIndexRouteImport.update({
+    id: '/dashboard/team/invitations/',
+    path: '/dashboard/team/invitations/',
+    getParentRoute: () => authAuth_layoutRoute,
+  } as any)
+const authAuth_layoutDashboardTeamActiveUsersIndexRoute =
+  authAuth_layoutDashboardTeamActiveUsersIndexRouteImport.update({
+    id: '/dashboard/team/active-users/',
+    path: '/dashboard/team/active-users/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
 const authAuth_layoutDashboardProductsRiskAssessmentIndexRoute =
@@ -180,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/reset-password/': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
   '/dashboard/apikeys/': typeof authAuth_layoutDashboardApikeysIndexRoute
   '/dashboard/billing/': typeof authAuth_layoutDashboardBillingIndexRoute
+  '/dashboard/kyc/': typeof authAuth_layoutDashboardKycIndexRoute
   '/dashboard/products/': typeof authAuth_layoutDashboardProductsIndexRoute
   '/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
   '/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
@@ -192,6 +214,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/products/government-registry-checks/': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
   '/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
   '/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
+  '/dashboard/team/active-users/': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
+  '/dashboard/team/invitations/': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -203,6 +227,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
   '/dashboard/apikeys': typeof authAuth_layoutDashboardApikeysIndexRoute
   '/dashboard/billing': typeof authAuth_layoutDashboardBillingIndexRoute
+  '/dashboard/kyc': typeof authAuth_layoutDashboardKycIndexRoute
   '/dashboard/products': typeof authAuth_layoutDashboardProductsIndexRoute
   '/dashboard/profile': typeof authAuth_layoutDashboardProfileIndexRoute
   '/dashboard/team': typeof authAuth_layoutDashboardTeamIndexRoute
@@ -215,6 +240,8 @@ export interface FileRoutesByTo {
   '/dashboard/products/government-registry-checks': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
   '/dashboard/products/kyb': typeof authAuth_layoutDashboardProductsKybIndexRoute
   '/dashboard/products/risk-assessment': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
+  '/dashboard/team/active-users': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
+  '/dashboard/team/invitations': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -229,6 +256,7 @@ export interface FileRoutesById {
   '/(unguarded)/_unguarded_layout/reset-password/': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
   '/(auth)/_auth_layout/dashboard/apikeys/': typeof authAuth_layoutDashboardApikeysIndexRoute
   '/(auth)/_auth_layout/dashboard/billing/': typeof authAuth_layoutDashboardBillingIndexRoute
+  '/(auth)/_auth_layout/dashboard/kyc/': typeof authAuth_layoutDashboardKycIndexRoute
   '/(auth)/_auth_layout/dashboard/products/': typeof authAuth_layoutDashboardProductsIndexRoute
   '/(auth)/_auth_layout/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
   '/(auth)/_auth_layout/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
@@ -241,6 +269,8 @@ export interface FileRoutesById {
   '/(auth)/_auth_layout/dashboard/products/government-registry-checks/': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
   '/(auth)/_auth_layout/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
   '/(auth)/_auth_layout/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
+  '/(auth)/_auth_layout/dashboard/team/active-users/': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
+  '/(auth)/_auth_layout/dashboard/team/invitations/': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -254,6 +284,7 @@ export interface FileRouteTypes {
     | '/reset-password/'
     | '/dashboard/apikeys/'
     | '/dashboard/billing/'
+    | '/dashboard/kyc/'
     | '/dashboard/products/'
     | '/dashboard/profile/'
     | '/dashboard/team/'
@@ -266,6 +297,8 @@ export interface FileRouteTypes {
     | '/dashboard/products/government-registry-checks/'
     | '/dashboard/products/kyb/'
     | '/dashboard/products/risk-assessment/'
+    | '/dashboard/team/active-users/'
+    | '/dashboard/team/invitations/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -277,6 +310,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/dashboard/apikeys'
     | '/dashboard/billing'
+    | '/dashboard/kyc'
     | '/dashboard/products'
     | '/dashboard/profile'
     | '/dashboard/team'
@@ -289,6 +323,8 @@ export interface FileRouteTypes {
     | '/dashboard/products/government-registry-checks'
     | '/dashboard/products/kyb'
     | '/dashboard/products/risk-assessment'
+    | '/dashboard/team/active-users'
+    | '/dashboard/team/invitations'
   id:
     | '__root__'
     | '/'
@@ -302,6 +338,7 @@ export interface FileRouteTypes {
     | '/(unguarded)/_unguarded_layout/reset-password/'
     | '/(auth)/_auth_layout/dashboard/apikeys/'
     | '/(auth)/_auth_layout/dashboard/billing/'
+    | '/(auth)/_auth_layout/dashboard/kyc/'
     | '/(auth)/_auth_layout/dashboard/products/'
     | '/(auth)/_auth_layout/dashboard/profile/'
     | '/(auth)/_auth_layout/dashboard/team/'
@@ -314,6 +351,8 @@ export interface FileRouteTypes {
     | '/(auth)/_auth_layout/dashboard/products/government-registry-checks/'
     | '/(auth)/_auth_layout/dashboard/products/kyb/'
     | '/(auth)/_auth_layout/dashboard/products/risk-assessment/'
+    | '/(auth)/_auth_layout/dashboard/team/active-users/'
+    | '/(auth)/_auth_layout/dashboard/team/invitations/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -408,6 +447,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authAuth_layoutDashboardProductsIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
+    '/(auth)/_auth_layout/dashboard/kyc/': {
+      id: '/(auth)/_auth_layout/dashboard/kyc/'
+      path: '/dashboard/kyc'
+      fullPath: '/dashboard/kyc/'
+      preLoaderRoute: typeof authAuth_layoutDashboardKycIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
+    }
     '/(auth)/_auth_layout/dashboard/billing/': {
       id: '/(auth)/_auth_layout/dashboard/billing/'
       path: '/dashboard/billing'
@@ -420,6 +466,20 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/apikeys'
       fullPath: '/dashboard/apikeys/'
       preLoaderRoute: typeof authAuth_layoutDashboardApikeysIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
+    }
+    '/(auth)/_auth_layout/dashboard/team/invitations/': {
+      id: '/(auth)/_auth_layout/dashboard/team/invitations/'
+      path: '/dashboard/team/invitations'
+      fullPath: '/dashboard/team/invitations/'
+      preLoaderRoute: typeof authAuth_layoutDashboardTeamInvitationsIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
+    }
+    '/(auth)/_auth_layout/dashboard/team/active-users/': {
+      id: '/(auth)/_auth_layout/dashboard/team/active-users/'
+      path: '/dashboard/team/active-users'
+      fullPath: '/dashboard/team/active-users/'
+      preLoaderRoute: typeof authAuth_layoutDashboardTeamActiveUsersIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
     '/(auth)/_auth_layout/dashboard/products/risk-assessment/': {
@@ -492,6 +552,7 @@ interface authAuth_layoutRouteChildren {
   authAuth_layoutDashboardIndexRoute: typeof authAuth_layoutDashboardIndexRoute
   authAuth_layoutDashboardApikeysIndexRoute: typeof authAuth_layoutDashboardApikeysIndexRoute
   authAuth_layoutDashboardBillingIndexRoute: typeof authAuth_layoutDashboardBillingIndexRoute
+  authAuth_layoutDashboardKycIndexRoute: typeof authAuth_layoutDashboardKycIndexRoute
   authAuth_layoutDashboardProductsIndexRoute: typeof authAuth_layoutDashboardProductsIndexRoute
   authAuth_layoutDashboardProfileIndexRoute: typeof authAuth_layoutDashboardProfileIndexRoute
   authAuth_layoutDashboardTeamIndexRoute: typeof authAuth_layoutDashboardTeamIndexRoute
@@ -504,6 +565,8 @@ interface authAuth_layoutRouteChildren {
   authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute: typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
   authAuth_layoutDashboardProductsKybIndexRoute: typeof authAuth_layoutDashboardProductsKybIndexRoute
   authAuth_layoutDashboardProductsRiskAssessmentIndexRoute: typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
+  authAuth_layoutDashboardTeamActiveUsersIndexRoute: typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
+  authAuth_layoutDashboardTeamInvitationsIndexRoute: typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
 }
 
 const authAuth_layoutRouteChildren: authAuth_layoutRouteChildren = {
@@ -512,6 +575,7 @@ const authAuth_layoutRouteChildren: authAuth_layoutRouteChildren = {
     authAuth_layoutDashboardApikeysIndexRoute,
   authAuth_layoutDashboardBillingIndexRoute:
     authAuth_layoutDashboardBillingIndexRoute,
+  authAuth_layoutDashboardKycIndexRoute: authAuth_layoutDashboardKycIndexRoute,
   authAuth_layoutDashboardProductsIndexRoute:
     authAuth_layoutDashboardProductsIndexRoute,
   authAuth_layoutDashboardProfileIndexRoute:
@@ -536,6 +600,10 @@ const authAuth_layoutRouteChildren: authAuth_layoutRouteChildren = {
     authAuth_layoutDashboardProductsKybIndexRoute,
   authAuth_layoutDashboardProductsRiskAssessmentIndexRoute:
     authAuth_layoutDashboardProductsRiskAssessmentIndexRoute,
+  authAuth_layoutDashboardTeamActiveUsersIndexRoute:
+    authAuth_layoutDashboardTeamActiveUsersIndexRoute,
+  authAuth_layoutDashboardTeamInvitationsIndexRoute:
+    authAuth_layoutDashboardTeamInvitationsIndexRoute,
 }
 
 const authAuth_layoutRouteWithChildren = authAuth_layoutRoute._addFileChildren(

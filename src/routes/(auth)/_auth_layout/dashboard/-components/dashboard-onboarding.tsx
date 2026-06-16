@@ -1,9 +1,5 @@
-import {
-	ArrowRightIcon,
-	CheckCircleIcon,
-	ShieldCheckIcon,
-	SparkleIcon,
-} from "@phosphor-icons/react";
+import { ArrowRightIcon, CheckCircleIcon, ShieldCheckIcon, SparkleIcon } from "@phosphor-icons/react";
+import { Link } from "@tanstack/react-router";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 
@@ -80,9 +76,14 @@ export function DashboardOnboarding() {
 								</p>
 							</div>
 						</div>
-						<Button className="shrink-0 cursor-pointer bg-[#1a4d47] text-white hover:bg-[#235a54]">
-							Start KYC
-							<ArrowRightIcon className="size-4" weight="bold" />
+						<Button
+							className="shrink-0 cursor-pointer bg-[#1a4d47] text-white hover:bg-[#235a54]"
+							asChild
+						>
+							<Link to="/dashboard/kyc">
+								Start KYC
+								<ArrowRightIcon className="size-4" weight="bold" />
+							</Link>
 						</Button>
 					</div>
 				</div>
