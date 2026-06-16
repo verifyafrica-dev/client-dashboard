@@ -138,3 +138,64 @@ export function formatSignedAmount(amount: number, currency = BALANCE.currency) 
 	const formatted = getCurrencyFormatter(currency).format(Math.abs(amount));
 	return `${sign}${formatted}`;
 }
+
+export const TRANSACTIONS_PAGE_SIZE = 10;
+
+export type BillingFilters = {
+	search: string;
+	type: string;
+	page: number;
+};
+
+export type BillingTransactionsResult = {
+	transactions: Transaction[];
+	total: number;
+	page: number;
+	pageSize: number;
+	totalPages: number;
+};
+
+export type BillingData = {
+	balance: typeof BALANCE;
+	billingInfo: typeof BILLING_INFO;
+	transactions: BillingTransactionsResult;
+};
+
+function filterTransactions(search: string, type: string) {
+	const query = search.trim().toLowerCase();
+
+	return TRANSACTIONS.filter((transaction) => {
+		const matchesType = type === "all" || transaction.type === type;
+		const matchesSearch =
+			query.length === 0 ||
+			transaction.reference.toLowerCase().includes(query) ||
+			transaction.description.toLowerCase().includes(query);
+
+		return matchesType && matchesSearch;
+	});
+}
+
+export async function fetchBillingData(
+	filters: BillingFilters,
+): Promise<BillingData> {
+	// Replace with a real API call when the billing endpoint is available.
+	await new Promise((resolve) => setTimeout(resolve, 600));
+
+	const filtered = filterTransactions(filters.search, filters.type);
+	const total = filtered.length;
+	const totalPages = Math.max(1, Math.ceil(total / TRANSACTIONS_PAGE_SIZE));
+	const page = Math.min(Math.max(filters.page, 1), totalPages);
+	const start = (page - 1) * TRANSACTIONS_PAGE_SIZE;
+
+	return {
+		balance: BALANCE,
+		billingInfo: BILLING_INFO,
+		transactions: {
+			transactions: filtered.slice(start, start + TRANSACTIONS_PAGE_SIZE),
+			total,
+			page,
+			pageSize: TRANSACTIONS_PAGE_SIZE,
+			totalPages,
+		},
+	};
+}

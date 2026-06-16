@@ -6,13 +6,23 @@ import {
 	MagnifyingGlassIcon,
 	PencilSimpleIcon,
 } from "@phosphor-icons/react";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
+import {
+	Pagination,
+	PaginationContent,
+	PaginationEllipsis,
+	PaginationItem,
+	PaginationLink,
+	PaginationNext,
+	PaginationPrevious,
+} from "#/components/ui/pagination";
 import {
 	Select,
 	SelectContent,
@@ -20,6 +30,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
+import { Skeleton } from "#/components/ui/skeleton";
 import {
 	Table,
 	TableBody,
@@ -34,11 +45,10 @@ import { AddCreditsDialog } from "./-components/add-credits-dialog";
 import { TransactionDetailsDialog } from "./-components/transaction-details-dialog";
 import { UpdateBillingDialog } from "./-components/update-billing-dialog";
 import {
-	BALANCE,
-	BILLING_INFO,
+	fetchBillingData,
 	formatMoney,
 	formatSignedAmount,
-	TRANSACTIONS,
+	type BillingData,
 	type Transaction,
 } from "./-data";
 
@@ -46,29 +56,130 @@ export const Route = createFileRoute("/(auth)/_layout/dashboard/billing/")({
 	component: BillingPage,
 });
 
+function BalanceCardSkeleton() {
+	return (
+		<Card>
+			<CardHeader className="flex flex-row items-start justify-between space-y-0">
+				<div className="space-y-3">
+					<Skeleton className="h-4 w-16" />
+					<div className="space-y-2">
+						<Skeleton className="h-10 w-24" />
+						<Skeleton className="h-4 w-10" />
+					</div>
+				</div>
+				<Skeleton className="h-9 w-32" />
+			</CardHeader>
+		</Card>
+	);
+}
+
+function BillingInfoCardSkeleton() {
+	return (
+		<Card>
+			<CardHeader className="flex flex-row items-start justify-between space-y-0">
+				<div className="flex items-center gap-2">
+					<Skeleton className="size-5 rounded-md" />
+					<Skeleton className="h-5 w-36" />
+				</div>
+				<Skeleton className="size-8 rounded-md" />
+			</CardHeader>
+			<CardContent>
+				<div className="space-y-2">
+					<Skeleton className="h-4 w-16" />
+					<Skeleton className="h-4 w-40" />
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+function TransactionsTableSkeleton({ rows = 5 }: { rows?: number }) {
+	const skeletonRows = ["one", "two", "three", "four", "five"].slice(0, rows);
+
+	return (
+		<Table>
+			<TableHeader>
+				<TableRow>
+					<TableHead>Reference</TableHead>
+					<TableHead>Date</TableHead>
+					<TableHead>Description</TableHead>
+					<TableHead>Amount</TableHead>
+					<TableHead>Type</TableHead>
+					<TableHead>Balance Before</TableHead>
+					<TableHead>Balance After</TableHead>
+					<TableHead>Actions</TableHead>
+				</TableRow>
+			</TableHeader>
+			<TableBody>
+				{skeletonRows.map((rowId) => (
+					<TableRow key={`transaction-skeleton-${rowId}`}>
+						<TableCell>
+							<Skeleton className="h-4 w-20" />
+						</TableCell>
+						<TableCell>
+							<Skeleton className="h-4 w-16" />
+						</TableCell>
+						<TableCell>
+							<Skeleton className="h-4 w-28" />
+						</TableCell>
+						<TableCell>
+							<Skeleton className="h-4 w-16" />
+						</TableCell>
+						<TableCell>
+							<Skeleton className="h-6 w-14 rounded-full" />
+						</TableCell>
+						<TableCell>
+							<Skeleton className="h-4 w-16" />
+						</TableCell>
+						<TableCell>
+							<Skeleton className="h-4 w-16" />
+						</TableCell>
+						<TableCell>
+							<Skeleton className="h-8 w-28" />
+						</TableCell>
+					</TableRow>
+				))}
+			</TableBody>
+		</Table>
+	);
+}
+
+function getVisiblePages(
+	currentPage: number,
+	totalPages: number,
+): Array<number | "ellipsis"> {
+	if (totalPages <= 5) {
+		return Array.from({ length: totalPages }, (_, index) => index + 1);
+	}
+
+	if (currentPage <= 3) {
+		return [1, 2, 3, "ellipsis", totalPages];
+	}
+
+	if (currentPage >= totalPages - 2) {
+		return [1, "ellipsis", totalPages - 2, totalPages - 1, totalPages];
+	}
+
+	return [1, "ellipsis", currentPage, "ellipsis", totalPages];
+}
+
 function BillingPage() {
 	const [search, setSearch] = useState("");
 	const [typeFilter, setTypeFilter] = useState("all");
+	const [page, setPage] = useState(1);
+	const [refreshKey, setRefreshKey] = useState(0);
 	const [topupOpen, setTopupOpen] = useState(false);
 	const [billingOpen, setBillingOpen] = useState(false);
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const [selectedTransaction, setSelectedTransaction] =
 		useState<Transaction | null>(null);
 
-	const filteredTransactions = useMemo(() => {
-		const query = search.trim().toLowerCase();
+	const { data, isPending, isFetching } = useQuery<BillingData>({
+		queryKey: ["billing", search, typeFilter, page, refreshKey],
+		queryFn: () => fetchBillingData({ search, type: typeFilter, page }),
+	});
 
-		return TRANSACTIONS.filter((transaction) => {
-			const matchesType =
-				typeFilter === "all" || transaction.type === typeFilter;
-			const matchesSearch =
-				query.length === 0 ||
-				transaction.reference.toLowerCase().includes(query) ||
-				transaction.description.toLowerCase().includes(query);
-
-			return matchesType && matchesSearch;
-		});
-	}, [search, typeFilter]);
+	const isLoading = isPending || isFetching;
 
 	function openTransactionDetails(transaction: Transaction) {
 		setSelectedTransaction(transaction);
@@ -87,57 +198,66 @@ function BillingPage() {
 			</div>
 
 			<div className="grid gap-4 lg:grid-cols-2">
-				<Card>
-					<CardHeader className="flex flex-row items-start justify-between space-y-0">
-						<div className="space-y-3">
-							<p className="text-sm text-muted-foreground">Balance</p>
-							<div>
-								<p className="text-4xl font-semibold tracking-tight">
-									{formatMoney(BALANCE.amount)}
-								</p>
-								<p className="text-sm font-medium text-muted-foreground">
-									{BALANCE.currency}
-								</p>
-							</div>
-						</div>
-						<Button
-							type="button"
-							className="cursor-pointer"
-							onClick={() => setTopupOpen(true)}
-						>
-							Topup Balance
-						</Button>
-					</CardHeader>
-				</Card>
+				{isLoading || !data ? (
+					<>
+						<BalanceCardSkeleton />
+						<BillingInfoCardSkeleton />
+					</>
+				) : (
+					<>
+						<Card>
+							<CardHeader className="flex flex-row items-start justify-between space-y-0">
+								<div className="space-y-3">
+									<p className="text-sm text-muted-foreground">Balance</p>
+									<div>
+										<p className="text-4xl font-semibold tracking-tight">
+											{formatMoney(data.balance.amount)}
+										</p>
+										<p className="text-sm font-medium text-muted-foreground">
+											{data.balance.currency}
+										</p>
+									</div>
+								</div>
+								<Button
+									type="button"
+									className="cursor-pointer"
+									onClick={() => setTopupOpen(true)}
+								>
+									Topup Balance
+								</Button>
+							</CardHeader>
+						</Card>
 
-				<Card>
-					<CardHeader className="flex flex-row items-start justify-between space-y-0">
-						<div className="flex items-center gap-2">
-							<BuildingsIcon className="size-5 text-muted-foreground" />
-							<CardTitle className="text-base font-semibold">
-								Billing Information
-							</CardTitle>
-						</div>
-						<Button
-							type="button"
-							variant="ghost"
-							size="icon-sm"
-							className="cursor-pointer text-primary"
-							onClick={() => setBillingOpen(true)}
-							aria-label="Edit billing information"
-						>
-							<PencilSimpleIcon className="size-4" />
-						</Button>
-					</CardHeader>
-					<CardContent>
-						<div className="space-y-1">
-							<p className="text-sm text-muted-foreground">Address</p>
-							<p className="text-sm font-medium">
-								{BILLING_INFO.displayAddress}
-							</p>
-						</div>
-					</CardContent>
-				</Card>
+						<Card>
+							<CardHeader className="flex flex-row items-start justify-between space-y-0">
+								<div className="flex items-center gap-2">
+									<BuildingsIcon className="size-5 text-muted-foreground" />
+									<CardTitle className="text-base font-semibold">
+										Billing Information
+									</CardTitle>
+								</div>
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon-sm"
+									className="cursor-pointer text-primary"
+									onClick={() => setBillingOpen(true)}
+									aria-label="Edit billing information"
+								>
+									<PencilSimpleIcon className="size-4" />
+								</Button>
+							</CardHeader>
+							<CardContent>
+								<div className="space-y-1">
+									<p className="text-sm text-muted-foreground">Address</p>
+									<p className="text-sm font-medium">
+										{data.billingInfo.displayAddress}
+									</p>
+								</div>
+							</CardContent>
+						</Card>
+					</>
+				)}
 			</div>
 
 			<Card>
@@ -160,15 +280,26 @@ function BillingPage() {
 										<Input
 											placeholder="Search transactions..."
 											value={search}
-											onChange={(event) => setSearch(event.target.value)}
+											onChange={(event) => {
+												setSearch(event.target.value);
+												setPage(1);
+											}}
 											className="pl-9"
+											disabled={isLoading}
 										/>
 									</div>
 									<div className="flex items-center gap-2">
 										<Label htmlFor="type-filter" className="sr-only">
 											Type
 										</Label>
-										<Select value={typeFilter} onValueChange={setTypeFilter}>
+										<Select
+											value={typeFilter}
+											onValueChange={(value) => {
+												setTypeFilter(value);
+												setPage(1);
+											}}
+											disabled={isLoading}
+										>
 											<SelectTrigger id="type-filter" className="w-[140px]">
 												<SelectValue placeholder="Type: All" />
 											</SelectTrigger>
@@ -182,14 +313,20 @@ function BillingPage() {
 											type="button"
 											variant="outline"
 											className="cursor-pointer"
+											disabled={isLoading}
+											onClick={() => setRefreshKey((key) => key + 1)}
 										>
-											<ArrowsClockwiseIcon className="size-4" />
+											<ArrowsClockwiseIcon
+												className={cn(isLoading && "animate-spin")}
+												weight="bold"
+											/>
 											Refresh
 										</Button>
 										<Button
 											type="button"
 											variant="outline"
 											className="cursor-pointer"
+											disabled={isLoading}
 										>
 											<DownloadSimpleIcon className="size-4" />
 											Export
@@ -198,74 +335,166 @@ function BillingPage() {
 								</div>
 							</div>
 
-							<Table>
-								<TableHeader>
-									<TableRow>
-										<TableHead>Reference</TableHead>
-										<TableHead>Date</TableHead>
-										<TableHead>Description</TableHead>
-										<TableHead>Amount</TableHead>
-										<TableHead>Type</TableHead>
-										<TableHead>Balance Before</TableHead>
-										<TableHead>Balance After</TableHead>
-										<TableHead>Actions</TableHead>
-									</TableRow>
-								</TableHeader>
-								<TableBody>
-									{filteredTransactions.map((transaction) => {
-										const isDebit = transaction.type === "debit";
-
-										return (
-											<TableRow key={transaction.id}>
-												<TableCell className="font-mono text-xs">
-													{transaction.reference}
-												</TableCell>
-												<TableCell>{transaction.date}</TableCell>
-												<TableCell>{transaction.description}</TableCell>
-												<TableCell
-													className={cn(
-														"font-medium",
-														isDebit ? "text-red-600" : "text-emerald-600",
-													)}
-												>
-													{formatSignedAmount(transaction.amount)}
-												</TableCell>
-												<TableCell>
-													<Badge
-														variant="outline"
-														className={cn(
-															"capitalize",
-															isDebit
-																? "border-red-200 bg-red-50 text-red-700"
-																: "border-emerald-200 bg-emerald-50 text-emerald-700",
-														)}
-													>
-														{transaction.type}
-													</Badge>
-												</TableCell>
-												<TableCell>
-													{formatSignedAmount(transaction.balanceBefore)}
-												</TableCell>
-												<TableCell>
-													{formatSignedAmount(transaction.balanceAfter)}
-												</TableCell>
-												<TableCell>
-													<Button
-														type="button"
-														variant="ghost"
-														size="sm"
-														className="cursor-pointer text-primary"
-														onClick={() => openTransactionDetails(transaction)}
-													>
-														<EyeIcon className="size-4" />
-														View Details
-													</Button>
-												</TableCell>
+							{isLoading || !data ? (
+								<TransactionsTableSkeleton />
+							) : (
+								<>
+									<Table>
+										<TableHeader>
+											<TableRow>
+												<TableHead>Reference</TableHead>
+												<TableHead>Date</TableHead>
+												<TableHead>Description</TableHead>
+												<TableHead>Amount</TableHead>
+												<TableHead>Type</TableHead>
+												<TableHead>Balance Before</TableHead>
+												<TableHead>Balance After</TableHead>
+												<TableHead>Actions</TableHead>
 											</TableRow>
-										);
-									})}
-								</TableBody>
-							</Table>
+										</TableHeader>
+										<TableBody>
+											{data.transactions.transactions.length === 0 ? (
+												<TableRow>
+													<TableCell
+														colSpan={8}
+														className="h-24 text-center text-muted-foreground"
+													>
+														No transactions found.
+													</TableCell>
+												</TableRow>
+											) : (
+												data.transactions.transactions.map((transaction) => {
+													const isDebit = transaction.type === "debit";
+
+													return (
+														<TableRow key={transaction.id}>
+															<TableCell className="font-mono text-xs">
+																{transaction.reference}
+															</TableCell>
+															<TableCell>{transaction.date}</TableCell>
+															<TableCell>{transaction.description}</TableCell>
+															<TableCell
+																className={cn(
+																	"font-medium",
+																	isDebit
+																		? "text-red-600"
+																		: "text-emerald-600",
+																)}
+															>
+																{formatSignedAmount(transaction.amount)}
+															</TableCell>
+															<TableCell>
+																<Badge
+																	variant="outline"
+																	className={cn(
+																		"capitalize",
+																		isDebit
+																			? "border-red-200 bg-red-50 text-red-700"
+																			: "border-emerald-200 bg-emerald-50 text-emerald-700",
+																	)}
+																>
+																	{transaction.type}
+																</Badge>
+															</TableCell>
+															<TableCell>
+																{formatSignedAmount(transaction.balanceBefore)}
+															</TableCell>
+															<TableCell>
+																{formatSignedAmount(transaction.balanceAfter)}
+															</TableCell>
+															<TableCell>
+																<Button
+																	type="button"
+																	variant="ghost"
+																	size="sm"
+																	className="cursor-pointer text-primary"
+																	onClick={() =>
+																		openTransactionDetails(transaction)
+																	}
+																>
+																	<EyeIcon className="size-4" />
+																	View Details
+																</Button>
+															</TableCell>
+														</TableRow>
+													);
+												})
+											)}
+										</TableBody>
+									</Table>
+
+									<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+										<p className="text-sm text-muted-foreground">
+											{data.transactions.total === 0
+												? "Showing 0 results"
+												: `Showing ${(data.transactions.page - 1) * data.transactions.pageSize + 1}-${Math.min(data.transactions.page * data.transactions.pageSize, data.transactions.total)} of ${data.transactions.total}`}
+										</p>
+										<Pagination className="mx-0 w-auto justify-end">
+											<PaginationContent>
+												<PaginationItem>
+													<PaginationPrevious
+														href="#"
+														text="Previous"
+														className={cn(
+															data.transactions.page <= 1 &&
+																"pointer-events-none opacity-50",
+														)}
+														onClick={(event) => {
+															event.preventDefault();
+															setPage((current) => Math.max(1, current - 1));
+														}}
+													/>
+												</PaginationItem>
+												{getVisiblePages(
+													data.transactions.page,
+													data.transactions.totalPages,
+												).map((pageNumber, index) =>
+													pageNumber === "ellipsis" ? (
+														<PaginationItem
+															key={`ellipsis-${index === 1 ? "start" : "end"}`}
+														>
+															<PaginationEllipsis />
+														</PaginationItem>
+													) : (
+														<PaginationItem key={pageNumber}>
+															<PaginationLink
+																href="#"
+																isActive={pageNumber === data.transactions.page}
+																onClick={(event) => {
+																	event.preventDefault();
+																	setPage(pageNumber);
+																}}
+															>
+																{pageNumber}
+															</PaginationLink>
+														</PaginationItem>
+													),
+												)}
+												<PaginationItem>
+													<PaginationNext
+														href="#"
+														text="Next"
+														className={cn(
+															data.transactions.page >=
+																data.transactions.totalPages &&
+																"pointer-events-none opacity-50",
+														)}
+														onClick={(event) => {
+															event.preventDefault();
+															setPage((current) =>
+																Math.min(
+																	data.transactions.totalPages,
+																	current + 1,
+																),
+															);
+														}}
+													/>
+												</PaginationItem>
+											</PaginationContent>
+										</Pagination>
+									</div>
+								</>
+							)}
 						</TabsContent>
 
 						<TabsContent value="invoices">
