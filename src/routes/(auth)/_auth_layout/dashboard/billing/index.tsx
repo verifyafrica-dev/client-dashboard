@@ -52,9 +52,11 @@ import {
 	type Transaction,
 } from "./-data";
 
-export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/billing/")({
-	component: BillingPage,
-});
+export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/billing/")(
+	{
+		component: BillingPage,
+	},
+);
 
 function BalanceCardSkeleton() {
 	return (
@@ -261,7 +263,7 @@ function BillingPage() {
 			</div>
 
 			<Card>
-				<CardContent className="pt-6">
+				<CardContent className="pt-0">
 					<Tabs
 						defaultValue="transactions"
 						className="flex w-full flex-col gap-4"
@@ -274,7 +276,7 @@ function BillingPage() {
 						<TabsContent value="transactions" className="flex flex-col gap-4">
 							<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 								<h2 className="text-lg font-semibold">Transaction History</h2>
-								<div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+								<div className="flex flex-col gap-2 sm:flex-row flex-wrap sm:items-center">
 									<div className="relative min-w-[200px] flex-1 sm:max-w-xs">
 										<MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 										<Input
@@ -288,7 +290,7 @@ function BillingPage() {
 											disabled={isLoading}
 										/>
 									</div>
-									<div className="flex items-center gap-2">
+									<div className="flex items-center gap-2 flex-wrap">
 										<Label htmlFor="type-filter" className="sr-only">
 											Type
 										</Label>

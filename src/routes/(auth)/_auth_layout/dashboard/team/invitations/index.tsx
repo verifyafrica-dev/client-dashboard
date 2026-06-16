@@ -76,7 +76,7 @@ function InvitationsPage() {
 				</div>
 			</div>
 
-			<Card className="gap-0">
+			<Card className="gap-0 py-4 sm:py-6">
 				<CardHeader className="border-b flex justify-between items-center">
 					<CardTitle className="text-base font-semibold">Invitations</CardTitle>
 					<Button
@@ -90,7 +90,7 @@ function InvitationsPage() {
 					<Table>
 						<TableHeader className="">
 							<TableRow className="hover:bg-transparent ">
-								<TableHead className="text-xs font-semibold tracking-wide uppercase pl-6">
+								<TableHead className="text-xs font-semibold tracking-wide uppercase pl-4 sm:pl-6">
 									User Details
 								</TableHead>
 								<TableHead className="text-xs font-semibold tracking-wide uppercase">
@@ -102,7 +102,7 @@ function InvitationsPage() {
 								<TableHead className="text-xs font-semibold tracking-wide uppercase">
 									Expires
 								</TableHead>
-								<TableHead className="text-xs font-semibold tracking-wide uppercase pr-6">
+								<TableHead className="text-xs font-semibold tracking-wide uppercase pr-4 sm:pr-6">
 									Actions
 								</TableHead>
 							</TableRow>
@@ -121,7 +121,7 @@ function InvitationsPage() {
 							) : (
 								invitations.map((invitation) => (
 									<TableRow key={invitation.id}>
-										<TableCell className="pl-6">
+										<TableCell className="pl-4 sm:pl-6">
 											<div className="flex items-center gap-3">
 												<Avatar size="sm">
 													<AvatarFallback>
@@ -143,7 +143,7 @@ function InvitationsPage() {
 												{formatInvitationExpiry(invitation.expiresAt)}
 											</div>
 										</TableCell>
-										<TableCell className="pr-6">
+										<TableCell className="pr-4 sm:pr-6">
 											<Button
 												type="button"
 												variant="destructive"
