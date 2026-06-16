@@ -23,6 +23,8 @@ import {
 } from "recharts";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
+import { Label } from "#/components/ui/label";
+import { Switch } from "#/components/ui/switch";
 import {
 	type ChartConfig,
 	ChartContainer,
@@ -44,6 +46,7 @@ import {
 	TIME_RANGE_OPTIONS,
 	type TimeRange,
 } from "./-data";
+import { DashboardOnboarding } from "./-components/dashboard-onboarding";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/")({
 	component: DashboardPage,
@@ -410,6 +413,7 @@ function DashboardContent({
 function DashboardPage() {
 	const [timeRange, setTimeRange] = useState<TimeRange>("all");
 	const [refreshKey, setRefreshKey] = useState(0);
+	const [showOnboarding, setShowOnboarding] = useState(true);
 
 	const { data, isPending, isFetching } = useQuery({
 		queryKey: ["dashboard", timeRange, refreshKey],
@@ -428,7 +432,17 @@ function DashboardPage() {
 						Welcome back! Here&apos;s your verification overview.
 					</p>
 				</div>
-				<div className="flex items-center gap-2">
+				<div className="flex flex-wrap items-center gap-4">
+					<div className="flex items-center gap-2">
+						<Switch
+							id="show-onboarding"
+							checked={showOnboarding}
+							onCheckedChange={setShowOnboarding}
+						/>
+						<Label htmlFor="show-onboarding" className="text-sm font-medium">
+							Show onboarding
+						</Label>
+					</div>
 					<Select
 						value={timeRange}
 						onValueChange={(value) => setTimeRange(value as TimeRange)}
@@ -457,6 +471,8 @@ function DashboardPage() {
 					</Button>
 				</div>
 			</div>
+
+			{showOnboarding && <DashboardOnboarding />}
 
 			{isLoading || !data ? (
 				<DashboardContentSkeleton />
