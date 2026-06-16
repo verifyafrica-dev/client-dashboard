@@ -45,10 +45,10 @@ import { AddCreditsDialog } from "./-components/add-credits-dialog";
 import { TransactionDetailsDialog } from "./-components/transaction-details-dialog";
 import { UpdateBillingDialog } from "./-components/update-billing-dialog";
 import {
+	type BillingData,
 	fetchBillingData,
 	formatMoney,
 	formatSignedAmount,
-	type BillingData,
 	type Transaction,
 } from "./-data";
 
@@ -363,62 +363,66 @@ function BillingPage() {
 													</TableCell>
 												</TableRow>
 											) : (
-												data.transactions.transactions.map((transaction) => {
-													const isDebit = transaction.type === "debit";
+												data.transactions.transactions.map(
+													(transaction: Transaction) => {
+														const isDebit = transaction.type === "debit";
 
-													return (
-														<TableRow key={transaction.id}>
-															<TableCell className="font-mono text-xs">
-																{transaction.reference}
-															</TableCell>
-															<TableCell>{transaction.date}</TableCell>
-															<TableCell>{transaction.description}</TableCell>
-															<TableCell
-																className={cn(
-																	"font-medium",
-																	isDebit
-																		? "text-red-600"
-																		: "text-emerald-600",
-																)}
-															>
-																{formatSignedAmount(transaction.amount)}
-															</TableCell>
-															<TableCell>
-																<Badge
-																	variant="outline"
+														return (
+															<TableRow key={transaction.id}>
+																<TableCell className="font-mono text-xs">
+																	{transaction.reference}
+																</TableCell>
+																<TableCell>{transaction.date}</TableCell>
+																<TableCell>{transaction.description}</TableCell>
+																<TableCell
 																	className={cn(
-																		"capitalize",
+																		"font-medium",
 																		isDebit
-																			? "border-red-200 bg-red-50 text-red-700"
-																			: "border-emerald-200 bg-emerald-50 text-emerald-700",
+																			? "text-red-600"
+																			: "text-emerald-600",
 																	)}
 																>
-																	{transaction.type}
-																</Badge>
-															</TableCell>
-															<TableCell>
-																{formatSignedAmount(transaction.balanceBefore)}
-															</TableCell>
-															<TableCell>
-																{formatSignedAmount(transaction.balanceAfter)}
-															</TableCell>
-															<TableCell>
-																<Button
-																	type="button"
-																	variant="ghost"
-																	size="sm"
-																	className="cursor-pointer text-primary"
-																	onClick={() =>
-																		openTransactionDetails(transaction)
-																	}
-																>
-																	<EyeIcon className="size-4" />
-																	View Details
-																</Button>
-															</TableCell>
-														</TableRow>
-													);
-												})
+																	{formatSignedAmount(transaction.amount)}
+																</TableCell>
+																<TableCell>
+																	<Badge
+																		variant="outline"
+																		className={cn(
+																			"capitalize",
+																			isDebit
+																				? "border-red-200 bg-red-50 text-red-700"
+																				: "border-emerald-200 bg-emerald-50 text-emerald-700",
+																		)}
+																	>
+																		{transaction.type}
+																	</Badge>
+																</TableCell>
+																<TableCell>
+																	{formatSignedAmount(
+																		transaction.balanceBefore,
+																	)}
+																</TableCell>
+																<TableCell>
+																	{formatSignedAmount(transaction.balanceAfter)}
+																</TableCell>
+																<TableCell>
+																	<Button
+																		type="button"
+																		variant="ghost"
+																		size="sm"
+																		className="cursor-pointer text-primary"
+																		onClick={() =>
+																			openTransactionDetails(transaction)
+																		}
+																	>
+																		<EyeIcon className="size-4" />
+																		View Details
+																	</Button>
+																</TableCell>
+															</TableRow>
+														);
+													},
+												)
 											)}
 										</TableBody>
 									</Table>
