@@ -8,7 +8,7 @@ export const isEmail = (value: string): boolean => {
 export const PUBLIC_EMAIL_DOMAIN_ERROR_MESSAGE =
 	"Please use your work email address.";
 
-export const BLOCKED_SIGNUP_EMAIL_DOMAINS = new Set([
+export const BLOCKED_register_EMAIL_DOMAINS = new Set([
 	"aol.com",
 	"fastmail.com",
 	"gmail.com",
@@ -45,9 +45,9 @@ export const getEmailDomain = (value: string): string | null => {
 	return normalizedDomain;
 };
 
-export const isBlockedSignupEmailDomain = (value: string): boolean => {
+export const isBlockedregisterEmailDomain = (value: string): boolean => {
 	const domain = getEmailDomain(value);
-	return domain ? BLOCKED_SIGNUP_EMAIL_DOMAINS.has(domain) : false;
+	return domain ? BLOCKED_register_EMAIL_DOMAINS.has(domain) : false;
 };
 
 // (Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char)

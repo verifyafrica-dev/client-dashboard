@@ -10,184 +10,248 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as authLayoutRouteImport } from './routes/(auth)/_layout'
-import { Route as authLayoutDashboardIndexRouteImport } from './routes/(auth)/_layout/dashboard/index'
-import { Route as authLayoutDashboardTeamIndexRouteImport } from './routes/(auth)/_layout/dashboard/team/index'
-import { Route as authLayoutDashboardProfileIndexRouteImport } from './routes/(auth)/_layout/dashboard/profile/index'
-import { Route as authLayoutDashboardProductsIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/index'
-import { Route as authLayoutDashboardBillingIndexRouteImport } from './routes/(auth)/_layout/dashboard/billing/index'
-import { Route as authLayoutDashboardApikeysIndexRouteImport } from './routes/(auth)/_layout/dashboard/apikeys/index'
-import { Route as authLayoutDashboardProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/risk-assessment/index'
-import { Route as authLayoutDashboardProductsKybIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/kyb/index'
-import { Route as authLayoutDashboardProductsGovernmentRegistryChecksIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/government-registry-checks/index'
-import { Route as authLayoutDashboardProductsFacialScreeningIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/facial-screening/index'
-import { Route as authLayoutDashboardProductsDocumentVerificationIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/document-verification/index'
-import { Route as authLayoutDashboardProductsCryptoWalletScreeningIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/crypto-wallet-screening/index'
-import { Route as authLayoutDashboardProductsBusinessAmlScreeningIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/business-aml-screening/index'
-import { Route as authLayoutDashboardProductsAmlScreeningIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/aml-screening/index'
-import { Route as authLayoutDashboardProductsAddressVerificationIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/address-verification/index'
+import { Route as unguardedUnguarded_layoutRouteImport } from './routes/(unguarded)/_unguarded_layout'
+import { Route as authAuth_layoutRouteImport } from './routes/(auth)/_auth_layout'
+import { Route as unguardedUnguarded_layoutResetPasswordIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/reset-password/index'
+import { Route as unguardedUnguarded_layoutRegisterIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/register/index'
+import { Route as unguardedUnguarded_layoutLoginIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/login/index'
+import { Route as unguardedUnguarded_layoutForgotPasswordIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/forgot-password/index'
+import { Route as unguardedUnguarded_layoutActivateAccountIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/activate-account/index'
+import { Route as authAuth_layoutDashboardIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/index'
+import { Route as authAuth_layoutDashboardTeamIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/index'
+import { Route as authAuth_layoutDashboardProfileIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/profile/index'
+import { Route as authAuth_layoutDashboardProductsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/index'
+import { Route as authAuth_layoutDashboardBillingIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/billing/index'
+import { Route as authAuth_layoutDashboardApikeysIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/apikeys/index'
+import { Route as authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/risk-assessment/index'
+import { Route as authAuth_layoutDashboardProductsKybIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/kyb/index'
+import { Route as authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/government-registry-checks/index'
+import { Route as authAuth_layoutDashboardProductsFacialScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/facial-screening/index'
+import { Route as authAuth_layoutDashboardProductsDocumentVerificationIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/document-verification/index'
+import { Route as authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/index'
+import { Route as authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/business-aml-screening/index'
+import { Route as authAuth_layoutDashboardProductsAmlScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/aml-screening/index'
+import { Route as authAuth_layoutDashboardProductsAddressVerificationIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/address-verification/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const authLayoutRoute = authLayoutRouteImport.update({
-  id: '/(auth)/_layout',
+const unguardedUnguarded_layoutRoute =
+  unguardedUnguarded_layoutRouteImport.update({
+    id: '/(unguarded)/_unguarded_layout',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const authAuth_layoutRoute = authAuth_layoutRouteImport.update({
+  id: '/(auth)/_auth_layout',
   getParentRoute: () => rootRouteImport,
 } as any)
-const authLayoutDashboardIndexRoute =
-  authLayoutDashboardIndexRouteImport.update({
+const unguardedUnguarded_layoutResetPasswordIndexRoute =
+  unguardedUnguarded_layoutResetPasswordIndexRouteImport.update({
+    id: '/reset-password/',
+    path: '/reset-password/',
+    getParentRoute: () => unguardedUnguarded_layoutRoute,
+  } as any)
+const unguardedUnguarded_layoutRegisterIndexRoute =
+  unguardedUnguarded_layoutRegisterIndexRouteImport.update({
+    id: '/register/',
+    path: '/register/',
+    getParentRoute: () => unguardedUnguarded_layoutRoute,
+  } as any)
+const unguardedUnguarded_layoutLoginIndexRoute =
+  unguardedUnguarded_layoutLoginIndexRouteImport.update({
+    id: '/login/',
+    path: '/login/',
+    getParentRoute: () => unguardedUnguarded_layoutRoute,
+  } as any)
+const unguardedUnguarded_layoutForgotPasswordIndexRoute =
+  unguardedUnguarded_layoutForgotPasswordIndexRouteImport.update({
+    id: '/forgot-password/',
+    path: '/forgot-password/',
+    getParentRoute: () => unguardedUnguarded_layoutRoute,
+  } as any)
+const unguardedUnguarded_layoutActivateAccountIndexRoute =
+  unguardedUnguarded_layoutActivateAccountIndexRouteImport.update({
+    id: '/activate-account/',
+    path: '/activate-account/',
+    getParentRoute: () => unguardedUnguarded_layoutRoute,
+  } as any)
+const authAuth_layoutDashboardIndexRoute =
+  authAuth_layoutDashboardIndexRouteImport.update({
     id: '/dashboard/',
     path: '/dashboard/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardTeamIndexRoute =
-  authLayoutDashboardTeamIndexRouteImport.update({
+const authAuth_layoutDashboardTeamIndexRoute =
+  authAuth_layoutDashboardTeamIndexRouteImport.update({
     id: '/dashboard/team/',
     path: '/dashboard/team/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProfileIndexRoute =
-  authLayoutDashboardProfileIndexRouteImport.update({
+const authAuth_layoutDashboardProfileIndexRoute =
+  authAuth_layoutDashboardProfileIndexRouteImport.update({
     id: '/dashboard/profile/',
     path: '/dashboard/profile/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProductsIndexRoute =
-  authLayoutDashboardProductsIndexRouteImport.update({
+const authAuth_layoutDashboardProductsIndexRoute =
+  authAuth_layoutDashboardProductsIndexRouteImport.update({
     id: '/dashboard/products/',
     path: '/dashboard/products/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardBillingIndexRoute =
-  authLayoutDashboardBillingIndexRouteImport.update({
+const authAuth_layoutDashboardBillingIndexRoute =
+  authAuth_layoutDashboardBillingIndexRouteImport.update({
     id: '/dashboard/billing/',
     path: '/dashboard/billing/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardApikeysIndexRoute =
-  authLayoutDashboardApikeysIndexRouteImport.update({
+const authAuth_layoutDashboardApikeysIndexRoute =
+  authAuth_layoutDashboardApikeysIndexRouteImport.update({
     id: '/dashboard/apikeys/',
     path: '/dashboard/apikeys/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProductsRiskAssessmentIndexRoute =
-  authLayoutDashboardProductsRiskAssessmentIndexRouteImport.update({
+const authAuth_layoutDashboardProductsRiskAssessmentIndexRoute =
+  authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport.update({
     id: '/dashboard/products/risk-assessment/',
     path: '/dashboard/products/risk-assessment/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProductsKybIndexRoute =
-  authLayoutDashboardProductsKybIndexRouteImport.update({
+const authAuth_layoutDashboardProductsKybIndexRoute =
+  authAuth_layoutDashboardProductsKybIndexRouteImport.update({
     id: '/dashboard/products/kyb/',
     path: '/dashboard/products/kyb/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProductsGovernmentRegistryChecksIndexRoute =
-  authLayoutDashboardProductsGovernmentRegistryChecksIndexRouteImport.update({
-    id: '/dashboard/products/government-registry-checks/',
-    path: '/dashboard/products/government-registry-checks/',
-    getParentRoute: () => authLayoutRoute,
-  } as any)
-const authLayoutDashboardProductsFacialScreeningIndexRoute =
-  authLayoutDashboardProductsFacialScreeningIndexRouteImport.update({
+const authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute =
+  authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRouteImport.update(
+    {
+      id: '/dashboard/products/government-registry-checks/',
+      path: '/dashboard/products/government-registry-checks/',
+      getParentRoute: () => authAuth_layoutRoute,
+    } as any,
+  )
+const authAuth_layoutDashboardProductsFacialScreeningIndexRoute =
+  authAuth_layoutDashboardProductsFacialScreeningIndexRouteImport.update({
     id: '/dashboard/products/facial-screening/',
     path: '/dashboard/products/facial-screening/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProductsDocumentVerificationIndexRoute =
-  authLayoutDashboardProductsDocumentVerificationIndexRouteImport.update({
+const authAuth_layoutDashboardProductsDocumentVerificationIndexRoute =
+  authAuth_layoutDashboardProductsDocumentVerificationIndexRouteImport.update({
     id: '/dashboard/products/document-verification/',
     path: '/dashboard/products/document-verification/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProductsCryptoWalletScreeningIndexRoute =
-  authLayoutDashboardProductsCryptoWalletScreeningIndexRouteImport.update({
+const authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute =
+  authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRouteImport.update({
     id: '/dashboard/products/crypto-wallet-screening/',
     path: '/dashboard/products/crypto-wallet-screening/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProductsBusinessAmlScreeningIndexRoute =
-  authLayoutDashboardProductsBusinessAmlScreeningIndexRouteImport.update({
+const authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute =
+  authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRouteImport.update({
     id: '/dashboard/products/business-aml-screening/',
     path: '/dashboard/products/business-aml-screening/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProductsAmlScreeningIndexRoute =
-  authLayoutDashboardProductsAmlScreeningIndexRouteImport.update({
+const authAuth_layoutDashboardProductsAmlScreeningIndexRoute =
+  authAuth_layoutDashboardProductsAmlScreeningIndexRouteImport.update({
     id: '/dashboard/products/aml-screening/',
     path: '/dashboard/products/aml-screening/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authLayoutDashboardProductsAddressVerificationIndexRoute =
-  authLayoutDashboardProductsAddressVerificationIndexRouteImport.update({
+const authAuth_layoutDashboardProductsAddressVerificationIndexRoute =
+  authAuth_layoutDashboardProductsAddressVerificationIndexRouteImport.update({
     id: '/dashboard/products/address-verification/',
     path: '/dashboard/products/address-verification/',
-    getParentRoute: () => authLayoutRoute,
+    getParentRoute: () => authAuth_layoutRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dashboard/': typeof authLayoutDashboardIndexRoute
-  '/dashboard/apikeys/': typeof authLayoutDashboardApikeysIndexRoute
-  '/dashboard/billing/': typeof authLayoutDashboardBillingIndexRoute
-  '/dashboard/products/': typeof authLayoutDashboardProductsIndexRoute
-  '/dashboard/profile/': typeof authLayoutDashboardProfileIndexRoute
-  '/dashboard/team/': typeof authLayoutDashboardTeamIndexRoute
-  '/dashboard/products/address-verification/': typeof authLayoutDashboardProductsAddressVerificationIndexRoute
-  '/dashboard/products/aml-screening/': typeof authLayoutDashboardProductsAmlScreeningIndexRoute
-  '/dashboard/products/business-aml-screening/': typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
-  '/dashboard/products/crypto-wallet-screening/': typeof authLayoutDashboardProductsCryptoWalletScreeningIndexRoute
-  '/dashboard/products/document-verification/': typeof authLayoutDashboardProductsDocumentVerificationIndexRoute
-  '/dashboard/products/facial-screening/': typeof authLayoutDashboardProductsFacialScreeningIndexRoute
-  '/dashboard/products/government-registry-checks/': typeof authLayoutDashboardProductsGovernmentRegistryChecksIndexRoute
-  '/dashboard/products/kyb/': typeof authLayoutDashboardProductsKybIndexRoute
-  '/dashboard/products/risk-assessment/': typeof authLayoutDashboardProductsRiskAssessmentIndexRoute
+  '/dashboard/': typeof authAuth_layoutDashboardIndexRoute
+  '/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
+  '/forgot-password/': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
+  '/login/': typeof unguardedUnguarded_layoutLoginIndexRoute
+  '/register/': typeof unguardedUnguarded_layoutRegisterIndexRoute
+  '/reset-password/': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
+  '/dashboard/apikeys/': typeof authAuth_layoutDashboardApikeysIndexRoute
+  '/dashboard/billing/': typeof authAuth_layoutDashboardBillingIndexRoute
+  '/dashboard/products/': typeof authAuth_layoutDashboardProductsIndexRoute
+  '/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
+  '/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
+  '/dashboard/products/address-verification/': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
+  '/dashboard/products/aml-screening/': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
+  '/dashboard/products/business-aml-screening/': typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
+  '/dashboard/products/crypto-wallet-screening/': typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute
+  '/dashboard/products/document-verification/': typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRoute
+  '/dashboard/products/facial-screening/': typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
+  '/dashboard/products/government-registry-checks/': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
+  '/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
+  '/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dashboard': typeof authLayoutDashboardIndexRoute
-  '/dashboard/apikeys': typeof authLayoutDashboardApikeysIndexRoute
-  '/dashboard/billing': typeof authLayoutDashboardBillingIndexRoute
-  '/dashboard/products': typeof authLayoutDashboardProductsIndexRoute
-  '/dashboard/profile': typeof authLayoutDashboardProfileIndexRoute
-  '/dashboard/team': typeof authLayoutDashboardTeamIndexRoute
-  '/dashboard/products/address-verification': typeof authLayoutDashboardProductsAddressVerificationIndexRoute
-  '/dashboard/products/aml-screening': typeof authLayoutDashboardProductsAmlScreeningIndexRoute
-  '/dashboard/products/business-aml-screening': typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
-  '/dashboard/products/crypto-wallet-screening': typeof authLayoutDashboardProductsCryptoWalletScreeningIndexRoute
-  '/dashboard/products/document-verification': typeof authLayoutDashboardProductsDocumentVerificationIndexRoute
-  '/dashboard/products/facial-screening': typeof authLayoutDashboardProductsFacialScreeningIndexRoute
-  '/dashboard/products/government-registry-checks': typeof authLayoutDashboardProductsGovernmentRegistryChecksIndexRoute
-  '/dashboard/products/kyb': typeof authLayoutDashboardProductsKybIndexRoute
-  '/dashboard/products/risk-assessment': typeof authLayoutDashboardProductsRiskAssessmentIndexRoute
+  '/dashboard': typeof authAuth_layoutDashboardIndexRoute
+  '/activate-account': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
+  '/forgot-password': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
+  '/login': typeof unguardedUnguarded_layoutLoginIndexRoute
+  '/register': typeof unguardedUnguarded_layoutRegisterIndexRoute
+  '/reset-password': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
+  '/dashboard/apikeys': typeof authAuth_layoutDashboardApikeysIndexRoute
+  '/dashboard/billing': typeof authAuth_layoutDashboardBillingIndexRoute
+  '/dashboard/products': typeof authAuth_layoutDashboardProductsIndexRoute
+  '/dashboard/profile': typeof authAuth_layoutDashboardProfileIndexRoute
+  '/dashboard/team': typeof authAuth_layoutDashboardTeamIndexRoute
+  '/dashboard/products/address-verification': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
+  '/dashboard/products/aml-screening': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
+  '/dashboard/products/business-aml-screening': typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
+  '/dashboard/products/crypto-wallet-screening': typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute
+  '/dashboard/products/document-verification': typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRoute
+  '/dashboard/products/facial-screening': typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
+  '/dashboard/products/government-registry-checks': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
+  '/dashboard/products/kyb': typeof authAuth_layoutDashboardProductsKybIndexRoute
+  '/dashboard/products/risk-assessment': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/(auth)/_layout': typeof authLayoutRouteWithChildren
-  '/(auth)/_layout/dashboard/': typeof authLayoutDashboardIndexRoute
-  '/(auth)/_layout/dashboard/apikeys/': typeof authLayoutDashboardApikeysIndexRoute
-  '/(auth)/_layout/dashboard/billing/': typeof authLayoutDashboardBillingIndexRoute
-  '/(auth)/_layout/dashboard/products/': typeof authLayoutDashboardProductsIndexRoute
-  '/(auth)/_layout/dashboard/profile/': typeof authLayoutDashboardProfileIndexRoute
-  '/(auth)/_layout/dashboard/team/': typeof authLayoutDashboardTeamIndexRoute
-  '/(auth)/_layout/dashboard/products/address-verification/': typeof authLayoutDashboardProductsAddressVerificationIndexRoute
-  '/(auth)/_layout/dashboard/products/aml-screening/': typeof authLayoutDashboardProductsAmlScreeningIndexRoute
-  '/(auth)/_layout/dashboard/products/business-aml-screening/': typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
-  '/(auth)/_layout/dashboard/products/crypto-wallet-screening/': typeof authLayoutDashboardProductsCryptoWalletScreeningIndexRoute
-  '/(auth)/_layout/dashboard/products/document-verification/': typeof authLayoutDashboardProductsDocumentVerificationIndexRoute
-  '/(auth)/_layout/dashboard/products/facial-screening/': typeof authLayoutDashboardProductsFacialScreeningIndexRoute
-  '/(auth)/_layout/dashboard/products/government-registry-checks/': typeof authLayoutDashboardProductsGovernmentRegistryChecksIndexRoute
-  '/(auth)/_layout/dashboard/products/kyb/': typeof authLayoutDashboardProductsKybIndexRoute
-  '/(auth)/_layout/dashboard/products/risk-assessment/': typeof authLayoutDashboardProductsRiskAssessmentIndexRoute
+  '/(auth)/_auth_layout': typeof authAuth_layoutRouteWithChildren
+  '/(unguarded)/_unguarded_layout': typeof unguardedUnguarded_layoutRouteWithChildren
+  '/(auth)/_auth_layout/dashboard/': typeof authAuth_layoutDashboardIndexRoute
+  '/(unguarded)/_unguarded_layout/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
+  '/(unguarded)/_unguarded_layout/forgot-password/': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
+  '/(unguarded)/_unguarded_layout/login/': typeof unguardedUnguarded_layoutLoginIndexRoute
+  '/(unguarded)/_unguarded_layout/register/': typeof unguardedUnguarded_layoutRegisterIndexRoute
+  '/(unguarded)/_unguarded_layout/reset-password/': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
+  '/(auth)/_auth_layout/dashboard/apikeys/': typeof authAuth_layoutDashboardApikeysIndexRoute
+  '/(auth)/_auth_layout/dashboard/billing/': typeof authAuth_layoutDashboardBillingIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/': typeof authAuth_layoutDashboardProductsIndexRoute
+  '/(auth)/_auth_layout/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
+  '/(auth)/_auth_layout/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/address-verification/': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/aml-screening/': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/business-aml-screening/': typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/': typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/document-verification/': typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/facial-screening/': typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/government-registry-checks/': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/dashboard/'
+    | '/activate-account/'
+    | '/forgot-password/'
+    | '/login/'
+    | '/register/'
+    | '/reset-password/'
     | '/dashboard/apikeys/'
     | '/dashboard/billing/'
     | '/dashboard/products/'
@@ -206,6 +270,11 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/activate-account'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/reset-password'
     | '/dashboard/apikeys'
     | '/dashboard/billing'
     | '/dashboard/products'
@@ -223,27 +292,34 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/(auth)/_layout'
-    | '/(auth)/_layout/dashboard/'
-    | '/(auth)/_layout/dashboard/apikeys/'
-    | '/(auth)/_layout/dashboard/billing/'
-    | '/(auth)/_layout/dashboard/products/'
-    | '/(auth)/_layout/dashboard/profile/'
-    | '/(auth)/_layout/dashboard/team/'
-    | '/(auth)/_layout/dashboard/products/address-verification/'
-    | '/(auth)/_layout/dashboard/products/aml-screening/'
-    | '/(auth)/_layout/dashboard/products/business-aml-screening/'
-    | '/(auth)/_layout/dashboard/products/crypto-wallet-screening/'
-    | '/(auth)/_layout/dashboard/products/document-verification/'
-    | '/(auth)/_layout/dashboard/products/facial-screening/'
-    | '/(auth)/_layout/dashboard/products/government-registry-checks/'
-    | '/(auth)/_layout/dashboard/products/kyb/'
-    | '/(auth)/_layout/dashboard/products/risk-assessment/'
+    | '/(auth)/_auth_layout'
+    | '/(unguarded)/_unguarded_layout'
+    | '/(auth)/_auth_layout/dashboard/'
+    | '/(unguarded)/_unguarded_layout/activate-account/'
+    | '/(unguarded)/_unguarded_layout/forgot-password/'
+    | '/(unguarded)/_unguarded_layout/login/'
+    | '/(unguarded)/_unguarded_layout/register/'
+    | '/(unguarded)/_unguarded_layout/reset-password/'
+    | '/(auth)/_auth_layout/dashboard/apikeys/'
+    | '/(auth)/_auth_layout/dashboard/billing/'
+    | '/(auth)/_auth_layout/dashboard/products/'
+    | '/(auth)/_auth_layout/dashboard/profile/'
+    | '/(auth)/_auth_layout/dashboard/team/'
+    | '/(auth)/_auth_layout/dashboard/products/address-verification/'
+    | '/(auth)/_auth_layout/dashboard/products/aml-screening/'
+    | '/(auth)/_auth_layout/dashboard/products/business-aml-screening/'
+    | '/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/'
+    | '/(auth)/_auth_layout/dashboard/products/document-verification/'
+    | '/(auth)/_auth_layout/dashboard/products/facial-screening/'
+    | '/(auth)/_auth_layout/dashboard/products/government-registry-checks/'
+    | '/(auth)/_auth_layout/dashboard/products/kyb/'
+    | '/(auth)/_auth_layout/dashboard/products/risk-assessment/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  authLayoutRoute: typeof authLayoutRouteWithChildren
+  authAuth_layoutRoute: typeof authAuth_layoutRouteWithChildren
+  unguardedUnguarded_layoutRoute: typeof unguardedUnguarded_layoutRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -255,173 +331,248 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(auth)/_layout': {
-      id: '/(auth)/_layout'
+    '/(unguarded)/_unguarded_layout': {
+      id: '/(unguarded)/_unguarded_layout'
       path: ''
       fullPath: ''
-      preLoaderRoute: typeof authLayoutRouteImport
+      preLoaderRoute: typeof unguardedUnguarded_layoutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/(auth)/_layout/dashboard/': {
-      id: '/(auth)/_layout/dashboard/'
+    '/(auth)/_auth_layout': {
+      id: '/(auth)/_auth_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof authAuth_layoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(unguarded)/_unguarded_layout/reset-password/': {
+      id: '/(unguarded)/_unguarded_layout/reset-password/'
+      path: '/reset-password'
+      fullPath: '/reset-password/'
+      preLoaderRoute: typeof unguardedUnguarded_layoutResetPasswordIndexRouteImport
+      parentRoute: typeof unguardedUnguarded_layoutRoute
+    }
+    '/(unguarded)/_unguarded_layout/register/': {
+      id: '/(unguarded)/_unguarded_layout/register/'
+      path: '/register'
+      fullPath: '/register/'
+      preLoaderRoute: typeof unguardedUnguarded_layoutRegisterIndexRouteImport
+      parentRoute: typeof unguardedUnguarded_layoutRoute
+    }
+    '/(unguarded)/_unguarded_layout/login/': {
+      id: '/(unguarded)/_unguarded_layout/login/'
+      path: '/login'
+      fullPath: '/login/'
+      preLoaderRoute: typeof unguardedUnguarded_layoutLoginIndexRouteImport
+      parentRoute: typeof unguardedUnguarded_layoutRoute
+    }
+    '/(unguarded)/_unguarded_layout/forgot-password/': {
+      id: '/(unguarded)/_unguarded_layout/forgot-password/'
+      path: '/forgot-password'
+      fullPath: '/forgot-password/'
+      preLoaderRoute: typeof unguardedUnguarded_layoutForgotPasswordIndexRouteImport
+      parentRoute: typeof unguardedUnguarded_layoutRoute
+    }
+    '/(unguarded)/_unguarded_layout/activate-account/': {
+      id: '/(unguarded)/_unguarded_layout/activate-account/'
+      path: '/activate-account'
+      fullPath: '/activate-account/'
+      preLoaderRoute: typeof unguardedUnguarded_layoutActivateAccountIndexRouteImport
+      parentRoute: typeof unguardedUnguarded_layoutRoute
+    }
+    '/(auth)/_auth_layout/dashboard/': {
+      id: '/(auth)/_auth_layout/dashboard/'
       path: '/dashboard'
       fullPath: '/dashboard/'
-      preLoaderRoute: typeof authLayoutDashboardIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/team/': {
-      id: '/(auth)/_layout/dashboard/team/'
+    '/(auth)/_auth_layout/dashboard/team/': {
+      id: '/(auth)/_auth_layout/dashboard/team/'
       path: '/dashboard/team'
       fullPath: '/dashboard/team/'
-      preLoaderRoute: typeof authLayoutDashboardTeamIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardTeamIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/profile/': {
-      id: '/(auth)/_layout/dashboard/profile/'
+    '/(auth)/_auth_layout/dashboard/profile/': {
+      id: '/(auth)/_auth_layout/dashboard/profile/'
       path: '/dashboard/profile'
       fullPath: '/dashboard/profile/'
-      preLoaderRoute: typeof authLayoutDashboardProfileIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProfileIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/': {
-      id: '/(auth)/_layout/dashboard/products/'
+    '/(auth)/_auth_layout/dashboard/products/': {
+      id: '/(auth)/_auth_layout/dashboard/products/'
       path: '/dashboard/products'
       fullPath: '/dashboard/products/'
-      preLoaderRoute: typeof authLayoutDashboardProductsIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/billing/': {
-      id: '/(auth)/_layout/dashboard/billing/'
+    '/(auth)/_auth_layout/dashboard/billing/': {
+      id: '/(auth)/_auth_layout/dashboard/billing/'
       path: '/dashboard/billing'
       fullPath: '/dashboard/billing/'
-      preLoaderRoute: typeof authLayoutDashboardBillingIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardBillingIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/apikeys/': {
-      id: '/(auth)/_layout/dashboard/apikeys/'
+    '/(auth)/_auth_layout/dashboard/apikeys/': {
+      id: '/(auth)/_auth_layout/dashboard/apikeys/'
       path: '/dashboard/apikeys'
       fullPath: '/dashboard/apikeys/'
-      preLoaderRoute: typeof authLayoutDashboardApikeysIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardApikeysIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/risk-assessment/': {
-      id: '/(auth)/_layout/dashboard/products/risk-assessment/'
+    '/(auth)/_auth_layout/dashboard/products/risk-assessment/': {
+      id: '/(auth)/_auth_layout/dashboard/products/risk-assessment/'
       path: '/dashboard/products/risk-assessment'
       fullPath: '/dashboard/products/risk-assessment/'
-      preLoaderRoute: typeof authLayoutDashboardProductsRiskAssessmentIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/kyb/': {
-      id: '/(auth)/_layout/dashboard/products/kyb/'
+    '/(auth)/_auth_layout/dashboard/products/kyb/': {
+      id: '/(auth)/_auth_layout/dashboard/products/kyb/'
       path: '/dashboard/products/kyb'
       fullPath: '/dashboard/products/kyb/'
-      preLoaderRoute: typeof authLayoutDashboardProductsKybIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsKybIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/government-registry-checks/': {
-      id: '/(auth)/_layout/dashboard/products/government-registry-checks/'
+    '/(auth)/_auth_layout/dashboard/products/government-registry-checks/': {
+      id: '/(auth)/_auth_layout/dashboard/products/government-registry-checks/'
       path: '/dashboard/products/government-registry-checks'
       fullPath: '/dashboard/products/government-registry-checks/'
-      preLoaderRoute: typeof authLayoutDashboardProductsGovernmentRegistryChecksIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/facial-screening/': {
-      id: '/(auth)/_layout/dashboard/products/facial-screening/'
+    '/(auth)/_auth_layout/dashboard/products/facial-screening/': {
+      id: '/(auth)/_auth_layout/dashboard/products/facial-screening/'
       path: '/dashboard/products/facial-screening'
       fullPath: '/dashboard/products/facial-screening/'
-      preLoaderRoute: typeof authLayoutDashboardProductsFacialScreeningIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsFacialScreeningIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/document-verification/': {
-      id: '/(auth)/_layout/dashboard/products/document-verification/'
+    '/(auth)/_auth_layout/dashboard/products/document-verification/': {
+      id: '/(auth)/_auth_layout/dashboard/products/document-verification/'
       path: '/dashboard/products/document-verification'
       fullPath: '/dashboard/products/document-verification/'
-      preLoaderRoute: typeof authLayoutDashboardProductsDocumentVerificationIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/crypto-wallet-screening/': {
-      id: '/(auth)/_layout/dashboard/products/crypto-wallet-screening/'
+    '/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/': {
+      id: '/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/'
       path: '/dashboard/products/crypto-wallet-screening'
       fullPath: '/dashboard/products/crypto-wallet-screening/'
-      preLoaderRoute: typeof authLayoutDashboardProductsCryptoWalletScreeningIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/business-aml-screening/': {
-      id: '/(auth)/_layout/dashboard/products/business-aml-screening/'
+    '/(auth)/_auth_layout/dashboard/products/business-aml-screening/': {
+      id: '/(auth)/_auth_layout/dashboard/products/business-aml-screening/'
       path: '/dashboard/products/business-aml-screening'
       fullPath: '/dashboard/products/business-aml-screening/'
-      preLoaderRoute: typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/aml-screening/': {
-      id: '/(auth)/_layout/dashboard/products/aml-screening/'
+    '/(auth)/_auth_layout/dashboard/products/aml-screening/': {
+      id: '/(auth)/_auth_layout/dashboard/products/aml-screening/'
       path: '/dashboard/products/aml-screening'
       fullPath: '/dashboard/products/aml-screening/'
-      preLoaderRoute: typeof authLayoutDashboardProductsAmlScreeningIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsAmlScreeningIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_layout/dashboard/products/address-verification/': {
-      id: '/(auth)/_layout/dashboard/products/address-verification/'
+    '/(auth)/_auth_layout/dashboard/products/address-verification/': {
+      id: '/(auth)/_auth_layout/dashboard/products/address-verification/'
       path: '/dashboard/products/address-verification'
       fullPath: '/dashboard/products/address-verification/'
-      preLoaderRoute: typeof authLayoutDashboardProductsAddressVerificationIndexRouteImport
-      parentRoute: typeof authLayoutRoute
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsAddressVerificationIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
     }
   }
 }
 
-interface authLayoutRouteChildren {
-  authLayoutDashboardIndexRoute: typeof authLayoutDashboardIndexRoute
-  authLayoutDashboardApikeysIndexRoute: typeof authLayoutDashboardApikeysIndexRoute
-  authLayoutDashboardBillingIndexRoute: typeof authLayoutDashboardBillingIndexRoute
-  authLayoutDashboardProductsIndexRoute: typeof authLayoutDashboardProductsIndexRoute
-  authLayoutDashboardProfileIndexRoute: typeof authLayoutDashboardProfileIndexRoute
-  authLayoutDashboardTeamIndexRoute: typeof authLayoutDashboardTeamIndexRoute
-  authLayoutDashboardProductsAddressVerificationIndexRoute: typeof authLayoutDashboardProductsAddressVerificationIndexRoute
-  authLayoutDashboardProductsAmlScreeningIndexRoute: typeof authLayoutDashboardProductsAmlScreeningIndexRoute
-  authLayoutDashboardProductsBusinessAmlScreeningIndexRoute: typeof authLayoutDashboardProductsBusinessAmlScreeningIndexRoute
-  authLayoutDashboardProductsCryptoWalletScreeningIndexRoute: typeof authLayoutDashboardProductsCryptoWalletScreeningIndexRoute
-  authLayoutDashboardProductsDocumentVerificationIndexRoute: typeof authLayoutDashboardProductsDocumentVerificationIndexRoute
-  authLayoutDashboardProductsFacialScreeningIndexRoute: typeof authLayoutDashboardProductsFacialScreeningIndexRoute
-  authLayoutDashboardProductsGovernmentRegistryChecksIndexRoute: typeof authLayoutDashboardProductsGovernmentRegistryChecksIndexRoute
-  authLayoutDashboardProductsKybIndexRoute: typeof authLayoutDashboardProductsKybIndexRoute
-  authLayoutDashboardProductsRiskAssessmentIndexRoute: typeof authLayoutDashboardProductsRiskAssessmentIndexRoute
+interface authAuth_layoutRouteChildren {
+  authAuth_layoutDashboardIndexRoute: typeof authAuth_layoutDashboardIndexRoute
+  authAuth_layoutDashboardApikeysIndexRoute: typeof authAuth_layoutDashboardApikeysIndexRoute
+  authAuth_layoutDashboardBillingIndexRoute: typeof authAuth_layoutDashboardBillingIndexRoute
+  authAuth_layoutDashboardProductsIndexRoute: typeof authAuth_layoutDashboardProductsIndexRoute
+  authAuth_layoutDashboardProfileIndexRoute: typeof authAuth_layoutDashboardProfileIndexRoute
+  authAuth_layoutDashboardTeamIndexRoute: typeof authAuth_layoutDashboardTeamIndexRoute
+  authAuth_layoutDashboardProductsAddressVerificationIndexRoute: typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
+  authAuth_layoutDashboardProductsAmlScreeningIndexRoute: typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
+  authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute: typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
+  authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute: typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute
+  authAuth_layoutDashboardProductsDocumentVerificationIndexRoute: typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRoute
+  authAuth_layoutDashboardProductsFacialScreeningIndexRoute: typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
+  authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute: typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
+  authAuth_layoutDashboardProductsKybIndexRoute: typeof authAuth_layoutDashboardProductsKybIndexRoute
+  authAuth_layoutDashboardProductsRiskAssessmentIndexRoute: typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
 }
 
-const authLayoutRouteChildren: authLayoutRouteChildren = {
-  authLayoutDashboardIndexRoute: authLayoutDashboardIndexRoute,
-  authLayoutDashboardApikeysIndexRoute: authLayoutDashboardApikeysIndexRoute,
-  authLayoutDashboardBillingIndexRoute: authLayoutDashboardBillingIndexRoute,
-  authLayoutDashboardProductsIndexRoute: authLayoutDashboardProductsIndexRoute,
-  authLayoutDashboardProfileIndexRoute: authLayoutDashboardProfileIndexRoute,
-  authLayoutDashboardTeamIndexRoute: authLayoutDashboardTeamIndexRoute,
-  authLayoutDashboardProductsAddressVerificationIndexRoute:
-    authLayoutDashboardProductsAddressVerificationIndexRoute,
-  authLayoutDashboardProductsAmlScreeningIndexRoute:
-    authLayoutDashboardProductsAmlScreeningIndexRoute,
-  authLayoutDashboardProductsBusinessAmlScreeningIndexRoute:
-    authLayoutDashboardProductsBusinessAmlScreeningIndexRoute,
-  authLayoutDashboardProductsCryptoWalletScreeningIndexRoute:
-    authLayoutDashboardProductsCryptoWalletScreeningIndexRoute,
-  authLayoutDashboardProductsDocumentVerificationIndexRoute:
-    authLayoutDashboardProductsDocumentVerificationIndexRoute,
-  authLayoutDashboardProductsFacialScreeningIndexRoute:
-    authLayoutDashboardProductsFacialScreeningIndexRoute,
-  authLayoutDashboardProductsGovernmentRegistryChecksIndexRoute:
-    authLayoutDashboardProductsGovernmentRegistryChecksIndexRoute,
-  authLayoutDashboardProductsKybIndexRoute:
-    authLayoutDashboardProductsKybIndexRoute,
-  authLayoutDashboardProductsRiskAssessmentIndexRoute:
-    authLayoutDashboardProductsRiskAssessmentIndexRoute,
+const authAuth_layoutRouteChildren: authAuth_layoutRouteChildren = {
+  authAuth_layoutDashboardIndexRoute: authAuth_layoutDashboardIndexRoute,
+  authAuth_layoutDashboardApikeysIndexRoute:
+    authAuth_layoutDashboardApikeysIndexRoute,
+  authAuth_layoutDashboardBillingIndexRoute:
+    authAuth_layoutDashboardBillingIndexRoute,
+  authAuth_layoutDashboardProductsIndexRoute:
+    authAuth_layoutDashboardProductsIndexRoute,
+  authAuth_layoutDashboardProfileIndexRoute:
+    authAuth_layoutDashboardProfileIndexRoute,
+  authAuth_layoutDashboardTeamIndexRoute:
+    authAuth_layoutDashboardTeamIndexRoute,
+  authAuth_layoutDashboardProductsAddressVerificationIndexRoute:
+    authAuth_layoutDashboardProductsAddressVerificationIndexRoute,
+  authAuth_layoutDashboardProductsAmlScreeningIndexRoute:
+    authAuth_layoutDashboardProductsAmlScreeningIndexRoute,
+  authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute:
+    authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute,
+  authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute:
+    authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute,
+  authAuth_layoutDashboardProductsDocumentVerificationIndexRoute:
+    authAuth_layoutDashboardProductsDocumentVerificationIndexRoute,
+  authAuth_layoutDashboardProductsFacialScreeningIndexRoute:
+    authAuth_layoutDashboardProductsFacialScreeningIndexRoute,
+  authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute:
+    authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute,
+  authAuth_layoutDashboardProductsKybIndexRoute:
+    authAuth_layoutDashboardProductsKybIndexRoute,
+  authAuth_layoutDashboardProductsRiskAssessmentIndexRoute:
+    authAuth_layoutDashboardProductsRiskAssessmentIndexRoute,
 }
 
-const authLayoutRouteWithChildren = authLayoutRoute._addFileChildren(
-  authLayoutRouteChildren,
+const authAuth_layoutRouteWithChildren = authAuth_layoutRoute._addFileChildren(
+  authAuth_layoutRouteChildren,
 )
+
+interface unguardedUnguarded_layoutRouteChildren {
+  unguardedUnguarded_layoutActivateAccountIndexRoute: typeof unguardedUnguarded_layoutActivateAccountIndexRoute
+  unguardedUnguarded_layoutForgotPasswordIndexRoute: typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
+  unguardedUnguarded_layoutLoginIndexRoute: typeof unguardedUnguarded_layoutLoginIndexRoute
+  unguardedUnguarded_layoutRegisterIndexRoute: typeof unguardedUnguarded_layoutRegisterIndexRoute
+  unguardedUnguarded_layoutResetPasswordIndexRoute: typeof unguardedUnguarded_layoutResetPasswordIndexRoute
+}
+
+const unguardedUnguarded_layoutRouteChildren: unguardedUnguarded_layoutRouteChildren =
+  {
+    unguardedUnguarded_layoutActivateAccountIndexRoute:
+      unguardedUnguarded_layoutActivateAccountIndexRoute,
+    unguardedUnguarded_layoutForgotPasswordIndexRoute:
+      unguardedUnguarded_layoutForgotPasswordIndexRoute,
+    unguardedUnguarded_layoutLoginIndexRoute:
+      unguardedUnguarded_layoutLoginIndexRoute,
+    unguardedUnguarded_layoutRegisterIndexRoute:
+      unguardedUnguarded_layoutRegisterIndexRoute,
+    unguardedUnguarded_layoutResetPasswordIndexRoute:
+      unguardedUnguarded_layoutResetPasswordIndexRoute,
+  }
+
+const unguardedUnguarded_layoutRouteWithChildren =
+  unguardedUnguarded_layoutRoute._addFileChildren(
+    unguardedUnguarded_layoutRouteChildren,
+  )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  authLayoutRoute: authLayoutRouteWithChildren,
+  authAuth_layoutRoute: authAuth_layoutRouteWithChildren,
+  unguardedUnguarded_layoutRoute: unguardedUnguarded_layoutRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
