@@ -1,0 +1,154 @@
+import { DownloadSimpleIcon, LightningIcon } from "@phosphor-icons/react";
+import type { ComponentProps } from "react";
+import { Badge } from "#/components/ui/badge";
+import { Button } from "#/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "#/components/ui/dialog";
+import { Separator } from "#/components/ui/separator";
+import { cn } from "#/lib/utils.ts";
+import { formatSignedAmount, type Transaction } from "../-data";
+
+function DetailRow({
+	label,
+	value,
+	valueClassName,
+}: {
+	label: string;
+	value: string;
+	valueClassName?: string;
+}) {
+	return (
+		<div className="flex items-start justify-between gap-4 py-2 text-sm">
+			<span className="text-muted-foreground">{label}</span>
+			<span className={cn("text-right font-medium", valueClassName)}>
+				{value}
+			</span>
+		</div>
+	);
+}
+
+export function TransactionDetailsDialog({
+	open,
+	onOpenChange,
+	transaction,
+}: ComponentProps<typeof Dialog> & { transaction: Transaction | null }) {
+	if (!transaction) return null;
+
+	const isDebit = transaction.type === "debit";
+	const formattedAmount = formatSignedAmount(transaction.amount);
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className="sm:max-w-lg">
+				<DialogHeader>
+					<div className="flex items-start gap-3">
+						<LightningIcon
+							className={cn(
+								"mt-0.5 size-5",
+								isDebit ? "text-red-500" : "text-emerald-600",
+							)}
+							weight="duotone"
+						/>
+						<div className="flex flex-col gap-2">
+							<DialogTitle>Transaction Details</DialogTitle>
+							<Badge
+								variant="outline"
+								className={cn(
+									"w-fit uppercase",
+									isDebit
+										? "border-red-200 bg-red-50 text-red-700"
+										: "border-emerald-200 bg-emerald-50 text-emerald-700",
+								)}
+							>
+								{transaction.type}
+							</Badge>
+						</div>
+					</div>
+				</DialogHeader>
+
+				<div className="rounded-lg border px-6 py-8 text-center">
+					<p className="text-sm text-muted-foreground">Amount</p>
+					<p
+						className={cn(
+							"mt-1 text-4xl font-semibold tracking-tight",
+							isDebit ? "text-red-600" : "text-emerald-600",
+						)}
+					>
+						{formattedAmount}
+					</p>
+				</div>
+
+				<div className="flex flex-col gap-4">
+					<div>
+						<h3 className="mb-2 font-medium">Transaction Information</h3>
+						<div className="space-y-1 text-sm">
+							<DetailRow
+								label="Reference Number"
+								value={transaction.reference}
+							/>
+							<DetailRow label="Date & Time" value={transaction.dateTime} />
+							<DetailRow label="Description" value={transaction.description} />
+							<DetailRow
+								label="Transaction ID"
+								value={transaction.transactionId}
+								valueClassName="max-w-[220px] break-all font-mono text-xs"
+							/>
+						</div>
+					</div>
+
+					<Separator />
+
+					<div>
+						<h3 className="mb-2 font-medium">Balance Impact</h3>
+						<DetailRow
+							label="Balance Before"
+							value={formatSignedAmount(transaction.balanceBefore)}
+						/>
+						<DetailRow
+							label="Transaction Amount"
+							value={formattedAmount}
+							valueClassName={isDebit ? "text-red-600" : "text-emerald-600"}
+						/>
+						<DetailRow
+							label="Balance After"
+							value={formatSignedAmount(transaction.balanceAfter)}
+							valueClassName="font-semibold text-primary"
+						/>
+					</div>
+
+					<Separator />
+
+					<div>
+						<h3 className="mb-2 font-medium">Additional Information</h3>
+						<DetailRow label="Type" value={transaction.meta.type} />
+						<DetailRow
+							label="Is Custom"
+							value={transaction.meta.isCustom ? "true" : "false"}
+						/>
+						<DetailRow
+							label="Journey Id"
+							value={transaction.meta.journeyId ?? "null"}
+						/>
+						<DetailRow
+							label="Mixed Verification Id"
+							value={transaction.meta.mixedVerificationId ?? "null"}
+							valueClassName="max-w-[220px] break-all font-mono text-xs"
+						/>
+					</div>
+				</div>
+
+				<DialogFooter>
+					<Button type="button" className="cursor-pointer">
+						<DownloadSimpleIcon className="size-4" />
+						Download Receipt
+					</Button>
+				</DialogFooter>
+			</DialogContent>
+		</Dialog>
+	);
+}

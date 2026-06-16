@@ -1,4 +1,5 @@
 import {
+	CreditCardIcon,
 	HouseIcon,
 	type IconWeight,
 	KeyIcon,
@@ -41,6 +42,11 @@ const navItems = [
 		title: "API Keys",
 		to: "/dashboard/apikeys",
 		icon: KeyIcon,
+	},
+	{
+		title: "Billing",
+		to: "/dashboard/billing",
+		icon: CreditCardIcon,
 	},
 ] as const;
 
