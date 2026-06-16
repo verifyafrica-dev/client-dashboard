@@ -1,6 +1,7 @@
 import {
 	HouseIcon,
 	type IconWeight,
+	KeyIcon,
 	SquaresFourIcon,
 	UserCircleIcon,
 } from "@phosphor-icons/react";
@@ -35,6 +36,11 @@ const navItems = [
 		title: "Profile",
 		to: "/dashboard/profile",
 		icon: UserCircleIcon,
+	},
+	{
+		title: "API Keys",
+		to: "/dashboard/apikeys",
+		icon: KeyIcon,
 	},
 ] as const;
 

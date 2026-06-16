@@ -15,6 +15,7 @@ import { Route as authLayoutDashboardIndexRouteImport } from './routes/(auth)/_l
 import { Route as authLayoutDashboardTeamIndexRouteImport } from './routes/(auth)/_layout/dashboard/team/index'
 import { Route as authLayoutDashboardProfileIndexRouteImport } from './routes/(auth)/_layout/dashboard/profile/index'
 import { Route as authLayoutDashboardProductsIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/index'
+import { Route as authLayoutDashboardApikeysIndexRouteImport } from './routes/(auth)/_layout/dashboard/apikeys/index'
 import { Route as authLayoutDashboardProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/risk-assessment/index'
 import { Route as authLayoutDashboardProductsKybIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/kyb/index'
 import { Route as authLayoutDashboardProductsGovernmentRegistryChecksIndexRouteImport } from './routes/(auth)/_layout/dashboard/products/government-registry-checks/index'
@@ -56,6 +57,12 @@ const authLayoutDashboardProductsIndexRoute =
   authLayoutDashboardProductsIndexRouteImport.update({
     id: '/dashboard/products/',
     path: '/dashboard/products/',
+    getParentRoute: () => authLayoutRoute,
+  } as any)
+const authLayoutDashboardApikeysIndexRoute =
+  authLayoutDashboardApikeysIndexRouteImport.update({
+    id: '/dashboard/apikeys/',
+    path: '/dashboard/apikeys/',
     getParentRoute: () => authLayoutRoute,
   } as any)
 const authLayoutDashboardProductsRiskAssessmentIndexRoute =
@@ -116,6 +123,7 @@ const authLayoutDashboardProductsAddressVerificationIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard/': typeof authLayoutDashboardIndexRoute
+  '/dashboard/apikeys/': typeof authLayoutDashboardApikeysIndexRoute
   '/dashboard/products/': typeof authLayoutDashboardProductsIndexRoute
   '/dashboard/profile/': typeof authLayoutDashboardProfileIndexRoute
   '/dashboard/team/': typeof authLayoutDashboardTeamIndexRoute
@@ -132,6 +140,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof authLayoutDashboardIndexRoute
+  '/dashboard/apikeys': typeof authLayoutDashboardApikeysIndexRoute
   '/dashboard/products': typeof authLayoutDashboardProductsIndexRoute
   '/dashboard/profile': typeof authLayoutDashboardProfileIndexRoute
   '/dashboard/team': typeof authLayoutDashboardTeamIndexRoute
@@ -150,6 +159,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(auth)/_layout': typeof authLayoutRouteWithChildren
   '/(auth)/_layout/dashboard/': typeof authLayoutDashboardIndexRoute
+  '/(auth)/_layout/dashboard/apikeys/': typeof authLayoutDashboardApikeysIndexRoute
   '/(auth)/_layout/dashboard/products/': typeof authLayoutDashboardProductsIndexRoute
   '/(auth)/_layout/dashboard/profile/': typeof authLayoutDashboardProfileIndexRoute
   '/(auth)/_layout/dashboard/team/': typeof authLayoutDashboardTeamIndexRoute
@@ -168,6 +178,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dashboard/'
+    | '/dashboard/apikeys/'
     | '/dashboard/products/'
     | '/dashboard/profile/'
     | '/dashboard/team/'
@@ -184,6 +195,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dashboard'
+    | '/dashboard/apikeys'
     | '/dashboard/products'
     | '/dashboard/profile'
     | '/dashboard/team'
@@ -201,6 +213,7 @@ export interface FileRouteTypes {
     | '/'
     | '/(auth)/_layout'
     | '/(auth)/_layout/dashboard/'
+    | '/(auth)/_layout/dashboard/apikeys/'
     | '/(auth)/_layout/dashboard/products/'
     | '/(auth)/_layout/dashboard/profile/'
     | '/(auth)/_layout/dashboard/team/'
@@ -262,6 +275,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/products'
       fullPath: '/dashboard/products/'
       preLoaderRoute: typeof authLayoutDashboardProductsIndexRouteImport
+      parentRoute: typeof authLayoutRoute
+    }
+    '/(auth)/_layout/dashboard/apikeys/': {
+      id: '/(auth)/_layout/dashboard/apikeys/'
+      path: '/dashboard/apikeys'
+      fullPath: '/dashboard/apikeys/'
+      preLoaderRoute: typeof authLayoutDashboardApikeysIndexRouteImport
       parentRoute: typeof authLayoutRoute
     }
     '/(auth)/_layout/dashboard/products/risk-assessment/': {
@@ -332,6 +352,7 @@ declare module '@tanstack/react-router' {
 
 interface authLayoutRouteChildren {
   authLayoutDashboardIndexRoute: typeof authLayoutDashboardIndexRoute
+  authLayoutDashboardApikeysIndexRoute: typeof authLayoutDashboardApikeysIndexRoute
   authLayoutDashboardProductsIndexRoute: typeof authLayoutDashboardProductsIndexRoute
   authLayoutDashboardProfileIndexRoute: typeof authLayoutDashboardProfileIndexRoute
   authLayoutDashboardTeamIndexRoute: typeof authLayoutDashboardTeamIndexRoute
@@ -348,6 +369,7 @@ interface authLayoutRouteChildren {
 
 const authLayoutRouteChildren: authLayoutRouteChildren = {
   authLayoutDashboardIndexRoute: authLayoutDashboardIndexRoute,
+  authLayoutDashboardApikeysIndexRoute: authLayoutDashboardApikeysIndexRoute,
   authLayoutDashboardProductsIndexRoute: authLayoutDashboardProductsIndexRoute,
   authLayoutDashboardProfileIndexRoute: authLayoutDashboardProfileIndexRoute,
   authLayoutDashboardTeamIndexRoute: authLayoutDashboardTeamIndexRoute,
