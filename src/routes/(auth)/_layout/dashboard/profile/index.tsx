@@ -5,7 +5,6 @@ import {
 	EyeSlashIcon,
 	FloppyDiskIcon,
 	LockIcon,
-	PhoneIcon,
 	ShieldCheckIcon,
 	UserIcon,
 } from "@phosphor-icons/react";
@@ -30,6 +29,7 @@ import {
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
+import { PhoneInput } from "#/components/ui-extended/phone-input";
 
 export const Route = createFileRoute("/(auth)/_layout/dashboard/profile/")({
 	component: ProfilePage,
@@ -191,14 +191,10 @@ function UpdateProfileTab() {
 					type="email"
 					defaultValue={PROFILE.email}
 				/>
-				<IconInput
-					id="phone"
-					label="Phone Number"
-					icon={PhoneIcon}
-					type="tel"
-					placeholder="Enter your phone number"
-					defaultValue={PROFILE.phone}
-				/>
+				<div className="space-y-2">
+					<Label htmlFor="phone">Phone Number</Label>
+					<PhoneInput id="phone" defaultValue={PROFILE.phone} />
+				</div>
 			</div>
 
 			<Button type="submit" className="w-full">
@@ -245,7 +241,9 @@ function ProfilePage() {
 	return (
 		<Card className="mx-auto w-full max-w-3xl">
 			<CardHeader>
-				<CardTitle className="text-xl">Profile Settings</CardTitle>
+				<CardTitle className="text-xl font-semibold">
+					Profile Settings
+				</CardTitle>
 				<CardDescription>
 					Manage your personal information and security
 				</CardDescription>

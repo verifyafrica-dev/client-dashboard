@@ -3,6 +3,7 @@
 @plugin '@tailwindcss/typography';
 
 @import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -19,8 +20,8 @@
   --secondary-foreground: oklch(0.25 0.059 178.9);
   --muted: oklch(0.97 0.002 178.9);
   --muted-foreground: oklch(0.52 0.024 178.9);
-  --accent: oklch(0.965 0.004 178.9);
-  --accent-foreground: oklch(0.25 0.036 178.9);
+  --accent: oklch(96.1% 0.006 264.5);
+  --accent-foreground: oklch(13.5% 0.01 264.5);
   --destructive: oklch(0.584 0.239 28.5);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.925 0.006 178.9);
