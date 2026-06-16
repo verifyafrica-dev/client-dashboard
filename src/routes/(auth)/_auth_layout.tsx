@@ -27,7 +27,7 @@ function AuthLayout() {
 	return (
 		<SidebarProvider>
 			<AppSidebar />
-			<SidebarInset>
+			<SidebarInset className="min-w-0">
 				<header className="flex min-h-14 items-center gap-2 border-b px-4 justify-between">
 					<SidebarTrigger />
 					<Popover>
@@ -66,7 +66,7 @@ function AuthLayout() {
 						</PopoverContent>
 					</Popover>
 				</header>
-				<div className="flex flex-1 flex-col p-4">
+				<div className="flex min-w-0 flex-1 flex-col p-4">
 					<Outlet />
 				</div>
 			</SidebarInset>

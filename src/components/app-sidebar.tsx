@@ -1,5 +1,6 @@
 import {
 	CaretRightIcon,
+	ClipboardTextIcon,
 	CreditCardIcon,
 	HouseIcon,
 	type IconWeight,
@@ -49,6 +50,11 @@ const navItems = [
 		title: "Products",
 		to: "/dashboard/products",
 		icon: SquaresFourIcon,
+	},
+	{
+		title: "Reports",
+		to: "/dashboard/reports",
+		icon: ClipboardTextIcon,
 	},
 	{
 		title: "Profile",
@@ -108,7 +114,9 @@ function SidebarNavItem({
 }
 
 function SidebarTeamNav() {
-	const pathname = useRouterState({ select: (state) => state.location.pathname });
+	const pathname = useRouterState({
+		select: (state) => state.location.pathname,
+	});
 	const isTeamActive = pathname.startsWith("/dashboard/team");
 	const [isOpen, setIsOpen] = React.useState(isTeamActive);
 
@@ -145,7 +153,8 @@ function SidebarTeamNav() {
 				<CollapsibleContent>
 					<SidebarMenuSub>
 						{teamSubItems.map((item) => {
-							const isActive = pathname === item.to || pathname === `${item.to}/`;
+							const isActive =
+								pathname === item.to || pathname === `${item.to}/`;
 
 							return (
 								<SidebarMenuSubItem key={item.to}>

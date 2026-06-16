@@ -19,6 +19,7 @@ import { Route as unguardedUnguarded_layoutForgotPasswordIndexRouteImport } from
 import { Route as unguardedUnguarded_layoutActivateAccountIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/activate-account/index'
 import { Route as authAuth_layoutDashboardIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/index'
 import { Route as authAuth_layoutDashboardTeamIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/index'
+import { Route as authAuth_layoutDashboardReportsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/reports/index'
 import { Route as authAuth_layoutDashboardProfileIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/profile/index'
 import { Route as authAuth_layoutDashboardProductsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/index'
 import { Route as authAuth_layoutDashboardKycIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/kyc/index'
@@ -90,6 +91,12 @@ const authAuth_layoutDashboardTeamIndexRoute =
   authAuth_layoutDashboardTeamIndexRouteImport.update({
     id: '/dashboard/team/',
     path: '/dashboard/team/',
+    getParentRoute: () => authAuth_layoutRoute,
+  } as any)
+const authAuth_layoutDashboardReportsIndexRoute =
+  authAuth_layoutDashboardReportsIndexRouteImport.update({
+    id: '/dashboard/reports/',
+    path: '/dashboard/reports/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
 const authAuth_layoutDashboardProfileIndexRoute =
@@ -204,6 +211,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/kyc/': typeof authAuth_layoutDashboardKycIndexRoute
   '/dashboard/products/': typeof authAuth_layoutDashboardProductsIndexRoute
   '/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
+  '/dashboard/reports/': typeof authAuth_layoutDashboardReportsIndexRoute
   '/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
   '/dashboard/products/address-verification/': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
   '/dashboard/products/aml-screening/': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
@@ -230,6 +238,7 @@ export interface FileRoutesByTo {
   '/dashboard/kyc': typeof authAuth_layoutDashboardKycIndexRoute
   '/dashboard/products': typeof authAuth_layoutDashboardProductsIndexRoute
   '/dashboard/profile': typeof authAuth_layoutDashboardProfileIndexRoute
+  '/dashboard/reports': typeof authAuth_layoutDashboardReportsIndexRoute
   '/dashboard/team': typeof authAuth_layoutDashboardTeamIndexRoute
   '/dashboard/products/address-verification': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
   '/dashboard/products/aml-screening': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
@@ -259,6 +268,7 @@ export interface FileRoutesById {
   '/(auth)/_auth_layout/dashboard/kyc/': typeof authAuth_layoutDashboardKycIndexRoute
   '/(auth)/_auth_layout/dashboard/products/': typeof authAuth_layoutDashboardProductsIndexRoute
   '/(auth)/_auth_layout/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
+  '/(auth)/_auth_layout/dashboard/reports/': typeof authAuth_layoutDashboardReportsIndexRoute
   '/(auth)/_auth_layout/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
   '/(auth)/_auth_layout/dashboard/products/address-verification/': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
   '/(auth)/_auth_layout/dashboard/products/aml-screening/': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
@@ -287,6 +297,7 @@ export interface FileRouteTypes {
     | '/dashboard/kyc/'
     | '/dashboard/products/'
     | '/dashboard/profile/'
+    | '/dashboard/reports/'
     | '/dashboard/team/'
     | '/dashboard/products/address-verification/'
     | '/dashboard/products/aml-screening/'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/dashboard/kyc'
     | '/dashboard/products'
     | '/dashboard/profile'
+    | '/dashboard/reports'
     | '/dashboard/team'
     | '/dashboard/products/address-verification'
     | '/dashboard/products/aml-screening'
@@ -341,6 +353,7 @@ export interface FileRouteTypes {
     | '/(auth)/_auth_layout/dashboard/kyc/'
     | '/(auth)/_auth_layout/dashboard/products/'
     | '/(auth)/_auth_layout/dashboard/profile/'
+    | '/(auth)/_auth_layout/dashboard/reports/'
     | '/(auth)/_auth_layout/dashboard/team/'
     | '/(auth)/_auth_layout/dashboard/products/address-verification/'
     | '/(auth)/_auth_layout/dashboard/products/aml-screening/'
@@ -431,6 +444,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/team'
       fullPath: '/dashboard/team/'
       preLoaderRoute: typeof authAuth_layoutDashboardTeamIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
+    }
+    '/(auth)/_auth_layout/dashboard/reports/': {
+      id: '/(auth)/_auth_layout/dashboard/reports/'
+      path: '/dashboard/reports'
+      fullPath: '/dashboard/reports/'
+      preLoaderRoute: typeof authAuth_layoutDashboardReportsIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
     '/(auth)/_auth_layout/dashboard/profile/': {
@@ -555,6 +575,7 @@ interface authAuth_layoutRouteChildren {
   authAuth_layoutDashboardKycIndexRoute: typeof authAuth_layoutDashboardKycIndexRoute
   authAuth_layoutDashboardProductsIndexRoute: typeof authAuth_layoutDashboardProductsIndexRoute
   authAuth_layoutDashboardProfileIndexRoute: typeof authAuth_layoutDashboardProfileIndexRoute
+  authAuth_layoutDashboardReportsIndexRoute: typeof authAuth_layoutDashboardReportsIndexRoute
   authAuth_layoutDashboardTeamIndexRoute: typeof authAuth_layoutDashboardTeamIndexRoute
   authAuth_layoutDashboardProductsAddressVerificationIndexRoute: typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
   authAuth_layoutDashboardProductsAmlScreeningIndexRoute: typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
@@ -580,6 +601,8 @@ const authAuth_layoutRouteChildren: authAuth_layoutRouteChildren = {
     authAuth_layoutDashboardProductsIndexRoute,
   authAuth_layoutDashboardProfileIndexRoute:
     authAuth_layoutDashboardProfileIndexRoute,
+  authAuth_layoutDashboardReportsIndexRoute:
+    authAuth_layoutDashboardReportsIndexRoute,
   authAuth_layoutDashboardTeamIndexRoute:
     authAuth_layoutDashboardTeamIndexRoute,
   authAuth_layoutDashboardProductsAddressVerificationIndexRoute:
