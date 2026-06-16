@@ -1,11 +1,8 @@
 import { AlertCircle, CheckCircle, Clock, XCircle } from "lucide-react";
 import { cn } from "#/lib/utils.ts";
-import {
-	type InvitationStatus,
-	ROLE_LABELS,
-	STATUS_LABELS,
-	type TenantUserRole,
-} from "../-data";
+import { type InvitationStatus, STATUS_LABELS } from "../-data";
+
+export { UserRoleBadge as InvitationRoleBadge } from "../../-components/user-role-badge";
 
 export function getStatusIcon(status: InvitationStatus) {
 	switch (status) {
@@ -36,19 +33,6 @@ export function getStatusBadgeClassName(status: InvitationStatus) {
 	}
 }
 
-export function getRoleBadgeClassName(role: TenantUserRole) {
-	const baseClasses = "inline-flex rounded px-2 py-1 text-xs font-medium";
-
-	switch (role) {
-		case "admin":
-			return cn(baseClasses, "bg-purple-100 text-purple-800");
-		case "member":
-			return cn(baseClasses, "bg-blue-100 text-blue-800");
-		default:
-			return cn(baseClasses, "bg-gray-100 text-gray-800");
-	}
-}
-
 export function InvitationStatusBadge({
 	status,
 }: {
@@ -59,11 +43,5 @@ export function InvitationStatusBadge({
 			{getStatusIcon(status)}
 			{STATUS_LABELS[status]}
 		</span>
-	);
-}
-
-export function InvitationRoleBadge({ role }: { role: TenantUserRole }) {
-	return (
-		<span className={getRoleBadgeClassName(role)}>{ROLE_LABELS[role]}</span>
 	);
 }

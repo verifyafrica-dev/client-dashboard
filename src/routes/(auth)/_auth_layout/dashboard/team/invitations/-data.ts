@@ -1,4 +1,4 @@
-export type TenantUserRole = "admin" | "member";
+import type { TenantUserRole } from "../-data";
 
 export type InvitationStatus = "pending" | "accepted" | "expired";
 
@@ -10,18 +10,19 @@ export type UserInvitation = {
 	expiresAt: Date;
 };
 
-export const ROLE_LABELS: Record<TenantUserRole, string> = {
-	admin: "Administrator",
-	member: "Member",
-};
+export {
+	formatTeamDate as formatInvitationExpiry,
+	ROLE_LABELS,
+	TEAM_PAGE_SIZE,
+	TEAM_ROLES as INVITATION_ROLES,
+	type TenantUserRole,
+} from "../-data";
 
 export const STATUS_LABELS: Record<InvitationStatus, string> = {
 	pending: "Pending",
 	accepted: "Accepted",
 	expired: "Expired",
 };
-
-export const INVITATION_ROLES: TenantUserRole[] = ["admin", "member"];
 
 export const MOCK_INVITATIONS: UserInvitation[] = [
 	{
@@ -45,14 +46,32 @@ export const MOCK_INVITATIONS: UserInvitation[] = [
 		status: "expired",
 		expiresAt: new Date("2026-05-01T14:00:00"),
 	},
+	{
+		id: "inv-4",
+		email: "jane.doe@example.com",
+		role: "member",
+		status: "pending",
+		expiresAt: new Date("2026-07-01T08:00:00"),
+	},
+	{
+		id: "inv-5",
+		email: "ops@verifyafrica.io",
+		role: "admin",
+		status: "pending",
+		expiresAt: new Date("2026-06-28T15:30:00"),
+	},
+	{
+		id: "inv-6",
+		email: "finance@verifyafrica.io",
+		role: "member",
+		status: "accepted",
+		expiresAt: new Date("2026-06-15T12:00:00"),
+	},
+	{
+		id: "inv-7",
+		email: "legacy@example.com",
+		role: "admin",
+		status: "expired",
+		expiresAt: new Date("2026-04-12T09:45:00"),
+	},
 ];
-
-export function formatInvitationExpiry(date: Date) {
-	return new Intl.DateTimeFormat("en-US", {
-		month: "long",
-		day: "numeric",
-		year: "numeric",
-		hour: "numeric",
-		minute: "2-digit",
-	}).format(date);
-}

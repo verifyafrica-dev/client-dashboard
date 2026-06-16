@@ -26,7 +26,14 @@ import {
 	TableHeader,
 	TableRow,
 } from "#/components/ui/table";
-import { DeleteInvitationDialog } from "./-components/delete-invitation-dialog";
+import {
+	DeleteUserDialog,
+	type DeleteUserDialogTarget,
+} from "../-components/delete-user-dialog";
+import {
+	paginateItems,
+	TablePagination,
+} from "../-components/table-pagination";
 import {
 	InvitationRoleBadge,
 	InvitationStatusBadge,
@@ -39,6 +46,7 @@ import {
 	MOCK_INVITATIONS,
 	ROLE_LABELS,
 	STATUS_LABELS,
+	TEAM_PAGE_SIZE,
 	type TenantUserRole,
 	type UserInvitation,
 } from "./-data";
@@ -61,6 +69,7 @@ function InvitationsPage() {
 		"all",
 	);
 	const [roleFilter, setRoleFilter] = useState<TenantUserRole | "all">("all");
+	const [page, setPage] = useState(1);
 
 	const filteredInvitations = useMemo(() => {
 		const query = search.trim().toLowerCase();
@@ -77,6 +86,11 @@ function InvitationsPage() {
 		});
 	}, [invitations, search, statusFilter, roleFilter]);
 
+	const { items: paginatedInvitations, safePage } = useMemo(
+		() => paginateItems(filteredInvitations, page, TEAM_PAGE_SIZE),
+		[filteredInvitations, page],
+	);
+
 	function handleInvite(payload: { email: string; role: TenantUserRole }) {
 		const newInvitation: UserInvitation = {
 			id: crypto.randomUUID(),
@@ -87,6 +101,7 @@ function InvitationsPage() {
 		};
 
 		setInvitations((current) => [newInvitation, ...current]);
+		setPage(1);
 	}
 
 	function openDeleteDialog(invitation: UserInvitation) {
@@ -94,9 +109,9 @@ function InvitationsPage() {
 		setDeleteDialogOpen(true);
 	}
 
-	function handleDeleteInvitation(invitation: UserInvitation) {
+	function handleDeleteInvitation(target: DeleteUserDialogTarget) {
 		setInvitations((current) =>
-			current.filter((item) => item.id !== invitation.id),
+			current.filter((item) => item.id !== target.id),
 		);
 		setInvitationToDelete(null);
 	}
@@ -132,7 +147,10 @@ function InvitationsPage() {
 								<Input
 									placeholder="Search invitations..."
 									value={search}
-									onChange={(event) => setSearch(event.target.value)}
+									onChange={(event) => {
+										setSearch(event.target.value);
+										setPage(1);
+									}}
 									className="pl-9"
 								/>
 							</div>
@@ -142,9 +160,10 @@ function InvitationsPage() {
 								</Label>
 								<Select
 									value={statusFilter}
-									onValueChange={(value) =>
-										setStatusFilter(value as InvitationStatus | "all")
-									}
+									onValueChange={(value) => {
+										setStatusFilter(value as InvitationStatus | "all");
+										setPage(1);
+									}}
 								>
 									<SelectTrigger id="status-filter" className="w-[150px]">
 										<SelectValue placeholder="Status: All" />
@@ -165,9 +184,10 @@ function InvitationsPage() {
 								</Label>
 								<Select
 									value={roleFilter}
-									onValueChange={(value) =>
-										setRoleFilter(value as TenantUserRole | "all")
-									}
+									onValueChange={(value) => {
+										setRoleFilter(value as TenantUserRole | "all");
+										setPage(1);
+									}}
 								>
 									<SelectTrigger id="role-filter" className="w-[150px]">
 										<SelectValue placeholder="Role: All" />
@@ -187,9 +207,9 @@ function InvitationsPage() {
 				</CardHeader>
 				<CardContent className="p-0">
 					<Table>
-						<TableHeader className="">
-							<TableRow className="hover:bg-transparent ">
-								<TableHead className="text-xs font-semibold tracking-wide uppercase pl-4 sm:pl-6">
+						<TableHeader>
+							<TableRow className="hover:bg-transparent">
+								<TableHead className="pl-4 text-xs font-semibold tracking-wide uppercase sm:pl-6">
 									User Details
 								</TableHead>
 								<TableHead className="text-xs font-semibold tracking-wide uppercase">
@@ -201,13 +221,13 @@ function InvitationsPage() {
 								<TableHead className="text-xs font-semibold tracking-wide uppercase">
 									Expires
 								</TableHead>
-								<TableHead className="text-xs font-semibold tracking-wide uppercase pr-4 sm:pr-6">
+								<TableHead className="pr-4 text-xs font-semibold tracking-wide uppercase sm:pr-6">
 									Actions
 								</TableHead>
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{filteredInvitations.length === 0 ? (
+							{paginatedInvitations.length === 0 ? (
 								<TableRow>
 									<TableCell
 										colSpan={5}
@@ -219,7 +239,7 @@ function InvitationsPage() {
 									</TableCell>
 								</TableRow>
 							) : (
-								filteredInvitations.map((invitation) => (
+								paginatedInvitations.map((invitation) => (
 									<TableRow key={invitation.id}>
 										<TableCell className="pl-4 sm:pl-6">
 											<div className="flex items-center gap-3">
@@ -260,6 +280,12 @@ function InvitationsPage() {
 							)}
 						</TableBody>
 					</Table>
+					<TablePagination
+						page={safePage}
+						pageSize={TEAM_PAGE_SIZE}
+						total={filteredInvitations.length}
+						onPageChange={setPage}
+					/>
 				</CardContent>
 			</Card>
 
@@ -269,8 +295,16 @@ function InvitationsPage() {
 				onInvite={handleInvite}
 			/>
 
-			<DeleteInvitationDialog
-				invitation={invitationToDelete}
+			<DeleteUserDialog
+				target={
+					invitationToDelete
+						? {
+								id: invitationToDelete.id,
+								email: invitationToDelete.email,
+							}
+						: null
+				}
+				type="invitation"
 				open={deleteDialogOpen}
 				onOpenChange={(open) => {
 					setDeleteDialogOpen(open);
