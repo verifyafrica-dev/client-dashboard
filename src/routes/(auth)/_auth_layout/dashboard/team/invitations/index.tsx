@@ -4,6 +4,7 @@ import {
 	TrashIcon,
 	UserIcon,
 } from "@phosphor-icons/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback } from "#/components/ui/avatar";
@@ -35,21 +36,35 @@ import {
 	TablePagination,
 } from "../-components/table-pagination";
 import {
+	TeamTablePaginationSkeleton,
+	TeamTableSkeleton,
+} from "../-components/team-table-skeleton";
+import {
 	InvitationRoleBadge,
 	InvitationStatusBadge,
 } from "./-components/invitation-badges";
 import { InviteUserDialog } from "./-components/invite-user-dialog";
 import {
+	fetchInvitations,
 	formatInvitationExpiry,
 	INVITATION_ROLES,
 	type InvitationStatus,
-	MOCK_INVITATIONS,
 	ROLE_LABELS,
 	STATUS_LABELS,
 	TEAM_PAGE_SIZE,
 	type TenantUserRole,
 	type UserInvitation,
 } from "./-data";
+
+const INVITATIONS_QUERY_KEY = ["team", "invitations"] as const;
+
+const INVITATION_TABLE_COLUMNS = [
+	"User Details",
+	"Role",
+	"Invitation Status",
+	"Expires",
+	"Actions",
+];
 
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/dashboard/team/invitations/",
@@ -58,8 +73,7 @@ export const Route = createFileRoute(
 });
 
 function InvitationsPage() {
-	const [invitations, setInvitations] =
-		useState<UserInvitation[]>(MOCK_INVITATIONS);
+	const queryClient = useQueryClient();
 	const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [invitationToDelete, setInvitationToDelete] =
@@ -70,6 +84,14 @@ function InvitationsPage() {
 	);
 	const [roleFilter, setRoleFilter] = useState<TenantUserRole | "all">("all");
 	const [page, setPage] = useState(1);
+
+	const { data, isPending, isFetching } = useQuery({
+		queryKey: INVITATIONS_QUERY_KEY,
+		queryFn: fetchInvitations,
+	});
+
+	const invitations = data ?? [];
+	const isLoading = isPending || isFetching;
 
 	const filteredInvitations = useMemo(() => {
 		const query = search.trim().toLowerCase();
@@ -100,7 +122,10 @@ function InvitationsPage() {
 			expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
 		};
 
-		setInvitations((current) => [newInvitation, ...current]);
+		queryClient.setQueryData<UserInvitation[]>(
+			INVITATIONS_QUERY_KEY,
+			(current) => [newInvitation, ...(current ?? [])],
+		);
 		setPage(1);
 	}
 
@@ -110,8 +135,9 @@ function InvitationsPage() {
 	}
 
 	function handleDeleteInvitation(target: DeleteUserDialogTarget) {
-		setInvitations((current) =>
-			current.filter((item) => item.id !== target.id),
+		queryClient.setQueryData<UserInvitation[]>(
+			INVITATIONS_QUERY_KEY,
+			(current) => current?.filter((item) => item.id !== target.id) ?? [],
 		);
 		setInvitationToDelete(null);
 	}
@@ -130,6 +156,7 @@ function InvitationsPage() {
 				<Button
 					className="cursor-pointer tracking-wide"
 					onClick={() => setInviteDialogOpen(true)}
+					disabled={isPending}
 				>
 					Invite User
 				</Button>
@@ -152,6 +179,7 @@ function InvitationsPage() {
 										setPage(1);
 									}}
 									className="pl-9"
+									disabled={isLoading}
 								/>
 							</div>
 							<div className="flex flex-wrap items-center gap-2">
@@ -164,6 +192,7 @@ function InvitationsPage() {
 										setStatusFilter(value as InvitationStatus | "all");
 										setPage(1);
 									}}
+									disabled={isLoading}
 								>
 									<SelectTrigger id="status-filter" className="w-[150px]">
 										<SelectValue placeholder="Status: All" />
@@ -188,6 +217,7 @@ function InvitationsPage() {
 										setRoleFilter(value as TenantUserRole | "all");
 										setPage(1);
 									}}
+									disabled={isLoading}
 								>
 									<SelectTrigger id="role-filter" className="w-[150px]">
 										<SelectValue placeholder="Role: All" />
@@ -206,86 +236,94 @@ function InvitationsPage() {
 					</div>
 				</CardHeader>
 				<CardContent className="p-0">
-					<Table>
-						<TableHeader>
-							<TableRow className="hover:bg-transparent">
-								<TableHead className="pl-4 text-xs font-semibold tracking-wide uppercase sm:pl-6">
-									User Details
-								</TableHead>
-								<TableHead className="text-xs font-semibold tracking-wide uppercase">
-									Role
-								</TableHead>
-								<TableHead className="text-xs font-semibold tracking-wide uppercase">
-									Invitation Status
-								</TableHead>
-								<TableHead className="text-xs font-semibold tracking-wide uppercase">
-									Expires
-								</TableHead>
-								<TableHead className="pr-4 text-xs font-semibold tracking-wide uppercase sm:pr-6">
-									Actions
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{paginatedInvitations.length === 0 ? (
-								<TableRow>
-									<TableCell
-										colSpan={5}
-										className="h-24 text-center text-sm text-muted-foreground"
-									>
-										{invitations.length === 0
-											? 'No invitations yet. Click "Invite User" to send one.'
-											: "No invitations match your search or filters."}
-									</TableCell>
-								</TableRow>
-							) : (
-								paginatedInvitations.map((invitation) => (
-									<TableRow key={invitation.id}>
-										<TableCell className="pl-4 sm:pl-6">
-											<div className="flex items-center gap-3">
-												<Avatar size="sm">
-													<AvatarFallback>
-														<UserIcon className="size-4" />
-													</AvatarFallback>
-												</Avatar>
-												<span className="text-sm">{invitation.email}</span>
-											</div>
-										</TableCell>
-										<TableCell>
-											<InvitationRoleBadge role={invitation.role} />
-										</TableCell>
-										<TableCell>
-											<InvitationStatusBadge status={invitation.status} />
-										</TableCell>
-										<TableCell>
-											<div className="flex items-center gap-2 text-sm text-muted-foreground">
-												<CalendarBlankIcon className="size-4 shrink-0" />
-												{formatInvitationExpiry(invitation.expiresAt)}
-											</div>
-										</TableCell>
-										<TableCell className="pr-4 sm:pr-6">
-											<Button
-												type="button"
-												variant="destructive"
-												size="sm"
-												className="cursor-pointer tracking-wide"
-												onClick={() => openDeleteDialog(invitation)}
+					{isPending ? (
+						<>
+							<TeamTableSkeleton columns={INVITATION_TABLE_COLUMNS} />
+							<TeamTablePaginationSkeleton />
+						</>
+					) : (
+						<>
+							<Table>
+								<TableHeader>
+									<TableRow className="hover:bg-transparent">
+										{INVITATION_TABLE_COLUMNS.map((column, index) => (
+											<TableHead
+												key={column}
+												className={
+													index === 0
+														? "pl-4 text-xs font-semibold tracking-wide uppercase sm:pl-6"
+														: index === INVITATION_TABLE_COLUMNS.length - 1
+															? "pr-4 text-xs font-semibold tracking-wide uppercase sm:pr-6"
+															: "text-xs font-semibold tracking-wide uppercase"
+												}
 											>
-												<TrashIcon className="size-4" />
-												Delete
-											</Button>
-										</TableCell>
+												{column}
+											</TableHead>
+										))}
 									</TableRow>
-								))
-							)}
-						</TableBody>
-					</Table>
-					<TablePagination
-						page={safePage}
-						pageSize={TEAM_PAGE_SIZE}
-						total={filteredInvitations.length}
-						onPageChange={setPage}
-					/>
+								</TableHeader>
+								<TableBody>
+									{paginatedInvitations.length === 0 ? (
+										<TableRow>
+											<TableCell
+												colSpan={INVITATION_TABLE_COLUMNS.length}
+												className="h-24 text-center text-sm text-muted-foreground"
+											>
+												{invitations.length === 0
+													? 'No invitations yet. Click "Invite User" to send one.'
+													: "No invitations match your search or filters."}
+											</TableCell>
+										</TableRow>
+									) : (
+										paginatedInvitations.map((invitation) => (
+											<TableRow key={invitation.id}>
+												<TableCell className="pl-4 sm:pl-6">
+													<div className="flex items-center gap-3">
+														<Avatar size="sm">
+															<AvatarFallback>
+																<UserIcon className="size-4" />
+															</AvatarFallback>
+														</Avatar>
+														<span className="text-sm">{invitation.email}</span>
+													</div>
+												</TableCell>
+												<TableCell>
+													<InvitationRoleBadge role={invitation.role} />
+												</TableCell>
+												<TableCell>
+													<InvitationStatusBadge status={invitation.status} />
+												</TableCell>
+												<TableCell>
+													<div className="flex items-center gap-2 text-sm text-muted-foreground">
+														<CalendarBlankIcon className="size-4 shrink-0" />
+														{formatInvitationExpiry(invitation.expiresAt)}
+													</div>
+												</TableCell>
+												<TableCell className="pr-4 sm:pr-6">
+													<Button
+														type="button"
+														variant="destructive"
+														size="sm"
+														className="cursor-pointer tracking-wide"
+														onClick={() => openDeleteDialog(invitation)}
+													>
+														<TrashIcon className="size-4" />
+														Delete
+													</Button>
+												</TableCell>
+											</TableRow>
+										))
+									)}
+								</TableBody>
+							</Table>
+							<TablePagination
+								page={safePage}
+								pageSize={TEAM_PAGE_SIZE}
+								total={filteredInvitations.length}
+								onPageChange={setPage}
+							/>
+						</>
+					)}
 				</CardContent>
 			</Card>
 

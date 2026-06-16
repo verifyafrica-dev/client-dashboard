@@ -75,3 +75,12 @@ export const MOCK_INVITATIONS: UserInvitation[] = [
 		expiresAt: new Date("2026-04-12T09:45:00"),
 	},
 ];
+
+export async function fetchInvitations(): Promise<UserInvitation[]> {
+	await new Promise((resolve) => setTimeout(resolve, 600));
+
+	return MOCK_INVITATIONS.map((invitation) => ({
+		...invitation,
+		expiresAt: new Date(invitation.expiresAt),
+	}));
+}

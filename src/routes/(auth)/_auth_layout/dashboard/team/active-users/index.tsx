@@ -3,6 +3,7 @@ import {
 	MagnifyingGlassIcon,
 	TrashIcon,
 } from "@phosphor-icons/react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Avatar, AvatarFallback } from "#/components/ui/avatar";
@@ -33,6 +34,10 @@ import {
 	paginateItems,
 	TablePagination,
 } from "../-components/table-pagination";
+import {
+	TeamTablePaginationSkeleton,
+	TeamTableSkeleton,
+} from "../-components/team-table-skeleton";
 import { UserRoleBadge } from "../-components/user-role-badge";
 import type { TenantUserRole } from "../-data";
 import { InviteUserDialog } from "../invitations/-components/invite-user-dialog";
@@ -42,13 +47,24 @@ import {
 	ACTIVE_USER_STATUSES,
 	type ActiveUser,
 	type ActiveUserStatus,
+	fetchActiveUsers,
 	formatTeamDate,
 	getUserInitials,
-	MOCK_ACTIVE_USERS,
 	ROLE_LABELS,
 	TEAM_PAGE_SIZE,
 	TEAM_ROLES,
 } from "./-data";
+
+const ACTIVE_USERS_QUERY_KEY = ["team", "active-users"] as const;
+
+const ACTIVE_USER_TABLE_COLUMNS = [
+	"Customer",
+	"Email",
+	"Role",
+	"Date",
+	"Status",
+	"Actions",
+];
 
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/dashboard/team/active-users/",
@@ -57,7 +73,7 @@ export const Route = createFileRoute(
 });
 
 function ActiveUsersPage() {
-	const [users, setUsers] = useState<ActiveUser[]>(MOCK_ACTIVE_USERS);
+	const queryClient = useQueryClient();
 	const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [userToDelete, setUserToDelete] = useState<ActiveUser | null>(null);
@@ -67,6 +83,14 @@ function ActiveUsersPage() {
 	);
 	const [roleFilter, setRoleFilter] = useState<TenantUserRole | "all">("all");
 	const [page, setPage] = useState(1);
+
+	const { data, isPending, isFetching } = useQuery({
+		queryKey: ACTIVE_USERS_QUERY_KEY,
+		queryFn: fetchActiveUsers,
+	});
+
+	const users = data ?? [];
+	const isLoading = isPending || isFetching;
 
 	const filteredUsers = useMemo(() => {
 		const query = search.trim().toLowerCase();
@@ -95,7 +119,10 @@ function ActiveUsersPage() {
 	}
 
 	function handleDeleteUser(target: DeleteUserDialogTarget) {
-		setUsers((current) => current.filter((item) => item.id !== target.id));
+		queryClient.setQueryData<ActiveUser[]>(
+			ACTIVE_USERS_QUERY_KEY,
+			(current) => current?.filter((item) => item.id !== target.id) ?? [],
+		);
 		setUserToDelete(null);
 	}
 
@@ -113,6 +140,7 @@ function ActiveUsersPage() {
 				<Button
 					className="cursor-pointer tracking-wide"
 					onClick={() => setInviteDialogOpen(true)}
+					disabled={isPending}
 				>
 					Invite User
 				</Button>
@@ -133,6 +161,7 @@ function ActiveUsersPage() {
 										setPage(1);
 									}}
 									className="pl-9"
+									disabled={isLoading}
 								/>
 							</div>
 							<div className="flex flex-wrap items-center gap-2">
@@ -145,6 +174,7 @@ function ActiveUsersPage() {
 										setStatusFilter(value as ActiveUserStatus | "all");
 										setPage(1);
 									}}
+									disabled={isLoading}
 								>
 									<SelectTrigger id="user-status-filter" className="w-[150px]">
 										<SelectValue placeholder="Status: All" />
@@ -167,6 +197,7 @@ function ActiveUsersPage() {
 										setRoleFilter(value as TenantUserRole | "all");
 										setPage(1);
 									}}
+									disabled={isLoading}
 								>
 									<SelectTrigger id="user-role-filter" className="w-[150px]">
 										<SelectValue placeholder="Role: All" />
@@ -185,99 +216,104 @@ function ActiveUsersPage() {
 					</div>
 				</CardHeader>
 				<CardContent className="p-0">
-					<Table>
-						<TableHeader>
-							<TableRow className="hover:bg-transparent">
-								<TableHead className="pl-4 text-xs font-semibold tracking-wide uppercase sm:pl-6">
-									Customer
-								</TableHead>
-								<TableHead className="text-xs font-semibold tracking-wide uppercase">
-									Email
-								</TableHead>
-								<TableHead className="text-xs font-semibold tracking-wide uppercase">
-									Role
-								</TableHead>
-								<TableHead className="text-xs font-semibold tracking-wide uppercase">
-									Date
-								</TableHead>
-								<TableHead className="text-xs font-semibold tracking-wide uppercase">
-									Status
-								</TableHead>
-								<TableHead className="pr-4 text-xs font-semibold tracking-wide uppercase sm:pr-6">
-									Actions
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{paginatedUsers.length === 0 ? (
-								<TableRow>
-									<TableCell
-										colSpan={6}
-										className="h-24 text-center text-sm text-muted-foreground"
-									>
-										{users.length === 0
-											? "No active users yet."
-											: "No users match your search or filters."}
-									</TableCell>
-								</TableRow>
-							) : (
-								paginatedUsers.map((user) => (
-									<TableRow key={user.id}>
-										<TableCell className="pl-4 sm:pl-6">
-											<div className="flex items-center gap-3">
-												<Avatar size="sm">
-													<AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
-														{getUserInitials(user.name)}
-													</AvatarFallback>
-												</Avatar>
-												<span className="text-sm font-medium">
-													{user.name}
-													{user.isCurrentUser && (
-														<span className="font-normal text-muted-foreground">
-															{" "}
-															(You)
-														</span>
-													)}
-												</span>
-											</div>
-										</TableCell>
-										<TableCell className="text-sm">{user.email}</TableCell>
-										<TableCell>
-											<UserRoleBadge role={user.role} />
-										</TableCell>
-										<TableCell>
-											<div className="flex items-center gap-2 text-sm text-muted-foreground">
-												<CalendarBlankIcon className="size-4 shrink-0" />
-												{formatTeamDate(user.joinedAt)}
-											</div>
-										</TableCell>
-										<TableCell>
-											<ActiveUserStatusBadge status={user.status} />
-										</TableCell>
-										<TableCell className="pr-4 sm:pr-6">
-											<Button
-												type="button"
-												variant="destructive"
-												size="sm"
-												className="cursor-pointer tracking-wide"
-												disabled={user.isCurrentUser}
-												onClick={() => openDeleteDialog(user)}
+					{isPending ? (
+						<>
+							<TeamTableSkeleton columns={ACTIVE_USER_TABLE_COLUMNS} />
+							<TeamTablePaginationSkeleton />
+						</>
+					) : (
+						<>
+							<Table>
+								<TableHeader>
+									<TableRow className="hover:bg-transparent">
+										{ACTIVE_USER_TABLE_COLUMNS.map((column, index) => (
+											<TableHead
+												key={column}
+												className={
+													index === 0
+														? "pl-4 text-xs font-semibold tracking-wide uppercase sm:pl-6"
+														: index === ACTIVE_USER_TABLE_COLUMNS.length - 1
+															? "pr-4 text-xs font-semibold tracking-wide uppercase sm:pr-6"
+															: "text-xs font-semibold tracking-wide uppercase"
+												}
 											>
-												<TrashIcon className="size-4" />
-												Delete
-											</Button>
-										</TableCell>
+												{column}
+											</TableHead>
+										))}
 									</TableRow>
-								))
-							)}
-						</TableBody>
-					</Table>
-					<TablePagination
-						page={safePage}
-						pageSize={TEAM_PAGE_SIZE}
-						total={filteredUsers.length}
-						onPageChange={setPage}
-					/>
+								</TableHeader>
+								<TableBody>
+									{paginatedUsers.length === 0 ? (
+										<TableRow>
+											<TableCell
+												colSpan={ACTIVE_USER_TABLE_COLUMNS.length}
+												className="h-24 text-center text-sm text-muted-foreground"
+											>
+												{users.length === 0
+													? "No active users yet."
+													: "No users match your search or filters."}
+											</TableCell>
+										</TableRow>
+									) : (
+										paginatedUsers.map((user) => (
+											<TableRow key={user.id}>
+												<TableCell className="pl-4 sm:pl-6">
+													<div className="flex items-center gap-3">
+														<Avatar size="sm">
+															<AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
+																{getUserInitials(user.name)}
+															</AvatarFallback>
+														</Avatar>
+														<span className="text-sm font-medium">
+															{user.name}
+															{user.isCurrentUser && (
+																<span className="font-normal text-muted-foreground">
+																	{" "}
+																	(You)
+																</span>
+															)}
+														</span>
+													</div>
+												</TableCell>
+												<TableCell className="text-sm">{user.email}</TableCell>
+												<TableCell>
+													<UserRoleBadge role={user.role} />
+												</TableCell>
+												<TableCell>
+													<div className="flex items-center gap-2 text-sm text-muted-foreground">
+														<CalendarBlankIcon className="size-4 shrink-0" />
+														{formatTeamDate(user.joinedAt)}
+													</div>
+												</TableCell>
+												<TableCell>
+													<ActiveUserStatusBadge status={user.status} />
+												</TableCell>
+												<TableCell className="pr-4 sm:pr-6">
+													<Button
+														type="button"
+														variant="destructive"
+														size="sm"
+														className="cursor-pointer tracking-wide"
+														disabled={user.isCurrentUser}
+														onClick={() => openDeleteDialog(user)}
+													>
+														<TrashIcon className="size-4" />
+														Delete
+													</Button>
+												</TableCell>
+											</TableRow>
+										))
+									)}
+								</TableBody>
+							</Table>
+							<TablePagination
+								page={safePage}
+								pageSize={TEAM_PAGE_SIZE}
+								total={filteredUsers.length}
+								onPageChange={setPage}
+							/>
+						</>
+					)}
 				</CardContent>
 			</Card>
 

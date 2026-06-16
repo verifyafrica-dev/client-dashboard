@@ -107,3 +107,12 @@ export function getActiveUserStatusBadgeClassName(status: ActiveUserStatus) {
 			return `${baseClasses} bg-gray-100 text-gray-800`;
 	}
 }
+
+export async function fetchActiveUsers(): Promise<ActiveUser[]> {
+	await new Promise((resolve) => setTimeout(resolve, 600));
+
+	return MOCK_ACTIVE_USERS.map((user) => ({
+		...user,
+		joinedAt: new Date(user.joinedAt),
+	}));
+}
