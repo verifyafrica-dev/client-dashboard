@@ -8,7 +8,15 @@ import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
-  resolve: { tsconfigPaths: true },
+  resolve: {
+    tsconfigPaths: true,
+    alias: {
+      html2canvas: 'html2canvas-pro',
+    },
+  },
+  optimizeDeps: {
+    include: ['html2canvas-pro'],
+  },
   plugins: [
     devtools(),
     tailwindcss(),
