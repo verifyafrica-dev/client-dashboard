@@ -48,14 +48,17 @@ export const USERS_API = {
 		await $http
 			.get<PaginatedUserDetailListResponse>(USER_ENDPOINTS.list, { params })
 			.then((res) => res.data),
+
 	DETAIL: async (id: string) =>
 		await $http
 			.get<UserDetail>(USER_ENDPOINTS.detail(id))
 			.then((res) => res.data),
+
 	UPDATE_DETAIL: async (id: string, data: UserDetailUpdatePayload) =>
 		await $http
 			.patch<UserDetail>(USER_ENDPOINTS.detail(id), data)
 			.then((res) => res.data),
+
 	ADMIN_RESET_PASSWORD: async (userId: string) =>
 		await $http
 			.post<UserAdminResetPasswordResponse>(
@@ -63,48 +66,59 @@ export const USERS_API = {
 				{},
 			)
 			.then((res) => res.data),
+
 	ACTIVATE_ACCOUNT: async (
 		data: UserActivateAccountPayload,
 	): Promise<UserActivateAccountResponse> =>
 		await $http
 			.post(USER_ENDPOINTS.activateAccount, data)
 			.then((res) => res.data),
+
 	CHANGE_PASSWORD: async (
 		data: UserChangePasswordPayload,
 	): Promise<UserChangePasswordResponse> =>
 		await $http
 			.post(USER_ENDPOINTS.changePassword, data)
 			.then((res) => res.data),
+
 	FORGOT_PASSWORD: async (
 		data: UserForgotPasswordPayload,
 	): Promise<UserForgotPasswordResponse> =>
 		await $http
 			.post(USER_ENDPOINTS.forgotPassword, data)
 			.then((res) => res.data),
+
 	LOGIN: async (data: UserLoginPayload): Promise<UserLoginResponse> =>
 		await $http.post(USER_ENDPOINTS.login, data).then((res) => res.data),
+
 	LOOKUP: async (params: UserLookupQuery): Promise<UserLookupResponse> =>
 		await $http.get(USER_ENDPOINTS.lookup, { params }).then((res) => res.data),
+
 	ME: async () =>
 		await $http.get<UserDetail>(USER_ENDPOINTS.me).then((res) => res.data),
+
 	UPDATE_ME: async (
 		data: UserProfileUpdatePayload,
 	): Promise<UserProfileUpdateResponse> =>
 		await $http.patch(USER_ENDPOINTS.updateMe, data).then((res) => res.data),
+
 	REGISTER: async (data: UserRegisterPayload): Promise<UserRegisterResponse> =>
 		await $http.post(USER_ENDPOINTS.register, data).then((res) => res.data),
+
 	RESEND_ACTIVATION_CODE: async (
 		data: UserResendActivationCodePayload,
 	): Promise<UserResendActivationCodeResponse> =>
 		await $http
 			.post(USER_ENDPOINTS.resendActivationCode, data)
 			.then((res) => res.data),
+
 	RESET_PASSWORD: async (
 		data: UserResetPasswordPayload,
 	): Promise<UserResetPasswordResponse> =>
 		await $http
 			.post(USER_ENDPOINTS.resetPassword, data)
 			.then((res) => res.data),
+
 	TOKEN_REFRESH: async (
 		data: UserTokenRefreshPayload,
 	): Promise<UserTokenRefreshResponse> =>
