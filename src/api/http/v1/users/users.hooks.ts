@@ -1,4 +1,8 @@
-import { useMutation, useQuery, type UseQueryResult } from "@tanstack/react-query";
+import {
+	type UseQueryResult,
+	useMutation,
+	useQuery,
+} from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { useAuthStore } from "#/stores/auth-store";
@@ -55,7 +59,9 @@ export const useUserDetailQuery = (id: string) =>
 		enabled: Boolean(id),
 	});
 
-export const useMeQuery = (isEnabled = true): UseQueryResult<UserDetail, Error> => {
+export const useMeQuery = (
+	isEnabled = true,
+): UseQueryResult<UserDetail, Error> => {
 	const query = useQuery<UserDetail, Error>({
 		queryKey: USER_QUERY_KEYS.me,
 		queryFn: USERS_API.ME,
