@@ -1,0 +1,6831 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /api/activity-logs/:
+    get:
+      operationId: activity_logs_list
+      description: |-
+        Activity log listing with strict access rules.
+
+        Rules:
+        - Super admins: full access
+        - Non-super admins: default to their own logs
+        - Tenant filter:
+            - user must belong to tenant
+            - otherwise → 404 (no tenant existence leak)
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: tenant
+        schema:
+          type: string
+          format: uuid
+        description: Filter activity logs by tenant ID
+      - in: query
+        name: user
+        schema:
+          type: string
+          format: uuid
+        description: Filter activity logs by user ID
+      tags:
+      - activity-logs
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedActivityLogList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedActivityLogList'
+          description: ''
+  /api/analytics/:
+    get:
+      operationId: analytics_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+            text/html:
+              schema:
+                type: object
+          description: ''
+  /api/analytics/statements/:
+    get:
+      operationId: analytics_statements_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: file
+            text/html:
+              schema:
+                type: file
+          description: ''
+  /api/analytics/tenant/{tenant_id}:
+    get:
+      operationId: analytics_tenant_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - analytics
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+            text/html:
+              schema:
+                type: object
+          description: ''
+  /api/billing/all-invoices/:
+    get:
+      operationId: billing_all_invoices_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+          description: ''
+  /api/billing/all-invoices/{id}/:
+    get:
+      operationId: billing_all_invoices_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this invoice.
+        required: true
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+  /api/billing/billing-information/:
+    get:
+      operationId: billing_billing_information_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBillingInformationList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedBillingInformationList'
+          description: ''
+    post:
+      operationId: billing_billing_information_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingInformation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BillingInformation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BillingInformation'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+          description: ''
+  /api/billing/billing-information/{id}/:
+    get:
+      operationId: billing_billing_information_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing information.
+        required: true
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+          description: ''
+    patch:
+      operationId: billing_billing_information_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing information.
+        required: true
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingInformation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingInformation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingInformation'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+          description: ''
+    delete:
+      operationId: billing_billing_information_destroy
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing information.
+        required: true
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/billing/billing-pricing/:
+    get:
+      operationId: billing_billing_pricing_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBillingPricingList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedBillingPricingList'
+          description: ''
+    post:
+      operationId: billing_billing_pricing_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingPricing'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BillingPricing'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BillingPricing'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+          description: ''
+  /api/billing/billing-pricing/{id}/:
+    get:
+      operationId: billing_billing_pricing_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing pricing.
+        required: true
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+          description: ''
+    patch:
+      operationId: billing_billing_pricing_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing pricing.
+        required: true
+      tags:
+      - billing
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingPricing'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingPricing'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingPricing'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+          description: ''
+    delete:
+      operationId: billing_billing_pricing_destroy
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing pricing.
+        required: true
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/billing/invoices/{tenant_id}/:
+    get:
+      operationId: billing_invoices_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+        required: true
+      tags:
+      - billing
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+          description: ''
+  /api/contact/:
+    post:
+      operationId: contact_create
+      description: |-
+        Endpoint for contact form submissions.
+        Accepts POST requests with name, email, company, and message.
+        Sends the information to the admin via email.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - contact
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactForm'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContactForm'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContactForm'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+            text/html:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+            text/html:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+          description: ''
+        '500':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+            text/html:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: ''
+  /api/openapi.json:
+    get:
+      operationId: openapi.json_retrieve
+      description: |-
+        OpenApi3 schema for this API. Format can be selected via content negotiation.
+
+        - YAML: application/vnd.oai.openapi
+        - JSON: application/vnd.oai.openapi+json
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - yaml
+      - in: query
+        name: lang
+        schema:
+          type: string
+          enum:
+          - af
+          - ar
+          - ar-dz
+          - ast
+          - az
+          - be
+          - bg
+          - bn
+          - br
+          - bs
+          - ca
+          - ckb
+          - cs
+          - cy
+          - da
+          - de
+          - dsb
+          - el
+          - en
+          - en-au
+          - en-gb
+          - eo
+          - es
+          - es-ar
+          - es-co
+          - es-mx
+          - es-ni
+          - es-ve
+          - et
+          - eu
+          - fa
+          - fi
+          - fr
+          - fy
+          - ga
+          - gd
+          - gl
+          - he
+          - hi
+          - hr
+          - hsb
+          - hu
+          - hy
+          - ia
+          - id
+          - ig
+          - io
+          - is
+          - it
+          - ja
+          - ka
+          - kab
+          - kk
+          - km
+          - kn
+          - ko
+          - ky
+          - lb
+          - lt
+          - lv
+          - mk
+          - ml
+          - mn
+          - mr
+          - ms
+          - my
+          - nb
+          - ne
+          - nl
+          - nn
+          - os
+          - pa
+          - pl
+          - pt
+          - pt-br
+          - ro
+          - ru
+          - sk
+          - sl
+          - sq
+          - sr
+          - sr-latn
+          - sv
+          - sw
+          - ta
+          - te
+          - tg
+          - th
+          - tk
+          - tr
+          - tt
+          - udm
+          - ug
+          - uk
+          - ur
+          - uz
+          - vi
+          - zh-hans
+          - zh-hant
+      tags:
+      - openapi.json
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/vnd.oai.openapi:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/yaml:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/vnd.oai.openapi+json:
+              schema:
+                type: object
+                additionalProperties: {}
+            application/json:
+              schema:
+                type: object
+                additionalProperties: {}
+          description: ''
+  /api/tenants/{id}/:
+    get:
+      operationId: tenants_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+          description: ''
+  /api/tenants/{tenant_id}/api-key/:
+    get:
+      operationId: tenants_api_key_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantAPIKey'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TenantAPIKey'
+          description: ''
+    put:
+      operationId: tenants_api_key_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantAPIKey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TenantAPIKey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TenantAPIKey'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantAPIKey'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TenantAPIKey'
+          description: ''
+    patch:
+      operationId: tenants_api_key_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTenantAPIKey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTenantAPIKey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTenantAPIKey'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantAPIKey'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TenantAPIKey'
+          description: ''
+  /api/tenants/{tenant_id}/delete/:
+    delete:
+      operationId: tenants_delete_destroy
+      description: Soft delete a tenant (superadmin only).
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+            text/html:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: ''
+  /api/tenants/{tenant_id}/invitations/:
+    get:
+      operationId: tenants_invitations_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvitationCreateList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvitationCreateList'
+          description: ''
+    post:
+      operationId: tenants_invitations_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InvitationCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvitationCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationCreate'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/InvitationCreate'
+          description: ''
+  /api/tenants/{tenant_id}/users/:
+    get:
+      operationId: tenants_users_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserDetailList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserDetailList'
+          description: ''
+  /api/tenants/{tenant_id}/users/{user_id}/remove/:
+    delete:
+      operationId: tenants_users_remove_destroy
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/tenants/{tenant_id}/users/{user_id}/role/:
+    patch:
+      operationId: tenants_users_role_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRoleUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRoleUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRoleUpdate'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserRoleUpdate'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/UserRoleUpdate'
+          description: ''
+  /api/tenants/{tenant_id}/webhook/:
+    get:
+      operationId: tenants_webhook_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantWebHook'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TenantWebHook'
+          description: ''
+    post:
+      operationId: tenants_webhook_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantWebHook'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TenantWebHook'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TenantWebHook'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantWebHook'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TenantWebHook'
+          description: ''
+    patch:
+      operationId: tenants_webhook_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTenantWebHook'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTenantWebHook'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTenantWebHook'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantWebHook'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TenantWebHook'
+          description: ''
+  /api/tenants/countries/:
+    get:
+      operationId: tenants_countries_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SupportedCountry'
+            text/html:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SupportedCountry'
+          description: ''
+  /api/tenants/create/:
+    post:
+      operationId: tenants_create_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminTenantCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminTenantCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminTenantCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminTenantCreate'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/AdminTenantCreate'
+          description: ''
+  /api/tenants/invitations/accept/:
+    post:
+      operationId: tenants_invitations_accept_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationAccept'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InvitationAccept'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvitationAccept'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationAccept'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/InvitationAccept'
+          description: ''
+  /api/tenants/invitations/complete/:
+    post:
+      operationId: tenants_invitations_complete_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InvitationComplete'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/InvitationComplete'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/InvitationComplete'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvitationComplete'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/InvitationComplete'
+          description: ''
+  /api/tenants/list/:
+    get:
+      operationId: tenants_list_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTenantList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedTenantList'
+          description: ''
+  /api/tenants/manage/:
+    get:
+      operationId: tenants_manage_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTenantCreateAndUpdateList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedTenantCreateAndUpdateList'
+          description: ''
+    post:
+      operationId: tenants_manage_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantCreateAndUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TenantCreateAndUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TenantCreateAndUpdate'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantCreateAndUpdate'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TenantCreateAndUpdate'
+          description: ''
+  /api/tenants/manage/{id}/:
+    get:
+      operationId: tenants_manage_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this tenant.
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantCreateAndUpdate'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TenantCreateAndUpdate'
+          description: ''
+    patch:
+      operationId: tenants_manage_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this tenant.
+        required: true
+      tags:
+      - tenants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTenantCreateAndUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTenantCreateAndUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTenantCreateAndUpdate'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenantCreateAndUpdate'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TenantCreateAndUpdate'
+          description: ''
+  /api/tenants/manage/{tenant_id}/verification-configs/:
+    get:
+      operationId: tenants_manage_verification_configs_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+    put:
+      operationId: tenants_manage_verification_configs_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - tenants
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/users/:
+    get:
+      operationId: users_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserDetailList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserDetailList'
+          description: ''
+  /api/users/{id}/:
+    get:
+      operationId: users_retrieve
+      description: |-
+        Retrieve or update a specific user.
+
+        - GET: Retrieve user details by ID (superuser only).
+        - PATCH: Update user fields such as `is_active` (superuser only).
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+    put:
+      operationId: users_update
+      description: |-
+        Retrieve or update a specific user.
+
+        - GET: Retrieve user details by ID (superuser only).
+        - PATCH: Update user fields such as `is_active` (superuser only).
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+    patch:
+      operationId: users_partial_update
+      description: |-
+        Retrieve or update a specific user.
+
+        - GET: Retrieve user details by ID (superuser only).
+        - PATCH: Update user fields such as `is_active` (superuser only).
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserDetail'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+  /api/users/{user_id}/reset-password/:
+    post:
+      operationId: users_reset_password_create_2
+      description: |-
+        Admin-initiated password reset for a user.
+
+        Generates a random 12-character password, sets it on the user's account,
+        and emails the password to the user. The password is never exposed in the
+        API response.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: user_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - users
+      requestBody:
+        content:
+          type:
+            schema:
+              type: object
+              additionalProperties: {}
+              description: Unspecified request body
+          properties:
+            schema: {}
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+            text/html:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: ''
+  /api/users/activate-account/:
+    post:
+      operationId: users_activate_account_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ActivateAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ActivateAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ActivateAccount'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActivateAccount'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ActivateAccount'
+          description: ''
+  /api/users/change-password/:
+    post:
+      operationId: users_change_password_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/users/forgot-password/:
+    post:
+      operationId: users_forgot_password_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ForgotPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ForgotPassword'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ForgotPassword'
+          description: ''
+  /api/users/login/:
+    post:
+      operationId: users_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Login'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Login'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: ''
+  /api/users/lookup/:
+    get:
+      operationId: users_lookup_retrieve
+      description: |-
+        Check if a user exists by email.
+        GET /api/users/lookup/?email=someone@example.com
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+            text/html:
+              schema:
+                type: object
+                properties:
+                  exists:
+                    type: boolean
+          description: ''
+  /api/users/me/:
+    get:
+      operationId: users_me_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/UserDetail'
+          description: ''
+  /api/users/me/update/:
+    patch:
+      operationId: users_me_update_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileUpdate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileUpdate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfileUpdate'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfileUpdate'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/UserProfileUpdate'
+          description: ''
+  /api/users/register/:
+    post:
+      operationId: users_register_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Register'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Register'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Register'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Register'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/Register'
+          description: ''
+  /api/users/resend-activation-code/:
+    post:
+      operationId: users_resend_activation_code_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResendActivationCode'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResendActivationCode'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResendActivationCode'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResendActivationCode'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ResendActivationCode'
+          description: ''
+  /api/users/reset-password/:
+    post:
+      operationId: users_reset_password_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ResetPassword'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPassword'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/ResetPassword'
+          description: ''
+  /api/users/token/refresh/:
+    post:
+      operationId: users_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/verifications/batch/{batch_id}/retry-failed/:
+    post:
+      operationId: verifications_batch_retry_failed_create
+      parameters:
+      - in: path
+        name: batch_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/verifications/bulk/:
+    post:
+      operationId: verifications_bulk_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - verifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkVerificationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BulkVerificationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BulkVerificationRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '202':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationBatch'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/VerificationBatch'
+          description: ''
+  /api/verifications/callback/:
+    post:
+      operationId: verifications_callback_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/verifications/links/{link}/:
+    get:
+      operationId: verifications_links_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: link
+        schema:
+          type: string
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationLink'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/VerificationLink'
+          description: ''
+  /api/verifications/mixed-verifications/:
+    get:
+      operationId: verifications_mixed_verifications_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMixedVerificationList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedMixedVerificationList'
+          description: ''
+    post:
+      operationId: verifications_mixed_verifications_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - verifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MixedVerification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MixedVerification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MixedVerification'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MixedVerification'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/MixedVerification'
+          description: ''
+  /api/verifications/mixed-verifications/{id}/:
+    get:
+      operationId: verifications_mixed_verifications_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this mixed verification.
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MixedVerification'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/MixedVerification'
+          description: ''
+    patch:
+      operationId: verifications_mixed_verifications_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this mixed verification.
+        required: true
+      tags:
+      - verifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMixedVerification'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMixedVerification'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMixedVerification'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MixedVerification'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/MixedVerification'
+          description: ''
+    delete:
+      operationId: verifications_mixed_verifications_destroy
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this mixed verification.
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/verifications/mixed-verifications/start/:
+    post:
+      operationId: verifications_mixed_verifications_start_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - verifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MixedVerificationStart'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MixedVerificationStart'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MixedVerificationStart'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MixedVerificationStart'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/MixedVerificationStart'
+          description: ''
+  /api/verifications/prices/:
+    get:
+      operationId: verifications_prices_list
+      description: |-
+        GET - List all prices
+        POST/PATCH - Admin only
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVerificationTypeActiveList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedVerificationTypeActiveList'
+          description: ''
+    post:
+      operationId: verifications_prices_create
+      description: |-
+        GET - List all prices
+        POST/PATCH - Admin only
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - verifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationTypeActive'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerificationTypeActive'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerificationTypeActive'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationTypeActive'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/VerificationTypeActive'
+          description: ''
+  /api/verifications/prices/{id}/:
+    get:
+      operationId: verifications_prices_retrieve
+      description: |-
+        GET - List all prices
+        POST/PATCH - Admin only
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this verification price.
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationTypeActive'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/VerificationTypeActive'
+          description: ''
+    patch:
+      operationId: verifications_prices_partial_update
+      description: |-
+        GET - List all prices
+        POST/PATCH - Admin only
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this verification price.
+        required: true
+      tags:
+      - verifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedVerificationTypeActive'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedVerificationTypeActive'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedVerificationTypeActive'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationTypeActive'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/VerificationTypeActive'
+          description: ''
+  /api/verifications/requests/:
+    get:
+      operationId: verifications_requests_list
+      description: |-
+        GET - List verifications
+        POST - Perform verification
+      parameters:
+      - in: query
+        name: batch_id
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: query
+        name: has_batch
+        schema:
+          type: boolean
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - ABANDONED
+          - ERROR
+          - FAILED
+          - PARTIAL
+          - PENDING
+          - SUCCESS
+        description: |-
+          * `SUCCESS` - Success
+          * `FAILED` - Failed
+          * `PENDING` - Pending
+          * `ABANDONED` - Abandoned
+          * `ERROR` - Error
+          * `PARTIAL` - Partial
+      - in: query
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        description: The tenant ID to filter verification requests by
+      - in: query
+        name: verification_type
+        schema:
+          type: string
+          enum:
+          - address_verification
+          - age_verification
+          - aml_screening
+          - business_aml_screening
+          - crypto_wallet_screening
+          - face_match
+          - gh_drivers_license_lookup
+          - gh_passport_lookup
+          - gh_ssnit_lookup
+          - gh_voter_card_lookup
+          - id_document
+          - ke_national_id_lookup
+          - ke_passport_lookup
+          - ke_phone_number_lookup
+          - ke_tax_pin_verification
+          - kyb_screening
+          - mixed_verification
+          - ng_advanced_phone_number_verification
+          - ng_bvn_verification
+          - ng_cac_lookup
+          - ng_nin_verification
+          - ng_passport_verification
+          - ng_phone_number_lookup
+          - ng_virtual_nin_verification
+          - risk_assessment
+          - two_fa_verification
+          - za_said_verification
+        description: |-
+          * `za_said_verification` - Za Said Verification
+          * `ng_bvn_verification` - Ng Bvn Verification
+          * `ng_nin_verification` - Ng Nin Verification
+          * `ng_virtual_nin_verification` - Ng Virtual Nin Verification
+          * `ng_advanced_phone_number_verification` - Ng Advanced Phone Number Verification
+          * `ng_phone_number_lookup` - Ng Phone Number Lookup
+          * `ng_cac_lookup` - Ng Cac Lookup
+          * `ng_passport_verification` - Ng Passport Verification
+          * `gh_passport_lookup` - Gh Passport Lookup
+          * `gh_voter_card_lookup` - Gh Voter Card Lookup
+          * `gh_ssnit_lookup` - Gh Ssnit Lookup
+          * `gh_drivers_license_lookup` - Gh Drivers License Lookup
+          * `ke_passport_lookup` - Ke Passport Lookup
+          * `ke_national_id_lookup` - Ke National Id Lookup
+          * `ke_phone_number_lookup` - Ke Phone Number Lookup
+          * `ke_tax_pin_verification` - Ke Tax Pin Verification
+          * `id_document` - Id Document
+          * `face_match` - Face Match
+          * `address_verification` - Address Verification
+          * `aml_screening` - Aml Screening
+          * `business_aml_screening` - Business Aml Screening
+          * `crypto_wallet_screening` - Crypto Wallet Screening
+          * `kyb_screening` - Kyb Screening
+          * `risk_assessment` - Risk Assessment
+          * `age_verification` - Age Verification
+          * `two_fa_verification` - Two Fa Verification
+          * `mixed_verification` - Mixed Verification
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVerificationRequestListList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedVerificationRequestListList'
+          description: ''
+    post:
+      operationId: verifications_requests_create
+      description: |-
+        GET - List verifications
+        POST - Perform verification
+      parameters:
+      - in: query
+        name: batch_id
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: query
+        name: has_batch
+        schema:
+          type: boolean
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: status
+        schema:
+          type: string
+          enum:
+          - ABANDONED
+          - ERROR
+          - FAILED
+          - PARTIAL
+          - PENDING
+          - SUCCESS
+        description: |-
+          * `SUCCESS` - Success
+          * `FAILED` - Failed
+          * `PENDING` - Pending
+          * `ABANDONED` - Abandoned
+          * `ERROR` - Error
+          * `PARTIAL` - Partial
+      - in: query
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        description: The tenant ID to filter verification requests by
+      - in: query
+        name: verification_type
+        schema:
+          type: string
+          enum:
+          - address_verification
+          - age_verification
+          - aml_screening
+          - business_aml_screening
+          - crypto_wallet_screening
+          - face_match
+          - gh_drivers_license_lookup
+          - gh_passport_lookup
+          - gh_ssnit_lookup
+          - gh_voter_card_lookup
+          - id_document
+          - ke_national_id_lookup
+          - ke_passport_lookup
+          - ke_phone_number_lookup
+          - ke_tax_pin_verification
+          - kyb_screening
+          - mixed_verification
+          - ng_advanced_phone_number_verification
+          - ng_bvn_verification
+          - ng_cac_lookup
+          - ng_nin_verification
+          - ng_passport_verification
+          - ng_phone_number_lookup
+          - ng_virtual_nin_verification
+          - risk_assessment
+          - two_fa_verification
+          - za_said_verification
+        description: |-
+          * `za_said_verification` - Za Said Verification
+          * `ng_bvn_verification` - Ng Bvn Verification
+          * `ng_nin_verification` - Ng Nin Verification
+          * `ng_virtual_nin_verification` - Ng Virtual Nin Verification
+          * `ng_advanced_phone_number_verification` - Ng Advanced Phone Number Verification
+          * `ng_phone_number_lookup` - Ng Phone Number Lookup
+          * `ng_cac_lookup` - Ng Cac Lookup
+          * `ng_passport_verification` - Ng Passport Verification
+          * `gh_passport_lookup` - Gh Passport Lookup
+          * `gh_voter_card_lookup` - Gh Voter Card Lookup
+          * `gh_ssnit_lookup` - Gh Ssnit Lookup
+          * `gh_drivers_license_lookup` - Gh Drivers License Lookup
+          * `ke_passport_lookup` - Ke Passport Lookup
+          * `ke_national_id_lookup` - Ke National Id Lookup
+          * `ke_phone_number_lookup` - Ke Phone Number Lookup
+          * `ke_tax_pin_verification` - Ke Tax Pin Verification
+          * `id_document` - Id Document
+          * `face_match` - Face Match
+          * `address_verification` - Address Verification
+          * `aml_screening` - Aml Screening
+          * `business_aml_screening` - Business Aml Screening
+          * `crypto_wallet_screening` - Crypto Wallet Screening
+          * `kyb_screening` - Kyb Screening
+          * `risk_assessment` - Risk Assessment
+          * `age_verification` - Age Verification
+          * `two_fa_verification` - Two Fa Verification
+          * `mixed_verification` - Mixed Verification
+      tags:
+      - verifications
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerificationRequestCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/VerificationRequestCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VerificationRequestCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVerificationRequestListList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedVerificationRequestListList'
+          description: ''
+  /api/verifications/requests/{verification_id}/detail/:
+    get:
+      operationId: verifications_requests_detail_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: verification_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: verifications_requests_detail_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: verification_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/verifications/requests/{verification_id}/proofs/{proof_key}/:
+    get:
+      operationId: verifications_requests_proofs_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: proof_key
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: verification_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: verifications_requests_proofs_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: proof_key
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: verification_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/verifications/requests/{verification_id}/refresh-status/:
+    post:
+      operationId: verifications_requests_refresh_status_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: verification_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/verifications/requests/{verification_id}/send-email/:
+    post:
+      operationId: verifications_requests_send_email_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: verification_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/verifications/types/:
+    get:
+      operationId: verifications_types_retrieve
+      description: GET /api/verifications/types/
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationType'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/VerificationType'
+          description: ''
+  /api/verifications/verification-batches/:
+    get:
+      operationId: verifications_verification_batches_list
+      description: |-
+        Supports:
+          - GET /verification-batches/ → list
+          - GET /verification-batches/{id}/ → retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedVerificationBatchList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedVerificationBatchList'
+          description: ''
+  /api/verifications/verification-batches/{id}/:
+    get:
+      operationId: verifications_verification_batches_retrieve
+      description: |-
+        Supports:
+          - GET /verification-batches/ → list
+          - GET /verification-batches/{id}/ → retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this verification batch.
+        required: true
+      tags:
+      - verifications
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerificationBatch'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/VerificationBatch'
+          description: ''
+  /api/version/:
+    get:
+      operationId: version_retrieve
+      description: Current version of the application
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - version
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/Version'
+          description: ''
+  /api/wallet/{tenant_id}/top-up/create-session/:
+    post:
+      operationId: wallet_top_up_create_session_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - wallet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TopUpRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TopUpRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TopUpRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  checkout_url:
+                    type: string
+                    format: uri
+                  session_id:
+                    type: string
+            text/html:
+              schema:
+                type: object
+                properties:
+                  checkout_url:
+                    type: string
+                    format: uri
+                  session_id:
+                    type: string
+          description: ''
+  /api/wallet/{tenant_id}/top-up/verify/:
+    get:
+      operationId: wallet_top_up_verify_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: query
+        name: session_id
+        schema:
+          type: string
+        description: The Stripe Checkout Session ID
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - wallet
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  amount:
+                    type: number
+                    format: float
+                    nullable: true
+            text/html:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  message:
+                    type: string
+                  amount:
+                    type: number
+                    format: float
+                    nullable: true
+          description: ''
+  /api/wallet/admin/{tenant_id}/credits/:
+    post:
+      operationId: wallet_admin_credits_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        required: true
+      tags:
+      - wallet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminManualCreditRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AdminManualCreditRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AdminManualCreditRequest'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AdminManualCreditResponse'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/AdminManualCreditResponse'
+          description: ''
+  /api/wallet/balance/:
+    get:
+      operationId: wallet_balance_retrieve
+      description: GET /api/wallet/
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: query
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        description: The tenant ID to filter verification requests by
+      tags:
+      - wallet
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+          description: ''
+  /api/wallet/funding-requests/:
+    get:
+      operationId: wallet_funding_requests_list
+      description: GET /api/wallet/funding-requests/
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        description: The tenant ID to filter wallet funding requests by
+      tags:
+      - wallet
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWalletFundingRequestList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedWalletFundingRequestList'
+          description: ''
+  /api/wallet/transactions/:
+    get:
+      operationId: wallet_transactions_list
+      description: GET /api/transactions/
+      parameters:
+      - in: query
+        name: exclude_source
+        schema:
+          type: string
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      - in: query
+        name: tenant_id
+        schema:
+          type: string
+          format: uuid
+        description: The tenant ID to filter verification requests by
+      - in: query
+        name: type
+        schema:
+          type: string
+      tags:
+      - wallet
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTransactionList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedTransactionList'
+          description: ''
+  /api/webhook:
+    get:
+      operationId: webhook_retrieve
+      description: Generic webhook endpoint that saves the source and event data.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - Webhooks
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+            text/html:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: ''
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+          description: ''
+    post:
+      operationId: webhook_create
+      description: Generic webhook endpoint that saves the source and event data.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - Webhooks
+      requestBody:
+        content:
+          content:
+            schema:
+              application/json:
+                schema:
+                  type: object
+          headers:
+            schema:
+              X-Webhook-Source:
+                description: The source of the webhook event (e.g. stripe, unknown)
+                type: string
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+          description: ''
+  /api/webhook/:
+    get:
+      operationId: webhook_retrieve_2
+      description: Generic webhook endpoint that saves the source and event data.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - Webhooks
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+            text/html:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+          description: ''
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+          description: ''
+    post:
+      operationId: webhook_create_2
+      description: Generic webhook endpoint that saves the source and event data.
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - Webhooks
+      requestBody:
+        content:
+          content:
+            schema:
+              application/json:
+                schema:
+                  type: object
+          headers:
+            schema:
+              X-Webhook-Source:
+                description: The source of the webhook event (e.g. stripe, unknown)
+                type: string
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+          description: ''
+  /api/webhook/events/:
+    get:
+      operationId: webhook_events_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - Webhooks
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWebHookEventList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedWebHookEventList'
+          description: ''
+  /api/webhook/events/{id}/:
+    get:
+      operationId: webhook_events_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this web hook event.
+        required: true
+      tags:
+      - Webhooks
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/WebHookEvent'
+          description: ''
+  /api/webhook/events/all-invoices/:
+    get:
+      operationId: webhook_events_all_invoices_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - webhook
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedInvoiceList'
+          description: ''
+  /api/webhook/events/all-invoices/{id}/:
+    get:
+      operationId: webhook_events_all_invoices_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this invoice.
+        required: true
+      tags:
+      - webhook
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+          description: ''
+  /api/webhook/events/billing-information/:
+    get:
+      operationId: webhook_events_billing_information_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - webhook
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBillingInformationList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedBillingInformationList'
+          description: ''
+    post:
+      operationId: webhook_events_billing_information_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingInformation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BillingInformation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BillingInformation'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+          description: ''
+  /api/webhook/events/billing-information/{id}/:
+    get:
+      operationId: webhook_events_billing_information_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing information.
+        required: true
+      tags:
+      - webhook
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+          description: ''
+    patch:
+      operationId: webhook_events_billing_information_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing information.
+        required: true
+      tags:
+      - webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingInformation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingInformation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingInformation'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingInformation'
+          description: ''
+    delete:
+      operationId: webhook_events_billing_information_destroy
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing information.
+        required: true
+      tags:
+      - webhook
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/webhook/events/billing-pricing/:
+    get:
+      operationId: webhook_events_billing_pricing_list
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - name: offset
+        required: false
+        in: query
+        description: The initial index from which to return the results.
+        schema:
+          type: integer
+      - name: page_size
+        required: false
+        in: query
+        description: Number of results to return per page.
+        schema:
+          type: integer
+      tags:
+      - webhook
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBillingPricingList'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PaginatedBillingPricingList'
+          description: ''
+    post:
+      operationId: webhook_events_billing_pricing_create
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      tags:
+      - webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillingPricing'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BillingPricing'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BillingPricing'
+        required: true
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+          description: ''
+  /api/webhook/events/billing-pricing/{id}/:
+    get:
+      operationId: webhook_events_billing_pricing_retrieve
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing pricing.
+        required: true
+      tags:
+      - webhook
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+          description: ''
+    patch:
+      operationId: webhook_events_billing_pricing_partial_update
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing pricing.
+        required: true
+      tags:
+      - webhook
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingPricing'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingPricing'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBillingPricing'
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/BillingPricing'
+          description: ''
+    delete:
+      operationId: webhook_events_billing_pricing_destroy
+      parameters:
+      - in: query
+        name: format
+        schema:
+          type: string
+          enum:
+          - json
+          - json-html
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+        description: A UUID string identifying this billing pricing.
+        required: true
+      tags:
+      - webhook
+      security:
+      - jwtAuth: []
+      - basicAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    ActivateAccount:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        code:
+          type: string
+          maxLength: 5
+      required:
+      - code
+      - email
+    ActivityLog:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        action:
+          type: string
+          readOnly: true
+          description: Short action identifier e.g. user.login, tenant.created
+        description:
+          type: string
+          readOnly: true
+          description: Optional human-readable description of the activity
+        metadata:
+          readOnly: true
+          description: Extra structured data related to the activity
+        ip_address:
+          type: string
+          readOnly: true
+          nullable: true
+        user_agent:
+          type: string
+          readOnly: true
+        user:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        user_name:
+          type: string
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+          readOnly: true
+          nullable: true
+        tenant_name:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - action
+      - created_at
+      - description
+      - id
+      - ip_address
+      - metadata
+      - tenant
+      - tenant_name
+      - user
+      - user_agent
+      - user_name
+    AdminManualCreditRequest:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        reason:
+          type: string
+          maxLength: 100
+        custom_reason:
+          type: string
+          maxLength: 255
+      required:
+      - amount
+      - reason
+    AdminManualCreditResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        wallet:
+          $ref: '#/components/schemas/Wallet'
+        transaction:
+          $ref: '#/components/schemas/Transaction'
+      required:
+      - message
+      - transaction
+      - wallet
+    AdminTenantCreate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        admin_email:
+          type: string
+          format: email
+          writeOnly: true
+        admin_first_name:
+          type: string
+          writeOnly: true
+        admin_last_name:
+          type: string
+          writeOnly: true
+        admin_phone_number:
+          type: string
+          writeOnly: true
+        name:
+          type: string
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          maxLength: 254
+      required:
+      - admin_email
+      - admin_first_name
+      - admin_last_name
+      - id
+      - name
+    BillingCountryEnum:
+      enum:
+      - Afghanistan
+      - Albania
+      - Algeria
+      - Andorra
+      - Angola
+      - Antigua and Barbuda
+      - Argentina
+      - Armenia
+      - Australia
+      - Austria
+      - Azerbaijan
+      - Bahamas
+      - Bahrain
+      - Bangladesh
+      - Barbados
+      - Belarus
+      - Belgium
+      - Belize
+      - Benin
+      - Bhutan
+      - Bolivia
+      - Bosnia and Herzegovina
+      - Botswana
+      - Brazil
+      - Brunei
+      - Bulgaria
+      - Burkina Faso
+      - Burundi
+      - Cabo Verde
+      - Cambodia
+      - Cameroon
+      - Canada
+      - Central African Republic
+      - Chad
+      - Chile
+      - China
+      - Colombia
+      - Comoros
+      - Costa Rica
+      - Cote d'Ivoire
+      - Croatia
+      - Cuba
+      - Cyprus
+      - Czechia
+      - Democratic Republic of the Congo
+      - Denmark
+      - Djibouti
+      - Dominica
+      - Dominican Republic
+      - Ecuador
+      - Egypt
+      - El Salvador
+      - Equatorial Guinea
+      - Eritrea
+      - Estonia
+      - Eswatini
+      - Ethiopia
+      - Fiji
+      - Finland
+      - France
+      - Gabon
+      - Gambia
+      - Georgia
+      - Germany
+      - Ghana
+      - Greece
+      - Grenada
+      - Guatemala
+      - Guinea
+      - Guinea-Bissau
+      - Guyana
+      - Haiti
+      - Honduras
+      - Hungary
+      - Iceland
+      - India
+      - Indonesia
+      - Iran
+      - Iraq
+      - Ireland
+      - Israel
+      - Italy
+      - Jamaica
+      - Japan
+      - Jordan
+      - Kazakhstan
+      - Kenya
+      - Kiribati
+      - Kuwait
+      - Kyrgyzstan
+      - Laos
+      - Latvia
+      - Lebanon
+      - Lesotho
+      - Liberia
+      - Libya
+      - Liechtenstein
+      - Lithuania
+      - Luxembourg
+      - Madagascar
+      - Malawi
+      - Malaysia
+      - Maldives
+      - Mali
+      - Malta
+      - Marshall Islands
+      - Mauritania
+      - Mauritius
+      - Mexico
+      - Micronesia
+      - Moldova
+      - Monaco
+      - Mongolia
+      - Montenegro
+      - Morocco
+      - Mozambique
+      - Myanmar
+      - Namibia
+      - Nauru
+      - Nepal
+      - Netherlands
+      - New Zealand
+      - Nicaragua
+      - Niger
+      - Nigeria
+      - North Korea
+      - North Macedonia
+      - Norway
+      - Oman
+      - Pakistan
+      - Palau
+      - Palestine
+      - Panama
+      - Papua New Guinea
+      - Paraguay
+      - Peru
+      - Philippines
+      - Poland
+      - Portugal
+      - Qatar
+      - Republic of the Congo
+      - Romania
+      - Russia
+      - Rwanda
+      - Saint Kitts and Nevis
+      - Saint Lucia
+      - Saint Vincent and the Grenadines
+      - Samoa
+      - San Marino
+      - Sao Tome and Principe
+      - Saudi Arabia
+      - Senegal
+      - Serbia
+      - Seychelles
+      - Sierra Leone
+      - Singapore
+      - Slovakia
+      - Slovenia
+      - Solomon Islands
+      - Somalia
+      - South Africa
+      - South Korea
+      - South Sudan
+      - Spain
+      - Sri Lanka
+      - Sudan
+      - Suriname
+      - Sweden
+      - Switzerland
+      - Syria
+      - Taiwan
+      - Tajikistan
+      - Tanzania
+      - Thailand
+      - Timor-Leste
+      - Togo
+      - Tonga
+      - Trinidad and Tobago
+      - Tunisia
+      - Turkey
+      - Turkmenistan
+      - Tuvalu
+      - Uganda
+      - Ukraine
+      - United Arab Emirates
+      - United Kingdom
+      - United States
+      - Uruguay
+      - Uzbekistan
+      - Vanuatu
+      - Vatican City
+      - Venezuela
+      - Vietnam
+      - Yemen
+      - Zambia
+      - Zimbabwe
+      type: string
+      description: |-
+        * `Afghanistan` - Afghanistan
+        * `Albania` - Albania
+        * `Algeria` - Algeria
+        * `Andorra` - Andorra
+        * `Angola` - Angola
+        * `Antigua and Barbuda` - Antigua and Barbuda
+        * `Argentina` - Argentina
+        * `Armenia` - Armenia
+        * `Australia` - Australia
+        * `Austria` - Austria
+        * `Azerbaijan` - Azerbaijan
+        * `Bahamas` - Bahamas
+        * `Bahrain` - Bahrain
+        * `Bangladesh` - Bangladesh
+        * `Barbados` - Barbados
+        * `Belarus` - Belarus
+        * `Belgium` - Belgium
+        * `Belize` - Belize
+        * `Benin` - Benin
+        * `Bhutan` - Bhutan
+        * `Bolivia` - Bolivia
+        * `Bosnia and Herzegovina` - Bosnia and Herzegovina
+        * `Botswana` - Botswana
+        * `Brazil` - Brazil
+        * `Brunei` - Brunei
+        * `Bulgaria` - Bulgaria
+        * `Burkina Faso` - Burkina Faso
+        * `Burundi` - Burundi
+        * `Cabo Verde` - Cabo Verde
+        * `Cambodia` - Cambodia
+        * `Cameroon` - Cameroon
+        * `Canada` - Canada
+        * `Central African Republic` - Central African Republic
+        * `Chad` - Chad
+        * `Chile` - Chile
+        * `China` - China
+        * `Colombia` - Colombia
+        * `Comoros` - Comoros
+        * `Costa Rica` - Costa Rica
+        * `Cote d'Ivoire` - Cote d'Ivoire
+        * `Croatia` - Croatia
+        * `Cuba` - Cuba
+        * `Cyprus` - Cyprus
+        * `Czechia` - Czechia
+        * `Democratic Republic of the Congo` - Democratic Republic of the Congo
+        * `Denmark` - Denmark
+        * `Djibouti` - Djibouti
+        * `Dominica` - Dominica
+        * `Dominican Republic` - Dominican Republic
+        * `Ecuador` - Ecuador
+        * `Egypt` - Egypt
+        * `El Salvador` - El Salvador
+        * `Equatorial Guinea` - Equatorial Guinea
+        * `Eritrea` - Eritrea
+        * `Estonia` - Estonia
+        * `Eswatini` - Eswatini
+        * `Ethiopia` - Ethiopia
+        * `Fiji` - Fiji
+        * `Finland` - Finland
+        * `France` - France
+        * `Gabon` - Gabon
+        * `Gambia` - Gambia
+        * `Georgia` - Georgia
+        * `Germany` - Germany
+        * `Ghana` - Ghana
+        * `Greece` - Greece
+        * `Grenada` - Grenada
+        * `Guatemala` - Guatemala
+        * `Guinea` - Guinea
+        * `Guinea-Bissau` - Guinea-Bissau
+        * `Guyana` - Guyana
+        * `Haiti` - Haiti
+        * `Honduras` - Honduras
+        * `Hungary` - Hungary
+        * `Iceland` - Iceland
+        * `India` - India
+        * `Indonesia` - Indonesia
+        * `Iran` - Iran
+        * `Iraq` - Iraq
+        * `Ireland` - Ireland
+        * `Israel` - Israel
+        * `Italy` - Italy
+        * `Jamaica` - Jamaica
+        * `Japan` - Japan
+        * `Jordan` - Jordan
+        * `Kazakhstan` - Kazakhstan
+        * `Kenya` - Kenya
+        * `Kiribati` - Kiribati
+        * `Kuwait` - Kuwait
+        * `Kyrgyzstan` - Kyrgyzstan
+        * `Laos` - Laos
+        * `Latvia` - Latvia
+        * `Lebanon` - Lebanon
+        * `Lesotho` - Lesotho
+        * `Liberia` - Liberia
+        * `Libya` - Libya
+        * `Liechtenstein` - Liechtenstein
+        * `Lithuania` - Lithuania
+        * `Luxembourg` - Luxembourg
+        * `Madagascar` - Madagascar
+        * `Malawi` - Malawi
+        * `Malaysia` - Malaysia
+        * `Maldives` - Maldives
+        * `Mali` - Mali
+        * `Malta` - Malta
+        * `Marshall Islands` - Marshall Islands
+        * `Mauritania` - Mauritania
+        * `Mauritius` - Mauritius
+        * `Mexico` - Mexico
+        * `Micronesia` - Micronesia
+        * `Moldova` - Moldova
+        * `Monaco` - Monaco
+        * `Mongolia` - Mongolia
+        * `Montenegro` - Montenegro
+        * `Morocco` - Morocco
+        * `Mozambique` - Mozambique
+        * `Myanmar` - Myanmar
+        * `Namibia` - Namibia
+        * `Nauru` - Nauru
+        * `Nepal` - Nepal
+        * `Netherlands` - Netherlands
+        * `New Zealand` - New Zealand
+        * `Nicaragua` - Nicaragua
+        * `Niger` - Niger
+        * `Nigeria` - Nigeria
+        * `North Korea` - North Korea
+        * `North Macedonia` - North Macedonia
+        * `Norway` - Norway
+        * `Oman` - Oman
+        * `Pakistan` - Pakistan
+        * `Palau` - Palau
+        * `Palestine` - Palestine
+        * `Panama` - Panama
+        * `Papua New Guinea` - Papua New Guinea
+        * `Paraguay` - Paraguay
+        * `Peru` - Peru
+        * `Philippines` - Philippines
+        * `Poland` - Poland
+        * `Portugal` - Portugal
+        * `Qatar` - Qatar
+        * `Republic of the Congo` - Republic of the Congo
+        * `Romania` - Romania
+        * `Russia` - Russia
+        * `Rwanda` - Rwanda
+        * `Saint Kitts and Nevis` - Saint Kitts and Nevis
+        * `Saint Lucia` - Saint Lucia
+        * `Saint Vincent and the Grenadines` - Saint Vincent and the Grenadines
+        * `Samoa` - Samoa
+        * `San Marino` - San Marino
+        * `Sao Tome and Principe` - Sao Tome and Principe
+        * `Saudi Arabia` - Saudi Arabia
+        * `Senegal` - Senegal
+        * `Serbia` - Serbia
+        * `Seychelles` - Seychelles
+        * `Sierra Leone` - Sierra Leone
+        * `Singapore` - Singapore
+        * `Slovakia` - Slovakia
+        * `Slovenia` - Slovenia
+        * `Solomon Islands` - Solomon Islands
+        * `Somalia` - Somalia
+        * `South Africa` - South Africa
+        * `South Korea` - South Korea
+        * `South Sudan` - South Sudan
+        * `Spain` - Spain
+        * `Sri Lanka` - Sri Lanka
+        * `Sudan` - Sudan
+        * `Suriname` - Suriname
+        * `Sweden` - Sweden
+        * `Switzerland` - Switzerland
+        * `Syria` - Syria
+        * `Taiwan` - Taiwan
+        * `Tajikistan` - Tajikistan
+        * `Tanzania` - Tanzania
+        * `Thailand` - Thailand
+        * `Timor-Leste` - Timor-Leste
+        * `Togo` - Togo
+        * `Tonga` - Tonga
+        * `Trinidad and Tobago` - Trinidad and Tobago
+        * `Tunisia` - Tunisia
+        * `Turkey` - Turkey
+        * `Turkmenistan` - Turkmenistan
+        * `Tuvalu` - Tuvalu
+        * `Uganda` - Uganda
+        * `Ukraine` - Ukraine
+        * `United Arab Emirates` - United Arab Emirates
+        * `United Kingdom` - United Kingdom
+        * `United States` - United States
+        * `Uruguay` - Uruguay
+        * `Uzbekistan` - Uzbekistan
+        * `Vanuatu` - Vanuatu
+        * `Vatican City` - Vatican City
+        * `Venezuela` - Venezuela
+        * `Vietnam` - Vietnam
+        * `Yemen` - Yemen
+        * `Zambia` - Zambia
+        * `Zimbabwe` - Zimbabwe
+    BillingInformation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+        billing_name:
+          type: string
+          maxLength: 255
+        billing_email:
+          type: string
+          format: email
+          maxLength: 254
+        billing_address:
+          type: string
+        billing_city:
+          type: string
+          maxLength: 255
+        billing_state:
+          type: string
+          maxLength: 255
+        billing_postal_code:
+          type: string
+          maxLength: 255
+        billing_country:
+          oneOf:
+          - $ref: '#/components/schemas/BillingCountryEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        billing_plan:
+          $ref: '#/components/schemas/BillingPlanEnum'
+        status:
+          $ref: '#/components/schemas/BillingInformationStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - billing_plan
+      - created_at
+      - id
+      - tenant
+      - updated_at
+    BillingInformationStatusEnum:
+      enum:
+      - active
+      - inactive
+      type: string
+      description: |-
+        * `active` - Active
+        * `inactive` - Inactive
+    BillingPlanEnum:
+      enum:
+      - payg
+      - enterprise
+      type: string
+      description: |-
+        * `payg` - Pay as you go
+        * `enterprise` - Enterprise
+    BillingPricing:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        plan:
+          $ref: '#/components/schemas/PlanEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - plan
+      - price
+      - updated_at
+    BlankEnum:
+      enum:
+      - ''
+    BulkVerificationItem:
+      type: object
+      properties:
+        verification_type:
+          $ref: '#/components/schemas/VerificationTypeEnum'
+        input_data: {}
+        method_type:
+          type: string
+      required:
+      - input_data
+      - verification_type
+    BulkVerificationRequest:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+          format: uuid
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BulkVerificationItem'
+        is_test:
+          type: boolean
+          default: false
+      required:
+      - items
+    ContactForm:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+        company:
+          type: string
+          maxLength: 255
+        message:
+          type: string
+      required:
+      - company
+      - email
+      - message
+      - name
+    ForgotPassword:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    InvitationAccept:
+      type: object
+      properties:
+        token:
+          type: string
+          format: uuid
+      required:
+      - token
+    InvitationComplete:
+      type: object
+      properties:
+        token:
+          type: string
+          format: uuid
+        first_name:
+          type: string
+        last_name:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+        phone_number:
+          type: string
+      required:
+      - password
+      - token
+    InvitationCreate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+        name:
+          type: string
+        tenant:
+          allOf:
+          - $ref: '#/components/schemas/Tenant'
+          readOnly: true
+        invitation_url:
+          type: string
+          readOnly: true
+        expires_at:
+          type: string
+          format: date-time
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/InvitationCreateStatusEnum'
+          readOnly: true
+      required:
+      - email
+      - expires_at
+      - id
+      - invitation_url
+      - status
+      - tenant
+    InvitationCreateStatusEnum:
+      enum:
+      - pending
+      - accepted
+      - expired
+      - canceled
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `accepted` - Accepted
+        * `expired` - Expired
+        * `canceled` - Canceled
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+        tenant_name:
+          type: string
+          readOnly: true
+        tenant_email:
+          type: string
+          format: email
+          readOnly: true
+        tenant_tenant_id:
+          type: string
+          readOnly: true
+        tenant_stripe_customer_id:
+          type: string
+          readOnly: true
+        tenant_kyc_verified:
+          type: boolean
+          readOnly: true
+        stripe_invoice_id:
+          type: string
+          maxLength: 255
+        stripe_status:
+          type: string
+          maxLength: 50
+        total_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+        description:
+          type: string
+        payment_status:
+          $ref: '#/components/schemas/PaymentStatusEnum'
+        file_attachment:
+          type: string
+          format: uri
+          nullable: true
+        paid_by:
+          type: string
+          readOnly: true
+        due_at:
+          type: string
+          format: date-time
+          nullable: true
+        paid_amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvoiceItem'
+          readOnly: true
+        invoice_id:
+          type: string
+          maxLength: 255
+      required:
+      - created_at
+      - description
+      - id
+      - items
+      - paid_by
+      - tenant
+      - tenant_email
+      - tenant_kyc_verified
+      - tenant_name
+      - tenant_stripe_customer_id
+      - tenant_tenant_id
+      - updated_at
+    InvoiceItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        invoice:
+          type: string
+          format: uuid
+        stripe_invoice_item_id:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        quantity:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        unit_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        total_price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - description
+      - id
+      - invoice
+      - total_price
+      - unit_price
+      - updated_at
+    Login:
+      type: object
+      properties:
+        email:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - password
+    MixedVerification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        verifications: {}
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        calculated_price:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+        is_test:
+          type: boolean
+        is_custom:
+          type: boolean
+        journey_id:
+          type: string
+          nullable: true
+          maxLength: 255
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - calculated_price
+      - created_at
+      - deleted_at
+      - id
+      - name
+      - tenant
+      - updated_at
+    MixedVerificationStart:
+      type: object
+      properties:
+        tenant_id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        full_address:
+          type: string
+          nullable: true
+        reference:
+          type: string
+          nullable: true
+        is_mixed:
+          type: boolean
+        verification_id:
+          type: string
+          format: uuid
+        is_test:
+          type: boolean
+          default: false
+        notification_email:
+          type: string
+          format: email
+          nullable: true
+      required:
+      - email
+      - is_mixed
+      - verification_id
+    PaginatedActivityLogList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ActivityLog'
+    PaginatedBillingInformationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingInformation'
+    PaginatedBillingPricingList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BillingPricing'
+    PaginatedInvitationCreateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InvitationCreate'
+    PaginatedInvoiceList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Invoice'
+    PaginatedMixedVerificationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MixedVerification'
+    PaginatedTenantCreateAndUpdateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/TenantCreateAndUpdate'
+    PaginatedTenantList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Tenant'
+    PaginatedTransactionList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Transaction'
+    PaginatedUserDetailList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDetail'
+    PaginatedVerificationBatchList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerificationBatch'
+    PaginatedVerificationRequestListList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerificationRequestList'
+    PaginatedVerificationTypeActiveList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerificationTypeActive'
+    PaginatedWalletFundingRequestList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletFundingRequest'
+    PaginatedWebHookEventList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=400&page_size=100
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?offset=200&page_size=100
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/WebHookEvent'
+    PatchedBillingInformation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+        billing_name:
+          type: string
+          maxLength: 255
+        billing_email:
+          type: string
+          format: email
+          maxLength: 254
+        billing_address:
+          type: string
+        billing_city:
+          type: string
+          maxLength: 255
+        billing_state:
+          type: string
+          maxLength: 255
+        billing_postal_code:
+          type: string
+          maxLength: 255
+        billing_country:
+          oneOf:
+          - $ref: '#/components/schemas/BillingCountryEnum'
+          - $ref: '#/components/schemas/BlankEnum'
+        billing_plan:
+          $ref: '#/components/schemas/BillingPlanEnum'
+        status:
+          $ref: '#/components/schemas/BillingInformationStatusEnum'
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedBillingPricing:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        plan:
+          $ref: '#/components/schemas/PlanEnum'
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedMixedVerification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant_id:
+          type: string
+          format: uuid
+          writeOnly: true
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        verifications: {}
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          nullable: true
+        calculated_price:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+        is_test:
+          type: boolean
+        is_custom:
+          type: boolean
+        journey_id:
+          type: string
+          nullable: true
+          maxLength: 255
+        deleted_at:
+          type: string
+          format: date-time
+          readOnly: true
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedTenantAPIKey:
+      type: object
+      properties:
+        key:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+        last_used:
+          type: string
+          format: date-time
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+    PatchedTenantCreateAndUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        compliance_data: {}
+        enabled_countries:
+          type: array
+          items:
+            type: string
+        kyc_verified:
+          type: boolean
+        tenant_id:
+          type: string
+          maxLength: 20
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        reject_reason:
+          type: string
+        billing_information:
+          allOf:
+          - $ref: '#/components/schemas/BillingInformation'
+          readOnly: true
+        custom_verification_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        use_custom_cost:
+          type: boolean
+    PatchedTenantWebHook:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          maxLength: 200
+        tenant:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        is_active:
+          type: boolean
+        use_auth:
+          type: boolean
+        auth_token:
+          type: string
+          maxLength: 255
+        retry_count:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+    PatchedUserDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone_number:
+          type: string
+          maxLength: 16
+        avatar_url:
+          type: string
+          format: uri
+          maxLength: 200
+        tenants:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+    PatchedUserProfileUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone_number:
+          type: string
+          maxLength: 16
+        avatar_url:
+          type: string
+          format: uri
+          maxLength: 200
+    PatchedUserRoleUpdate:
+      type: object
+      properties:
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+    PatchedVerificationTypeActive:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        verification_type:
+          $ref: '#/components/schemas/VerificationTypeEnum'
+        is_active:
+          type: boolean
+        plan:
+          $ref: '#/components/schemas/PlanEnum'
+    PaymentStatusEnum:
+      enum:
+      - SUCCESS
+      - FAILED
+      - PENDING
+      - DUE
+      type: string
+      description: |-
+        * `SUCCESS` - Success
+        * `FAILED` - Failed
+        * `PENDING` - Pending
+        * `DUE` - Due
+    PlanEnum:
+      enum:
+      - payg
+      - enterprise
+      type: string
+      description: |-
+        * `payg` - Pay as you go
+        * `enterprise` - Enterprise
+    ProviderEnum:
+      enum:
+      - korapay
+      - shufti
+      type: string
+      description: |-
+        * `korapay` - KoraPay
+        * `shufti` - Shufti
+    Register:
+      type: object
+      properties:
+        tenant_name:
+          type: string
+        tenant_email:
+          type: string
+          format: email
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+          format: email
+        phone_number:
+          type: string
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - email
+      - first_name
+      - last_name
+      - password
+      - tenant_email
+      - tenant_name
+    ResendActivationCode:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+      required:
+      - email
+    ResetPassword:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        code:
+          type: string
+        new_password:
+          type: string
+          writeOnly: true
+      required:
+      - code
+      - email
+      - new_password
+    RoleEnum:
+      enum:
+      - admin
+      - member
+      type: string
+      description: |-
+        * `admin` - Admin
+        * `member` - Member
+    SourceEnum:
+      enum:
+      - korapay
+      - shufti
+      type: string
+      description: |-
+        * `korapay` - KoraPay
+        * `shufti` - Shufti
+    Status2b9Enum:
+      enum:
+      - SUCCESS
+      - FAILED
+      - PENDING
+      - ABANDONED
+      - ERROR
+      - PARTIAL
+      type: string
+      description: |-
+        * `SUCCESS` - Success
+        * `FAILED` - Failed
+        * `PENDING` - Pending
+        * `ABANDONED` - Abandoned
+        * `ERROR` - Error
+        * `PARTIAL` - Partial
+    SupportedCountry:
+      type: object
+      properties:
+        code:
+          type: string
+        name:
+          type: string
+        region:
+          type: string
+        flag_png:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - code
+      - flag_png
+      - name
+      - region
+    Tenant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 150
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        compliance_data: {}
+        enabled_countries: {}
+        kyc_verified:
+          type: boolean
+        stripe_customer_id:
+          type: string
+          maxLength: 255
+        email:
+          type: string
+          format: email
+          maxLength: 254
+        tenant_id:
+          type: string
+          maxLength: 20
+      required:
+      - created_at
+      - id
+      - name
+    TenantAPIKey:
+      type: object
+      properties:
+        key:
+          type: string
+          readOnly: true
+        is_active:
+          type: boolean
+        last_used:
+          type: string
+          format: date-time
+          nullable: true
+        expires_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - key
+    TenantComplianceStatus:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/TenantComplianceStatusStatusEnum'
+        submitted_at:
+          type: string
+          format: date-time
+          readOnly: true
+        approved_by:
+          type: string
+          readOnly: true
+        approved_at:
+          type: string
+          format: date-time
+          nullable: true
+        rejected_by:
+          type: string
+          readOnly: true
+        rejected_at:
+          type: string
+          format: date-time
+          nullable: true
+        rejected_reason:
+          type: string
+      required:
+      - approved_by
+      - id
+      - rejected_by
+      - status
+      - submitted_at
+    TenantComplianceStatusStatusEnum:
+      enum:
+      - pending
+      - verified
+      - rejected
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `verified` - Verified
+        * `rejected` - Rejected
+    TenantCreateAndUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        email:
+          type: string
+          format: email
+        compliance_data: {}
+        enabled_countries:
+          type: array
+          items:
+            type: string
+        kyc_verified:
+          type: boolean
+        tenant_id:
+          type: string
+          maxLength: 20
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        compliance_status:
+          $ref: '#/components/schemas/TenantComplianceStatus'
+        reject_reason:
+          type: string
+        billing_information:
+          allOf:
+          - $ref: '#/components/schemas/BillingInformation'
+          readOnly: true
+        custom_verification_cost:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        use_custom_cost:
+          type: boolean
+      required:
+      - billing_information
+      - created_at
+      - email
+      - id
+      - name
+    TenantWebHook:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        url:
+          type: string
+          format: uri
+          maxLength: 200
+        tenant:
+          type: string
+          format: uuid
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        is_active:
+          type: boolean
+        use_auth:
+          type: boolean
+        auth_token:
+          type: string
+          maxLength: 255
+        retry_count:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - created_at
+      - id
+      - tenant
+      - updated_at
+      - url
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          writeOnly: true
+      required:
+      - access
+      - refresh
+    TopUpRequest:
+      type: object
+      properties:
+        amount:
+          type: integer
+          minimum: 1
+        currency:
+          type: string
+          default: USD
+          maxLength: 3
+      required:
+      - amount
+    Transaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+        tenant_name:
+          type: string
+          readOnly: true
+        tenant_email:
+          type: string
+          format: email
+          readOnly: true
+        tenant_tenant_id:
+          type: string
+          readOnly: true
+        tenant_stripe_customer_id:
+          type: string
+          readOnly: true
+        tenant_kyc_verified:
+          type: boolean
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        reference:
+          type: string
+          maxLength: 255
+        balance_before:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        balance_after:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        type:
+          $ref: '#/components/schemas/TypeEnum'
+        reason:
+          type: string
+          maxLength: 255
+        metadata: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - balance_after
+      - balance_before
+      - created_at
+      - id
+      - reason
+      - reference
+      - tenant
+      - tenant_email
+      - tenant_kyc_verified
+      - tenant_name
+      - tenant_stripe_customer_id
+      - tenant_tenant_id
+      - type
+    TypeEnum:
+      enum:
+      - DEBIT
+      - CREDIT
+      type: string
+      description: |-
+        * `DEBIT` - Debit
+        * `CREDIT` - Credit
+    UserDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone_number:
+          type: string
+          maxLength: 16
+        avatar_url:
+          type: string
+          format: uri
+          maxLength: 200
+        tenants:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+          readOnly: true
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - email
+      - id
+      - tenants
+    UserProfileUpdate:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        phone_number:
+          type: string
+          maxLength: 16
+        avatar_url:
+          type: string
+          format: uri
+          maxLength: 200
+    UserRoleUpdate:
+      type: object
+      properties:
+        role:
+          $ref: '#/components/schemas/RoleEnum'
+      required:
+      - role
+    VerificationBatch:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/Status2b9Enum'
+          readOnly: true
+        total_count:
+          type: integer
+          readOnly: true
+        success_count:
+          type: integer
+          readOnly: true
+        failed_count:
+          type: integer
+          readOnly: true
+        inactive_count:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - failed_count
+      - id
+      - inactive_count
+      - status
+      - success_count
+      - tenant
+      - total_count
+      - updated_at
+    VerificationLink:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        link:
+          type: string
+          maxLength: 20
+        inner_link:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        verification_id:
+          type: string
+          format: uuid
+          readOnly: true
+        verification_reference:
+          type: string
+          maxLength: 255
+        provider:
+          $ref: '#/components/schemas/ProviderEnum'
+      required:
+      - created_at
+      - id
+      - inner_link
+      - verification_id
+      - verification_reference
+    VerificationRequestCreate:
+      type: object
+      description: Used for POST /verifications/
+      properties:
+        verification_type:
+          $ref: '#/components/schemas/VerificationTypeEnum'
+        input_data: {}
+        tenant_id:
+          type: string
+          format: uuid
+        is_test:
+          type: boolean
+          default: false
+        method_type:
+          type: string
+        notification_email:
+          type: string
+          format: email
+          nullable: true
+      required:
+      - input_data
+      - verification_type
+    VerificationRequestList:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        verification_type:
+          $ref: '#/components/schemas/VerificationTypeEnum'
+        status:
+          $ref: '#/components/schemas/Status2b9Enum'
+        input_data: {}
+        response_data: {}
+        cost_charged:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        batch_id:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+        reference:
+          type: string
+          maxLength: 255
+        source:
+          $ref: '#/components/schemas/SourceEnum'
+        link:
+          type: string
+          readOnly: true
+        email_sent_at:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+      - batch_id
+      - created_at
+      - id
+      - input_data
+      - link
+      - response_data
+      - verification_type
+    VerificationType:
+      type: object
+      description: Used for GET /verifications/types/
+      properties:
+        verification_type:
+          type: string
+        required_parameters:
+          type: array
+          items:
+            type: string
+        validation_parameters:
+          type: array
+          items:
+            type: string
+      required:
+      - required_parameters
+      - verification_type
+    VerificationTypeActive:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        verification_type:
+          $ref: '#/components/schemas/VerificationTypeEnum'
+        is_active:
+          type: boolean
+        plan:
+          $ref: '#/components/schemas/PlanEnum'
+      required:
+      - id
+      - verification_type
+    VerificationTypeEnum:
+      enum:
+      - za_said_verification
+      - ng_bvn_verification
+      - ng_nin_verification
+      - ng_virtual_nin_verification
+      - ng_advanced_phone_number_verification
+      - ng_phone_number_lookup
+      - ng_cac_lookup
+      - ng_passport_verification
+      - gh_passport_lookup
+      - gh_voter_card_lookup
+      - gh_ssnit_lookup
+      - gh_drivers_license_lookup
+      - ke_passport_lookup
+      - ke_national_id_lookup
+      - ke_phone_number_lookup
+      - ke_tax_pin_verification
+      - id_document
+      - face_match
+      - address_verification
+      - aml_screening
+      - business_aml_screening
+      - crypto_wallet_screening
+      - kyb_screening
+      - risk_assessment
+      - age_verification
+      - two_fa_verification
+      - mixed_verification
+      type: string
+      description: |-
+        * `za_said_verification` - Za Said Verification
+        * `ng_bvn_verification` - Ng Bvn Verification
+        * `ng_nin_verification` - Ng Nin Verification
+        * `ng_virtual_nin_verification` - Ng Virtual Nin Verification
+        * `ng_advanced_phone_number_verification` - Ng Advanced Phone Number Verification
+        * `ng_phone_number_lookup` - Ng Phone Number Lookup
+        * `ng_cac_lookup` - Ng Cac Lookup
+        * `ng_passport_verification` - Ng Passport Verification
+        * `gh_passport_lookup` - Gh Passport Lookup
+        * `gh_voter_card_lookup` - Gh Voter Card Lookup
+        * `gh_ssnit_lookup` - Gh Ssnit Lookup
+        * `gh_drivers_license_lookup` - Gh Drivers License Lookup
+        * `ke_passport_lookup` - Ke Passport Lookup
+        * `ke_national_id_lookup` - Ke National Id Lookup
+        * `ke_phone_number_lookup` - Ke Phone Number Lookup
+        * `ke_tax_pin_verification` - Ke Tax Pin Verification
+        * `id_document` - Id Document
+        * `face_match` - Face Match
+        * `address_verification` - Address Verification
+        * `aml_screening` - Aml Screening
+        * `business_aml_screening` - Business Aml Screening
+        * `crypto_wallet_screening` - Crypto Wallet Screening
+        * `kyb_screening` - Kyb Screening
+        * `risk_assessment` - Risk Assessment
+        * `age_verification` - Age Verification
+        * `two_fa_verification` - Two Fa Verification
+        * `mixed_verification` - Mixed Verification
+    Version:
+      type: object
+      properties:
+        git_commit_sha:
+          type: string
+        git_ref_name:
+          type: string
+          nullable: true
+      required:
+      - git_commit_sha
+      - git_ref_name
+    Wallet:
+      type: object
+      properties:
+        balance:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+        currency:
+          type: string
+          maxLength: 3
+    WalletFundingRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        tenant:
+          type: string
+          format: uuid
+          readOnly: true
+        amount:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,10}(?:\.\d{0,2})?$
+          readOnly: true
+        currency:
+          type: string
+          readOnly: true
+        is_successful:
+          type: boolean
+          readOnly: true
+        stripe_session_id:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - amount
+      - created_at
+      - currency
+      - id
+      - is_successful
+      - stripe_session_id
+      - tenant
+      - updated_at
+    WebHookEvent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        source:
+          type: string
+          maxLength: 255
+        event_data: {}
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - source
+      - updated_at
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    jwtAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "JWT"

@@ -3,7 +3,8 @@ export const BILLING_TYPES = {
 	ENTERPRISE: "enterprise",
 };
 
-export const IS_LOCALHOST = window?.location?.hostname === "localhost";
+export const IS_LOCALHOST =
+	typeof window !== "undefined" && window.location.hostname === "localhost";
 
 // Comprehensive list of country phone codes for all countries worldwide
 export const COUNTRY_CODES = [

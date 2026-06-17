@@ -4,9 +4,13 @@ import { COUNTRIES } from "@/lib/constants";
 import { isPlainObject } from "@/lib/validators";
 import { env } from "../../config/env";
 
+const isBrowser = typeof window !== "undefined";
+
+const getBrowserHost = () => (isBrowser ? window.location.host : "");
+
 const getBaseUrl = () => {
-	const windowUrl = window.location.host;
-	if (windowUrl.includes("verifyafrica.io")) {
+	const host = getBrowserHost();
+	if (host.includes("verifyafrica.io")) {
 		return "https://api.verifyafrica.io/api";
 	}
 
@@ -17,7 +21,7 @@ const getBaseUrl = () => {
 const BASE_URL = getBaseUrl();
 
 const getTokenPrefix = (): string => {
-	const host = window.location.host;
+	const host = getBrowserHost();
 	if (host.includes("localhost")) return "local:";
 	if (host.includes("dashboard.verifyafrica.io")) return "dashboard:";
 	if (host.includes("admin.verifyafrica.io")) return "admin:";
@@ -29,6 +33,13 @@ export const getRefreshTokenKey = (): string =>
 	`${getTokenPrefix()}refreshToken`;
 
 const getTokens = () => {
+	if (!isBrowser) {
+		return {
+			accessToken: "",
+			refreshToken: "",
+		};
+	}
+
 	return {
 		accessToken: localStorage.getItem(getAccessTokenKey()),
 		refreshToken: localStorage.getItem(getRefreshTokenKey()),
@@ -36,11 +47,15 @@ const getTokens = () => {
 };
 
 export const setTokens = (accessToken: string, refreshToken = "") => {
+	if (!isBrowser) return;
+
 	localStorage.setItem(getAccessTokenKey(), accessToken);
 	if (refreshToken) localStorage.setItem(getRefreshTokenKey(), refreshToken);
 };
 
 const clearTokensAndLogout = () => {
+	if (!isBrowser) return;
+
 	localStorage.removeItem(getAccessTokenKey());
 	localStorage.removeItem(getRefreshTokenKey());
 	window.location.href = "/login";
@@ -51,7 +66,6 @@ const $http = axios.create({
 	timeout: 30000,
 	headers: {
 		"Content-Type": "application/json",
-		"Cache-Control": "max-age=604800, must-revalidate",
 	},
 	withCredentials: true,
 });
@@ -153,7 +167,9 @@ $http.interceptors.response.use(
 
 					isRefreshing = false;
 					// Retry all queued requests with the new access token
-					failedRequestsQueue.forEach((req) => req.resolve($http(req.config)));
+					failedRequestsQueue.forEach((req) => {
+						req.resolve($http(req.config));
+					});
 					failedRequestsQueue = [];
 					return $http(originalRequest); // Retry the original failed request
 				} catch (refreshError) {

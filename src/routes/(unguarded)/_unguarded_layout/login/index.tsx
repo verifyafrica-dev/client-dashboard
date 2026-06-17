@@ -1,10 +1,19 @@
-import { ArrowRightIcon, EnvelopeSimpleIcon } from "@phosphor-icons/react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { ArrowRightIcon, LockIcon } from "@phosphor-icons/react";
+import { useForm } from "@tanstack/react-form";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+
+import { useUserLoginMutation } from "#/api/http/v1/users/users.hooks";
+import {
+	type UserLoginPayload,
+	UserLoginSchema,
+} from "#/api/http/v1/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
+import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
-import { AuthPageShell, IconField, PasswordField } from "../-components";
+import { Field, FieldError, FieldGroup } from "@/components/ui/field";
+import { AuthPageShell } from "../-components";
 
 export const Route = createFileRoute("/(unguarded)/_unguarded_layout/login/")({
 	component: LoginPage,
@@ -12,6 +21,30 @@ export const Route = createFileRoute("/(unguarded)/_unguarded_layout/login/")({
 
 function LoginPage() {
 	const [rememberMe, setRememberMe] = useState(false);
+	const navigate = useNavigate();
+	const userLoginMutation = useUserLoginMutation();
+
+	const form = useForm({
+		defaultValues: {
+			email: "",
+			password: "",
+		} satisfies UserLoginPayload,
+		validators: {
+			onSubmit: UserLoginSchema,
+		},
+
+		onSubmit: async ({ value }) => {
+			await userLoginMutation.mutateAsync(value, {
+				onSuccess: async (values) => {
+					console.log("Debug Success", values);
+					await navigate({ to: "/dashboard" });
+				},
+				onError: (error) => {
+					console.error("Login failed:", error.message);
+				},
+			});
+		},
+	});
 
 	return (
 		<AuthPageShell
@@ -29,42 +62,99 @@ function LoginPage() {
 				</p>
 			}
 		>
-			<IconField
-				id="email"
-				label="Email Address"
-				icon={EnvelopeSimpleIcon}
-				type="email"
-				placeholder="Enter your email"
-				autoComplete="email"
-			/>
+			<form
+				id="login-form"
+				onSubmit={(e) => {
+					e.preventDefault();
+					form.handleSubmit();
+				}}
+				className="flex flex-col gap-4"
+			>
+				<FieldGroup className="flex flex-col gap-2">
+					<form.Field name="email">
+						{(field) => (
+							<Field className="flex flex-col gap-2">
+								<Label htmlFor="email">Email</Label>
+								<Input
+									id="email"
+									type="email"
+									autoComplete="email"
+									placeholder="Enter your email"
+									value={field.state.value}
+									onBlur={field.handleBlur}
+									onChange={(e) => field.handleChange(e.target.value)}
+									aria-invalid={
+										field.state.meta.isTouched && !field.state.meta.isValid
+									}
+									aria-describedby={field.state.meta.errors?.join(" ")}
+								/>
+								{field.state.meta.isTouched && !field.state.meta.isValid && (
+									<FieldError errors={field.state.meta.errors} />
+								)}
+							</Field>
+						)}
+					</form.Field>
+				</FieldGroup>
 
-			<PasswordField id="password" label="Password" />
-
-			<div className="flex items-center justify-between gap-4">
-				<div className="flex items-center gap-2">
-					<Checkbox
-						id="remember-me"
-						checked={rememberMe}
-						onCheckedChange={(checked) => setRememberMe(checked === true)}
-					/>
-					<Label htmlFor="remember-me" className="font-normal">
-						Remember me
-					</Label>
+				<form.Field name="password">
+					{(field) => (
+						<Field className="flex flex-col gap-2">
+							<Label htmlFor="password">Password</Label>
+							<div className="relative">
+								<LockIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+								<Input
+									id="password"
+									type="password"
+									placeholder="Enter your password"
+									autoComplete="current-password"
+									className="pl-10"
+									value={field.state.value}
+									onBlur={field.handleBlur}
+									onChange={(e) => field.handleChange(e.target.value)}
+									aria-invalid={
+										field.state.meta.isTouched && !field.state.meta.isValid
+									}
+									aria-describedby={field.state.meta.errors?.join(" ")}
+								/>
+							</div>
+							{field.state.meta.isTouched && !field.state.meta.isValid && (
+								<FieldError errors={field.state.meta.errors} />
+							)}
+						</Field>
+					)}
+				</form.Field>
+				{userLoginMutation.isError && (
+					<FieldError errors={[{ message: userLoginMutation.error.message }]} />
+				)}
+				<div className="flex items-center justify-between gap-4">
+					<div className="flex items-center gap-2">
+						<Checkbox
+							id="remember-me"
+							checked={rememberMe}
+							onCheckedChange={(checked) => setRememberMe(checked === true)}
+						/>
+						<Label htmlFor="remember-me" className="font-normal">
+							Remember me
+						</Label>
+					</div>
+					<Link
+						to="/forgot-password"
+						className="text-sm font-semibold text-foreground hover:underline"
+					>
+						Forgot password?
+					</Link>
 				</div>
-				<Link
-					to="/forgot-password"
-					className="text-sm font-semibold text-foreground hover:underline"
-				>
-					Forgot password?
-				</Link>
-			</div>
-
-			<Button type="button" className="w-full cursor-pointer" asChild>
-				<Link to="/dashboard">
-					Sign In
-					<ArrowRightIcon className="size-4" weight="bold" />
-				</Link>
-			</Button>
+				<Field orientation="horizontal">
+					<Button
+						type="submit"
+						className="w-full cursor-pointer"
+						disabled={userLoginMutation.isPending}
+					>
+						Sign In
+						<ArrowRightIcon className="size-4" weight="bold" />
+					</Button>
+				</Field>
+			</form>
 		</AuthPageShell>
 	);
 }
