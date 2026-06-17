@@ -1,12 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Button } from "#/components/ui/button";
+import LoginPage from "#/routes/(unguarded)/_unguarded_layout/login";
 
 export const Route = createFileRoute("/")({ component: Home });
 
 function Home() {
-	return (
-		<div className="p-8">
-			<Button className="bg-teal-500 text-white">Click me</Button>
-		</div>
-	);
+	return <LoginPage />;
 }

@@ -174,22 +174,24 @@ function SidebarTeamNav() {
 export function AppSidebar() {
 	return (
 		<Sidebar collapsible="icon">
-			<SidebarHeader className="flex min-h-14 max-h-14 items-center border-b border-sidebar-border px-4 py-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
-				<picture className="group-data-[collapsible=icon]:hidden">
-					<img
-						src="/assets/brand/logo.svg"
-						alt="VerifyAfrica"
-						className="h-12 w-auto"
-					/>
-				</picture>
-				<picture className="hidden group-data-[collapsible=icon]:block">
-					<img
-						src="/assets/brand/logo-square.svg"
-						alt="VerifyAfrica"
-						className="size-8"
-					/>
-				</picture>
-			</SidebarHeader>
+			<Link to="/dashboard">
+				<SidebarHeader className="flex min-h-14 max-h-14 items-center border-b border-sidebar-border px-4 py-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
+					<picture className="group-data-[collapsible=icon]:hidden">
+						<img
+							src="/assets/brand/logo.svg"
+							alt="VerifyAfrica"
+							className="h-12 w-auto"
+						/>
+					</picture>
+					<picture className="hidden group-data-[collapsible=icon]:block">
+						<img
+							src="/assets/brand/logo-square.svg"
+							alt="VerifyAfrica"
+							className="size-8"
+						/>
+					</picture>
+				</SidebarHeader>
+			</Link>
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarGroupContent>
