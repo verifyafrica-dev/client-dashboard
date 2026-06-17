@@ -2,21 +2,71 @@ import {
 	ArrowRightIcon,
 	BuildingsIcon,
 	EnvelopeSimpleIcon,
+	LockIcon,
 	UserIcon,
 } from "@phosphor-icons/react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useForm } from "@tanstack/react-form";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
+import type { z } from "zod";
+
+import { useUserRegisterMutation } from "#/api/http/v1/users/users.hooks";
+import { UserRegisterSchema } from "#/api/http/v1/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
+import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
-import { AuthPageShell, IconField, PasswordField } from "../-components";
+import { Field, FieldError, FieldGroup } from "@/components/ui/field";
+import { AuthPageShell } from "../-components";
 
-export const Route = createFileRoute("/(unguarded)/_unguarded_layout/register/")({
-	component: registerPage,
-});
+const RegisterFormSchema = UserRegisterSchema.omit({ tenant_email: true });
 
-function registerPage() {
+type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
+
+export const Route = createFileRoute("/(unguarded)/_unguarded_layout/register/")(
+	{
+		component: RegisterPage,
+	},
+);
+
+function RegisterPage() {
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
+	const navigate = useNavigate();
+	const registerMutation = useUserRegisterMutation();
+
+	const form = useForm({
+		defaultValues: {
+			tenant_name: "",
+			first_name: "",
+			last_name: "",
+			email: "",
+			password: "",
+		} satisfies RegisterFormValues,
+		validators: {
+			onSubmit: RegisterFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			await registerMutation.mutateAsync(
+				{
+					...value,
+					tenant_email: value.email,
+				},
+				{
+					onSuccess: () => {
+						toast.success("Account created. Check your email for a verification code.");
+						navigate({
+							to: "/activate-account",
+							search: { email: value.email },
+						});
+					},
+					onError: (error) => {
+						console.error("Registration failed:", error.message);
+					},
+				},
+			);
+		},
+	});
 
 	return (
 		<AuthPageShell
@@ -34,68 +84,185 @@ function registerPage() {
 				</p>
 			}
 		>
-			<div className="grid gap-4 sm:grid-cols-2">
-				<IconField
-					id="first-name"
-					label="First Name"
-					icon={UserIcon}
-					placeholder="John"
-					autoComplete="given-name"
-				/>
-				<IconField
-					id="last-name"
-					label="Last Name"
-					icon={UserIcon}
-					placeholder="Doe"
-					autoComplete="family-name"
-				/>
-			</div>
-
-			<IconField
-				id="company-name"
-				label="Company Name"
-				icon={BuildingsIcon}
-				placeholder="Acme Inc."
-				autoComplete="organization"
-			/>
-
-			<IconField
-				id="email"
-				label="Email Address"
-				icon={EnvelopeSimpleIcon}
-				type="email"
-				placeholder="john.doe@example.com"
-				autoComplete="email"
-			/>
-
-			<PasswordField id="password" label="Password" />
-
-			<div className="flex items-start gap-3">
-				<Checkbox
-					id="terms"
-					checked={acceptedTerms}
-					onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
-				/>
-				<Label
-					htmlFor="terms"
-					className="text-sm leading-relaxed font-normal text-muted-foreground"
-				>
-					By creating an account, I agree to VerifyAfrica&apos;s Terms of
-					Service, Privacy Policy, and Cookie Policy.
-				</Label>
-			</div>
-
-			<Button
-				type="button"
-				className="w-full cursor-pointer"
-				disabled={!acceptedTerms}
-				asChild
+			<form
+				id="register-form"
+				onSubmit={(e) => {
+					e.preventDefault();
+					form.handleSubmit();
+				}}
+				className="flex flex-col gap-4"
 			>
-				<Link to="/activate-account">
-					Create Account
-					<ArrowRightIcon className="size-4" weight="bold" />
-				</Link>
-			</Button>
+				<div className="grid gap-4 sm:grid-cols-2">
+					<form.Field name="first_name">
+						{(field) => (
+							<Field className="flex flex-col gap-2">
+								<Label htmlFor="first-name">First Name</Label>
+								<div className="relative">
+									<UserIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+									<Input
+										id="first-name"
+										placeholder="John"
+										autoComplete="given-name"
+										className="pl-10"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(e) => field.handleChange(e.target.value)}
+										aria-invalid={
+											field.state.meta.isTouched && !field.state.meta.isValid
+										}
+										aria-describedby={field.state.meta.errors?.join(" ")}
+									/>
+								</div>
+								{field.state.meta.isTouched && !field.state.meta.isValid && (
+									<FieldError errors={field.state.meta.errors} />
+								)}
+							</Field>
+						)}
+					</form.Field>
+
+					<form.Field name="last_name">
+						{(field) => (
+							<Field className="flex flex-col gap-2">
+								<Label htmlFor="last-name">Last Name</Label>
+								<div className="relative">
+									<UserIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+									<Input
+										id="last-name"
+										placeholder="Doe"
+										autoComplete="family-name"
+										className="pl-10"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(e) => field.handleChange(e.target.value)}
+										aria-invalid={
+											field.state.meta.isTouched && !field.state.meta.isValid
+										}
+										aria-describedby={field.state.meta.errors?.join(" ")}
+									/>
+								</div>
+								{field.state.meta.isTouched && !field.state.meta.isValid && (
+									<FieldError errors={field.state.meta.errors} />
+								)}
+							</Field>
+						)}
+					</form.Field>
+				</div>
+
+				<FieldGroup className="flex flex-col gap-2">
+					<form.Field name="tenant_name">
+						{(field) => (
+							<Field className="flex flex-col gap-2">
+								<Label htmlFor="company-name">Company Name</Label>
+								<div className="relative">
+									<BuildingsIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+									<Input
+										id="company-name"
+										placeholder="Acme Inc."
+										autoComplete="organization"
+										className="pl-10"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(e) => field.handleChange(e.target.value)}
+										aria-invalid={
+											field.state.meta.isTouched && !field.state.meta.isValid
+										}
+										aria-describedby={field.state.meta.errors?.join(" ")}
+									/>
+								</div>
+								{field.state.meta.isTouched && !field.state.meta.isValid && (
+									<FieldError errors={field.state.meta.errors} />
+								)}
+							</Field>
+						)}
+					</form.Field>
+
+					<form.Field name="email">
+						{(field) => (
+							<Field className="flex flex-col gap-2">
+								<Label htmlFor="email">Email Address</Label>
+								<div className="relative">
+									<EnvelopeSimpleIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+									<Input
+										id="email"
+										type="email"
+										placeholder="john.doe@example.com"
+										autoComplete="email"
+										className="pl-10"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(e) => field.handleChange(e.target.value)}
+										aria-invalid={
+											field.state.meta.isTouched && !field.state.meta.isValid
+										}
+										aria-describedby={field.state.meta.errors?.join(" ")}
+									/>
+								</div>
+								{field.state.meta.isTouched && !field.state.meta.isValid && (
+									<FieldError errors={field.state.meta.errors} />
+								)}
+							</Field>
+						)}
+					</form.Field>
+
+					<form.Field name="password">
+						{(field) => (
+							<Field className="flex flex-col gap-2">
+								<Label htmlFor="password">Password</Label>
+								<div className="relative">
+									<LockIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+									<Input
+										id="password"
+										type="password"
+										placeholder="Enter your password"
+										autoComplete="new-password"
+										className="pl-10"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(e) => field.handleChange(e.target.value)}
+										aria-invalid={
+											field.state.meta.isTouched && !field.state.meta.isValid
+										}
+										aria-describedby={field.state.meta.errors?.join(" ")}
+									/>
+								</div>
+								{field.state.meta.isTouched && !field.state.meta.isValid && (
+									<FieldError errors={field.state.meta.errors} />
+								)}
+							</Field>
+						)}
+					</form.Field>
+				</FieldGroup>
+
+				{registerMutation.isError && (
+					<FieldError errors={[{ message: registerMutation.error.message }]} />
+				)}
+
+				<div className="flex items-start gap-3">
+					<Checkbox
+						id="terms"
+						checked={acceptedTerms}
+						onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+					/>
+					<Label
+						htmlFor="terms"
+						className="text-sm leading-relaxed font-normal text-muted-foreground"
+					>
+						By creating an account, I agree to VerifyAfrica&apos;s Terms of
+						Service, Privacy Policy, and Cookie Policy.
+					</Label>
+				</div>
+
+				<Field orientation="horizontal">
+					<Button
+						type="submit"
+						className="w-full cursor-pointer"
+						disabled={!acceptedTerms || registerMutation.isPending}
+					>
+						Create Account
+						<ArrowRightIcon className="size-4" weight="bold" />
+					</Button>
+				</Field>
+			</form>
 		</AuthPageShell>
 	);
 }

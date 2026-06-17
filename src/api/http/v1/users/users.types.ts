@@ -1,3 +1,4 @@
+import type { AxiosError } from "axios";
 import { z } from "zod";
 import type { COUNTRIES } from "#/lib/constants";
 import {
@@ -69,6 +70,28 @@ export const UserResetPasswordSchema = z.object({
 });
 
 export type UserResetPasswordPayload = z.infer<typeof UserResetPasswordSchema>;
+
+export const UserResetPasswordSearchSchema = z.object({
+	email: z.email({ message: "Invalid email address" }),
+});
+
+export const UserResetPasswordFormSchema = UserResetPasswordSchema.omit({
+	code: true,
+})
+	.extend({
+		code: z.string().length(5, { message: "Reset code must be 5 characters" }),
+		confirm_password: z
+			.string()
+			.min(8, { message: "Password must be at least 8 characters long" }),
+	})
+	.refine((data) => data.new_password === data.confirm_password, {
+		message: "Passwords do not match",
+		path: ["confirm_password"],
+	});
+
+export type UserResetPasswordFormValues = z.infer<
+	typeof UserResetPasswordFormSchema
+>;
 
 export const UserTokenRefreshSchema = z.object({
 	refresh: z.string().min(1, { message: "Refresh token is required" }),
@@ -189,4 +212,18 @@ export type UserChangePasswordResponse = Record<string, never>;
 export interface UserLoginError {
 	message: string;
 	status: number;
+}
+
+export type UserResetPasswordErrorResponse = AxiosError<{
+	non_field_errors: string[];
+}>;
+
+export interface UserAuthTokenInvalidErrorResponse {
+	detail: string;
+	code: string;
+	messages: {
+		token_class: string;
+		token_type: string;
+		message: string;
+	}[];
 }

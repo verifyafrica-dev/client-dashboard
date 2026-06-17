@@ -1,13 +1,61 @@
 import { ArrowRightIcon, EnvelopeSimpleIcon } from "@phosphor-icons/react";
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { Button } from "#/components/ui/button";
-import { AuthPageShell, IconField } from "../-components";
+import { useForm } from "@tanstack/react-form";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
 
-export const Route = createFileRoute("/(unguarded)/_unguarded_layout/forgot-password/")({
+import { useUserForgotPasswordMutation } from "#/api/http/v1/users/users.hooks";
+import {
+	type UserForgotPasswordPayload,
+	UserForgotPasswordSchema,
+	type UserLoginError,
+} from "#/api/http/v1/users/users.types";
+import { Button } from "#/components/ui/button";
+import { Input } from "#/components/ui/input";
+import { Label } from "#/components/ui/label";
+import {
+	getUserLoginErrorFieldErrors,
+	toUserLoginError,
+} from "#/lib/api-errors";
+import { Field, FieldError, FieldGroup } from "@/components/ui/field";
+import { AuthPageShell } from "../-components";
+
+export const Route = createFileRoute(
+	"/(unguarded)/_unguarded_layout/forgot-password/",
+)({
 	component: ForgotPasswordPage,
 });
 
 function ForgotPasswordPage() {
+	const navigate = useNavigate();
+	const forgotPasswordMutation = useUserForgotPasswordMutation();
+	const [formError, setFormError] = useState<UserLoginError | null>(null);
+
+	const form = useForm({
+		defaultValues: {
+			email: "",
+		} satisfies UserForgotPasswordPayload,
+		validators: {
+			onSubmit: UserForgotPasswordSchema,
+		},
+		onSubmit: async ({ value }) => {
+			setFormError(null);
+
+			await forgotPasswordMutation.mutateAsync(value, {
+				onSuccess: () => {
+					toast.success("Reset code sent to your email");
+					navigate({
+						to: "/reset-password",
+						search: { email: value.email },
+					});
+				},
+				onError: (error) => {
+					setFormError(toUserLoginError(error));
+				},
+			});
+		},
+	});
+
 	return (
 		<AuthPageShell
 			title="Forgot password?"
@@ -24,21 +72,59 @@ function ForgotPasswordPage() {
 				</p>
 			}
 		>
-			<IconField
-				id="email"
-				label="Email Address"
-				icon={EnvelopeSimpleIcon}
-				type="email"
-				placeholder="Enter your email"
-				autoComplete="email"
-			/>
+			<form
+				id="forgot-password-form"
+				onSubmit={(e) => {
+					e.preventDefault();
+					form.handleSubmit();
+				}}
+				className="flex flex-col gap-4"
+			>
+				<FieldGroup className="flex flex-col gap-2">
+					<form.Field name="email">
+						{(field) => (
+							<Field className="flex flex-col gap-2">
+								<Label htmlFor="email">Email Address</Label>
+								<div className="relative">
+									<EnvelopeSimpleIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+									<Input
+										id="email"
+										type="email"
+										autoComplete="email"
+										placeholder="Enter your email"
+										className="pl-10"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(e) => field.handleChange(e.target.value)}
+										aria-invalid={
+											field.state.meta.isTouched && !field.state.meta.isValid
+										}
+										aria-describedby={field.state.meta.errors?.join(" ")}
+									/>
+								</div>
+								{field.state.meta.isTouched && !field.state.meta.isValid && (
+									<FieldError errors={field.state.meta.errors} />
+								)}
+							</Field>
+						)}
+					</form.Field>
+				</FieldGroup>
 
-			<Button type="button" className="w-full cursor-pointer" asChild>
-				<Link to="/reset-password">
-					Send Reset Code
-					<ArrowRightIcon className="size-4" weight="bold" />
-				</Link>
-			</Button>
+				{formError && (
+					<FieldError errors={getUserLoginErrorFieldErrors(formError)} />
+				)}
+
+				<Field orientation="horizontal">
+					<Button
+						type="submit"
+						className="w-full cursor-pointer"
+						disabled={forgotPasswordMutation.isPending}
+					>
+						Send Reset Code
+						<ArrowRightIcon className="size-4" weight="bold" />
+					</Button>
+				</Field>
+			</form>
 		</AuthPageShell>
 	);
 }

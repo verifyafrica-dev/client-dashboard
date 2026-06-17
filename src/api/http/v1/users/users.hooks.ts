@@ -28,6 +28,7 @@ import type {
 	UserRegisterResponse,
 	UserResendActivationCodePayload,
 	UserResendActivationCodeResponse,
+	UserResetPasswordErrorResponse,
 	UserResetPasswordPayload,
 	UserResetPasswordResponse,
 	UserTokenRefreshPayload,
@@ -142,7 +143,7 @@ export const useUserForgotPasswordMutation = () =>
 export const useUserResetPasswordMutation = () =>
 	useMutation<
 		UserResetPasswordResponse,
-		UserLoginError,
+		UserResetPasswordErrorResponse,
 		UserResetPasswordPayload
 	>({
 		mutationFn: USERS_API.RESET_PASSWORD,

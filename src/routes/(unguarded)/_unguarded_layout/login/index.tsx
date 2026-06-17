@@ -12,12 +12,17 @@ import {
 import {
 	type UserLoginPayload,
 	UserLoginSchema,
+	type UserLoginError,
 } from "#/api/http/v1/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
 import { deleteAllCookies } from "#/lib/cookies";
+import {
+	getUserLoginErrorFieldErrors,
+	toUserLoginError,
+} from "#/lib/api-errors";
 import { useAuthStore } from "#/stores/auth-store";
 import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
@@ -31,6 +36,7 @@ function LoginPage() {
 	const navigate = useNavigate();
 	const queryClient = useQueryClient();
 	const userLoginMutation = useUserLoginMutation();
+	const [formError, setFormError] = useState<UserLoginError | null>(null);
 
 	const form = useForm({
 		defaultValues: {
@@ -41,7 +47,9 @@ function LoginPage() {
 			onSubmit: UserLoginSchema,
 		},
 		onSubmit: async ({ value }) => {
+			setFormError(null);
 			deleteAllCookies();
+
 			await userLoginMutation.mutateAsync(value, {
 				onSuccess: async () => {
 					const user = await queryClient.fetchQuery({
@@ -62,7 +70,7 @@ function LoginPage() {
 					navigate({ to: "/dashboard" });
 				},
 				onError: (error) => {
-					console.error("Login failed:", error.message);
+					setFormError(toUserLoginError(error));
 				},
 			});
 		},
@@ -145,8 +153,8 @@ function LoginPage() {
 						</Field>
 					)}
 				</form.Field>
-				{userLoginMutation.isError && (
-					<FieldError errors={[{ message: userLoginMutation.error.message }]} />
+				{formError && (
+					<FieldError errors={getUserLoginErrorFieldErrors(formError)} />
 				)}
 				<div className="flex items-center justify-between gap-4">
 					<div className="flex items-center gap-2">
