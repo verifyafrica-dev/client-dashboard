@@ -1,6 +1,5 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, type UseQueryResult } from "@tanstack/react-query";
 import { useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 import { useAuthStore } from "#/stores/auth-store";
 import { setTokens } from "../../xhr";
@@ -36,7 +35,7 @@ export const USER_QUERY_KEYS = {
 	list: (params?: { offset?: number; page_size?: number }) =>
 		["users", "list", params ?? {}] as const,
 	detail: (id: string) => ["users", "detail", id] as const,
-	me: (id: string) => ["users", "me", id] as const,
+	me: ["users", "me"] as const,
 	lookup: (query: UserLookupQuery) => ["users", "lookup", query] as const,
 } as const;
 
@@ -56,9 +55,9 @@ export const useUserDetailQuery = (id: string) =>
 		enabled: Boolean(id),
 	});
 
-export const useMeQuery = (isEnabled = true) => {
+export const useMeQuery = (isEnabled = true): UseQueryResult<UserDetail, Error> => {
 	const query = useQuery<UserDetail, Error>({
-		queryKey: USER_QUERY_KEYS.me(uuidv4() as string),
+		queryKey: USER_QUERY_KEYS.me,
 		queryFn: USERS_API.ME,
 		enabled: isEnabled,
 	});

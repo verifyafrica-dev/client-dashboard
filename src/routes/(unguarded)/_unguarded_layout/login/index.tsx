@@ -53,6 +53,12 @@ function LoginPage() {
 	});
 
 	if (getUserQuery.data?.id) {
+		if (!getUserQuery.data?.is_active) {
+			toast.error("Your account is not active. Please contact support.", {
+				duration: 10_000,
+			});
+			return null;
+		}
 		navigate({ to: "/dashboard" });
 		return null;
 	}
