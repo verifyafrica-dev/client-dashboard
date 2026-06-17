@@ -1,4 +1,11 @@
-import { createFileRoute, Link, Outlet } from "@tanstack/react-router";
+import {
+	createFileRoute,
+	Link,
+	Navigate,
+	Outlet,
+} from "@tanstack/react-router";
+import { Loader2Icon } from "lucide-react";
+import { useMeQuery } from "#/api/http/v1/users/users.hooks";
 import { AppSidebar } from "#/components/app-sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
 import {
@@ -11,7 +18,9 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "#/components/ui/sidebar";
+import { deleteAllCookies } from "#/lib/cookies";
 import { cn } from "#/lib/utils.ts";
+import { useAuthStore } from "#/stores/auth-store";
 
 const userMenuItems = [
 	{ label: "Profile", to: "/dashboard/profile" },
@@ -24,6 +33,23 @@ export const Route = createFileRoute("/(auth)/_auth_layout")({
 });
 
 function AuthLayout() {
+	const getUserQuery = useMeQuery();
+
+	if (getUserQuery.isLoading) {
+		return (
+			<div className="flex min-h-screen items-center justify-center">
+				<Loader2Icon className="size-8 animate-spin text-primary" />
+			</div>
+		);
+	}
+
+	if (!getUserQuery.isLoading && !getUserQuery.data?.id) {
+		deleteAllCookies();
+		useAuthStore.getState().clearAuth();
+
+		return <Navigate to="/login" />;
+	}
+
 	return (
 		<SidebarProvider>
 			<AppSidebar />

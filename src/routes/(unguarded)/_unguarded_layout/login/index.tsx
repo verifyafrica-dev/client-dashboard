@@ -1,13 +1,15 @@
 import { ArrowRightIcon, LockIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 
 import {
-	useMeQuery,
+	USER_QUERY_KEYS,
 	useUserLoginMutation,
 } from "#/api/http/v1/users/users.hooks";
+import { USERS_API } from "#/api/http/v1/users/users.api";
 import {
 	type UserLoginPayload,
 	UserLoginSchema,
@@ -17,6 +19,7 @@ import { Checkbox } from "#/components/ui/checkbox";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
 import { deleteAllCookies } from "#/lib/cookies";
+import { useAuthStore } from "#/stores/auth-store";
 import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
 
@@ -27,9 +30,8 @@ export const Route = createFileRoute("/(unguarded)/_unguarded_layout/login/")({
 function LoginPage() {
 	const [rememberMe, setRememberMe] = useState(false);
 	const navigate = useNavigate();
+	const queryClient = useQueryClient();
 	const userLoginMutation = useUserLoginMutation();
-
-	const getUserQuery = useMeQuery(userLoginMutation.isSuccess);
 
 	const form = useForm({
 		defaultValues: {
@@ -43,7 +45,22 @@ function LoginPage() {
 			deleteAllCookies();
 			await userLoginMutation.mutateAsync(value, {
 				onSuccess: async () => {
+					const user = await queryClient.fetchQuery({
+						queryKey: USER_QUERY_KEYS.me,
+						queryFn: USERS_API.ME,
+						staleTime: 60_000,
+					});
+					useAuthStore.setState({ user });
+
+					if (!user.is_active) {
+						toast.error("Your account is not active. Please contact support.", {
+							duration: 10_000,
+						});
+						return;
+					}
+
 					toast.success("Login successful");
+					navigate({ to: "/dashboard" });
 				},
 				onError: (error) => {
 					console.error("Login failed:", error.message);
@@ -51,17 +68,6 @@ function LoginPage() {
 			});
 		},
 	});
-
-	if (getUserQuery.data?.id) {
-		if (!getUserQuery.data?.is_active) {
-			toast.error("Your account is not active. Please contact support.", {
-				duration: 10_000,
-			});
-			return null;
-		}
-		navigate({ to: "/dashboard" });
-		return null;
-	}
 
 	return (
 		<AuthPageShell

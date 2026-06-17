@@ -60,6 +60,7 @@ export const useMeQuery = (isEnabled = true): UseQueryResult<UserDetail, Error> 
 		queryKey: USER_QUERY_KEYS.me,
 		queryFn: USERS_API.ME,
 		enabled: isEnabled,
+		staleTime: 60_000,
 	});
 
 	useEffect(() => {
