@@ -12,12 +12,16 @@ import {
 } from "#/api/http/v1/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
-import { Label } from "#/components/ui/label";
 import {
 	getUserLoginErrorFieldErrors,
 	toUserLoginError,
 } from "#/lib/api-errors";
-import { Field, FieldError, FieldGroup } from "@/components/ui/field";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
 
 export const Route = createFileRoute(
@@ -84,7 +88,7 @@ function ForgotPasswordPage() {
 					<form.Field name="email">
 						{(field) => (
 							<Field className="flex flex-col gap-2">
-								<Label htmlFor="email">Email Address</Label>
+								<FieldLabel htmlFor="email">Email Address</FieldLabel>
 								<div className="relative">
 									<EnvelopeSimpleIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input

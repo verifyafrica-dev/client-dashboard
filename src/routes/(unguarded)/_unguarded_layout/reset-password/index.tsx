@@ -11,10 +11,10 @@ import { toast } from "sonner";
 
 import { useUserResetPasswordMutation } from "#/api/http/v1/users/users.hooks";
 import {
+	type UserResetPasswordErrorResponse,
 	UserResetPasswordFormSchema,
 	type UserResetPasswordFormValues,
 	UserResetPasswordSearchSchema,
-	type UserResetPasswordErrorResponse,
 } from "#/api/http/v1/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
@@ -26,7 +26,12 @@ import {
 import { Label } from "#/components/ui/label";
 import { getUserResetPasswordErrorFieldErrors } from "#/lib/api-errors";
 import { deleteAllCookies } from "#/lib/cookies";
-import { Field, FieldError, FieldGroup } from "@/components/ui/field";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
 
 export const Route = createFileRoute(
@@ -75,7 +80,7 @@ function ResetPasswordPage() {
 				{
 					onSuccess: () => {
 						toast.success("Password reset successful");
-						navigate({ to: "/login" });
+						navigate({ to: "/login", replace: true });
 					},
 					onError: (error) => {
 						setFormError(error);
@@ -99,6 +104,7 @@ function ResetPasswordPage() {
 					<Link
 						to="/forgot-password"
 						className="font-semibold text-foreground hover:underline"
+						replace
 					>
 						Try again
 					</Link>
@@ -116,9 +122,7 @@ function ResetPasswordPage() {
 				<form.Field name="code">
 					{(field) => (
 						<Field className="flex flex-col gap-2">
-							<Label htmlFor="reset-code" className="text-muted-foreground">
-								Reset code
-							</Label>
+							<FieldLabel htmlFor="reset-code">Reset code</FieldLabel>
 							<InputOTP
 								id="reset-code"
 								maxLength={5}
@@ -142,11 +146,11 @@ function ResetPasswordPage() {
 					)}
 				</form.Field>
 
-				<FieldGroup className="flex flex-col gap-2">
+				<FieldGroup className="flex flex-col gap-4">
 					<form.Field name="new_password">
 						{(field) => (
 							<Field className="flex flex-col gap-2">
-								<Label htmlFor="new-password">New Password</Label>
+								<FieldLabel htmlFor="new-password">New Password</FieldLabel>
 								<div className="relative">
 									<LockIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input
@@ -174,7 +178,9 @@ function ResetPasswordPage() {
 					<form.Field name="confirm_password">
 						{(field) => (
 							<Field className="flex flex-col gap-2">
-								<Label htmlFor="confirm-password">Confirm New Password</Label>
+								<FieldLabel htmlFor="confirm-password">
+									Confirm New Password
+								</FieldLabel>
 								<div className="relative">
 									<LockIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input

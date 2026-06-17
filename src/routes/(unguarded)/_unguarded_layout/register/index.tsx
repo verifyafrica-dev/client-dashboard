@@ -17,18 +17,23 @@ import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
-import { Field, FieldError, FieldGroup } from "@/components/ui/field";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
 
 const RegisterFormSchema = UserRegisterSchema.omit({ tenant_email: true });
 
 type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
 
-export const Route = createFileRoute("/(unguarded)/_unguarded_layout/register/")(
-	{
-		component: RegisterPage,
-	},
-);
+export const Route = createFileRoute(
+	"/(unguarded)/_unguarded_layout/register/",
+)({
+	component: RegisterPage,
+});
 
 function RegisterPage() {
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
@@ -54,7 +59,9 @@ function RegisterPage() {
 				},
 				{
 					onSuccess: () => {
-						toast.success("Account created. Check your email for a verification code.");
+						toast.success(
+							"Account created. Check your email for a verification code.",
+						);
 						navigate({
 							to: "/activate-account",
 							search: { email: value.email },
@@ -96,7 +103,7 @@ function RegisterPage() {
 					<form.Field name="first_name">
 						{(field) => (
 							<Field className="flex flex-col gap-2">
-								<Label htmlFor="first-name">First Name</Label>
+								<FieldLabel htmlFor="first-name">First Name</FieldLabel>
 								<div className="relative">
 									<UserIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input
@@ -123,7 +130,7 @@ function RegisterPage() {
 					<form.Field name="last_name">
 						{(field) => (
 							<Field className="flex flex-col gap-2">
-								<Label htmlFor="last-name">Last Name</Label>
+								<FieldLabel htmlFor="last-name">Last Name</FieldLabel>
 								<div className="relative">
 									<UserIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input
@@ -152,7 +159,7 @@ function RegisterPage() {
 					<form.Field name="tenant_name">
 						{(field) => (
 							<Field className="flex flex-col gap-2">
-								<Label htmlFor="company-name">Company Name</Label>
+								<FieldLabel htmlFor="company-name">Company Name</FieldLabel>
 								<div className="relative">
 									<BuildingsIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input
@@ -179,7 +186,7 @@ function RegisterPage() {
 					<form.Field name="email">
 						{(field) => (
 							<Field className="flex flex-col gap-2">
-								<Label htmlFor="email">Email Address</Label>
+								<FieldLabel htmlFor="email">Email Address</FieldLabel>
 								<div className="relative">
 									<EnvelopeSimpleIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input
@@ -207,7 +214,7 @@ function RegisterPage() {
 					<form.Field name="password">
 						{(field) => (
 							<Field className="flex flex-col gap-2">
-								<Label htmlFor="password">Password</Label>
+								<FieldLabel htmlFor="password">Password</FieldLabel>
 								<div className="relative">
 									<LockIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input

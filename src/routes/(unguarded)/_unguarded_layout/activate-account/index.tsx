@@ -58,7 +58,7 @@ function ActivateAccountPage() {
 	const { email } = Route.useSearch();
 	const activateAccountMutation = useUserActivateAccountMutation();
 	const resendActivationCodeMutation = useUserResendActivationCodeMutation();
-	const [formError, setFormError] = useState<UserLoginError | null>(null);
+	// const [formError, setFormError] = useState<UserLoginError | null>(null);
 	const [resendError, setResendError] = useState<UserLoginError | null>(null);
 
 	const form = useForm({
@@ -70,15 +70,16 @@ function ActivateAccountPage() {
 			onSubmit: UserActivateAccountSchema,
 		},
 		onSubmit: async ({ value }) => {
-			setFormError(null);
+			// setFormError(null);
 
 			await activateAccountMutation.mutateAsync(value, {
 				onSuccess: () => {
 					toast.success("Account activated successfully");
 					navigate({ to: "/login" });
 				},
-				onError: (error) => {
-					setFormError(toUserLoginError(error));
+				onError: () => {
+					toast.error("Invalid activation code");
+					// setFormError(toUserLoginError(error));
 				},
 			});
 		},
@@ -166,9 +167,9 @@ function ActivateAccountPage() {
 					)}
 				</form.Field>
 
-				{formError && (
+				{/* {formError && (
 					<FieldError errors={getUserLoginErrorFieldErrors(formError)} />
-				)}
+				)} */}
 
 				{resendError && (
 					<FieldError errors={getUserLoginErrorFieldErrors(resendError)} />
