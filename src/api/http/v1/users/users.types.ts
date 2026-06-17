@@ -1,4 +1,4 @@
-import { ZodUUID, z } from "zod";
+import { z } from "zod";
 import {
 	isBlockedregisterEmailDomain,
 	PUBLIC_EMAIL_DOMAIN_ERROR_MESSAGE,
@@ -144,7 +144,7 @@ export interface UserRegisterResponse {
 }
 
 export interface UserDetail {
-	id: ZodUUID;
+	id: string;
 	email: string;
 	first_name?: string;
 	last_name?: string;

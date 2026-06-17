@@ -2,8 +2,12 @@ import { ArrowRightIcon, LockIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
 
-import { useUserLoginMutation } from "#/api/http/v1/users/users.hooks";
+import {
+	useMeQuery,
+	useUserLoginMutation,
+} from "#/api/http/v1/users/users.hooks";
 import {
 	type UserLoginPayload,
 	UserLoginSchema,
@@ -12,6 +16,7 @@ import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
+import { deleteAllCookies } from "#/lib/cookies";
 import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
 
@@ -24,6 +29,8 @@ function LoginPage() {
 	const navigate = useNavigate();
 	const userLoginMutation = useUserLoginMutation();
 
+	const getUserQuery = useMeQuery(userLoginMutation.isSuccess);
+
 	const form = useForm({
 		defaultValues: {
 			email: "",
@@ -32,12 +39,11 @@ function LoginPage() {
 		validators: {
 			onSubmit: UserLoginSchema,
 		},
-
 		onSubmit: async ({ value }) => {
+			deleteAllCookies();
 			await userLoginMutation.mutateAsync(value, {
-				onSuccess: async (values) => {
-					console.log("Debug Success", values);
-					await navigate({ to: "/dashboard" });
+				onSuccess: async () => {
+					toast.success("Login successful");
 				},
 				onError: (error) => {
 					console.error("Login failed:", error.message);
@@ -45,6 +51,11 @@ function LoginPage() {
 			});
 		},
 	});
+
+	if (getUserQuery.data?.id) {
+		navigate({ to: "/dashboard" });
+		return null;
+	}
 
 	return (
 		<AuthPageShell

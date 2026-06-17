@@ -1,4 +1,3 @@
-import type { ZodUUID } from "zod";
 import $http from "../../xhr";
 import type {
 	PaginatedUserDetailListResponse,
@@ -29,8 +28,8 @@ import type {
 
 const USER_ENDPOINTS = {
 	list: "/users/",
-	detail: (id: ZodUUID) => `/users/${id}/`,
-	adminResetPassword: (userId: ZodUUID) => `/users/${userId}/reset-password/`,
+	detail: (id: string) => `/users/${id}/`,
+	adminResetPassword: (userId: string) => `/users/${userId}/reset-password/`,
 	activateAccount: "/users/activate-account/",
 	changePassword: "/users/change-password/",
 	forgotPassword: "/users/forgot-password/",
@@ -49,15 +48,15 @@ export const USERS_API = {
 		await $http
 			.get<PaginatedUserDetailListResponse>(USER_ENDPOINTS.list, { params })
 			.then((res) => res.data),
-	DETAIL: async (id: ZodUUID) =>
+	DETAIL: async (id: string) =>
 		await $http
 			.get<UserDetail>(USER_ENDPOINTS.detail(id))
 			.then((res) => res.data),
-	UPDATE_DETAIL: async (id: ZodUUID, data: UserDetailUpdatePayload) =>
+	UPDATE_DETAIL: async (id: string, data: UserDetailUpdatePayload) =>
 		await $http
 			.patch<UserDetail>(USER_ENDPOINTS.detail(id), data)
 			.then((res) => res.data),
-	ADMIN_RESET_PASSWORD: async (userId: ZodUUID) =>
+	ADMIN_RESET_PASSWORD: async (userId: string) =>
 		await $http
 			.post<UserAdminResetPasswordResponse>(
 				USER_ENDPOINTS.adminResetPassword(userId),

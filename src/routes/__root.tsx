@@ -6,6 +6,7 @@ import {
 	Scripts,
 } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { Toaster } from "#/components/ui/sonner";
 import { TooltipProvider } from "#/components/ui/tooltip";
 import PostHogProvider from "../integrations/posthog/provider";
 import TanStackQueryDevtools from "../integrations/tanstack-query/devtools";
@@ -47,7 +48,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			</head>
 			<body>
 				<PostHogProvider>
-					<TooltipProvider>{children}</TooltipProvider>
+					<TooltipProvider>
+						<Toaster position="top-right" />
+						{children}
+					</TooltipProvider>
 					<TanStackDevtools
 						config={{
 							position: "bottom-right",

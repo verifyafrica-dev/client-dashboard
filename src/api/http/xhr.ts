@@ -2,6 +2,7 @@ import type { InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
 import { COUNTRIES } from "@/lib/constants";
 import { isPlainObject } from "@/lib/validators";
+import { deleteCookie, getCookie, setCookie } from "#/lib/cookies";
 import { env } from "../../config/env";
 
 const isBrowser = typeof window !== "undefined";
@@ -31,6 +32,7 @@ const getTokenPrefix = (): string => {
 export const getAccessTokenKey = (): string => `${getTokenPrefix()}accessToken`;
 export const getRefreshTokenKey = (): string =>
 	`${getTokenPrefix()}refreshToken`;
+const TOKEN_COOKIE_EXPIRES_DAYS = 30;
 
 const getTokens = () => {
 	if (!isBrowser) {
@@ -41,23 +43,25 @@ const getTokens = () => {
 	}
 
 	return {
-		accessToken: localStorage.getItem(getAccessTokenKey()),
-		refreshToken: localStorage.getItem(getRefreshTokenKey()),
+		accessToken: getCookie(getAccessTokenKey()) ?? "",
+		refreshToken: getCookie(getRefreshTokenKey()) ?? "",
 	};
 };
 
 export const setTokens = (accessToken: string, refreshToken = "") => {
 	if (!isBrowser) return;
 
-	localStorage.setItem(getAccessTokenKey(), accessToken);
-	if (refreshToken) localStorage.setItem(getRefreshTokenKey(), refreshToken);
+	setCookie(getAccessTokenKey(), accessToken, TOKEN_COOKIE_EXPIRES_DAYS);
+	if (refreshToken) {
+		setCookie(getRefreshTokenKey(), refreshToken, TOKEN_COOKIE_EXPIRES_DAYS);
+	}
 };
 
 const clearTokensAndLogout = () => {
 	if (!isBrowser) return;
 
-	localStorage.removeItem(getAccessTokenKey());
-	localStorage.removeItem(getRefreshTokenKey());
+	deleteCookie(getAccessTokenKey());
+	deleteCookie(getRefreshTokenKey());
 	window.location.href = "/login";
 };
 
