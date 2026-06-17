@@ -20,6 +20,11 @@ export const UserLoginSchema = z.object({
 
 export type UserLoginPayload = z.infer<typeof UserLoginSchema>;
 
+export type UserLoginMutationInput = {
+	payload: UserLoginPayload;
+	rememberMe: boolean;
+};
+
 export const UserRegisterSchema = z.object({
 	tenant_name: z.string().min(1, { message: "Tenant name is required" }),
 	tenant_email: z.email({ message: "Invalid tenant email address" }),

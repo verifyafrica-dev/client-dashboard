@@ -48,13 +48,23 @@ const getTokens = () => {
 	};
 };
 
-export const setTokens = (accessToken: string, refreshToken = "") => {
+export const setTokens = (
+	accessToken: string,
+	refreshToken = "",
+	options?: { rememberRefreshToken?: boolean },
+) => {
 	if (!isBrowser) return;
 
+	const rememberRefreshToken = options?.rememberRefreshToken ?? true;
+
 	setCookie(getAccessTokenKey(), accessToken, TOKEN_COOKIE_EXPIRES_DAYS);
-	if (refreshToken) {
+
+	if (rememberRefreshToken && refreshToken) {
 		setCookie(getRefreshTokenKey(), refreshToken, TOKEN_COOKIE_EXPIRES_DAYS);
+		return;
 	}
+
+	deleteCookie(getRefreshTokenKey());
 };
 
 const clearTokensAndLogout = () => {

@@ -1,14 +1,10 @@
 import { ArrowRightIcon, LockIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { USERS_API } from "#/api/http/v1/users/users.api";
-import {
-	USER_QUERY_KEYS,
-	useUserLoginMutation,
-} from "#/api/http/v1/users/users.hooks";
+
+import { useUserLoginMutation } from "#/api/http/v1/users/users.hooks";
 import {
 	type UserLoginPayload,
 	UserLoginSchema,
@@ -34,7 +30,6 @@ export const Route = createFileRoute("/(unguarded)/_unguarded_layout/login/")({
 function LoginPage() {
 	const [rememberMe, setRememberMe] = useState(false);
 	const navigate = useNavigate();
-	const queryClient = useQueryClient();
 	const userLoginMutation = useUserLoginMutation();
 	const [formError, setFormError] = useState<UserLoginError | null>(null);
 
@@ -50,29 +45,30 @@ function LoginPage() {
 			setFormError(null);
 			deleteAllCookies();
 
-			await userLoginMutation.mutateAsync(value, {
-				onSuccess: async () => {
-					const user = await queryClient.fetchQuery({
-						queryKey: USER_QUERY_KEYS.me,
-						queryFn: USERS_API.ME,
-						staleTime: 60_000,
-					});
-					useAuthStore.setState({ user });
+			await userLoginMutation.mutateAsync(
+				{ payload: value, rememberMe },
+				{
+					onSuccess: () => {
+						const user = useAuthStore.getState().user;
 
-					if (!user.is_active) {
-						toast.error("Your account is not active. Please contact support.", {
-							duration: 10_000,
-						});
-						return;
-					}
+						if (!user?.is_active) {
+							toast.error(
+								"Your account is not active. Please contact support.",
+								{
+									duration: 10_000,
+								},
+							);
+							return;
+						}
 
-					toast.success("Login successful");
-					navigate({ to: "/dashboard" });
+						toast.success("Login successful");
+						navigate({ to: "/dashboard" });
+					},
+					onError: (error) => {
+						setFormError(toUserLoginError(error));
+					},
 				},
-				onError: (error) => {
-					setFormError(toUserLoginError(error));
-				},
-			});
+			);
 		},
 	});
 

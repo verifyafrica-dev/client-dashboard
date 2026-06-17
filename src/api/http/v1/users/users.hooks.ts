@@ -19,7 +19,7 @@ import type {
 	UserForgotPasswordPayload,
 	UserForgotPasswordResponse,
 	UserLoginError,
-	UserLoginPayload,
+	UserLoginMutationInput,
 	UserLoginResponse,
 	UserLookupQuery,
 	UserProfileUpdatePayload,
@@ -89,14 +89,19 @@ export const useUserLookupQuery = (query: UserLookupQuery, enabled = true) =>
 	});
 
 export const useUserLoginMutation = () => {
-	return useMutation<UserLoginResponse, UserLoginError, UserLoginPayload>({
-		mutationFn: USERS_API.LOGIN,
-		onSuccess: (data) => {
-			setTokens(data.access, data.refresh);
+	return useMutation<UserLoginResponse, UserLoginError, UserLoginMutationInput>({
+		mutationFn: ({ payload }) => USERS_API.LOGIN(payload),
+		onSuccess: async (data, { rememberMe }) => {
+			setTokens(data.access, data.refresh, {
+				rememberRefreshToken: rememberMe,
+			});
 			useAuthStore.setState({
 				access_token: data.access,
-				refresh_token: data.refresh,
+				refresh_token: rememberMe ? data.refresh : null,
 			});
+
+			const user = await USERS_API.ME();
+			useAuthStore.setState({ user });
 		},
 	});
 };
