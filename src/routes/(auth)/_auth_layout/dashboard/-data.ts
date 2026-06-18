@@ -1,4 +1,28 @@
+import type { UserDetail } from "#/api/http/v1/users/users.types";
+
 export type TimeRange = "all" | "7d" | "30d" | "90d";
+
+const calendarDayFormatter = new Intl.DateTimeFormat("en-NG", {
+	year: "numeric",
+	month: "2-digit",
+	day: "2-digit",
+});
+
+function getCalendarDayKey(value: string | Date) {
+	return calendarDayFormatter.format(new Date(value));
+}
+
+export function isSameCalendarDay(left: string | Date, right: string | Date) {
+	return getCalendarDayKey(left) === getCalendarDayKey(right);
+}
+
+export function shouldShowDashboardOnboarding(user: UserDetail | null) {
+	if (!user?.last_login) {
+		return false;
+	}
+
+	return isSameCalendarDay(user.created_at, user.last_login);
+}
 
 export const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [
 	{ value: "all", label: "All time" },
@@ -80,7 +104,10 @@ export function getDashboardStats(range: TimeRange) {
 	const trends = getTrendData(range);
 	const types = getTypeData(range);
 
-	const totalVerifications = trends.reduce((sum, point) => sum + point.total, 0);
+	const totalVerifications = trends.reduce(
+		(sum, point) => sum + point.total,
+		0,
+	);
 	const successfulVerifications = trends.reduce(
 		(sum, point) => sum + point.successful,
 		0,
@@ -104,13 +131,15 @@ export function getDashboardStats(range: TimeRange) {
 		"90d": 11200,
 	};
 
-	const refundsByRange: Record<TimeRange, { amount: number; transactions: number }> =
-		{
-			all: { amount: 420, transactions: 8 },
-			"7d": { amount: 0, transactions: 0 },
-			"30d": { amount: 120, transactions: 2 },
-			"90d": { amount: 280, transactions: 5 },
-		};
+	const refundsByRange: Record<
+		TimeRange,
+		{ amount: number; transactions: number }
+	> = {
+		all: { amount: 420, transactions: 8 },
+		"7d": { amount: 0, transactions: 0 },
+		"30d": { amount: 120, transactions: 2 },
+		"90d": { amount: 280, transactions: 5 },
+	};
 
 	const topUpTransactions: Record<TimeRange, number> = {
 		all: 42,

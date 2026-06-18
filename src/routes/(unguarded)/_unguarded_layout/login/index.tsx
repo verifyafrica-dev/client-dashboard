@@ -14,11 +14,11 @@ import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
-import { deleteAllCookies } from "#/lib/cookies";
 import {
 	getUserLoginErrorFieldErrors,
 	toUserLoginError,
 } from "#/lib/api-errors";
+import { deleteAllCookies } from "#/lib/cookies";
 import { useAuthStore } from "#/stores/auth-store";
 import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/(unguarded)/_unguarded_layout/login/")({
 });
 
 function LoginPage() {
-	const [rememberMe, setRememberMe] = useState(false);
+	const [rememberMe, setRememberMe] = useState(true);
 	const navigate = useNavigate();
 	const userLoginMutation = useUserLoginMutation();
 	const [formError, setFormError] = useState<UserLoginError | null>(null);

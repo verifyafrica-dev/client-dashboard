@@ -23,8 +23,6 @@ import {
 } from "recharts";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
-import { Label } from "#/components/ui/label";
-import { Switch } from "#/components/ui/switch";
 import {
 	type ChartConfig,
 	ChartContainer,
@@ -40,13 +38,15 @@ import {
 } from "#/components/ui/select";
 import { Skeleton } from "#/components/ui/skeleton";
 import { cn } from "#/lib/utils.ts";
+import { useAuthStore } from "#/stores/auth-store";
+import { DashboardOnboarding } from "./-components/dashboard-onboarding";
 import {
 	type DashboardData,
 	fetchDashboardData,
+	shouldShowDashboardOnboarding,
 	TIME_RANGE_OPTIONS,
 	type TimeRange,
 } from "./-data";
-import { DashboardOnboarding } from "./-components/dashboard-onboarding";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/")({
 	component: DashboardPage,
@@ -264,7 +264,7 @@ function DashboardContent({
 			<div className="grid gap-4 lg:grid-cols-2">
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0">
-						<CardTitle>Verification Trends</CardTitle>
+						<CardTitle className="font-semibold">Verification Trends</CardTitle>
 						<div className="flex items-center gap-4 text-xs text-muted-foreground">
 							<span className="flex items-center gap-1.5">
 								<span className="size-2 rounded-full bg-[oklch(0.55_0.15_250)]" />
@@ -317,7 +317,7 @@ function DashboardContent({
 
 				<Card>
 					<CardHeader>
-						<CardTitle>Verification Types</CardTitle>
+						<CardTitle className="font-semibold">Verification Types</CardTitle>
 					</CardHeader>
 					<CardContent>
 						<ChartContainer
@@ -413,7 +413,8 @@ function DashboardContent({
 function DashboardPage() {
 	const [timeRange, setTimeRange] = useState<TimeRange>("all");
 	const [refreshKey, setRefreshKey] = useState(0);
-	const [showOnboarding, setShowOnboarding] = useState(true);
+	const user = useAuthStore((state) => state.user);
+	const showOnboarding = shouldShowDashboardOnboarding(user);
 
 	const { data, isPending, isFetching } = useQuery({
 		queryKey: ["dashboard", timeRange, refreshKey],
@@ -433,16 +434,6 @@ function DashboardPage() {
 					</p>
 				</div>
 				<div className="flex flex-wrap items-center gap-4">
-					<div className="flex items-center gap-2">
-						<Switch
-							id="show-onboarding"
-							checked={showOnboarding}
-							onCheckedChange={setShowOnboarding}
-						/>
-						<Label htmlFor="show-onboarding" className="text-sm font-medium">
-							Show onboarding
-						</Label>
-					</div>
 					<Select
 						value={timeRange}
 						onValueChange={(value) => setTimeRange(value as TimeRange)}
