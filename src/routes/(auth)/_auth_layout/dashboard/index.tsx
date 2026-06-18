@@ -7,10 +7,9 @@ import {
 	LightningIcon,
 	TrendUpIcon,
 } from "@phosphor-icons/react";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import type { ComponentType } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
 	Area,
 	AreaChart,
@@ -21,6 +20,7 @@ import {
 	Sector,
 	XAxis,
 } from "recharts";
+import { useTenantAnalyticsQuery } from "#/api/http/v1/analytics/analytics.hooks";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import {
@@ -42,7 +42,8 @@ import { useAuthStore } from "#/stores/auth-store";
 import { DashboardOnboarding } from "./-components/dashboard-onboarding";
 import {
 	type DashboardData,
-	fetchDashboardData,
+	getAnalyticsDateRange,
+	mapTenantAnalyticsToDashboardData,
 	shouldShowDashboardOnboarding,
 	TIME_RANGE_OPTIONS,
 	type TimeRange,
@@ -69,6 +70,89 @@ const typeChartConfig = {
 	faceMatch: { label: "Face Match", color: "var(--chart-3)" },
 	address: { label: "Address", color: "var(--chart-4)" },
 } satisfies ChartConfig;
+
+function DashboardPage() {
+	const [timeRange, setTimeRange] = useState<TimeRange>("all");
+	const user = useAuthStore((state) => state.user);
+	const tenantId = user?.tenants[0]?.id;
+	const showOnboarding = shouldShowDashboardOnboarding(user);
+	const analyticsDateRange = useMemo(
+		() => getAnalyticsDateRange(timeRange),
+		[timeRange],
+	);
+
+	const tenantsAnalyticsQuery = useTenantAnalyticsQuery(
+		tenantId,
+		analyticsDateRange,
+		Boolean(tenantId),
+	);
+
+	const data = useMemo(
+		() =>
+			tenantsAnalyticsQuery.data
+				? mapTenantAnalyticsToDashboardData(tenantsAnalyticsQuery.data)
+				: undefined,
+		[tenantsAnalyticsQuery.data],
+	);
+
+	const isLoading =
+		tenantsAnalyticsQuery.isPending || tenantsAnalyticsQuery.isFetching;
+	const chartKey = `${tenantId ?? "tenant"}-${timeRange}`;
+
+	return (
+		<div className="flex flex-col gap-6">
+			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+				<div>
+					<h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
+					<p className="mt-1 text-sm text-muted-foreground">
+						Welcome back! Here&apos;s your verification overview.
+					</p>
+				</div>
+				<div className="flex flex-wrap items-center gap-4">
+					<Select
+						value={timeRange}
+						onValueChange={(value) => setTimeRange(value as TimeRange)}
+						disabled={isLoading}
+					>
+						<SelectTrigger className="w-[160px]">
+							<SelectValue />
+						</SelectTrigger>
+						<SelectContent>
+							{TIME_RANGE_OPTIONS.map((option) => (
+								<SelectItem key={option.value} value={option.value}>
+									{option.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<Button
+						onClick={() => tenantsAnalyticsQuery.refetch()}
+						disabled={isLoading}
+					>
+						<ArrowClockwiseIcon
+							className={isLoading ? "animate-spin" : undefined}
+							weight="bold"
+						/>
+						Refresh
+					</Button>
+				</div>
+			</div>
+
+			{showOnboarding && <DashboardOnboarding />}
+
+			{isLoading || !data ? (
+				<DashboardContentSkeleton />
+			) : (
+				<DashboardContent
+					stats={data.stats}
+					trendData={data.trendData}
+					typeData={data.typeData}
+					chartKey={chartKey}
+				/>
+			)}
+		</div>
+	);
+}
 
 function VerificationTypeSector(props: PieSectorShapeProps) {
 	const type = String(props.payload?.type ?? "");
@@ -407,74 +491,5 @@ function DashboardContent({
 				</CardContent>
 			</Card>
 		</>
-	);
-}
-
-function DashboardPage() {
-	const [timeRange, setTimeRange] = useState<TimeRange>("all");
-	const [refreshKey, setRefreshKey] = useState(0);
-	const user = useAuthStore((state) => state.user);
-	const showOnboarding = shouldShowDashboardOnboarding(user);
-
-	const { data, isPending, isFetching } = useQuery({
-		queryKey: ["dashboard", timeRange, refreshKey],
-		queryFn: () => fetchDashboardData(timeRange),
-	});
-
-	const isLoading = isPending || isFetching;
-	const chartKey = `${timeRange}-${refreshKey}`;
-
-	return (
-		<div className="flex flex-col gap-6">
-			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-				<div>
-					<h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-					<p className="mt-1 text-sm text-muted-foreground">
-						Welcome back! Here&apos;s your verification overview.
-					</p>
-				</div>
-				<div className="flex flex-wrap items-center gap-4">
-					<Select
-						value={timeRange}
-						onValueChange={(value) => setTimeRange(value as TimeRange)}
-						disabled={isLoading}
-					>
-						<SelectTrigger className="w-[160px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							{TIME_RANGE_OPTIONS.map((option) => (
-								<SelectItem key={option.value} value={option.value}>
-									{option.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					<Button
-						onClick={() => setRefreshKey((key) => key + 1)}
-						disabled={isLoading}
-					>
-						<ArrowClockwiseIcon
-							className={isLoading ? "animate-spin" : undefined}
-							weight="bold"
-						/>
-						Refresh
-					</Button>
-				</div>
-			</div>
-
-			{showOnboarding && <DashboardOnboarding />}
-
-			{isLoading || !data ? (
-				<DashboardContentSkeleton />
-			) : (
-				<DashboardContent
-					stats={data.stats}
-					trendData={data.trendData}
-					typeData={data.typeData}
-					chartKey={chartKey}
-				/>
-			)}
-		</div>
 	);
 }
