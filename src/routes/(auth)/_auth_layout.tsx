@@ -8,6 +8,7 @@ import { Loader2Icon } from "lucide-react";
 import { useMeQuery } from "#/api/http/v1/users/users.hooks";
 import { AppSidebar } from "#/components/app-sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
+import { Button } from "#/components/ui/button";
 import {
 	Popover,
 	PopoverContent,
@@ -18,15 +19,15 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "#/components/ui/sidebar";
+import { useLogout } from "#/hooks/use-logout";
 import { deleteAllCookies } from "#/lib/cookies";
 import { cn } from "#/lib/utils.ts";
 import { getUserInitials } from "#/routes/(auth)/_auth_layout/dashboard/team/-data";
 import { useAuthStore } from "#/stores/auth-store";
 
-const userMenuItems = [
+const userMenuLinks = [
 	{ label: "Profile", to: "/dashboard/profile" },
 	{ label: "My Team", to: "/dashboard/team" },
-	{ label: "Logout", to: "/" },
 ] as const;
 
 export const Route = createFileRoute("/(auth)/_auth_layout")({
@@ -35,6 +36,7 @@ export const Route = createFileRoute("/(auth)/_auth_layout")({
 
 function AuthLayout() {
 	const getUserQuery = useMeQuery();
+	const { logout, isLoggingOut } = useLogout();
 
 	if (getUserQuery.isLoading) {
 		return (
@@ -86,10 +88,10 @@ function AuthLayout() {
 						</PopoverTrigger>
 						<PopoverContent align="end" className="w-40 gap-0 p-1">
 							<nav className="flex flex-col">
-								{userMenuItems.map((item) => (
+								{userMenuLinks.map((item) => (
 									<Link
 										key={item.to}
-										to={item.to as string}
+										to={item.to}
 										className={cn(
 											"rounded-md px-3 py-2 text-sm font-medium transition-colors",
 											"hover:bg-muted",
@@ -98,6 +100,15 @@ function AuthLayout() {
 										{item.label}
 									</Link>
 								))}
+								<Button
+									variant="ghost"
+									size="sm"
+									className="w-full justify-start px-3"
+									onClick={() => logout()}
+									disabled={isLoggingOut}
+								>
+									Logout
+								</Button>
 							</nav>
 						</PopoverContent>
 					</Popover>

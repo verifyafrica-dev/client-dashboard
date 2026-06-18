@@ -12,6 +12,7 @@ import type {
 	UserForgotPasswordResponse,
 	UserLoginPayload,
 	UserLoginResponse,
+	UserLogoutResponse,
 	UserLookupQuery,
 	UserLookupResponse,
 	UserProfileUpdatePayload,
@@ -34,6 +35,7 @@ const USER_ENDPOINTS = {
 	changePassword: "/users/change-password/",
 	forgotPassword: "/users/forgot-password/",
 	login: "/users/login/",
+	logout: "/users/logout/",
 	lookup: "/users/lookup/",
 	me: "/users/me/",
 	updateMe: "/users/me/update/",
@@ -90,6 +92,9 @@ export const USERS_API = {
 
 	LOGIN: async (data: UserLoginPayload): Promise<UserLoginResponse> =>
 		await $http.post(USER_ENDPOINTS.login, data).then((res) => res.data),
+
+	LOGOUT: async (): Promise<UserLogoutResponse> =>
+		await $http.post(USER_ENDPOINTS.logout, {}).then((res) => res.data),
 
 	LOOKUP: async (params: UserLookupQuery): Promise<UserLookupResponse> =>
 		await $http.get(USER_ENDPOINTS.lookup, { params }).then((res) => res.data),

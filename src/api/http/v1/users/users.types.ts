@@ -242,6 +242,10 @@ export type UserChangePasswordResponse = {
 	detail: string;
 };
 
+export type UserLogoutResponse = {
+	detail: string;
+};
+
 export interface UserLoginError {
 	message: string;
 	status: number;
