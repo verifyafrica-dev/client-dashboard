@@ -1,6 +1,7 @@
 import type { AxiosError } from "axios";
 
 import type {
+	UserChangePasswordErrorResponse,
 	UserLoginError,
 	UserResetPasswordErrorResponse,
 } from "#/api/http/v1/users/users.types";
@@ -75,4 +76,31 @@ export function getUserResetPasswordErrorFieldErrors(
 	}
 
 	return nonFieldErrors.map((message) => ({ message }));
+}
+
+function getFieldErrorMessages(
+	errors: string[] | undefined,
+): Array<{ message: string }> {
+	if (!errors?.length) {
+		return [];
+	}
+
+	return errors.map((message) => ({ message }));
+}
+
+export function getUserChangePasswordFieldError(
+	error: UserChangePasswordErrorResponse | null | undefined,
+	field: "old_password" | "new_password",
+): Array<{ message: string }> {
+	const fieldErrors = error?.response?.data?.[field];
+
+	if (fieldErrors?.length) {
+		return getFieldErrorMessages(fieldErrors);
+	}
+
+	if (field === "old_password" && error?.response?.data?.detail) {
+		return [{ message: error.response.data.detail }];
+	}
+
+	return [];
 }

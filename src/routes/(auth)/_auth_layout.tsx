@@ -20,6 +20,7 @@ import {
 } from "#/components/ui/sidebar";
 import { deleteAllCookies } from "#/lib/cookies";
 import { cn } from "#/lib/utils.ts";
+import { getUserInitials } from "#/routes/(auth)/_auth_layout/dashboard/team/-data";
 import { useAuthStore } from "#/stores/auth-store";
 
 const userMenuItems = [
@@ -50,6 +51,13 @@ function AuthLayout() {
 		return <Navigate to="/login" />;
 	}
 
+	const user = getUserQuery.data;
+	const displayName =
+		[user?.first_name, user?.last_name].filter(Boolean).join(" ").trim() ||
+		user?.email ||
+		"";
+	const initials = getUserInitials(displayName);
+
 	return (
 		<SidebarProvider>
 			<AppSidebar />
@@ -63,13 +71,15 @@ function AuthLayout() {
 								className="flex items-center gap-4 rounded-lg text-left outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring"
 							>
 								<Avatar>
-									<AvatarImage src="https://github.com/shadcn.pngdeqd" />
-									<AvatarFallback>CN</AvatarFallback>
+									{user?.avatar_url ? (
+										<AvatarImage src={user.avatar_url} alt={displayName} />
+									) : null}
+									<AvatarFallback>{initials}</AvatarFallback>
 								</Avatar>
 								<div>
-									<p className="text-sm font-semibold">John Doe</p>
+									<p className="text-sm font-semibold">{displayName}</p>
 									<p className="text-sm font-medium text-muted-foreground">
-										john.doe@example.com
+										{user?.email}
 									</p>
 								</div>
 							</button>

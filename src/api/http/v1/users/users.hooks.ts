@@ -2,6 +2,7 @@ import {
 	type UseQueryResult,
 	useMutation,
 	useQuery,
+	useQueryClient,
 } from "@tanstack/react-query";
 import { useEffect } from "react";
 
@@ -172,14 +173,38 @@ export const useUserChangePasswordMutation = () =>
 		mutationFn: USERS_API.CHANGE_PASSWORD,
 	});
 
-export const useUpdateMeMutation = () =>
-	useMutation<
+export const useUpdateMeMutation = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation<
 		UserProfileUpdateResponse,
 		UserLoginError,
 		UserProfileUpdatePayload
 	>({
 		mutationFn: USERS_API.UPDATE_ME,
+		onSuccess: async (data) => {
+			const currentUser = useAuthStore.getState().user;
+
+			if (currentUser) {
+				const updatedUser: UserDetail = {
+					...currentUser,
+					first_name: data.first_name ?? currentUser.first_name,
+					last_name: data.last_name ?? currentUser.last_name,
+					phone_number: data.phone_number ?? currentUser.phone_number,
+					avatar_url: data.avatar_url ?? currentUser.avatar_url,
+				};
+
+				useAuthStore.setState({ user: updatedUser });
+				queryClient.setQueryData(USER_QUERY_KEYS.me, updatedUser);
+				return;
+			}
+
+			const user = await USERS_API.ME();
+			useAuthStore.setState({ user });
+			queryClient.setQueryData(USER_QUERY_KEYS.me, user);
+		},
 	});
+};
 
 export const useUpdateUserDetailMutation = (id: string) =>
 	useMutation<UserDetail, UserLoginError, UserDetailUpdatePayload>({

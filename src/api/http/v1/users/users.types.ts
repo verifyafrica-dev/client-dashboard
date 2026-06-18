@@ -118,6 +118,16 @@ export const UserProfileUpdateSchema = z.object({
 
 export type UserProfileUpdatePayload = z.infer<typeof UserProfileUpdateSchema>;
 
+export const UserProfileUpdateFormSchema = z.object({
+	first_name: z.string().min(1, { message: "First name is required" }),
+	last_name: z.string().min(1, { message: "Last name is required" }),
+	phone_number: z.string(),
+});
+
+export type UserProfileUpdateFormValues = z.infer<
+	typeof UserProfileUpdateFormSchema
+>;
+
 export const UserDetailUpdateSchema = z.object({
 	email: z.email({ message: "Invalid email address" }).optional(),
 	first_name: z.string().optional(),
@@ -202,8 +212,35 @@ export interface UserAdminResetPasswordResponse {
 	detail: string;
 }
 
-export type UserChangePasswordPayload = Record<string, unknown>;
-export type UserChangePasswordResponse = Record<string, never>;
+export type UserChangePasswordPayload = {
+	old_password: string;
+	new_password: string;
+};
+
+export const UserChangePasswordFormSchema = z
+	.object({
+		old_password: z
+			.string()
+			.min(1, { message: "Current password is required" }),
+		new_password: z
+			.string()
+			.min(8, { message: "Password must be at least 8 characters long" }),
+		confirm_password: z
+			.string()
+			.min(8, { message: "Password must be at least 8 characters long" }),
+	})
+	.refine((data) => data.new_password === data.confirm_password, {
+		message: "Passwords do not match",
+		path: ["confirm_password"],
+	});
+
+export type UserChangePasswordFormValues = z.infer<
+	typeof UserChangePasswordFormSchema
+>;
+
+export type UserChangePasswordResponse = {
+	detail: string;
+};
 
 export interface UserLoginError {
 	message: string;
@@ -212,6 +249,12 @@ export interface UserLoginError {
 
 export type UserResetPasswordErrorResponse = AxiosError<{
 	non_field_errors: string[];
+}>;
+
+export type UserChangePasswordErrorResponse = AxiosError<{
+	old_password?: string[];
+	new_password?: string[];
+	detail?: string;
 }>;
 
 export interface UserAuthTokenInvalidErrorResponse {

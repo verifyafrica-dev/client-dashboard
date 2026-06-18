@@ -21,7 +21,7 @@ import {
 import {
 	Sidebar,
 	SidebarContent,
-	SidebarFooter,
+	// SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarHeader,
@@ -204,7 +204,9 @@ export function AppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
-			<SidebarFooter />
+			{/* <SidebarFooter>
+				<SidebarUser />
+			</SidebarFooter> */}
 		</Sidebar>
 	);
 }
