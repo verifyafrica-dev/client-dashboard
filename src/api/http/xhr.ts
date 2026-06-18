@@ -1,5 +1,12 @@
 import type { InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
+
+import {
+	getReasonPhrase,
+	getStatusCode,
+	ReasonPhrases,
+	StatusCodes,
+} from "http-status-codes";
 import { deleteCookie, getCookie, setCookie } from "#/lib/cookies";
 import { COUNTRIES } from "@/lib/constants";
 import { isPlainObject } from "@/lib/validators";
@@ -142,8 +149,9 @@ const shouldUseAccessToken = (url: string) => {
 
 const isTokenExpiredError = (error: any) => {
 	return (
-		error?.response?.status === 401 &&
-		error?.response?.data?.code === "token_not_valid"
+		error?.response?.status === StatusCodes.UNAUTHORIZED ||
+		error?.response?.data?.code === "token_not_valid" ||
+		error?.response?.status === StatusCodes.FORBIDDEN
 	);
 };
 
@@ -161,50 +169,51 @@ $http.interceptors.request.use(
 	},
 );
 
-// $http.interceptors.response.use(
-// 	(response) => response,
-// 	async (error) => {
-// 		const originalRequest = error.config;
-// 		if (isTokenExpiredError(error) && !originalRequest._retry) {
-// 			originalRequest._retry = true;
+$http.interceptors.response.use(
+	(response) => response,
+	async (error) => {
+		const originalRequest = error.config;
+		console.log(error.response);
+		if (isTokenExpiredError(error) && !originalRequest._retry) {
+			originalRequest._retry = true;
 
-// 			if (!isRefreshing) {
-// 				isRefreshing = true;
-// 				try {
-// 					const { refreshToken } = getTokens();
-// 					const newTokenResponse = await axios.post(
-// 						`${BASE_URL}/users/token/refresh/`,
-// 						{ refresh: refreshToken },
-// 					);
-// 					const accessToken = newTokenResponse.data.access;
-// 					setTokens(accessToken);
+			if (!isRefreshing) {
+				isRefreshing = true;
+				try {
+					const { refreshToken } = getTokens();
+					const newTokenResponse = await axios.post(
+						`${BASE_URL}/users/token/refresh/`,
+						{ refresh: refreshToken },
+					);
+					const accessToken = newTokenResponse.data.access;
+					setTokens(accessToken);
 
-// 					isRefreshing = false;
-// 					// Retry all queued requests with the new access token
-// 					failedRequestsQueue.forEach((req) => {
-// 						req.resolve($http(req.config));
-// 					});
-// 					failedRequestsQueue = [];
-// 					return $http(originalRequest); // Retry the original failed request
-// 				} catch (refreshError) {
-// 					isRefreshing = false;
-// 					// Handle refresh token failure (e.g., logout user)
-// 					clearTokensAndLogout();
-// 					return Promise.reject(refreshError);
-// 				}
-// 			} else {
-// 				// Queue the request if a refresh is already in progress
-// 				return new Promise((resolve, reject) => {
-// 					failedRequestsQueue.push({
-// 						resolve,
-// 						reject,
-// 						config: originalRequest,
-// 					});
-// 				});
-// 			}
-// 		}
-// 		return Promise.reject(error);
-// 	},
-// );
+					isRefreshing = false;
+					// Retry all queued requests with the new access token
+					failedRequestsQueue.forEach((req) => {
+						req.resolve($http(req.config));
+					});
+					failedRequestsQueue = [];
+					return $http(originalRequest); // Retry the original failed request
+				} catch (refreshError) {
+					isRefreshing = false;
+					// Handle refresh token failure (e.g., logout user)
+					clearTokensAndLogout();
+					return Promise.reject(refreshError);
+				}
+			} else {
+				// Queue the request if a refresh is already in progress
+				return new Promise((resolve, reject) => {
+					failedRequestsQueue.push({
+						resolve,
+						reject,
+						config: originalRequest,
+					});
+				});
+			}
+		}
+		return Promise.reject(error);
+	},
+);
 
 export default $http;
