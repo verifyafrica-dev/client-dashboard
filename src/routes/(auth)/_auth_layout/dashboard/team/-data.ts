@@ -1,4 +1,6 @@
-export type TenantUserRole = "admin" | "member";
+import type { TenantRole } from "#/api/http/v1/tenants/tenants.types";
+
+export type TenantUserRole = TenantRole;
 
 export const ROLE_LABELS: Record<TenantUserRole, string> = {
 	admin: "Administrator",

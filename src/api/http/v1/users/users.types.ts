@@ -1,11 +1,10 @@
 import type { AxiosError } from "axios";
 import { z } from "zod";
-import type { COUNTRIES } from "#/lib/constants";
+import type { UserTenantMembership } from "#/api/http/v1/tenants/tenants.types";
 import {
 	isBlockedregisterEmailDomain,
 	PUBLIC_EMAIL_DOMAIN_ERROR_MESSAGE,
 } from "#/lib/validators";
-import type { TenantUserRole } from "#/routes/(auth)/_auth_layout/dashboard/team/-data";
 
 export const UserLoginSchema = z.object({
 	email: z
@@ -180,18 +179,10 @@ export interface UserDetail {
 	last_name?: string;
 	phone_number?: string;
 	avatar_url?: string;
-	tenants: Tenant[];
+	tenants: UserTenantMembership[];
 	is_active?: boolean;
 	last_login?: string | null;
 	created_at: string;
-}
-
-export interface Tenant {
-	id: string;
-	date_added: string;
-	namme: string;
-	role: TenantUserRole;
-	enabled_countries: (typeof COUNTRIES)[number]["code"][];
 }
 
 export interface PaginatedUserDetailListResponse {

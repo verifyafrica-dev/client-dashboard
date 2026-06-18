@@ -10,6 +10,13 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { toast } from "sonner";
+
+import {
+	useRotateTenantApiKeyMutation,
+	useTenantApiKeyQuery,
+	useUpdateTenantApiKeyMutation,
+} from "#/api/http/v1/tenants/tenants.hooks";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import {
@@ -22,235 +29,340 @@ import {
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
 import { Separator } from "#/components/ui/separator";
+import { Skeleton } from "#/components/ui/skeleton";
 import { Switch } from "#/components/ui/switch";
+import { useClipboard } from "#/hooks/use-clipboard";
 import { cn } from "#/lib/utils.ts";
+import { useAuthStore } from "#/stores/auth-store";
+import { formatApiKeyDate, getApiKeyPreview, maskApiKey } from "./-data";
 
-export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/apikeys/")({
-	component: ApiKeysPage,
-});
-
-const API_KEY = {
-	full: "VA-G3KuleQxkkdBjKqu4mN8pRt2wXyZ1aBcDeFgHiJk",
-	masked: "VA-G3Ku1••••••••••••••••••••",
-	preview: "VA-G3KuleQxkkdBjKqu4...",
-	lastUsed: "Never",
-	expires: "Never",
-} as const;
+export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/apikeys/")(
+	{
+		component: ApiKeysPage,
+	},
+);
 
 function ApiKeysPage() {
 	const [isKeyVisible, setIsKeyVisible] = useState(false);
-	const [isKeyActive, setIsKeyActive] = useState(true);
-	const [copied, setCopied] = useState(false);
+	const { copied, copy } = useClipboard();
+	const user = useAuthStore((state) => state.user);
+	const tenantId = user?.tenants[0]?.id;
 
-	const displayedKey = isKeyVisible ? API_KEY.full : API_KEY.masked;
+	const apiKeyQuery = useTenantApiKeyQuery(tenantId, Boolean(tenantId));
+	const updateApiKeyMutation = useUpdateTenantApiKeyMutation(tenantId ?? "");
+	const rotateApiKeyMutation = useRotateTenantApiKeyMutation(tenantId ?? "");
+
+	const apiKey = apiKeyQuery.data;
+
+	const isLoading = apiKeyQuery.isPending || apiKeyQuery.isFetching;
+	const isMutating =
+		updateApiKeyMutation.isPending || rotateApiKeyMutation.isPending;
 
 	async function handleCopy() {
-		const valueToCopy = isKeyVisible ? API_KEY.full : API_KEY.full;
-		await navigator.clipboard.writeText(valueToCopy);
-		setCopied(true);
-		setTimeout(() => setCopied(false), 2000);
+		if (!apiKey?.key) {
+			return;
+		}
+
+		await copy(apiKey.key);
+	}
+
+	function handleToggleActive(checked: boolean) {
+		updateApiKeyMutation.mutate(
+			{ is_active: checked },
+			{
+				onSuccess: () => {
+					toast.success(
+						`API key ${checked ? "activated" : "deactivated"} successfully`,
+					);
+				},
+				onError: () => {
+					toast.error("Failed to update key status");
+				},
+			},
+		);
+	}
+
+	function handleRotateKey() {
+		rotateApiKeyMutation.mutate(
+			{ key: "reset", is_active: true },
+			{
+				onSuccess: () => {
+					toast.success("API key rotated successfully");
+					setIsKeyVisible(false);
+				},
+				onError: () => {
+					toast.error("Failed to rotate key");
+				},
+			},
+		);
+	}
+
+	if (apiKeyQuery.isError) {
+		return (
+			<div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
+				<ApiKeysHeader />
+				<Card>
+					<CardContent className="py-10 text-center text-sm text-muted-foreground">
+						Failed to load API key. Please try again.
+					</CardContent>
+				</Card>
+			</div>
+		);
 	}
 
 	return (
 		<div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
-			<div className="flex items-start gap-3">
-				<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-					<ShieldCheckIcon className="size-5" weight="duotone" />
-				</div>
-				<div>
-					<h1 className="text-2xl font-semibold tracking-tight">
-						API Access Key
-					</h1>
-					<p className="mt-1 text-sm text-muted-foreground">
-						Manage your API key to authenticate requests to the VerifyAfrica
-						API.
-					</p>
-				</div>
-			</div>
+			<ApiKeysHeader />
 
-			<Card>
-				<CardHeader className="flex sm:flex-row items-start justify-between gap-4 space-y-0 flex-col">
-					<div className="flex items-start gap-3">
-						<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-							<KeyIcon className="size-5 text-muted-foreground" />
-						</div>
-						<div>
-							<CardTitle className="font-semibold">
-								Production API Key
-							</CardTitle>
-							<CardDescription>Active and ready to use</CardDescription>
-						</div>
-					</div>
-					<Badge
-						variant="outline"
-						className="border-emerald-200 bg-emerald-50 text-emerald-700"
-					>
-						<CheckIcon className="size-3" weight="bold" />
-						Active
-					</Badge>
-				</CardHeader>
-
-				<CardContent className="flex flex-col gap-6">
-					<div className="space-y-2">
-						<Label htmlFor="api-key">API Key</Label>
-						<div className="flex gap-2">
-							<Input
-								id="api-key"
-								readOnly
-								value={displayedKey}
-								className="font-mono text-sm"
-							/>
-							<Button
-								type="button"
-								variant="outline"
-								size="icon"
-								onClick={() => setIsKeyVisible((visible) => !visible)}
-								aria-label={isKeyVisible ? "Hide API key" : "Reveal API key"}
-								className="cursor-pointer"
-							>
-								{isKeyVisible ? (
-									<EyeSlashIcon className="size-4" />
-								) : (
-									<EyeIcon className="size-4" />
-								)}
-							</Button>
-							<Button
-								type="button"
-								variant="outline"
-								size="icon"
-								onClick={handleCopy}
-								aria-label="Copy API key"
-								className="cursor-pointer"
-							>
-								{copied ? (
-									<CheckIcon className="size-4 text-emerald-600" />
-								) : (
-									<CopyIcon className="size-4" />
-								)}
-							</Button>
-						</div>
-						<p className="text-xs text-muted-foreground">
-							Click the eye icon to reveal the full key before copying
-						</p>
-					</div>
-
-					<div className="grid gap-3 sm:grid-cols-3">
-						<div className="rounded-lg border bg-muted/30 px-4 py-3">
-							<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-								Last Used
-							</p>
-							<div className="mt-1 flex items-center gap-2 text-sm font-medium">
-								<ClockIcon className="size-4 text-muted-foreground" />
-								{API_KEY.lastUsed}
+			{isLoading || !apiKey ? (
+				<ApiKeyCardSkeleton />
+			) : (
+				<Card>
+					<CardHeader className="flex flex-col items-start justify-between gap-4 space-y-0 sm:flex-row">
+						<div className="flex items-start gap-3">
+							<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
+								<KeyIcon className="size-5 text-muted-foreground" />
+							</div>
+							<div>
+								<CardTitle className="font-semibold">
+									Production API Key
+								</CardTitle>
+								<CardDescription>
+									{apiKey.is_active
+										? "Active and ready to use"
+										: "Currently inactive"}
+								</CardDescription>
 							</div>
 						</div>
-						<div className="rounded-lg border bg-muted/30 px-4 py-3">
-							<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-								Status
-							</p>
-							<div className="mt-1">
+						<div className="flex gap-2 items-center">
+							<Switch
+								id="key-status"
+								checked={apiKey.is_active}
+								onCheckedChange={handleToggleActive}
+								disabled={isMutating}
+								className="cursor-pointer"
+							/>
+							<p>{apiKey.is_active ? "Active" : "Inactive"}</p>
+						</div>
+					</CardHeader>
+
+					<CardContent className="flex flex-col gap-6">
+						<div className="space-y-2">
+							<Label htmlFor="api-key">API Key</Label>
+							<div className="flex gap-2">
+								<Input
+									id="api-key"
+									readOnly
+									value={maskApiKey(apiKey.key, isKeyVisible)}
+									className="font-mono text-sm"
+								/>
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									onClick={() => setIsKeyVisible((visible) => !visible)}
+									aria-label={isKeyVisible ? "Hide API key" : "Reveal API key"}
+									className="cursor-pointer"
+									disabled={isMutating}
+								>
+									{isKeyVisible ? (
+										<EyeSlashIcon className="size-4" />
+									) : (
+										<EyeIcon className="size-4" />
+									)}
+								</Button>
+								<Button
+									type="button"
+									variant="outline"
+									size="icon"
+									onClick={handleCopy}
+									aria-label="Copy API key"
+									className="cursor-pointer"
+									disabled={isMutating}
+								>
+									{copied ? (
+										<CheckIcon className="size-4 text-emerald-600" />
+									) : (
+										<CopyIcon className="size-4" />
+									)}
+								</Button>
+							</div>
+							{!isKeyVisible && (
+								<p className="text-xs text-muted-foreground">
+									Click the eye icon to reveal the full key before copying
+								</p>
+							)}
+						</div>
+
+						<div className="grid gap-3 sm:grid-cols-3">
+							<div className="flex flex-col gap-1 rounded-lg border bg-muted/30 px-4 py-3">
+								<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+									Last Used
+								</p>
+								<div className="flex items-center gap-2 text-sm font-medium">
+									<ClockIcon className="size-4 text-muted-foreground" />
+									{formatApiKeyDate(apiKey.last_used)}
+								</div>
+							</div>
+							<div className="flex flex-col gap-1 rounded-lg border bg-muted/30 px-4 py-3">
+								<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+									Status
+								</p>
+
 								<Badge
 									variant="outline"
 									className={cn(
 										"border-emerald-200 bg-emerald-50 text-emerald-700",
-										!isKeyActive &&
+										!apiKey.is_active &&
 											"border-muted bg-muted text-muted-foreground",
 									)}
 								>
-									{isKeyActive ? "Active" : "Inactive"}
+									{apiKey.is_active ? "Active" : "Inactive"}
 								</Badge>
 							</div>
-						</div>
-						<div className="rounded-lg border bg-muted/30 px-4 py-3">
-							<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-								Expires
-							</p>
-							<p className="mt-1 text-sm font-medium">{API_KEY.expires}</p>
-						</div>
-					</div>
-
-					<Separator />
-
-					<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-						<div className="flex items-center gap-3">
-							<Switch
-								id="key-status"
-								checked={isKeyActive}
-								onCheckedChange={setIsKeyActive}
-								className="cursor-pointer"
-							/>
-							<Label htmlFor="key-status" className="font-medium">
-								Key Status
-							</Label>
-						</div>
-						<Button
-							type="button"
-							variant="outline"
-							className="border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800 cursor-pointer"
-						>
-							<ArrowsClockwiseIcon className="size-4" />
-							Rotate Key
-						</Button>
-					</div>
-				</CardContent>
-			</Card>
-
-			<Card>
-				<CardHeader>
-					<div className="flex items-center gap-2">
-						<KeyIcon className="size-5 text-muted-foreground" />
-						<CardTitle>Usage Instructions</CardTitle>
-					</div>
-				</CardHeader>
-				<CardContent className="flex flex-col gap-4">
-					<div className="rounded-lg border bg-muted/20 p-4">
-						<div className="flex gap-3 flex-col sm:flex-row items-start">
-							<div className="flex items-center gap-2">
-								<div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
-									1
-								</div>
-								<h3 className="font-medium block sm:hidden">
-									Authentication Header
-								</h3>
-							</div>
-							<div className="flex min-w-0 flex-1 flex-col gap-2">
-								<h3 className="font-medium hidden sm:block">
-									Authentication Header
-								</h3>
-								<p className="text-sm text-muted-foreground">
-									Include your API key in the X-API-KEY header:
+							<div className="flex flex-col gap-1 rounded-lg border bg-muted/30 px-4 py-3">
+								<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
+									Expires
 								</p>
-								<pre className="min-w-full overflow-x-auto rounded-lg bg-zinc-900 px-4 py-3 text-sm text-emerald-400">
-									<code className="break-all whitespace-pre-wrap">{`X-API-KEY: ${API_KEY.preview}`}</code>
-								</pre>
+								<p className="text-sm font-medium">
+									{formatApiKeyDate(apiKey.expires_at)}
+								</p>
 							</div>
 						</div>
-					</div>
 
-					<div className="rounded-lg border bg-muted/20 p-4">
-						<div className="flex gap-3 flex-col sm:flex-row items-start">
-							<div className="flex items-center gap-2">
-								<div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
-									2
-								</div>
-								<h3 className="font-medium block sm:hidden">
-									Security Best Practices
-								</h3>
+						<Separator />
+
+						<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+							<Button
+								type="button"
+								variant="outline"
+								onClick={handleRotateKey}
+								disabled={isMutating}
+								className="cursor-pointer border-amber-300 text-amber-700 hover:bg-amber-50 hover:text-amber-800"
+							>
+								<ArrowsClockwiseIcon
+									className={cn("size-4", isMutating && "animate-spin")}
+								/>
+								{rotateApiKeyMutation.isPending ? "Rotating..." : "Rotate Key"}
+							</Button>
+						</div>
+					</CardContent>
+				</Card>
+			)}
+
+			<UsageInstructionsCard keyPreview={getApiKeyPreview(apiKey?.key)} />
+		</div>
+	);
+}
+
+function ApiKeysHeader() {
+	return (
+		<div className="flex items-start gap-3">
+			<div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+				<ShieldCheckIcon className="size-5" weight="duotone" />
+			</div>
+			<div className="flex flex-col gap-1">
+				<h1 className="text-2xl font-semibold tracking-tight">
+					API Access Key
+				</h1>
+				<p className="text-sm text-muted-foreground">
+					Manage your API key to authenticate requests to the VerifyAfrica API.
+				</p>
+			</div>
+		</div>
+	);
+}
+
+function ApiKeyCardSkeleton() {
+	return (
+		<Card>
+			<CardHeader className="flex flex-col items-start justify-between gap-4 space-y-0 sm:flex-row">
+				<div className="flex items-start gap-3">
+					<Skeleton className="size-10 rounded-lg" />
+					<div className="space-y-2">
+						<Skeleton className="h-5 w-40" />
+						<Skeleton className="h-4 w-32" />
+					</div>
+				</div>
+				<Skeleton className="h-6 w-16 rounded-full" />
+			</CardHeader>
+			<CardContent className="flex flex-col gap-6">
+				<div className="space-y-2">
+					<Skeleton className="h-4 w-16" />
+					<Skeleton className="h-10 w-full" />
+				</div>
+				<div className="grid gap-3 sm:grid-cols-3">
+					{["last-used", "status", "expires"].map((item) => (
+						<Skeleton key={item} className="h-20 rounded-lg" />
+					))}
+				</div>
+				<Separator />
+				<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+					<Skeleton className="h-6 w-28" />
+					<Skeleton className="h-10 w-32" />
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+function UsageInstructionsCard({ keyPreview }: { keyPreview: string }) {
+	return (
+		<Card>
+			<CardHeader>
+				<div className="flex items-center gap-2">
+					<KeyIcon className="size-5 text-muted-foreground" />
+					<CardTitle>Usage Instructions</CardTitle>
+				</div>
+			</CardHeader>
+			<CardContent className="flex flex-col gap-4">
+				<div className="rounded-lg border bg-muted/20 p-4">
+					<div className="flex flex-col items-start gap-3 sm:flex-row">
+						<div className="flex items-center gap-2">
+							<div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
+								1
 							</div>
-							<div className="flex min-w-0 flex-1 flex-col gap-2">
-								<h3 className="font-medium hidden sm:block">
-									Security Best Practices
-								</h3>
-								<ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
-									<li>Store keys in environment variables, never in code</li>
-									<li>Rotate keys periodically or when compromised</li>
-									<li>Deactivate keys when not in use</li>
-								</ul>
-							</div>
+							<h3 className="block font-medium sm:hidden">
+								Authentication Header
+							</h3>
+						</div>
+						<div className="flex min-w-0 flex-1 flex-col gap-2">
+							<h3 className="hidden font-medium sm:block">
+								Authentication Header
+							</h3>
+							<p className="text-sm text-muted-foreground">
+								Include your API key in the X-API-KEY header:
+							</p>
+							<pre className="min-w-full overflow-x-auto rounded-lg bg-zinc-900 px-4 py-3 text-sm text-emerald-400">
+								<code className="break-all whitespace-pre-wrap">{`X-API-KEY: ${keyPreview}`}</code>
+							</pre>
 						</div>
 					</div>
-				</CardContent>
-			</Card>
-		</div>
+				</div>
+
+				<div className="rounded-lg border bg-muted/20 p-4">
+					<div className="flex flex-col items-start gap-3 sm:flex-row">
+						<div className="flex items-center gap-2">
+							<div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
+								2
+							</div>
+							<h3 className="block font-medium sm:hidden">
+								Security Best Practices
+							</h3>
+						</div>
+						<div className="flex min-w-0 flex-1 flex-col gap-2">
+							<h3 className="hidden font-medium sm:block">
+								Security Best Practices
+							</h3>
+							<ul className="list-disc space-y-1 pl-5 text-sm text-muted-foreground">
+								<li>Store keys in environment variables, never in code</li>
+								<li>Rotate keys periodically or when compromised</li>
+								<li>Deactivate keys when not in use</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</CardContent>
+		</Card>
 	);
 }
