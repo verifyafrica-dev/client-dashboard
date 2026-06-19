@@ -129,11 +129,11 @@ function InvitationsPage() {
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-				<div>
+				<div className="flex flex-col gap-1">
 					<h1 className="text-2xl font-semibold tracking-tight">
 						User Invitations
 					</h1>
-					<p className="mt-1 text-sm text-muted-foreground">
+					<p className="text-sm text-muted-foreground">
 						Manage and track user invitation status
 					</p>
 				</div>

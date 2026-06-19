@@ -144,11 +144,11 @@ function BillingPage() {
 	if (walletBalanceQuery.isError || billingInformationQuery.isError) {
 		return (
 			<div className="flex w-full flex-col gap-6">
-				<div>
+				<div className="flex flex-col gap-1">
 					<h1 className="text-2xl font-semibold tracking-tight">
 						Billing & Invoices
 					</h1>
-					<p className="mt-1 text-sm text-muted-foreground">
+					<p className="text-sm text-muted-foreground">
 						Manage your invoices, payment history, and account credits
 					</p>
 				</div>
@@ -163,11 +163,11 @@ function BillingPage() {
 
 	return (
 		<div className="flex w-full flex-col gap-6">
-			<div>
+			<div className="flex flex-col gap-1">
 				<h1 className="text-2xl font-semibold tracking-tight">
 					Billing & Invoices
 				</h1>
-				<p className="mt-1 text-sm text-muted-foreground">
+				<p className="text-sm text-muted-foreground">
 					Manage your invoices, payment history, and account credits
 				</p>
 			</div>

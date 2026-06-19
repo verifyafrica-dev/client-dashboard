@@ -125,9 +125,9 @@ export function BillingInformationSection({ tenantId }: { tenantId?: string }) {
 		return (
 			<div className="flex flex-col gap-4">
 				<Separator />
-				<div>
+				<div className="flex flex-col gap-1">
 					<h3 className="text-base font-semibold">Billing Information</h3>
-					<p className="mt-1 text-sm text-muted-foreground">
+					<p className="text-sm text-muted-foreground">
 						Failed to load billing information. Please try again.
 					</p>
 				</div>
@@ -142,9 +142,9 @@ export function BillingInformationSection({ tenantId }: { tenantId?: string }) {
 	return (
 		<div className="flex flex-col gap-6">
 			<Separator />
-			<div>
+			<div className="flex flex-col gap-1">
 				<h3 className="text-base font-semibold">Billing Information</h3>
-				<p className="mt-1 text-sm text-muted-foreground">
+				<p className="text-sm text-muted-foreground">
 					Manage the billing details used for invoices and receipts
 				</p>
 			</div>

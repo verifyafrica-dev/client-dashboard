@@ -10,9 +10,9 @@ export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/products/")
 function ProductsPage() {
 	return (
 		<div className="flex flex-col gap-6">
-			<div>
+			<div className="flex flex-col gap-1">
 				<h1 className="text-2xl font-semibold tracking-tight">Products</h1>
-				<p className="mt-1 text-sm text-muted-foreground">
+				<p className="text-sm text-muted-foreground">
 					Explore our suite of verification and compliance products.
 				</p>
 			</div>

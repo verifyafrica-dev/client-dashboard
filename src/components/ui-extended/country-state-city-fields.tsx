@@ -1,5 +1,5 @@
 import { GlobeHemisphereWestIcon } from "@phosphor-icons/react";
-import { City, Country, State } from "country-state-city";
+import { City, State } from "country-state-city";
 import { useMemo } from "react";
 
 import { Input } from "#/components/ui/input";
@@ -11,6 +11,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
+import {
+	getCountryIsoCodeByName,
+	getCountrySelectOptions,
+} from "#/lib/country-state-city";
 import { cn } from "#/lib/utils.ts";
 
 type CountryStateCityFieldsProps = {
@@ -78,17 +82,9 @@ export function CountryStateCityFields({
 	disabled,
 	className,
 }: CountryStateCityFieldsProps) {
-	const countries = useMemo(
-		() =>
-			Country.getAllCountries().sort((left, right) =>
-				left.name.localeCompare(right.name),
-			),
-		[],
-	);
-
 	const countryCode = useMemo(
-		() => countries.find((entry) => entry.name === country)?.isoCode ?? "",
-		[countries, country],
+		() => getCountryIsoCodeByName(country),
+		[country],
 	);
 
 	const states = useMemo(
@@ -117,10 +113,7 @@ export function CountryStateCityFields({
 		return City.getCitiesOfCountry(countryCode) ?? [];
 	}, [countryCode, stateCode, states.length]);
 
-	const countryOptions = useMemo(
-		() => countries.map((entry) => ({ value: entry.name, label: entry.name })),
-		[countries],
-	);
+	const countryOptions = useMemo(() => getCountrySelectOptions(), []);
 
 	const stateOptions = useMemo(
 		() => states.map((entry) => ({ value: entry.name, label: entry.name })),

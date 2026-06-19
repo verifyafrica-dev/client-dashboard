@@ -94,10 +94,6 @@ export function BasicInformationForm() {
 		form.reset(getDefaultValues(kycData));
 	}, [form, kycData]);
 
-	const incorporationDate = form.state.values.dateOfIncorporation
-		? new Date(form.state.values.dateOfIncorporation)
-		: undefined;
-
 	return (
 		<form
 			className="flex flex-col gap-6"
@@ -199,7 +195,7 @@ export function BasicInformationForm() {
 								</FieldLabel>
 								<KycDatePicker
 									id="dateOfIncorporation"
-									value={incorporationDate}
+									value={field.state.value}
 									onChange={(date) =>
 										field.handleChange(
 											date ? format(date, "yyyy-MM-dd") : "",

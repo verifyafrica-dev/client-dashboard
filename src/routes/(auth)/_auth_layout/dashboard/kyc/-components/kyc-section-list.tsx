@@ -43,9 +43,9 @@ export function KycSectionList({ sections }: { sections: KycSection[] }) {
 					>
 						<SectionStatusIcon completed={isCompleted} />
 
-						<div className="min-w-0 flex-1">
+						<div className="flex min-w-0 flex-1 flex-col gap-1">
 							<p className="font-semibold text-foreground">{section.title}</p>
-							<p className="mt-1 text-sm text-muted-foreground">
+							<p className="text-sm text-muted-foreground">
 								{section.description}
 							</p>
 						</div>

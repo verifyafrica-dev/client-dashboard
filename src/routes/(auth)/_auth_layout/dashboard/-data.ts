@@ -2,15 +2,8 @@ import type {
 	AnalyticsDateRangeQuery,
 	TenantAnalyticsResponse,
 } from "#/api/http/v1/analytics/analytics.types";
-import type { UserDetail } from "#/api/http/v1/users/users.types";
 
 export type TimeRange = "all" | "7d" | "30d" | "90d";
-
-const calendarDayFormatter = new Intl.DateTimeFormat("en-NG", {
-	year: "numeric",
-	month: "2-digit",
-	day: "2-digit",
-});
 
 const chartDateFormatter = new Intl.DateTimeFormat("en-US", {
 	month: "short",
@@ -23,20 +16,8 @@ const isoDateFormatter = new Intl.DateTimeFormat("en-CA", {
 	day: "2-digit",
 });
 
-function getCalendarDayKey(value: string | Date) {
-	return calendarDayFormatter.format(new Date(value));
-}
-
-export function isSameCalendarDay(left: string | Date, right: string | Date) {
-	return getCalendarDayKey(left) === getCalendarDayKey(right);
-}
-
-export function shouldShowDashboardOnboarding(user: UserDetail | null) {
-	if (!user?.last_login) {
-		return false;
-	}
-
-	return isSameCalendarDay(user.created_at, user.last_login);
+export function shouldShowDashboardOnboarding(isKycVerified: boolean) {
+	return !isKycVerified;
 }
 
 export const TIME_RANGE_OPTIONS: { value: TimeRange; label: string }[] = [

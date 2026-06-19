@@ -31,7 +31,13 @@ export const KYC_CLIENT_GEOGRAPHIES = [
 	"Global",
 ] as const;
 
-export const KYC_SIGNATURE_METHODS = ["Type Signature", "Upload Signature"] as const;
+export const KYC_SIGNATURE_METHODS = [
+	{ value: "type", label: "Type Signature" },
+	{ value: "upload", label: "Upload Signature" },
+] as const;
+
+export type KycSignatureMethod =
+	(typeof KYC_SIGNATURE_METHODS)[number]["value"];
 
 export const KYC_DECLARATIONS = [
 	{

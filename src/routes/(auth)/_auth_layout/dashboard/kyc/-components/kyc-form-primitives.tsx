@@ -3,8 +3,8 @@ import {
 	CloudArrowUpIcon,
 	XIcon,
 } from "@phosphor-icons/react";
-import { format } from "date-fns";
-import { useState } from "react";
+import { format, isValid, parse } from "date-fns";
+import { useMemo, useState } from "react";
 import { Button } from "#/components/ui/button";
 import { Calendar } from "#/components/ui/calendar";
 import {
@@ -33,7 +33,7 @@ import {
 } from "#/components/ui/select";
 import { Separator } from "#/components/ui/separator";
 import { Textarea } from "#/components/ui/textarea";
-import { COUNTRIES } from "#/lib/constants.ts";
+import { getCountrySelectOptions } from "#/lib/country-state-city";
 import { cn } from "#/lib/utils.ts";
 
 export function KycSectionHeader({
@@ -128,20 +128,35 @@ export function CountrySelect({
 	placeholder?: string;
 	disabled?: boolean;
 }) {
+	const countryOptions = useMemo(() => getCountrySelectOptions(), []);
+
 	return (
 		<Select value={value} onValueChange={onValueChange} disabled={disabled}>
 			<SelectTrigger id={id} className="w-full">
 				<SelectValue placeholder={placeholder} />
 			</SelectTrigger>
-			<SelectContent>
-				{COUNTRIES.map((country) => (
-					<SelectItem key={country.code} value={country.name}>
-						{country.name}
+			<SelectContent className="max-h-60">
+				{countryOptions.map((country) => (
+					<SelectItem key={country.value} value={country.value}>
+						{country.label}
 					</SelectItem>
 				))}
 			</SelectContent>
 		</Select>
 	);
+}
+
+function parseKycDateValue(value?: string | Date) {
+	if (!value) {
+		return undefined;
+	}
+
+	if (value instanceof Date) {
+		return isValid(value) ? value : undefined;
+	}
+
+	const parsed = parse(value, "yyyy-MM-dd", new Date());
+	return isValid(parsed) ? parsed : undefined;
 }
 
 export function KycDatePicker({
@@ -152,12 +167,13 @@ export function KycDatePicker({
 	disabled,
 }: {
 	id?: string;
-	value?: Date;
+	value?: string | Date;
 	onChange?: (date: Date | undefined) => void;
 	placeholder?: string;
 	disabled?: boolean;
 }) {
 	const [open, setOpen] = useState(false);
+	const selectedDate = parseKycDateValue(value);
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
@@ -169,17 +185,17 @@ export function KycDatePicker({
 					disabled={disabled}
 					className={cn(
 						"w-full justify-between font-normal",
-						!value && "text-muted-foreground",
+						!selectedDate && "text-muted-foreground",
 					)}
 				>
-					{value ? format(value, "dd/MM/yyyy") : placeholder}
+					{selectedDate ? format(selectedDate, "dd/MM/yyyy") : placeholder}
 					<CalendarBlankIcon className="size-4" />
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent className="w-auto p-0" align="start">
 				<Calendar
 					mode="single"
-					selected={value}
+					selected={selectedDate}
 					onSelect={(date) => {
 						onChange?.(date);
 						setOpen(false);
@@ -197,12 +213,14 @@ export function KycFileUpload({
 	accept = "image/*,.pdf",
 	maxSize = 10 * 1024 * 1024,
 	multiple = true,
+	disabled,
 }: {
 	value: File[];
 	onValueChange: (files: File[]) => void;
 	accept?: string;
 	maxSize?: number;
 	multiple?: boolean;
+	disabled?: boolean;
 }) {
 	return (
 		<FileUpload
@@ -211,6 +229,7 @@ export function KycFileUpload({
 			accept={accept}
 			maxSize={maxSize}
 			multiple={multiple}
+			disabled={disabled}
 		>
 			<FileUploadDropzone className="flex min-h-32 flex-col items-center justify-center gap-2 border-dashed py-8">
 				<CloudArrowUpIcon className="size-8 text-muted-foreground" />

@@ -12,6 +12,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
+import { PhoneInput } from "#/components/ui-extended/phone-input";
 import {
 	Field,
 	FieldError,
@@ -20,13 +21,13 @@ import {
 } from "@/components/ui/field";
 import { KYC_CONTACT_POSITIONS } from "../-constants";
 import { SECTION_NAMES } from "../-data";
-import { useKyc } from "./kyc-provider";
 import {
 	Input,
 	KycFormGrid,
 	KycSaveButton,
 	KycSectionHeader,
 } from "./kyc-form-primitives";
+import { useKyc } from "./kyc-provider";
 
 function getDefaultValues(
 	kycData: ReturnType<typeof useKyc>["kycData"],
@@ -81,7 +82,10 @@ export function PrimaryContactForm() {
 			<FieldGroup>
 				<form.Field name="name">
 					{(field) => (
-						<Field data-invalid={field.state.meta.errors.length > 0}>
+						<Field
+							data-invalid={field.state.meta.errors.length > 0}
+							className="gap-1.5"
+						>
 							<FieldLabel htmlFor="contactName">
 								Name <span className="text-destructive">*</span>
 							</FieldLabel>
@@ -100,7 +104,10 @@ export function PrimaryContactForm() {
 
 				<form.Field name="position">
 					{(field) => (
-						<Field data-invalid={field.state.meta.errors.length > 0}>
+						<Field
+							data-invalid={field.state.meta.errors.length > 0}
+							className="gap-1.5"
+						>
 							<FieldLabel htmlFor="contactPosition">
 								Position <span className="text-destructive">*</span>
 							</FieldLabel>
@@ -128,7 +135,10 @@ export function PrimaryContactForm() {
 				<KycFormGrid>
 					<form.Field name="email">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								data-invalid={field.state.meta.errors.length > 0}
+								className="gap-1.5"
+							>
 								<FieldLabel htmlFor="contactEmail">
 									Email <span className="text-destructive">*</span>
 								</FieldLabel>
@@ -147,17 +157,18 @@ export function PrimaryContactForm() {
 					</form.Field>
 					<form.Field name="phone">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								data-invalid={field.state.meta.errors.length > 0}
+								className="gap-1.5"
+							>
 								<FieldLabel htmlFor="contactPhone">
 									Phone <span className="text-destructive">*</span>
 								</FieldLabel>
-								<Input
+								<PhoneInput
 									id="contactPhone"
-									type="tel"
 									value={field.state.value}
 									onBlur={field.handleBlur}
-									onChange={(event) => field.handleChange(event.target.value)}
-									placeholder="+2348012345678"
+									onChange={field.handleChange}
 									disabled={isReadOnly}
 								/>
 								<FieldError errors={field.state.meta.errors} />

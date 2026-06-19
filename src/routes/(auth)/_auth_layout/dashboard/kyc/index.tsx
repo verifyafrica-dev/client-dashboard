@@ -6,21 +6,25 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
+
 import { useKycTenantQuery } from "#/api/http/v1/kyc/kyc.hooks";
+import type { KYBApplication } from "#/api/http/v1/kyc/kyc.types";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
 import { cn } from "#/lib/utils.ts";
 import { KycProvider, useKycTenantId } from "./-components/kyc-provider";
-import { KycRejectedAlert, KycSubmitPanel } from "./-components/kyc-submit-panel";
 import { KycSectionContent } from "./-components/kyc-section-content";
 import { KycSectionList } from "./-components/kyc-section-list";
-import type { KYBApplication } from "#/api/http/v1/kyc/kyc.types";
+import {
+	KycRejectedAlert,
+	KycSubmitPanel,
+} from "./-components/kyc-submit-panel";
 import {
 	getSectionByPath,
 	KYC_SECTION_PATHS,
-	sections,
 	type KycSectionPath,
+	sections,
 } from "./-data";
 import { getKycCompletionStatus, getKycDisplayStatus } from "./-utils";
 
@@ -62,8 +66,8 @@ function KycPageSkeleton() {
 			<Skeleton className="h-8 w-48" />
 			<Skeleton className="h-4 w-full max-w-xl" />
 			<div className="space-y-3">
-				{Array.from({ length: 4 }).map((_, index) => (
-					<Skeleton key={`kyc-skeleton-${index}`} className="h-24 w-full" />
+				{sections.slice(0, 4).map((section) => (
+					<Skeleton key={section.path} className="h-24 w-full" />
 				))}
 			</div>
 		</div>
@@ -75,7 +79,10 @@ function KycStatusBadge({ status }: { status: keyof typeof STATUS_BADGE }) {
 	const Icon = config.icon;
 
 	return (
-		<Badge variant="outline" className={cn("gap-1.5 px-3 py-1", config.className)}>
+		<Badge
+			variant="outline"
+			className={cn("gap-1.5 px-3 py-1", config.className)}
+		>
 			<Icon className="size-3.5" weight="fill" />
 			{config.label}
 		</Badge>
@@ -118,14 +125,6 @@ function KycPageInner({
 							Back to KYC
 						</Link>
 					</Button>
-					<div>
-						<h1 className="text-2xl font-semibold tracking-tight">
-							{activeSection.title}
-						</h1>
-						<p className="mt-1 text-sm text-muted-foreground">
-							{activeSection.description}
-						</p>
-					</div>
 					<KycSectionContent section={activeSection} />
 				</div>
 			) : (

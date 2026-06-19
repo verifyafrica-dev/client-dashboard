@@ -8,7 +8,7 @@ import {
 	StatusCodes,
 } from "http-status-codes";
 import { deleteCookie, getCookie, setCookie } from "#/lib/cookies";
-import { COUNTRIES } from "@/lib/constants";
+import { COUNTRY_NAME_BY_ISO_CODE } from "@/lib/country-state-city";
 import { isPlainObject } from "@/lib/validators";
 import { env } from "../../config/env";
 
@@ -102,20 +102,13 @@ const $http = axios.create({
 
 let isRefreshing = false;
 let failedRequestsQueue: any[] = [];
-const COUNTRY_NAME_BY_CODE = COUNTRIES.reduce<Record<string, string>>(
-	(acc, country) => {
-		acc[country.code.toUpperCase()] = country.name;
-		return acc;
-	},
-	{},
-);
 
 const DISABLED_COUNTRY_PATTERN =
 	/Country '([A-Z]{2})' is not enabled for this tenant\./g;
 
 const mapCountryCodesToNamesInMessage = (message: string) => {
 	return message.replace(DISABLED_COUNTRY_PATTERN, (_, countryCode: string) => {
-		const countryName = COUNTRY_NAME_BY_CODE[countryCode] || countryCode;
+		const countryName = COUNTRY_NAME_BY_ISO_CODE[countryCode] || countryCode;
 		return `Country '${countryName}' is not enabled for this tenant.`;
 	});
 };

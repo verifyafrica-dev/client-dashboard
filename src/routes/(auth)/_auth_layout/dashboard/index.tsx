@@ -21,6 +21,7 @@ import {
 	XAxis,
 } from "recharts";
 import { useTenantAnalyticsQuery } from "#/api/http/v1/analytics/analytics.hooks";
+import { useKycTenantQuery } from "#/api/http/v1/kyc/kyc.hooks";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import {
@@ -38,7 +39,7 @@ import {
 } from "#/components/ui/select";
 import { Skeleton } from "#/components/ui/skeleton";
 import { cn } from "#/lib/utils.ts";
-import { useAuthStore } from "#/stores/auth-store";
+import { useCurrentTenant } from "./team/-data";
 import { DashboardOnboarding } from "./-components/dashboard-onboarding";
 import {
 	type DashboardData,
@@ -73,9 +74,12 @@ const typeChartConfig = {
 
 function DashboardPage() {
 	const [timeRange, setTimeRange] = useState<TimeRange>("all");
-	const user = useAuthStore((state) => state.user);
-	const tenantId = user?.tenants[0]?.id;
-	const showOnboarding = shouldShowDashboardOnboarding(user);
+	const { tenantId } = useCurrentTenant();
+	const kycQuery = useKycTenantQuery(tenantId, Boolean(tenantId));
+	const isKycVerified = kycQuery.data?.isKycApproved ?? false;
+	const isKycLoading = kycQuery.isPending || kycQuery.isFetching;
+	const showOnboarding =
+		!kycQuery.isError && !isKycLoading && shouldShowDashboardOnboarding(isKycVerified);
 	const analyticsDateRange = useMemo(
 		() => getAnalyticsDateRange(timeRange),
 		[timeRange],
@@ -84,7 +88,7 @@ function DashboardPage() {
 	const tenantsAnalyticsQuery = useTenantAnalyticsQuery(
 		tenantId,
 		analyticsDateRange,
-		Boolean(tenantId),
+		Boolean(tenantId) && isKycVerified,
 	);
 
 	const data = useMemo(
@@ -95,63 +99,81 @@ function DashboardPage() {
 		[tenantsAnalyticsQuery.data],
 	);
 
-	const isLoading =
-		tenantsAnalyticsQuery.isPending || tenantsAnalyticsQuery.isFetching;
+	const isAnalyticsLoading =
+		isKycVerified &&
+		(tenantsAnalyticsQuery.isPending || tenantsAnalyticsQuery.isFetching);
 	const chartKey = `${tenantId ?? "tenant"}-${timeRange}`;
 
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-				<div>
+				<div className="flex flex-col gap-1">
 					<h1 className="text-2xl font-semibold tracking-tight">Dashboard</h1>
-					<p className="mt-1 text-sm text-muted-foreground">
+					<p className="text-sm text-muted-foreground">
 						Welcome back! Here&apos;s your verification overview.
 					</p>
 				</div>
-				<div className="flex flex-wrap items-center gap-4">
-					<Select
-						value={timeRange}
-						onValueChange={(value) => setTimeRange(value as TimeRange)}
-						disabled={isLoading}
-					>
-						<SelectTrigger className="w-[160px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							{TIME_RANGE_OPTIONS.map((option) => (
-								<SelectItem key={option.value} value={option.value}>
-									{option.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					<Button
-						onClick={() => tenantsAnalyticsQuery.refetch()}
-						disabled={isLoading}
-					>
-						<ArrowClockwiseIcon
-							className={isLoading ? "animate-spin" : undefined}
-							weight="bold"
-						/>
-						Refresh
-					</Button>
-				</div>
+				{isKycVerified && (
+					<div className="flex flex-wrap items-center gap-4">
+						<Select
+							value={timeRange}
+							onValueChange={(value) => setTimeRange(value as TimeRange)}
+							disabled={isAnalyticsLoading}
+						>
+							<SelectTrigger className="w-[160px]">
+								<SelectValue />
+							</SelectTrigger>
+							<SelectContent>
+								{TIME_RANGE_OPTIONS.map((option) => (
+									<SelectItem key={option.value} value={option.value}>
+										{option.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+						<Button
+							onClick={() => tenantsAnalyticsQuery.refetch()}
+							disabled={isAnalyticsLoading}
+						>
+							<ArrowClockwiseIcon
+								className={isAnalyticsLoading ? "animate-spin" : undefined}
+								weight="bold"
+							/>
+							Refresh
+						</Button>
+					</div>
+				)}
 			</div>
 
-			{showOnboarding && <DashboardOnboarding />}
-
-			{isLoading || !data ? (
-				<DashboardContentSkeleton />
+			{kycQuery.isError ? (
+				<div className="rounded-lg border px-6 py-10 text-center text-sm text-muted-foreground">
+					Failed to load verification status. Please try again.
+				</div>
+			) : isKycLoading ? (
+				<DashboardKycLoadingState />
 			) : (
-				<DashboardContent
-					stats={data.stats}
-					trendData={data.trendData}
-					typeData={data.typeData}
-					chartKey={chartKey}
-				/>
+				<>
+					{showOnboarding && <DashboardOnboarding />}
+
+					{isKycVerified &&
+						(isAnalyticsLoading || !data ? (
+							<DashboardContentSkeleton />
+						) : (
+							<DashboardContent
+								stats={data.stats}
+								trendData={data.trendData}
+								typeData={data.typeData}
+								chartKey={chartKey}
+							/>
+						))}
+				</>
 			)}
 		</div>
 	);
+}
+
+function DashboardKycLoadingState() {
+	return <Skeleton className="h-48 w-full rounded-2xl" />;
 }
 
 function VerificationTypeSector(props: PieSectorShapeProps) {

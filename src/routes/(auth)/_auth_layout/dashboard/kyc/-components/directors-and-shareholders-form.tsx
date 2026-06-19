@@ -117,12 +117,7 @@ export function DirectorsAndShareholdersForm() {
 				{(directorsField) => (
 					<section className="space-y-4">
 						<h3 className="text-base font-semibold">Directors</h3>
-						{directorsField.state.value.map((director, index) => {
-							const dateOfBirth = director.dateOfBirth
-								? new Date(director.dateOfBirth)
-								: undefined;
-
-							return (
+						{directorsField.state.value.map((director, index) => (
 								<KycEntryCard
 									key={`director-${index}`}
 									title={`Director ${index + 1}`}
@@ -159,7 +154,7 @@ export function DirectorsAndShareholdersForm() {
 													>
 														<FieldLabel>Date of Birth</FieldLabel>
 														<KycDatePicker
-															value={dateOfBirth}
+															value={field.state.value}
 															onChange={(date) =>
 																field.handleChange(
 																	date ? format(date, "yyyy-MM-dd") : "",
@@ -264,8 +259,7 @@ export function DirectorsAndShareholdersForm() {
 										</form.Field>
 									</FieldGroup>
 								</KycEntryCard>
-							);
-						})}
+						))}
 						{!isReadOnly && (
 							<Button
 								type="button"
