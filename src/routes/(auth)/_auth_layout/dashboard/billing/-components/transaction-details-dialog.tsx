@@ -14,51 +14,6 @@ import { generatePDFWithColorSupport } from "#/lib/pdfHelpers";
 import { cn } from "#/lib/utils.ts";
 import { formatSignedAmount, type Transaction } from "../-data";
 
-function DetailRow({
-	label,
-	value,
-	valueClassName,
-}: {
-	label: string;
-	value: string;
-	valueClassName?: string;
-}) {
-	return (
-		<div className="flex items-start justify-between gap-4 py-2 text-sm">
-			<span className="text-muted-foreground">{label}</span>
-			<span className={cn("text-right font-medium", valueClassName)}>
-				{value}
-			</span>
-		</div>
-	);
-}
-
-function formatMetadataLabel(key: string) {
-	return key
-		.replaceAll("_", " ")
-		.replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-function formatMetaValue(value: unknown) {
-	if (value === null || value === undefined || value === "") {
-		return "—";
-	}
-
-	if (typeof value === "boolean") {
-		return value ? "true" : "false";
-	}
-
-	return String(value);
-}
-
-function getMetadataFields(metadata: unknown): Array<[string, unknown]> {
-	if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
-		return [];
-	}
-
-	return Object.entries(metadata as Record<string, unknown>);
-}
-
 export function TransactionDetailsDialog({
 	open,
 	onOpenChange,
@@ -212,4 +167,49 @@ export function TransactionDetailsDialog({
 			</DialogContent>
 		</Dialog>
 	);
+}
+
+function DetailRow({
+	label,
+	value,
+	valueClassName,
+}: {
+	label: string;
+	value: string;
+	valueClassName?: string;
+}) {
+	return (
+		<div className="flex items-start justify-between gap-4 py-2 text-sm">
+			<span className="text-muted-foreground">{label}</span>
+			<span className={cn("text-right font-medium", valueClassName)}>
+				{value}
+			</span>
+		</div>
+	);
+}
+
+function formatMetadataLabel(key: string) {
+	return key
+		.replaceAll("_", " ")
+		.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatMetaValue(value: unknown) {
+	if (value === null || value === undefined || value === "") {
+		return "—";
+	}
+
+	if (typeof value === "boolean") {
+		return value ? "true" : "false";
+	}
+
+	return String(value);
+}
+
+function getMetadataFields(metadata: unknown): Array<[string, unknown]> {
+	if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+		return [];
+	}
+
+	return Object.entries(metadata as Record<string, unknown>);
 }

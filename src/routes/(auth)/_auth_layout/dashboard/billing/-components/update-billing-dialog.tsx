@@ -1,7 +1,6 @@
 import {
 	BuildingsIcon,
 	EnvelopeSimpleIcon,
-	GlobeHemisphereWestIcon,
 	HouseIcon,
 } from "@phosphor-icons/react";
 import {
@@ -17,6 +16,7 @@ import {
 	usePartialUpdateBillingInformationMutation,
 } from "#/api/http/v1/billing/billing.hooks";
 import type { BillingInformation } from "#/api/http/v1/billing/billing.types";
+import { CountryStateCityFields } from "#/components/ui-extended/country-state-city-fields";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -27,14 +27,6 @@ import {
 } from "#/components/ui/dialog";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "#/components/ui/select";
-import { COUNTRIES } from "#/lib/constants.ts";
 import { cn } from "#/lib/utils.ts";
 
 type BillingFormState = {
@@ -120,7 +112,9 @@ export function UpdateBillingDialog({
 }) {
 	const [form, setForm] = useState<BillingFormState>(EMPTY_FORM);
 	const createMutation = useCreateBillingInformationMutation();
-	const updateMutation = usePartialUpdateBillingInformationMutation(tenantId);
+	const updateMutation = usePartialUpdateBillingInformationMutation(
+		billingInfo?.id,
+	);
 
 	const isSaving = createMutation.isPending || updateMutation.isPending;
 
@@ -206,48 +200,18 @@ export function UpdateBillingDialog({
 						value={form.billing_address}
 						onChange={(value) => updateField("billing_address", value)}
 					/>
-					<div className="grid gap-4 sm:grid-cols-3">
-						<IconField
-							id="billing-city"
-							label="City"
-							icon={BuildingsIcon}
-							value={form.billing_city}
-							onChange={(value) => updateField("billing_city", value)}
-						/>
-						<IconField
-							id="billing-state"
-							label="State/Province"
-							value={form.billing_state}
-							onChange={(value) => updateField("billing_state", value)}
-						/>
-						<IconField
-							id="billing-postal"
-							label="Postal Code"
-							value={form.billing_postal_code}
-							onChange={(value) => updateField("billing_postal_code", value)}
-						/>
-					</div>
-					<div className="space-y-2">
-						<Label htmlFor="billing-country">Country</Label>
-						<div className="relative">
-							<GlobeHemisphereWestIcon className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
-							<Select
-								value={form.billing_country}
-								onValueChange={(value) => updateField("billing_country", value)}
-							>
-								<SelectTrigger id="billing-country" className="w-full pl-10">
-									<SelectValue placeholder="Select country" />
-								</SelectTrigger>
-								<SelectContent>
-									{COUNTRIES.map((country) => (
-										<SelectItem key={country.code} value={country.name}>
-											{country.name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-					</div>
+					<CountryStateCityFields
+						country={form.billing_country}
+						state={form.billing_state}
+						city={form.billing_city}
+						postalCode={form.billing_postal_code}
+						onCountryChange={(value) => updateField("billing_country", value)}
+						onStateChange={(value) => updateField("billing_state", value)}
+						onCityChange={(value) => updateField("billing_city", value)}
+						onPostalCodeChange={(value) =>
+							updateField("billing_postal_code", value)
+						}
+					/>
 				</div>
 
 				<DialogFooter>

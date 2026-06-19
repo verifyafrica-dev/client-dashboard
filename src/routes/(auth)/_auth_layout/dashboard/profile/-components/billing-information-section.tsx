@@ -82,7 +82,9 @@ export function BillingInformationSection({
 
 	const [form, setForm] = useState<BillingFormState>(EMPTY_FORM);
 	const createMutation = useCreateBillingInformationMutation();
-	const updateMutation = usePartialUpdateBillingInformationMutation(tenantId);
+	const updateMutation = usePartialUpdateBillingInformationMutation(
+		billingInfo?.id,
+	);
 
 	const isLoading =
 		billingInformationQuery.isPending || billingInformationQuery.isFetching;

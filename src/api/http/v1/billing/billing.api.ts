@@ -16,6 +16,8 @@ import type {
 
 const BILLING_ENDPOINTS = {
 	billingInformation: "/billing/billing-information/",
+	billingInformationDetail: (id: string) =>
+		`/billing/billing-information/${id}/`,
 	billingPricing: "/billing/billing-pricing/",
 	billingPricingDetail: (id: string) => `/billing/billing-pricing/${id}/`,
 	allInvoices: "/billing/all-invoices/",
@@ -50,13 +52,14 @@ export const BILLING_API = {
 			.then((res) => res.data),
 
 	BILLING_INFORMATION_PARTIAL_UPDATE: async (
-		params: BillingInformationTenantQuery,
+		id: string,
 		data: BillingInformationUpdatePayload,
 	) =>
 		await $http
-			.patch<BillingInformation>(BILLING_ENDPOINTS.billingInformation, data, {
-				params,
-			})
+			.patch<BillingInformation>(
+				BILLING_ENDPOINTS.billingInformationDetail(id),
+				data,
+			)
 			.then((res) => res.data),
 
 	BILLING_INFORMATION_DELETE: async (params: BillingInformationTenantQuery) =>

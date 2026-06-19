@@ -86,7 +86,7 @@ export const useUpdateBillingInformationMutation = (
 };
 
 export const usePartialUpdateBillingInformationMutation = (
-	tenantId: string | undefined,
+	billingInformationId: string | undefined,
 ) => {
 	const queryClient = useQueryClient();
 
@@ -97,7 +97,7 @@ export const usePartialUpdateBillingInformationMutation = (
 	>({
 		mutationFn: (payload) =>
 			BILLING_API.BILLING_INFORMATION_PARTIAL_UPDATE(
-				{ tenant_id: tenantId ?? "" },
+				billingInformationId ?? "",
 				payload,
 			),
 		onSuccess: () => {
