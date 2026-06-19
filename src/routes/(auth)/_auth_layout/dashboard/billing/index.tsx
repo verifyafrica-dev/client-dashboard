@@ -366,9 +366,9 @@ function BillingPage() {
 															<TableCell>
 																<Button
 																	type="button"
-																	variant="ghost"
+																	variant="outline"
 																	size="sm"
-																	className="cursor-pointer text-primary"
+																	className="cursor-pointer"
 																	onClick={() =>
 																		openTransactionDetails(transaction)
 																	}

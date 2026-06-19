@@ -7,6 +7,8 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+
+import { paginateItems, TablePagination } from "#/components/table-pagination";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Label } from "#/components/ui/label";
@@ -27,10 +29,6 @@ import {
 } from "#/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { cn } from "#/lib/utils.ts";
-import {
-	paginateItems,
-	TablePagination,
-} from "#/components/table-pagination";
 import { ReportsTableShell } from "./-components/reports-table-shell";
 import {
 	ReportsPaginationSkeleton,
@@ -189,7 +187,7 @@ function ReportsPage() {
 					<Button
 						type="button"
 						variant="outline"
-						className="cursor-pointer uppercase tracking-wide"
+						className="cursor-pointer tracking-wide"
 						disabled={isIndividualLoading || isBatchLoading}
 						onClick={() => void handleRefresh()}
 					>
@@ -199,7 +197,7 @@ function ReportsPage() {
 						/>
 						Refresh
 					</Button>
-					<Button className="cursor-pointer uppercase tracking-wide">
+					<Button className="cursor-pointer tracking-wide">
 						New Verification
 					</Button>
 				</div>

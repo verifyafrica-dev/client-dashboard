@@ -77,9 +77,9 @@ export const setTokens = (
 const clearTokensAndLogout = () => {
 	if (!isBrowser) return;
 
-	deleteCookie(getAccessTokenKey());
-	deleteCookie(getRefreshTokenKey());
-	window.location.href = "/login";
+	// deleteCookie(getAccessTokenKey());
+	// deleteCookie(getRefreshTokenKey());
+	// window.location.href = "/login";
 };
 
 const $http = axios.create({

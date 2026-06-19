@@ -33,6 +33,12 @@ function DetailRow({
 	);
 }
 
+function formatMetadataLabel(key: string) {
+	return key
+		.replaceAll("_", " ")
+		.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function formatMetaValue(value: unknown) {
 	if (value === null || value === undefined || value === "") {
 		return "—";
@@ -43,6 +49,14 @@ function formatMetaValue(value: unknown) {
 	}
 
 	return String(value);
+}
+
+function getMetadataFields(metadata: unknown): Array<[string, unknown]> {
+	if (!metadata || typeof metadata !== "object" || Array.isArray(metadata)) {
+		return [];
+	}
+
+	return Object.entries(metadata as Record<string, unknown>);
 }
 
 export function TransactionDetailsDialog({
@@ -74,10 +88,7 @@ export function TransactionDetailsDialog({
 		transaction.currency,
 	);
 
-	const additionalFields = Object.entries(transaction.meta).filter(
-		([key]) =>
-			!["created_at", "updated_at", "id", "reference", "reason"].includes(key),
-	);
+	const metadataFields = getMetadataFields(transaction.meta.metadata);
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -168,17 +179,15 @@ export function TransactionDetailsDialog({
 							/>
 						</div>
 
-						{additionalFields.length > 0 && (
+						{metadataFields.length > 0 && (
 							<>
 								<Separator />
 								<div>
 									<h3 className="mb-2 font-medium">Additional Information</h3>
-									{additionalFields.map(([key, value]) => (
+									{metadataFields.map(([key, value]) => (
 										<DetailRow
 											key={key}
-											label={key
-												.replaceAll("_", " ")
-												.replace(/\b\w/g, (char) => char.toUpperCase())}
+											label={formatMetadataLabel(key)}
 											value={formatMetaValue(value)}
 											valueClassName="max-w-[220px] break-all font-mono text-xs"
 										/>
