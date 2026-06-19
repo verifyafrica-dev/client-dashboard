@@ -4,7 +4,7 @@ import { type ComponentProps, useEffect, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
-import { useExportWalletTransactionsMutation } from "#/api/http/v1/billing/billing.hooks";
+import { useExportWalletTransactionsMutation } from "#/api/http/v1/wallet/wallet.hooks";
 import { Button } from "#/components/ui/button";
 import { Calendar } from "#/components/ui/calendar";
 import {

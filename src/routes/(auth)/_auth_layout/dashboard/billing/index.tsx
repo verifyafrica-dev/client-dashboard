@@ -5,16 +5,21 @@ import {
 	EyeIcon,
 	PencilSimpleIcon,
 } from "@phosphor-icons/react";
-import { useQueryClient } from "@tanstack/react-query";
+import { type UseQueryResult, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import type { AxiosError } from "axios";
 import { useMemo, useState } from "react";
 import {
 	BILLING_QUERY_KEYS,
 	useBillingInformationListQuery,
 	useTenantInvoicesQuery,
+} from "#/api/http/v1/billing/billing.hooks";
+import type { TenantInvoicesListResponse } from "#/api/http/v1/billing/billing.types";
+import {
 	useWalletBalanceQuery,
 	useWalletTransactionsQuery,
-} from "#/api/http/v1/billing/billing.hooks";
+} from "#/api/http/v1/wallet/wallet.hooks";
+import type { WalletTransactionsListResponse } from "#/api/http/v1/wallet/wallet.types";
 import {
 	TablePagination,
 	TablePaginationSkeleton,
@@ -78,15 +83,18 @@ function BillingPage() {
 		{ tenant_id: tenantId },
 		Boolean(tenantId),
 	);
-	const transactionsQuery = useWalletTransactionsQuery({
-		tenant_id: tenantId,
-		offset: (transactionPage - 1) * TRANSACTIONS_PAGE_SIZE,
-		page_size: TRANSACTIONS_PAGE_SIZE,
-	});
+	const transactionsQuery = useWalletTransactionsQuery(
+		{
+			tenant_id: tenantId,
+			offset: (transactionPage - 1) * TRANSACTIONS_PAGE_SIZE,
+			page_size: TRANSACTIONS_PAGE_SIZE,
+		},
+		Boolean(tenantId),
+	) as UseQueryResult<WalletTransactionsListResponse, AxiosError>;
 	const invoicesQuery = useTenantInvoicesQuery(tenantId, {
 		offset: (invoicePage - 1) * INVOICES_PAGE_SIZE,
 		page_size: INVOICES_PAGE_SIZE,
-	});
+	}) as UseQueryResult<TenantInvoicesListResponse, AxiosError>;
 
 	const wallet = walletBalanceQuery.data;
 	const billingInfo = billingInformationQuery.data?.results[0];

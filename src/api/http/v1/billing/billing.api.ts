@@ -12,16 +12,6 @@ import type {
 	BillingPricingListResponse,
 	Invoice,
 	TenantInvoicesListResponse,
-	Wallet,
-	WalletAdminCreditsPayload,
-	WalletAdminCreditsResponse,
-	WalletFundingRequestsListResponse,
-	WalletTenantQuery,
-	WalletTopUpCreateSessionPayload,
-	WalletTopUpCreateSessionResponse,
-	WalletTopUpVerifyResponse,
-	WalletTransactionsListResponse,
-	WalletTransactionsQuery,
 } from "./billing.types";
 
 const BILLING_ENDPOINTS = {
@@ -31,14 +21,6 @@ const BILLING_ENDPOINTS = {
 	allInvoices: "/billing/all-invoices/",
 	allInvoiceDetail: (id: string) => `/billing/all-invoices/${id}/`,
 	invoicesByTenant: (tenantId: string) => `/billing/invoices/${tenantId}/`,
-	walletBalance: "/wallet/balance/",
-	walletFundingRequests: "/wallet/funding-requests/",
-	walletTransactions: "/wallet/transactions/",
-	walletTopUpCreateSession: (tenantId: string) =>
-		`/wallet/${tenantId}/top-up/create-session/`,
-	walletTopUpVerify: (tenantId: string) => `/wallet/${tenantId}/top-up/verify/`,
-	walletAdminCredits: (tenantId: string) =>
-		`/wallet/admin/${tenantId}/credits/`,
 } as const;
 
 export const BILLING_API = {
@@ -140,85 +122,6 @@ export const BILLING_API = {
 				{
 					params,
 				},
-			)
-			.then((res) => res.data),
-
-	WALLET_BALANCE: async (params: WalletTenantQuery) =>
-		await $http
-			.get<Wallet>(BILLING_ENDPOINTS.walletBalance, { params })
-			.then((res) => res.data),
-
-	WALLET_TRANSACTIONS: async (params?: WalletTransactionsQuery) =>
-		await $http
-			.get<WalletTransactionsListResponse>(
-				BILLING_ENDPOINTS.walletTransactions,
-				{
-					params,
-				},
-			)
-			.then((res) => res.data),
-
-	WALLET_TRANSACTIONS_EXPORT: async (params?: WalletTransactionsQuery) => {
-		const pageSize = 100;
-		let offset = 0;
-		const results: WalletTransactionsListResponse["results"] = [];
-
-		while (true) {
-			const response = await BILLING_API.WALLET_TRANSACTIONS({
-				...params,
-				offset,
-				page_size: pageSize,
-			});
-
-			results.push(...response.results);
-
-			if (!response.next) {
-				break;
-			}
-
-			offset += pageSize;
-		}
-
-		return results;
-	},
-
-	WALLET_FUNDING_REQUESTS: async (params?: {
-		offset?: number;
-		page_size?: number;
-	}) =>
-		await $http
-			.get<WalletFundingRequestsListResponse>(
-				BILLING_ENDPOINTS.walletFundingRequests,
-				{ params },
-			)
-			.then((res) => res.data),
-
-	WALLET_TOP_UP_CREATE_SESSION: async (
-		tenantId: string,
-		data: WalletTopUpCreateSessionPayload,
-	) =>
-		await $http
-			.post<WalletTopUpCreateSessionResponse>(
-				BILLING_ENDPOINTS.walletTopUpCreateSession(tenantId),
-				data,
-			)
-			.then((res) => res.data),
-
-	WALLET_TOP_UP_VERIFY: async (tenantId: string) =>
-		await $http
-			.get<WalletTopUpVerifyResponse>(
-				BILLING_ENDPOINTS.walletTopUpVerify(tenantId),
-			)
-			.then((res) => res.data),
-
-	WALLET_ADMIN_CREDITS: async (
-		tenantId: string,
-		data: WalletAdminCreditsPayload,
-	) =>
-		await $http
-			.post<WalletAdminCreditsResponse>(
-				BILLING_ENDPOINTS.walletAdminCredits(tenantId),
-				data,
 			)
 			.then((res) => res.data),
 };

@@ -1,5 +1,4 @@
 import {
-	type UseQueryResult,
 	useMutation,
 	useQuery,
 	useQueryClient,
@@ -17,15 +16,6 @@ import type {
 	BillingPricingListResponse,
 	Invoice,
 	TenantInvoicesListResponse,
-	Wallet,
-	WalletAdminCreditsPayload,
-	WalletAdminCreditsResponse,
-	WalletFundingRequestsListResponse,
-	WalletTopUpCreateSessionPayload,
-	WalletTopUpCreateSessionResponse,
-	WalletTopUpVerifyResponse,
-	WalletTransactionsListResponse,
-	WalletTransactionsQuery,
 } from "./billing.types";
 
 const BILLING_STALE_TIME = 60_000;
@@ -46,16 +36,6 @@ export const BILLING_QUERY_KEYS = {
 		tenantId: string,
 		params?: { offset?: number; page_size?: number },
 	) => ["billing", "tenant-invoices", tenantId, params ?? {}] as const,
-	walletBalance: (tenantId: string) =>
-		["billing", "wallet", "balance", tenantId] as const,
-	walletTransactionsList: (params?: WalletTransactionsQuery) =>
-		["billing", "wallet", "transactions", params ?? {}] as const,
-	walletFundingRequestsList: (params?: {
-		offset?: number;
-		page_size?: number;
-	}) => ["billing", "wallet", "funding-requests", params ?? {}] as const,
-	walletTopUpVerify: (tenantId: string) =>
-		["billing", "wallet", "top-up", "verify", tenantId] as const,
 } as const;
 
 export const useBillingInformationListQuery = (
@@ -196,80 +176,4 @@ export const useTenantInvoicesQuery = (
 		queryFn: () => BILLING_API.INVOICES_BY_TENANT(tenantId ?? "", params),
 		enabled: enabled && Boolean(tenantId),
 		staleTime: BILLING_STALE_TIME,
-	});
-
-export const useWalletBalanceQuery = (
-	tenantId: string | undefined,
-	enabled = true,
-): UseQueryResult<Wallet, Error> =>
-	useQuery<Wallet, Error>({
-		queryKey: BILLING_QUERY_KEYS.walletBalance(tenantId ?? ""),
-		queryFn: () => BILLING_API.WALLET_BALANCE({ tenant_id: tenantId ?? "" }),
-		enabled: enabled && Boolean(tenantId),
-		staleTime: BILLING_STALE_TIME,
-	});
-
-export const useWalletTransactionsQuery = (
-	params?: WalletTransactionsQuery,
-	enabled = true,
-) =>
-	useQuery<WalletTransactionsListResponse>({
-		queryKey: BILLING_QUERY_KEYS.walletTransactionsList(params),
-		queryFn: () => BILLING_API.WALLET_TRANSACTIONS(params),
-		enabled,
-		staleTime: BILLING_STALE_TIME,
-	});
-
-export const useExportWalletTransactionsMutation = () =>
-	useMutation({
-		mutationFn: (params?: WalletTransactionsQuery) =>
-			BILLING_API.WALLET_TRANSACTIONS_EXPORT(params),
-	});
-
-export const useWalletFundingRequestsQuery = (
-	params?: { offset?: number; page_size?: number },
-	enabled = true,
-) =>
-	useQuery<WalletFundingRequestsListResponse>({
-		queryKey: BILLING_QUERY_KEYS.walletFundingRequestsList(params),
-		queryFn: () => BILLING_API.WALLET_FUNDING_REQUESTS(params),
-		enabled,
-		staleTime: BILLING_STALE_TIME,
-	});
-
-export const useWalletTopUpCreateSessionMutation = () =>
-	useMutation<
-		WalletTopUpCreateSessionResponse,
-		Error,
-		{
-			tenantId: string;
-			payload: WalletTopUpCreateSessionPayload;
-		}
-	>({
-		mutationFn: ({ tenantId, payload }) =>
-			BILLING_API.WALLET_TOP_UP_CREATE_SESSION(tenantId, payload),
-	});
-
-export const useWalletTopUpVerifyQuery = (
-	tenantId: string | undefined,
-	enabled = true,
-) =>
-	useQuery<WalletTopUpVerifyResponse, Error>({
-		queryKey: BILLING_QUERY_KEYS.walletTopUpVerify(tenantId ?? ""),
-		queryFn: () => BILLING_API.WALLET_TOP_UP_VERIFY(tenantId ?? ""),
-		enabled: enabled && Boolean(tenantId),
-		staleTime: BILLING_STALE_TIME,
-	});
-
-export const useWalletAdminCreditsMutation = () =>
-	useMutation<
-		WalletAdminCreditsResponse,
-		Error,
-		{
-			tenantId: string;
-			payload: WalletAdminCreditsPayload;
-		}
-	>({
-		mutationFn: ({ tenantId, payload }) =>
-			BILLING_API.WALLET_ADMIN_CREDITS(tenantId, payload),
 	});

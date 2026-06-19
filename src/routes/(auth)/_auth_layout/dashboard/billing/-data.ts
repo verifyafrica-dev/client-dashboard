@@ -1,9 +1,11 @@
 import { subDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
 
-import type { BillingInformation } from "#/api/http/v1/billing/billing.types";
-import type { WalletTransaction } from "#/api/http/v1/billing/billing.types";
-import type { Invoice } from "#/api/http/v1/billing/billing.types";
+import type {
+	BillingInformation,
+	Invoice,
+} from "#/api/http/v1/billing/billing.types";
+import type { WalletTransaction } from "#/api/http/v1/wallet/wallet.types";
 
 export type TransactionType = "debit" | "credit";
 
