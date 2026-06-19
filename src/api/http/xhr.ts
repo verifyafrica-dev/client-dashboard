@@ -39,7 +39,8 @@ const getTokenPrefix = (): string => {
 export const getAccessTokenKey = (): string => `${getTokenPrefix()}accessToken`;
 export const getRefreshTokenKey = (): string =>
 	`${getTokenPrefix()}refreshToken`;
-const TOKEN_COOKIE_EXPIRES_DAYS = 30;
+const ACCESS_TOKEN_COOKIE_EXPIRES_DAYS = 5 / 60 / 24; // 5 minutes
+const REFRESH_TOKEN_COOKIE_EXPIRES_DAYS = 2; // 2 days
 
 const getTokens = () => {
 	if (!isBrowser) {
@@ -57,29 +58,37 @@ const getTokens = () => {
 
 export const setTokens = (
 	accessToken: string,
-	refreshToken = "",
+	refreshToken?: string,
 	options?: { rememberRefreshToken?: boolean },
 ) => {
 	if (!isBrowser) return;
 
-	const rememberRefreshToken = options?.rememberRefreshToken ?? true;
+	setCookie(getAccessTokenKey(), accessToken, ACCESS_TOKEN_COOKIE_EXPIRES_DAYS);
 
-	setCookie(getAccessTokenKey(), accessToken, TOKEN_COOKIE_EXPIRES_DAYS);
-
-	if (rememberRefreshToken && refreshToken) {
-		setCookie(getRefreshTokenKey(), refreshToken, TOKEN_COOKIE_EXPIRES_DAYS);
+	if (refreshToken) {
+		if (options?.rememberRefreshToken ?? true) {
+			setCookie(
+				getRefreshTokenKey(),
+				refreshToken,
+				REFRESH_TOKEN_COOKIE_EXPIRES_DAYS,
+			);
+		} else {
+			deleteCookie(getRefreshTokenKey());
+		}
 		return;
 	}
 
-	deleteCookie(getRefreshTokenKey());
+	if (options?.rememberRefreshToken === false) {
+		deleteCookie(getRefreshTokenKey());
+	}
 };
 
 const clearTokensAndLogout = () => {
 	if (!isBrowser) return;
 
-	// deleteCookie(getAccessTokenKey());
-	// deleteCookie(getRefreshTokenKey());
-	// window.location.href = "/login";
+	deleteCookie(getAccessTokenKey());
+	deleteCookie(getRefreshTokenKey());
+	window.location.href = "/login";
 };
 
 const $http = axios.create({
