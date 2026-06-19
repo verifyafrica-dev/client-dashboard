@@ -1,101 +1,159 @@
-import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { format } from "date-fns";
+import { useEffect } from "react";
+
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "#/components/ui/select";
+	KycAuthorizedSignatureFormSchema,
+	type KycAuthorizedSignatureFormValues,
+} from "#/api/http/v1/kyc/kyc.types";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
+import { SECTION_NAMES } from "../-data";
+import { useKyc } from "./kyc-provider";
 import {
 	Input,
 	KycDatePicker,
-	KycFileUpload,
-	KycFormField,
 	KycSaveButton,
 	KycSectionHeader,
 } from "./kyc-form-primitives";
 
-const SIGNATURE_METHODS = ["Type Signature", "Upload Signature"] as const;
+function getDefaultValues(
+	kycData: ReturnType<typeof useKyc>["kycData"],
+): KycAuthorizedSignatureFormValues {
+	return {
+		fullName: kycData.authorizedSignatory?.fullName ?? "",
+		positionTitle: kycData.authorizedSignatory?.positionTitle ?? "",
+		date:
+			kycData.authorizedSignatory?.date ||
+			format(new Date(), "yyyy-MM-dd"),
+		signature: kycData.authorizedSignatory?.signature ?? "",
+	};
+}
 
 export function AuthorizedSignatureForm() {
-	const [signatureDate, setSignatureDate] = useState<Date>(new Date());
-	const [signatureMethod, setSignatureMethod] =
-		useState<(typeof SIGNATURE_METHODS)[number]>("Type Signature");
-	const [signatureFiles, setSignatureFiles] = useState<File[]>([]);
+	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+
+	const form = useForm({
+		defaultValues: getDefaultValues(kycData),
+		validators: {
+			onSubmit: KycAuthorizedSignatureFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			await saveCompliance(
+				(current) => ({
+					...current,
+					authorizedSignatory: value,
+				}),
+				{ currentSection: SECTION_NAMES.AUTHORIZED_SIGNATURE },
+			);
+		},
+	});
+
+	useEffect(() => {
+		form.reset(getDefaultValues(kycData));
+	}, [form, kycData]);
+
+	const signatureDate = form.state.values.date
+		? new Date(form.state.values.date)
+		: undefined;
 
 	return (
 		<form
 			className="flex flex-col gap-6"
-			onSubmit={(event) => event.preventDefault()}
+			onSubmit={(event) => {
+				event.preventDefault();
+				form.handleSubmit();
+			}}
 		>
 			<KycSectionHeader
 				title="Authorized Signature"
 				description="Provide your authorized signature."
 			/>
 
-			<KycFormField id="signatoryName" label="Full Name" required>
-				<Input
-					id="signatoryName"
-					placeholder="Enter the full name of the authorized signatory"
-				/>
-			</KycFormField>
+			<FieldGroup>
+				<form.Field name="fullName">
+					{(field) => (
+						<Field data-invalid={field.state.meta.errors.length > 0}>
+							<FieldLabel htmlFor="signatoryName">
+								Full Name <span className="text-destructive">*</span>
+							</FieldLabel>
+							<Input
+								id="signatoryName"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+								placeholder="Enter the full name of the authorized signatory"
+								disabled={isReadOnly}
+							/>
+							<FieldError errors={field.state.meta.errors} />
+						</Field>
+					)}
+				</form.Field>
 
-			<KycFormField id="signatoryPosition" label="Position Title" required>
-				<Input
-					id="signatoryPosition"
-					placeholder="Enter the position title of the authorized signatory"
-				/>
-			</KycFormField>
+				<form.Field name="positionTitle">
+					{(field) => (
+						<Field data-invalid={field.state.meta.errors.length > 0}>
+							<FieldLabel htmlFor="signatoryPosition">
+								Position Title <span className="text-destructive">*</span>
+							</FieldLabel>
+							<Input
+								id="signatoryPosition"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+								placeholder="Enter the position title of the authorized signatory"
+								disabled={isReadOnly}
+							/>
+							<FieldError errors={field.state.meta.errors} />
+						</Field>
+					)}
+				</form.Field>
 
-			<KycFormField id="signatureDate" label="Date" required>
-				<KycDatePicker
-					id="signatureDate"
-					value={signatureDate}
-					onChange={(date) => date && setSignatureDate(date)}
-				/>
-			</KycFormField>
+				<form.Field name="date">
+					{(field) => (
+						<Field data-invalid={field.state.meta.errors.length > 0}>
+							<FieldLabel htmlFor="signatureDate">
+								Date <span className="text-destructive">*</span>
+							</FieldLabel>
+							<KycDatePicker
+								id="signatureDate"
+								value={signatureDate}
+								onChange={(date) =>
+									field.handleChange(date ? format(date, "yyyy-MM-dd") : "")
+								}
+								disabled={isReadOnly}
+							/>
+							<FieldError errors={field.state.meta.errors} />
+						</Field>
+					)}
+				</form.Field>
 
-			<KycFormField id="signatureMethod" label="Signature Method" required>
-				<Select
-					value={signatureMethod}
-					onValueChange={(value) =>
-						setSignatureMethod(value as (typeof SIGNATURE_METHODS)[number])
-					}
-				>
-					<SelectTrigger id="signatureMethod" className="w-full">
-						<SelectValue />
-					</SelectTrigger>
-					<SelectContent>
-						{SIGNATURE_METHODS.map((method) => (
-							<SelectItem key={method} value={method}>
-								{method}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-			</KycFormField>
+				<form.Field name="signature">
+					{(field) => (
+						<Field data-invalid={field.state.meta.errors.length > 0}>
+							<FieldLabel htmlFor="signature">
+								Signature <span className="text-destructive">*</span>
+							</FieldLabel>
+							<Input
+								id="signature"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+								placeholder="Type your signature (e.g., John Smith)"
+								className="font-[family-name:var(--font-signature,cursive)] text-lg italic"
+								disabled={isReadOnly}
+							/>
+							<FieldError errors={field.state.meta.errors} />
+						</Field>
+					)}
+				</form.Field>
+			</FieldGroup>
 
-			<KycFormField
-				label="Signature"
-				required
-				description="Please provide your signature using the selected method"
-			>
-				{signatureMethod === "Type Signature" ? (
-					<Input
-						placeholder="Type your signature (e.g., John Smith)"
-						className="font-[family-name:var(--font-signature,cursive)] text-lg italic"
-					/>
-				) : (
-					<KycFileUpload
-						value={signatureFiles}
-						onValueChange={setSignatureFiles}
-						accept="image/*,.pdf"
-						multiple={false}
-					/>
-				)}
-			</KycFormField>
-
-			<KycSaveButton />
+			{!isReadOnly && <KycSaveButton isSaving={isSaving} />}
 		</form>
 	);
 }

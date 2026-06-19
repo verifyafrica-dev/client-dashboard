@@ -1,3 +1,10 @@
+import { useForm } from "@tanstack/react-form";
+import { useEffect } from "react";
+
+import {
+	KycPrimaryContactFormSchema,
+	type KycPrimaryContactFormValues,
+} from "#/api/http/v1/kyc/kyc.types";
 import {
 	Select,
 	SelectContent,
@@ -6,74 +13,161 @@ import {
 	SelectValue,
 } from "#/components/ui/select";
 import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
+import { KYC_CONTACT_POSITIONS } from "../-constants";
+import { SECTION_NAMES } from "../-data";
+import { useKyc } from "./kyc-provider";
+import {
 	Input,
-	KycFormField,
 	KycFormGrid,
 	KycSaveButton,
 	KycSectionHeader,
 } from "./kyc-form-primitives";
 
-const POSITIONS = [
-	"Chief Executive Officer (CEO)",
-	"Chief Financial Officer (CFO)",
-	"Chief Operating Officer (COO)",
-	"Managing Director",
-	"Director",
-	"Company Secretary",
-	"Other",
-];
+function getDefaultValues(
+	kycData: ReturnType<typeof useKyc>["kycData"],
+): KycPrimaryContactFormValues {
+	return {
+		name: kycData.company.primaryContact?.name ?? "",
+		position: kycData.company.primaryContact?.position ?? "",
+		email: kycData.company.primaryContact?.email ?? "",
+		phone: kycData.company.primaryContact?.phone ?? "",
+	};
+}
 
 export function PrimaryContactForm() {
+	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+
+	const form = useForm({
+		defaultValues: getDefaultValues(kycData),
+		validators: {
+			onSubmit: KycPrimaryContactFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			await saveCompliance(
+				(current) => ({
+					...current,
+					company: {
+						...current.company,
+						primaryContact: value,
+					},
+				}),
+				{ currentSection: SECTION_NAMES.PRIMARY_CONTACT },
+			);
+		},
+	});
+
+	useEffect(() => {
+		form.reset(getDefaultValues(kycData));
+	}, [form, kycData]);
+
 	return (
 		<form
 			className="flex flex-col gap-6"
-			onSubmit={(event) => event.preventDefault()}
+			onSubmit={(event) => {
+				event.preventDefault();
+				form.handleSubmit();
+			}}
 		>
 			<KycSectionHeader
 				title="Primary Contact"
 				description="Provide your primary contact details."
 			/>
 
-			<KycFormField id="contactName" label="Name" required>
-				<Input
-					id="contactName"
-					placeholder="Enter the primary contact's full name"
-				/>
-			</KycFormField>
+			<FieldGroup>
+				<form.Field name="name">
+					{(field) => (
+						<Field data-invalid={field.state.meta.errors.length > 0}>
+							<FieldLabel htmlFor="contactName">
+								Name <span className="text-destructive">*</span>
+							</FieldLabel>
+							<Input
+								id="contactName"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+								placeholder="Enter the primary contact's full name"
+								disabled={isReadOnly}
+							/>
+							<FieldError errors={field.state.meta.errors} />
+						</Field>
+					)}
+				</form.Field>
 
-			<KycFormField id="contactPosition" label="Position" required>
-				<Select>
-					<SelectTrigger id="contactPosition" className="w-full">
-						<SelectValue placeholder="Select position" />
-					</SelectTrigger>
-					<SelectContent>
-						{POSITIONS.map((position) => (
-							<SelectItem key={position} value={position}>
-								{position}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
-			</KycFormField>
+				<form.Field name="position">
+					{(field) => (
+						<Field data-invalid={field.state.meta.errors.length > 0}>
+							<FieldLabel htmlFor="contactPosition">
+								Position <span className="text-destructive">*</span>
+							</FieldLabel>
+							<Select
+								value={field.state.value}
+								onValueChange={field.handleChange}
+								disabled={isReadOnly}
+							>
+								<SelectTrigger id="contactPosition" className="w-full">
+									<SelectValue placeholder="Select position" />
+								</SelectTrigger>
+								<SelectContent>
+									{KYC_CONTACT_POSITIONS.map((position) => (
+										<SelectItem key={position} value={position}>
+											{position}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+							<FieldError errors={field.state.meta.errors} />
+						</Field>
+					)}
+				</form.Field>
 
-			<KycFormGrid>
-				<KycFormField id="contactEmail" label="Email" required>
-					<Input
-						id="contactEmail"
-						type="email"
-						placeholder="Enter the primary contact's email address"
-					/>
-				</KycFormField>
-				<KycFormField id="contactPhone" label="Phone" required>
-					<Input
-						id="contactPhone"
-						type="tel"
-						placeholder="Enter the primary contact's phone number"
-					/>
-				</KycFormField>
-			</KycFormGrid>
+				<KycFormGrid>
+					<form.Field name="email">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="contactEmail">
+									Email <span className="text-destructive">*</span>
+								</FieldLabel>
+								<Input
+									id="contactEmail"
+									type="email"
+									value={field.state.value}
+									onBlur={field.handleBlur}
+									onChange={(event) => field.handleChange(event.target.value)}
+									placeholder="Enter the primary contact's email address"
+									disabled={isReadOnly}
+								/>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+					<form.Field name="phone">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="contactPhone">
+									Phone <span className="text-destructive">*</span>
+								</FieldLabel>
+								<Input
+									id="contactPhone"
+									type="tel"
+									value={field.state.value}
+									onBlur={field.handleBlur}
+									onChange={(event) => field.handleChange(event.target.value)}
+									placeholder="+2348012345678"
+									disabled={isReadOnly}
+								/>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+				</KycFormGrid>
+			</FieldGroup>
 
-			<KycSaveButton />
+			{!isReadOnly && <KycSaveButton isSaving={isSaving} />}
 		</form>
 	);
 }

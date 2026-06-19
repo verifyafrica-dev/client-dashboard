@@ -1,4 +1,20 @@
-import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { format } from "date-fns";
+import { useEffect } from "react";
+
+import {
+	KycBasicInformationFormSchema,
+	type KycBasicInformationFormValues,
+	normalizeWebsiteUrl,
+} from "#/api/http/v1/kyc/kyc.types";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
+import { SECTION_NAMES } from "../-data";
+import { useKyc } from "./kyc-provider";
 import {
 	CountrySelect,
 	Input,
@@ -11,117 +27,328 @@ import {
 	Textarea,
 } from "./kyc-form-primitives";
 
+function getDefaultValues(
+	kycData: ReturnType<typeof useKyc>["kycData"],
+): KycBasicInformationFormValues {
+	return {
+		legalName: kycData.company.legalName ?? "",
+		tradingName: kycData.company.tradingName ?? "",
+		countryOfIncorporation: kycData.company.countryOfIncorporation ?? "",
+		registrationNumber: kycData.company.registrationNumber ?? "",
+		dateOfIncorporation: kycData.company.dateOfIncorporation ?? "",
+		registeredAddress: kycData.company.registeredAddress?.address ?? "",
+		registeredPostalCode: kycData.company.registeredAddress?.postalCode ?? "",
+		registeredCountry: kycData.company.registeredAddress?.country ?? "",
+		businessAddress: kycData.company.businessAddress?.address ?? "",
+		businessPostalCode: kycData.company.businessAddress?.postalCode ?? "",
+		businessCountry: kycData.company.businessAddress?.country ?? "",
+		website: kycData.company.website ?? "",
+		taxIdVatNumber: kycData.company.taxIdVatNumber ?? "",
+	};
+}
+
 export function BasicInformationForm() {
-	const [incorporationDate, setIncorporationDate] = useState<Date>();
+	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+
+	const form = useForm({
+		defaultValues: getDefaultValues(kycData),
+		validators: {
+			onSubmit: KycBasicInformationFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			await saveCompliance(
+				(current) => ({
+					...current,
+					company: {
+						...current.company,
+						legalName: value.legalName,
+						tradingName: value.tradingName,
+						countryOfIncorporation: value.countryOfIncorporation,
+						registrationNumber: value.registrationNumber,
+						dateOfIncorporation: value.dateOfIncorporation,
+						registeredAddress: {
+							address: value.registeredAddress,
+							postalCode: value.registeredPostalCode,
+							country: value.registeredCountry,
+						},
+						businessAddress:
+							value.businessAddress ||
+							value.businessPostalCode ||
+							value.businessCountry
+								? {
+										address: value.businessAddress ?? "",
+										postalCode: value.businessPostalCode ?? "",
+										country: value.businessCountry ?? "",
+									}
+								: undefined,
+						website: normalizeWebsiteUrl(value.website),
+						taxIdVatNumber: value.taxIdVatNumber,
+					},
+				}),
+				{ currentSection: SECTION_NAMES.BASIC_INFORMATION },
+			);
+		},
+	});
+
+	useEffect(() => {
+		form.reset(getDefaultValues(kycData));
+	}, [form, kycData]);
+
+	const incorporationDate = form.state.values.dateOfIncorporation
+		? new Date(form.state.values.dateOfIncorporation)
+		: undefined;
 
 	return (
 		<form
 			className="flex flex-col gap-6"
-			onSubmit={(event) => event.preventDefault()}
+			onSubmit={(event) => {
+				event.preventDefault();
+				form.handleSubmit();
+			}}
 		>
 			<KycSectionHeader
 				title="Basic Information"
 				description="Provide your basic information to get started."
 			/>
 
-			<KycFormGrid>
-				<KycFormField id="legalName" label="Legal Name" required>
-					<Input
-						id="legalName"
-						placeholder="Enter the official legal name of the company"
-					/>
-				</KycFormField>
-				<KycFormField id="tradingName" label="Trading Name">
-					<Input
-						id="tradingName"
-						placeholder="Enter trading or doing business as name"
-					/>
-				</KycFormField>
-			</KycFormGrid>
+			<FieldGroup>
+				<KycFormGrid>
+					<form.Field name="legalName">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="legalName">
+									Legal Name <span className="text-destructive">*</span>
+								</FieldLabel>
+								<Input
+									id="legalName"
+									value={field.state.value}
+									onBlur={field.handleBlur}
+									onChange={(event) => field.handleChange(event.target.value)}
+									placeholder="Enter the official legal name of the company"
+									disabled={isReadOnly}
+									aria-invalid={field.state.meta.errors.length > 0}
+								/>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+					<form.Field name="tradingName">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="tradingName">Trading Name</FieldLabel>
+								<Input
+									id="tradingName"
+									value={field.state.value}
+									onBlur={field.handleBlur}
+									onChange={(event) => field.handleChange(event.target.value)}
+									placeholder="Enter trading or doing business as name"
+									disabled={isReadOnly}
+								/>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+				</KycFormGrid>
+
+				<KycFormGrid>
+					<form.Field name="countryOfIncorporation">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="countryOfIncorporation">
+									Country of Incorporation{" "}
+									<span className="text-destructive">*</span>
+								</FieldLabel>
+								<CountrySelect
+									id="countryOfIncorporation"
+									value={field.state.value}
+									onValueChange={field.handleChange}
+									disabled={isReadOnly}
+								/>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+					<form.Field name="registrationNumber">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="registrationNumber">
+									Registration Number{" "}
+									<span className="text-destructive">*</span>
+								</FieldLabel>
+								<Input
+									id="registrationNumber"
+									value={field.state.value}
+									onBlur={field.handleBlur}
+									onChange={(event) => field.handleChange(event.target.value)}
+									placeholder="Enter company registration number"
+									disabled={isReadOnly}
+								/>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+				</KycFormGrid>
+
+				<KycFormGrid>
+					<form.Field name="dateOfIncorporation">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="dateOfIncorporation">
+									Date of Incorporation{" "}
+									<span className="text-destructive">*</span>
+								</FieldLabel>
+								<KycDatePicker
+									id="dateOfIncorporation"
+									value={incorporationDate}
+									onChange={(date) =>
+										field.handleChange(
+											date ? format(date, "yyyy-MM-dd") : "",
+										)
+									}
+									disabled={isReadOnly}
+								/>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+					<form.Field name="website">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="website">Website</FieldLabel>
+								<Input
+									id="website"
+									type="url"
+									value={field.state.value}
+									onBlur={field.handleBlur}
+									onChange={(event) => field.handleChange(event.target.value)}
+									placeholder="https://example.com"
+									disabled={isReadOnly}
+								/>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+				</KycFormGrid>
+			</FieldGroup>
+
+			<KycFormSeparator />
+
+			<form.Field name="registeredAddress">
+				{(field) => (
+					<Field data-invalid={field.state.meta.errors.length > 0}>
+						<FieldLabel htmlFor="registeredAddress">
+							Registered Address <span className="text-destructive">*</span>
+						</FieldLabel>
+						<Textarea
+							id="registeredAddress"
+							value={field.state.value}
+							onBlur={field.handleBlur}
+							onChange={(event) => field.handleChange(event.target.value)}
+							placeholder="Enter the complete registered address including street and city"
+							rows={3}
+							disabled={isReadOnly}
+						/>
+						<FieldError errors={field.state.meta.errors} />
+					</Field>
+				)}
+			</form.Field>
 
 			<KycFormGrid>
-				<KycFormField
-					id="countryOfIncorporation"
-					label="Country of Incorporation"
-					required
-				>
-					<CountrySelect id="countryOfIncorporation" />
-				</KycFormField>
-				<KycFormField
-					id="registrationNumber"
-					label="Registration Number"
-					required
-				>
-					<Input
-						id="registrationNumber"
-						placeholder="Enter company registration number"
-					/>
-				</KycFormField>
-			</KycFormGrid>
-
-			<KycFormGrid>
-				<KycFormField
-					id="dateOfIncorporation"
-					label="Date of Incorporation"
-					required
-				>
-					<KycDatePicker
-						id="dateOfIncorporation"
-						value={incorporationDate}
-						onChange={setIncorporationDate}
-					/>
-				</KycFormField>
-				<KycFormField id="website" label="Website">
-					<Input id="website" placeholder="https://example.com" type="url" />
-				</KycFormField>
+				<form.Field name="registeredPostalCode">
+					{(field) => (
+						<KycFormField id="registeredPostalCode" label="Postal Code" required>
+							<Input
+								id="registeredPostalCode"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+								placeholder="Enter postal code"
+								disabled={isReadOnly}
+							/>
+							<FieldError errors={field.state.meta.errors} />
+						</KycFormField>
+					)}
+				</form.Field>
+				<form.Field name="registeredCountry">
+					{(field) => (
+						<KycFormField id="registeredCountry" label="Country" required>
+							<CountrySelect
+								id="registeredCountry"
+								value={field.state.value}
+								onValueChange={field.handleChange}
+								disabled={isReadOnly}
+							/>
+							<FieldError errors={field.state.meta.errors} />
+						</KycFormField>
+					)}
+				</form.Field>
 			</KycFormGrid>
 
 			<KycFormSeparator />
 
-			<KycFormField id="registeredAddress" label="Registered Address" required>
-				<Textarea
-					id="registeredAddress"
-					placeholder="Enter the complete registered address including street and city"
-					rows={3}
-				/>
-			</KycFormField>
+			<form.Field name="businessAddress">
+				{(field) => (
+					<Field data-invalid={field.state.meta.errors.length > 0}>
+						<FieldLabel htmlFor="businessAddress">Business Address</FieldLabel>
+						<Textarea
+							id="businessAddress"
+							value={field.state.value}
+							onBlur={field.handleBlur}
+							onChange={(event) => field.handleChange(event.target.value)}
+							placeholder="Enter the complete business address including street and city"
+							rows={3}
+							disabled={isReadOnly}
+						/>
+						<FieldError errors={field.state.meta.errors} />
+					</Field>
+				)}
+			</form.Field>
 
 			<KycFormGrid>
-				<KycFormField id="registeredPostalCode" label="Postal Code" required>
-					<Input id="registeredPostalCode" placeholder="Enter postal code" />
-				</KycFormField>
-				<KycFormField id="registeredCountry" label="Country" required>
-					<CountrySelect id="registeredCountry" />
-				</KycFormField>
+				<form.Field name="businessPostalCode">
+					{(field) => (
+						<KycFormField id="businessPostalCode" label="Postal Code">
+							<Input
+								id="businessPostalCode"
+								value={field.state.value ?? ""}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+								placeholder="Enter postal code"
+								disabled={isReadOnly}
+							/>
+						</KycFormField>
+					)}
+				</form.Field>
+				<form.Field name="businessCountry">
+					{(field) => (
+						<KycFormField id="businessCountry" label="Country">
+							<CountrySelect
+								id="businessCountry"
+								value={field.state.value}
+								onValueChange={field.handleChange}
+								disabled={isReadOnly}
+							/>
+						</KycFormField>
+					)}
+				</form.Field>
 			</KycFormGrid>
 
-			<KycFormSeparator />
+			<form.Field name="taxIdVatNumber">
+				{(field) => (
+					<KycFormField id="taxIdVatNumber" label="Tax ID / VAT Number">
+						<Input
+							id="taxIdVatNumber"
+							value={field.state.value}
+							onBlur={field.handleBlur}
+							onChange={(event) => field.handleChange(event.target.value)}
+							placeholder="Enter tax identification or VAT number"
+							disabled={isReadOnly}
+						/>
+					</KycFormField>
+				)}
+			</form.Field>
 
-			<KycFormField id="businessAddress" label="Business Address">
-				<Textarea
-					id="businessAddress"
-					placeholder="Enter the complete business address including street and city"
-					rows={3}
-				/>
-			</KycFormField>
-
-			<KycFormGrid>
-				<KycFormField id="businessPostalCode" label="Postal Code">
-					<Input id="businessPostalCode" placeholder="Enter postal code" />
-				</KycFormField>
-				<KycFormField id="businessCountry" label="Country">
-					<CountrySelect id="businessCountry" />
-				</KycFormField>
-			</KycFormGrid>
-
-			<KycFormField id="taxId" label="Tax ID / VAT Number">
-				<Input
-					id="taxId"
-					placeholder="Enter tax identification or VAT number"
-				/>
-			</KycFormField>
-
-			<KycSaveButton />
+			{!isReadOnly && <KycSaveButton isSaving={isSaving} />}
 		</form>
 	);
 }

@@ -96,13 +96,21 @@ export function KycFormSeparator() {
 export function KycSaveButton({
 	label = "Save Changes",
 	className,
+	disabled,
+	isSaving,
 }: {
 	label?: string;
 	className?: string;
+	disabled?: boolean;
+	isSaving?: boolean;
 }) {
 	return (
-		<Button type="submit" className={cn("uppercase tracking-wide", className)}>
-			{label}
+		<Button
+			type="submit"
+			className={cn("cursor-pointer uppercase tracking-wide", className)}
+			disabled={disabled || isSaving}
+		>
+			{isSaving ? "Saving..." : label}
 		</Button>
 	);
 }
@@ -112,14 +120,16 @@ export function CountrySelect({
 	value,
 	onValueChange,
 	placeholder = "Select country",
+	disabled,
 }: {
 	id?: string;
 	value?: string;
 	onValueChange?: (value: string) => void;
 	placeholder?: string;
+	disabled?: boolean;
 }) {
 	return (
-		<Select value={value} onValueChange={onValueChange}>
+		<Select value={value} onValueChange={onValueChange} disabled={disabled}>
 			<SelectTrigger id={id} className="w-full">
 				<SelectValue placeholder={placeholder} />
 			</SelectTrigger>
@@ -139,11 +149,13 @@ export function KycDatePicker({
 	value,
 	onChange,
 	placeholder = "dd/mm/yyyy",
+	disabled,
 }: {
 	id?: string;
 	value?: Date;
 	onChange?: (date: Date | undefined) => void;
 	placeholder?: string;
+	disabled?: boolean;
 }) {
 	const [open, setOpen] = useState(false);
 
@@ -152,7 +164,9 @@ export function KycDatePicker({
 			<PopoverTrigger asChild>
 				<Button
 					id={id}
+					type="button"
 					variant="outline"
+					disabled={disabled}
 					className={cn(
 						"w-full justify-between font-normal",
 						!value && "text-muted-foreground",

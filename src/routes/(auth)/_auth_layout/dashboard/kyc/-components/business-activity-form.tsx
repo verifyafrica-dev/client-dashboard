@@ -1,6 +1,11 @@
-import { InfoIcon, PlusIcon } from "@phosphor-icons/react";
-import { useState } from "react";
-import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
+import { PlusIcon } from "@phosphor-icons/react";
+import { useForm } from "@tanstack/react-form";
+import { useEffect } from "react";
+
+import {
+	KycBusinessActivityFormSchema,
+	type KycBusinessActivityFormValues,
+} from "#/api/http/v1/kyc/kyc.types";
 import { Button } from "#/components/ui/button";
 import {
 	Select,
@@ -10,168 +15,291 @@ import {
 	SelectValue,
 } from "#/components/ui/select";
 import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
+import {
+	KYC_CLIENT_GEOGRAPHIES,
+	KYC_VERIFICATION_VOLUMES,
+} from "../-constants";
+import { SECTION_NAMES } from "../-data";
+import { useKyc } from "./kyc-provider";
+import {
 	CountrySelect,
 	Input,
 	KycEntryCard,
-	KycFormField,
 	KycFormGrid,
 	KycSaveButton,
 	KycSectionHeader,
 	Textarea,
 } from "./kyc-form-primitives";
 
-const VERIFICATION_VOLUMES = [
-	"0 - 1,000",
-	"1,001 - 10,000",
-	"10,001 - 50,000",
-	"50,001 - 100,000",
-	"100,000+",
-];
+function getDefaultValues(
+	kycData: ReturnType<typeof useKyc>["kycData"],
+): KycBusinessActivityFormValues {
+	const activity = kycData.company.businessActivity;
 
-const CLIENT_GEOGRAPHIES = [
-	"Nigeria",
-	"West Africa",
-	"Sub-Saharan Africa",
-	"Africa",
-	"Global",
-];
-
-type LicenseEntry = {
-	id: string;
-};
-
-function createLicense(): LicenseEntry {
-	return { id: crypto.randomUUID() };
+	return {
+		natureOfBusiness: activity.natureOfBusiness ?? "",
+		descriptionOfProductsServices: activity.descriptionOfProductsServices ?? "",
+		expectedMonthlyVerificationVolume:
+			activity.expectedMonthlyVerificationVolume ?? "",
+		mainGeographiesOfClients: activity.mainGeographiesOfClients?.length
+			? activity.mainGeographiesOfClients
+			: [],
+		regulatoryLicensesHeld: activity.regulatoryLicensesHeld ?? [],
+	};
 }
 
 export function BusinessActivityForm() {
-	const [licenses, setLicenses] = useState<LicenseEntry[]>([]);
+	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+
+	const form = useForm({
+		defaultValues: getDefaultValues(kycData),
+		validators: {
+			onSubmit: KycBusinessActivityFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			await saveCompliance(
+				(current) => ({
+					...current,
+					company: {
+						...current.company,
+						businessActivity: {
+							natureOfBusiness: value.natureOfBusiness,
+							descriptionOfProductsServices: value.descriptionOfProductsServices,
+							expectedMonthlyVerificationVolume:
+								value.expectedMonthlyVerificationVolume,
+							mainGeographiesOfClients: value.mainGeographiesOfClients,
+							regulatoryLicensesHeld: value.regulatoryLicensesHeld,
+						},
+					},
+				}),
+				{ currentSection: SECTION_NAMES.BUSINESS_ACTIVITY },
+			);
+		},
+	});
+
+	useEffect(() => {
+		form.reset(getDefaultValues(kycData));
+	}, [form, kycData]);
+
+	const selectedGeography = form.state.values.mainGeographiesOfClients[0] ?? "";
 
 	return (
 		<form
 			className="flex flex-col gap-6"
-			onSubmit={(event) => event.preventDefault()}
+			onSubmit={(event) => {
+				event.preventDefault();
+				form.handleSubmit();
+			}}
 		>
 			<KycSectionHeader
 				title="Business Activity"
 				description="Provide your business activity details."
 			/>
 
-			<KycFormField id="natureOfBusiness" label="Nature of Business" required>
-				<Input
-					id="natureOfBusiness"
-					placeholder="Describe the nature of your business (e.g., retail, manufacturing, services)"
-				/>
-			</KycFormField>
+			<FieldGroup>
+				<form.Field name="natureOfBusiness">
+					{(field) => (
+						<Field data-invalid={field.state.meta.errors.length > 0}>
+							<FieldLabel htmlFor="natureOfBusiness">
+								Nature of Business <span className="text-destructive">*</span>
+							</FieldLabel>
+							<Input
+								id="natureOfBusiness"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+								disabled={isReadOnly}
+							/>
+							<FieldError errors={field.state.meta.errors} />
+						</Field>
+					)}
+				</form.Field>
 
-			<KycFormField
-				id="productsDescription"
-				label="Description of Products/Services"
-				required
-			>
-				<Textarea
-					id="productsDescription"
-					placeholder="Provide detailed description of your products or services"
-					rows={4}
-				/>
-			</KycFormField>
+				<form.Field name="descriptionOfProductsServices">
+					{(field) => (
+						<Field data-invalid={field.state.meta.errors.length > 0}>
+							<FieldLabel htmlFor="productsDescription">
+								Description of Products/Services{" "}
+								<span className="text-destructive">*</span>
+							</FieldLabel>
+							<Textarea
+								id="productsDescription"
+								value={field.state.value}
+								onBlur={field.handleBlur}
+								onChange={(event) => field.handleChange(event.target.value)}
+								rows={4}
+								disabled={isReadOnly}
+							/>
+							<FieldError errors={field.state.meta.errors} />
+						</Field>
+					)}
+				</form.Field>
 
-			<KycFormGrid>
-				<KycFormField
-					id="verificationVolume"
-					label="Expected Monthly Verification Volume"
-					required
-				>
-					<Select>
-						<SelectTrigger id="verificationVolume" className="w-full">
-							<SelectValue placeholder="Select volume range" />
-						</SelectTrigger>
-						<SelectContent>
-							{VERIFICATION_VOLUMES.map((volume) => (
-								<SelectItem key={volume} value={volume}>
-									{volume}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</KycFormField>
-				<KycFormField
-					id="clientGeographies"
-					label="Main Geographies of Clients"
-					required
-				>
-					<Select>
-						<SelectTrigger id="clientGeographies" className="w-full">
-							<SelectValue placeholder="Select geography" />
-						</SelectTrigger>
-						<SelectContent>
-							{CLIENT_GEOGRAPHIES.map((geography) => (
-								<SelectItem key={geography} value={geography}>
-									{geography}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</KycFormField>
-			</KycFormGrid>
+				<KycFormGrid>
+					<form.Field name="expectedMonthlyVerificationVolume">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="verificationVolume">
+									Expected Monthly Verification Volume{" "}
+									<span className="text-destructive">*</span>
+								</FieldLabel>
+								<Select
+									value={field.state.value}
+									onValueChange={field.handleChange}
+									disabled={isReadOnly}
+								>
+									<SelectTrigger id="verificationVolume" className="w-full">
+										<SelectValue placeholder="Select volume range" />
+									</SelectTrigger>
+									<SelectContent>
+										{KYC_VERIFICATION_VOLUMES.map((volume) => (
+											<SelectItem key={volume} value={volume}>
+												{volume}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
 
-			<section className="space-y-4">
-				<div className="flex flex-wrap items-center justify-between gap-3">
-					<h3 className="text-base font-semibold">Regulatory Licenses Held</h3>
-					<Button
-						type="button"
-						variant="outline"
-						size="sm"
-						className="uppercase tracking-wide"
-						onClick={() =>
-							setLicenses((current) => [...current, createLicense()])
-						}
-					>
-						<PlusIcon className="size-4" weight="bold" />
-						Add License
-					</Button>
-				</div>
+					<form.Field name="mainGeographiesOfClients">
+						{(field) => (
+							<Field data-invalid={field.state.meta.errors.length > 0}>
+								<FieldLabel htmlFor="clientGeographies">
+									Main Geographies of Clients{" "}
+									<span className="text-destructive">*</span>
+								</FieldLabel>
+								<Select
+									value={selectedGeography}
+									onValueChange={(value) => field.handleChange([value])}
+									disabled={isReadOnly}
+								>
+									<SelectTrigger id="clientGeographies" className="w-full">
+										<SelectValue placeholder="Select geography" />
+									</SelectTrigger>
+									<SelectContent>
+										{KYC_CLIENT_GEOGRAPHIES.map((geography) => (
+											<SelectItem key={geography} value={geography}>
+												{geography}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+				</KycFormGrid>
+			</FieldGroup>
 
-				{licenses.length === 0 ? (
-					<Alert className="border-sky-200 bg-sky-50 text-sky-950">
-						<InfoIcon className="size-4 text-sky-600" weight="fill" />
-						<AlertTitle className="text-sky-950">
-							No regulatory licenses added yet
-						</AlertTitle>
-						<AlertDescription className="text-sky-800">
-							Click &quot;Add License&quot; to add one.
-						</AlertDescription>
-					</Alert>
-				) : (
-					licenses.map((license, index) => (
-						<KycEntryCard
-							key={license.id}
-							title={`License ${index + 1}`}
-							onRemove={() =>
-								setLicenses((current) =>
-									current.filter((item) => item.id !== license.id),
-								)
-							}
-						>
-							<div className="space-y-4">
-								<KycFormField label="License Name" required>
-									<Input placeholder="e.g., Payment Service Provider License" />
-								</KycFormField>
-								<KycFormGrid>
-									<KycFormField label="License Number" required>
-										<Input placeholder="e.g., PSP-2023-001" />
-									</KycFormField>
-									<KycFormField label="Country" required>
-										<CountrySelect />
-									</KycFormField>
-								</KycFormGrid>
-							</div>
-						</KycEntryCard>
-					))
+			<form.Field name="regulatoryLicensesHeld" mode="array">
+				{(licensesField) => (
+					<section className="space-y-4">
+						<div className="flex flex-wrap items-center justify-between gap-3">
+							<h3 className="text-base font-semibold">Regulatory Licenses Held</h3>
+							{!isReadOnly && (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									className="uppercase tracking-wide"
+									onClick={() =>
+										licensesField.pushValue({
+											license_name: "",
+											license_number: "",
+											country: "",
+										})
+									}
+								>
+									<PlusIcon className="size-4" weight="bold" />
+									Add License
+								</Button>
+							)}
+						</div>
+
+						{licensesField.state.value.map((_, index) => (
+							<KycEntryCard
+								key={`license-${index}`}
+								title={`License ${index + 1}`}
+								onRemove={
+									!isReadOnly
+										? () => licensesField.removeValue(index)
+										: undefined
+								}
+							>
+								<div className="space-y-4">
+									<form.Field
+										name={`regulatoryLicensesHeld[${index}].license_name`}
+									>
+										{(field) => (
+											<Field data-invalid={field.state.meta.errors.length > 0}>
+												<FieldLabel>License Name</FieldLabel>
+												<Input
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(event) =>
+														field.handleChange(event.target.value)
+													}
+													disabled={isReadOnly}
+												/>
+												<FieldError errors={field.state.meta.errors} />
+											</Field>
+										)}
+									</form.Field>
+									<KycFormGrid>
+										<form.Field
+											name={`regulatoryLicensesHeld[${index}].license_number`}
+										>
+											{(field) => (
+												<Field
+													data-invalid={field.state.meta.errors.length > 0}
+												>
+													<FieldLabel>License Number</FieldLabel>
+													<Input
+														value={field.state.value}
+														onBlur={field.handleBlur}
+														onChange={(event) =>
+															field.handleChange(event.target.value)
+														}
+														disabled={isReadOnly}
+													/>
+													<FieldError errors={field.state.meta.errors} />
+												</Field>
+											)}
+										</form.Field>
+										<form.Field
+											name={`regulatoryLicensesHeld[${index}].country`}
+										>
+											{(field) => (
+												<Field
+													data-invalid={field.state.meta.errors.length > 0}
+												>
+													<FieldLabel>Country</FieldLabel>
+													<CountrySelect
+														value={field.state.value}
+														onValueChange={field.handleChange}
+														disabled={isReadOnly}
+													/>
+													<FieldError errors={field.state.meta.errors} />
+												</Field>
+											)}
+										</form.Field>
+									</KycFormGrid>
+								</div>
+							</KycEntryCard>
+						))}
+					</section>
 				)}
-			</section>
+			</form.Field>
 
-			<KycSaveButton />
+			{!isReadOnly && <KycSaveButton isSaving={isSaving} />}
 		</form>
 	);
 }
