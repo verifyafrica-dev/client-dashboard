@@ -27,7 +27,7 @@ export function ProductDetailPage({ slug }: { slug: ProductSlug }) {
 					<div className="flex size-14 items-center justify-center rounded-md bg-secondary/10 text-secondary">
 						<Icon className="size-7" weight={product.iconWeight} />
 					</div>
-					<div className="space-y-2">
+					<div className="space-y-1.5">
 						<h1 className="text-2xl font-semibold tracking-tight">
 							{product.title}
 						</h1>

@@ -39,8 +39,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { cn } from "#/lib/utils.ts";
 import { useAuthStore } from "#/stores/auth-store";
-import { ExportTransactionsDialog } from "./-components/export-transactions-dialog";
 import { AddCreditsDialog } from "./-components/add-credits-dialog";
+import { ExportTransactionsDialog } from "./-components/export-transactions-dialog";
 import { TransactionDetailsDialog } from "./-components/transaction-details-dialog";
 import { UpdateBillingDialog } from "./-components/update-billing-dialog";
 import {
@@ -542,7 +542,7 @@ function BalanceCardSkeleton() {
 			<CardHeader className="flex flex-row items-start justify-between space-y-0">
 				<div className="space-y-3">
 					<Skeleton className="h-4 w-16" />
-					<div className="space-y-2">
+					<div className="space-y-1.5">
 						<Skeleton className="h-10 w-24" />
 						<Skeleton className="h-4 w-10" />
 					</div>
@@ -563,7 +563,7 @@ function BillingInfoCardSkeleton() {
 				<Skeleton className="size-8 rounded-md" />
 			</CardHeader>
 			<CardContent>
-				<div className="space-y-2">
+				<div className="space-y-1.5">
 					<Skeleton className="h-4 w-16" />
 					<Skeleton className="h-4 w-40" />
 				</div>

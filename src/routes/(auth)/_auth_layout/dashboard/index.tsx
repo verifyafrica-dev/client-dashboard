@@ -203,7 +203,7 @@ function MetricCardSkeleton() {
 		<Card>
 			<CardContent className="flex flex-col gap-3">
 				<Skeleton className="size-10 rounded-xl" />
-				<div className="space-y-2">
+				<div className="space-y-1.5">
 					<Skeleton className="h-8 w-20" />
 					<Skeleton className="h-4 w-36" />
 				</div>

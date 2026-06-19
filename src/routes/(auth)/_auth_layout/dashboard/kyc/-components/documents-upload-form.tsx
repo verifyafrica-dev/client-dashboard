@@ -68,7 +68,7 @@ export function DocumentsUploadForm() {
 
 			<Alert className="border-sky-200 bg-sky-50 text-sky-950">
 				<InfoIcon className="size-4 text-sky-600" weight="fill" />
-				<AlertDescription className="space-y-2 text-sky-900">
+				<AlertDescription className="space-y-1.5 text-sky-900">
 					<p>
 						All document categories are required. You can upload multiple files
 						per category. Accepted formats: Images (JPEG, PNG, GIF) and PDF

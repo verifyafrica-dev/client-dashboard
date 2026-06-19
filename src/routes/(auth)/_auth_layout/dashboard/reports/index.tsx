@@ -234,7 +234,7 @@ function ReportsPage() {
 										<p className="font-semibold">Filters</p>
 									</div>
 									<div className="grid gap-4 md:grid-cols-3">
-										<div className="space-y-2">
+										<div className="space-y-1.5">
 											<Label htmlFor="verification-type-filter">
 												Verification Type
 											</Label>
@@ -262,7 +262,7 @@ function ReportsPage() {
 												</SelectContent>
 											</Select>
 										</div>
-										<div className="space-y-2">
+										<div className="space-y-1.5">
 											<Label htmlFor="status-filter">Status</Label>
 											<Select
 												value={statusFilter}
@@ -285,7 +285,7 @@ function ReportsPage() {
 												</SelectContent>
 											</Select>
 										</div>
-										<div className="space-y-2">
+										<div className="space-y-1.5">
 											<Label htmlFor="country-filter">Country</Label>
 											<Select
 												value={countryFilter}

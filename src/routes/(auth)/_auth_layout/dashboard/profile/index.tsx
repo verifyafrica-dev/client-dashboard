@@ -46,8 +46,8 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from "@/components/ui/field";
-import { getProfileInitials } from "./-data";
 import { BillingInformationSection } from "./-components/billing-information-section";
+import { getProfileInitials } from "./-data";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/profile/")(
 	{
@@ -169,109 +169,109 @@ function UpdateProfileTab({
 					form.handleSubmit();
 				}}
 			>
-			<div className="flex flex-col items-center gap-2 text-center">
-				<Avatar className="size-24">
-					{user.avatar_url ? (
-						<AvatarImage src={user.avatar_url} alt="Profile avatar" />
-					) : null}
-					<AvatarFallback className="bg-muted text-lg text-muted-foreground">
-						{getProfileInitials(user.first_name, user.last_name)}
-					</AvatarFallback>
-				</Avatar>
-				<p className="text-sm text-muted-foreground">
-					Your profile photo is shown across the dashboard
-				</p>
-			</div>
+				<div className="flex flex-col items-center gap-2 text-center">
+					<Avatar className="size-24">
+						{user.avatar_url ? (
+							<AvatarImage src={user.avatar_url} alt="Profile avatar" />
+						) : null}
+						<AvatarFallback className="bg-muted text-lg text-muted-foreground">
+							{getProfileInitials(user.first_name, user.last_name)}
+						</AvatarFallback>
+					</Avatar>
+					<p className="text-sm text-muted-foreground">
+						Your profile photo is shown across the dashboard
+					</p>
+				</div>
 
-			<FieldGroup className="grid gap-4 sm:grid-cols-2">
-				<form.Field name="first_name">
-					{(field) => (
-						<Field
-							className="flex flex-col gap-2"
-							data-invalid={field.state.meta.errors.length > 0}
-						>
-							<FieldLabel htmlFor="first-name">First Name</FieldLabel>
-							<div className="relative">
-								<UserIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-								<Input
-									id="first-name"
-									placeholder="Enter your first name"
-									className="pl-10"
-									value={field.state.value}
-									onBlur={field.handleBlur}
-									onChange={(event) => field.handleChange(event.target.value)}
-									aria-invalid={field.state.meta.errors.length > 0}
-								/>
-							</div>
-							<FieldError errors={field.state.meta.errors} />
-						</Field>
-					)}
-				</form.Field>
+				<FieldGroup className="grid gap-4 sm:grid-cols-2">
+					<form.Field name="first_name">
+						{(field) => (
+							<Field
+								className="flex flex-col gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
+								<FieldLabel htmlFor="first-name">First Name</FieldLabel>
+								<div className="relative">
+									<UserIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+									<Input
+										id="first-name"
+										placeholder="Enter your first name"
+										className="pl-10"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(event) => field.handleChange(event.target.value)}
+										aria-invalid={field.state.meta.errors.length > 0}
+									/>
+								</div>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
 
-				<form.Field name="last_name">
-					{(field) => (
-						<Field
-							className="flex flex-col gap-2"
-							data-invalid={field.state.meta.errors.length > 0}
-						>
-							<FieldLabel htmlFor="last-name">Last Name</FieldLabel>
-							<div className="relative">
-								<UserIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-								<Input
-									id="last-name"
-									placeholder="Enter your last name"
-									className="pl-10"
-									value={field.state.value}
-									onBlur={field.handleBlur}
-									onChange={(event) => field.handleChange(event.target.value)}
-									aria-invalid={field.state.meta.errors.length > 0}
-								/>
-							</div>
-							<FieldError errors={field.state.meta.errors} />
-						</Field>
-					)}
-				</form.Field>
+					<form.Field name="last_name">
+						{(field) => (
+							<Field
+								className="flex flex-col gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
+								<FieldLabel htmlFor="last-name">Last Name</FieldLabel>
+								<div className="relative">
+									<UserIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+									<Input
+										id="last-name"
+										placeholder="Enter your last name"
+										className="pl-10"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(event) => field.handleChange(event.target.value)}
+										aria-invalid={field.state.meta.errors.length > 0}
+									/>
+								</div>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
 
-				<Field className="flex flex-col gap-2">
-					<FieldLabel htmlFor="email">Email Address</FieldLabel>
-					<div className="relative">
-						<EnvelopeSimpleIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-						<Input
-							id="email"
-							type="email"
-							value={user.email}
-							disabled
-							className="pl-10"
-						/>
-					</div>
-				</Field>
-
-				<form.Field name="phone_number">
-					{(field) => (
-						<Field
-							className="flex flex-col gap-2"
-							data-invalid={field.state.meta.errors.length > 0}
-						>
-							<FieldLabel htmlFor="phone">Phone Number</FieldLabel>
-							<PhoneInput
-								id="phone"
-								value={field.state.value}
-								onBlur={field.handleBlur}
-								onChange={field.handleChange}
+					<Field className="flex flex-col gap-2">
+						<FieldLabel htmlFor="email">Email Address</FieldLabel>
+						<div className="relative">
+							<EnvelopeSimpleIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+							<Input
+								id="email"
+								type="email"
+								value={user.email}
+								disabled
+								className="pl-10"
 							/>
-							<FieldError errors={field.state.meta.errors} />
-						</Field>
-					)}
-				</form.Field>
-			</FieldGroup>
+						</div>
+					</Field>
 
-			<Button type="submit" className="w-full" disabled={isSubmitting}>
-				<FloppyDiskIcon
-					className={cn("size-4", isSubmitting && "animate-pulse")}
-					weight="fill"
-				/>
-				{isSubmitting ? "Updating Profile..." : "Update Profile"}
-			</Button>
+					<form.Field name="phone_number">
+						{(field) => (
+							<Field
+								className="flex flex-col gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
+								<FieldLabel htmlFor="phone">Phone Number</FieldLabel>
+								<PhoneInput
+									id="phone"
+									value={field.state.value}
+									onBlur={field.handleBlur}
+									onChange={field.handleChange}
+								/>
+								<FieldError errors={field.state.meta.errors} />
+							</Field>
+						)}
+					</form.Field>
+				</FieldGroup>
+
+				<Button type="submit" className="w-full" disabled={isSubmitting}>
+					<FloppyDiskIcon
+						className={cn("size-4", isSubmitting && "animate-pulse")}
+						weight="fill"
+					/>
+					{isSubmitting ? "Updating Profile..." : "Update Profile"}
+				</Button>
 			</form>
 
 			<BillingInformationSection tenantId={tenantId} />
@@ -341,7 +341,7 @@ function ChangePasswordTab() {
 
 						return (
 							<Field
-								className="flex flex-col gap-2"
+								className="flex flex-col gap-1.5"
 								data-invalid={errors.length > 0}
 							>
 								<FieldLabel htmlFor="old-password">Current Password</FieldLabel>
@@ -355,9 +355,7 @@ function ChangePasswordTab() {
 										className="pr-10 pl-10"
 										value={field.state.value}
 										onBlur={field.handleBlur}
-										onChange={(event) =>
-											field.handleChange(event.target.value)
-										}
+										onChange={(event) => field.handleChange(event.target.value)}
 										aria-invalid={errors.length > 0}
 									/>
 									<Button
@@ -392,7 +390,7 @@ function ChangePasswordTab() {
 
 						return (
 							<Field
-								className="flex flex-col gap-2"
+								className="flex flex-col gap-1.5"
 								data-invalid={errors.length > 0}
 							>
 								<FieldLabel htmlFor="new-password">New Password</FieldLabel>
@@ -406,9 +404,7 @@ function ChangePasswordTab() {
 										className="pr-10 pl-10"
 										value={field.state.value}
 										onBlur={field.handleBlur}
-										onChange={(event) =>
-											field.handleChange(event.target.value)
-										}
+										onChange={(event) => field.handleChange(event.target.value)}
 										aria-invalid={errors.length > 0}
 									/>
 									<Button
@@ -437,7 +433,7 @@ function ChangePasswordTab() {
 				<form.Field name="confirm_password">
 					{(field) => (
 						<Field
-							className="flex flex-col gap-2"
+							className="flex flex-col gap-1.5"
 							data-invalid={field.state.meta.errors.length > 0}
 						>
 							<FieldLabel htmlFor="confirm-password">
@@ -493,18 +489,18 @@ function ChangePasswordTab() {
 function ProfilePageSkeleton() {
 	return (
 		<>
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-1.5">
 				<Skeleton className="h-7 w-40" />
 				<Skeleton className="h-4 w-64" />
 			</div>
 			<Skeleton className="h-10 w-full max-w-md" />
-			<div className="flex flex-col items-center gap-2">
+			<div className="flex flex-col items-center gap-1.5">
 				<Skeleton className="size-24 rounded-full" />
 				<Skeleton className="h-4 w-56" />
 			</div>
 			<div className="grid gap-4 sm:grid-cols-2">
 				{["first", "last", "email", "phone"].map((field) => (
-					<div key={field} className="flex flex-col gap-2">
+					<div key={field} className="flex flex-col gap-1.5">
 						<Skeleton className="h-4 w-24" />
 						<Skeleton className="h-10 w-full" />
 					</div>

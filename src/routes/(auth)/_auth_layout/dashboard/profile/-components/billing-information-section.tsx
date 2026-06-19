@@ -13,17 +13,13 @@ import {
 	usePartialUpdateBillingInformationMutation,
 } from "#/api/http/v1/billing/billing.hooks";
 import type { BillingInformation } from "#/api/http/v1/billing/billing.types";
-import { CountryStateCityFields } from "#/components/ui-extended/country-state-city-fields";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Separator } from "#/components/ui/separator";
 import { Skeleton } from "#/components/ui/skeleton";
+import { CountryStateCityFields } from "#/components/ui-extended/country-state-city-fields";
 import { cn } from "#/lib/utils.ts";
-import {
-	Field,
-	FieldGroup,
-	FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 
 type BillingFormState = {
 	billing_name: string;
@@ -61,11 +57,7 @@ function getFormState(billingInfo?: BillingInformation): BillingFormState {
 	};
 }
 
-export function BillingInformationSection({
-	tenantId,
-}: {
-	tenantId?: string;
-}) {
+export function BillingInformationSection({ tenantId }: { tenantId?: string }) {
 	const billingInformationQuery = useBillingInformationListQuery(
 		{ tenant_id: tenantId },
 		Boolean(tenantId),
@@ -239,7 +231,7 @@ function BillingInformationSectionSkeleton() {
 	return (
 		<div className="flex flex-col gap-6">
 			<Separator />
-			<div className="space-y-2">
+			<div className="space-y-1.5">
 				<Skeleton className="h-5 w-40" />
 				<Skeleton className="h-4 w-72" />
 			</div>

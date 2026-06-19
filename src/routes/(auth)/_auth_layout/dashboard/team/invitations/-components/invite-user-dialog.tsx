@@ -2,12 +2,13 @@ import {
 	EnvelopeSimpleIcon,
 	IdentificationCardIcon,
 } from "@phosphor-icons/react";
-import {
-	type ComponentProps,
-	type ComponentType,
-	useEffect,
-	useState,
-} from "react";
+import { useForm } from "@tanstack/react-form";
+import { type ComponentProps, type ComponentType, useEffect } from "react";
+import { toast } from "sonner";
+
+import { useCreateTenantInvitationMutation } from "#/api/http/v1/tenants/tenants.hooks";
+import type { InvitationCreateFormValues } from "#/api/http/v1/tenants/tenants.types";
+import { InvitationCreateFormSchema } from "#/api/http/v1/tenants/tenants.types";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -17,7 +18,6 @@ import {
 	DialogTitle,
 } from "#/components/ui/dialog";
 import { Input } from "#/components/ui/input";
-import { Label } from "#/components/ui/label";
 import {
 	Select,
 	SelectContent,
@@ -26,10 +26,16 @@ import {
 	SelectValue,
 } from "#/components/ui/select";
 import { cn } from "#/lib/utils.ts";
-import { INVITATION_ROLES, ROLE_LABELS, type TenantUserRole } from "../-data";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
+import { INVITATION_ROLES, ROLE_LABELS } from "../-data";
 
 type InviteUserDialogProps = ComponentProps<typeof Dialog> & {
-	onInvite?: (payload: { email: string; role: TenantUserRole }) => void;
+	tenantId?: string;
 };
 
 function IconField({
@@ -47,7 +53,7 @@ function IconField({
 }) {
 	return (
 		<div className={cn("space-y-2", className)}>
-			<Label htmlFor={id}>{label}</Label>
+			<FieldLabel htmlFor={id}>{label}</FieldLabel>
 			<div className="relative">
 				{Icon && (
 					<Icon className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -61,27 +67,49 @@ function IconField({
 export function InviteUserDialog({
 	open,
 	onOpenChange,
-	onInvite,
+	tenantId,
 }: InviteUserDialogProps) {
-	const [email, setEmail] = useState("");
-	const [role, setRole] = useState<TenantUserRole>("member");
+	const inviteMutation = useCreateTenantInvitationMutation(tenantId ?? "");
 
-	const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+	const form = useForm({
+		defaultValues: {
+			email: "",
+			role: "member",
+		} satisfies InvitationCreateFormValues,
+		validators: {
+			onSubmit: InvitationCreateFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			if (!tenantId) {
+				toast.error("Tenant information is unavailable");
+				return;
+			}
+
+			await inviteMutation.mutateAsync(
+				{
+					email: value.email,
+					role: value.role,
+				},
+				{
+					onSuccess: () => {
+						toast.success("User invitation sent successfully");
+						onOpenChange?.(false);
+					},
+					onError: () => {
+						toast.error("Failed to send invitation. Please try again.");
+					},
+				},
+			);
+		},
+	});
 
 	useEffect(() => {
 		if (!open) {
-			setEmail("");
-			setRole("member");
+			form.reset();
 		}
-	}, [open]);
+	}, [open, form]);
 
-	function handleSubmit(event: React.FormEvent) {
-		event.preventDefault();
-		if (!isValidEmail) return;
-
-		onInvite?.({ email, role });
-		onOpenChange?.(false);
-	}
+	const isSubmitting = inviteMutation.isPending;
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -90,44 +118,82 @@ export function InviteUserDialog({
 					<DialogTitle>Invite New User</DialogTitle>
 				</DialogHeader>
 
-				<form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-					<IconField
-						id="invite-email"
-						label="Email Address"
-						icon={EnvelopeSimpleIcon}
-					>
-						<Input
-							id="invite-email"
-							type="email"
-							placeholder="user@example.com"
-							value={email}
-							onChange={(event) => setEmail(event.target.value)}
-							className="pl-10"
-							required
-						/>
-					</IconField>
+				<form
+					className="flex flex-col gap-4"
+					onSubmit={(event) => {
+						event.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<FieldGroup className="flex flex-col gap-2">
+						<form.Field name="email">
+							{(field) => (
+								<Field
+									className="flex flex-col space-y-1 gap-1"
+									data-invalid={field.state.meta.errors.length > 0}
+								>
+									<IconField
+										id="invite-email"
+										label="Email Address"
+										icon={EnvelopeSimpleIcon}
+									>
+										<Input
+											id="invite-email"
+											type="email"
+											placeholder="user@example.com"
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(event) =>
+												field.handleChange(event.target.value)
+											}
+											className="pl-10"
+											autoFocus
+											disabled={isSubmitting}
+											aria-invalid={field.state.meta.errors.length > 0}
+										/>
+									</IconField>
+									<FieldError errors={field.state.meta.errors} />
+								</Field>
+							)}
+						</form.Field>
 
-					<IconField
-						id="invite-role"
-						label="Role"
-						icon={IdentificationCardIcon}
-					>
-						<Select
-							value={role}
-							onValueChange={(value) => setRole(value as TenantUserRole)}
-						>
-							<SelectTrigger id="invite-role" className="w-full pl-10">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								{INVITATION_ROLES.map((option) => (
-									<SelectItem key={option} value={option}>
-										{ROLE_LABELS[option]}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</IconField>
+						<form.Field name="role">
+							{(field) => (
+								<Field
+									className="flex flex-col space-y-1 gap-1"
+									data-invalid={field.state.meta.errors.length > 0}
+								>
+									<IconField
+										id="invite-role"
+										label="Role"
+										icon={IdentificationCardIcon}
+									>
+										<Select
+											value={field.state.value}
+											onValueChange={(value) =>
+												field.handleChange(
+													value as InvitationCreateFormValues["role"],
+												)
+											}
+											disabled={isSubmitting}
+										>
+											<SelectTrigger id="invite-role" className="w-full pl-10">
+												<SelectValue />
+											</SelectTrigger>
+											<SelectContent>
+												{INVITATION_ROLES.map((option) => (
+													<SelectItem key={option} value={option}>
+														{ROLE_LABELS[option]}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+									</IconField>
+									<FieldError errors={field.state.meta.errors} />
+								</Field>
+							)}
+						</form.Field>
+					</FieldGroup>
 
 					<DialogFooter>
 						<Button
@@ -135,15 +201,16 @@ export function InviteUserDialog({
 							variant="ghost"
 							className="cursor-pointer text-primary"
 							onClick={() => onOpenChange?.(false)}
+							disabled={isSubmitting}
 						>
 							Cancel
 						</Button>
 						<Button
 							type="submit"
-							disabled={!isValidEmail}
+							disabled={isSubmitting || !tenantId}
 							className="cursor-pointer uppercase tracking-wide"
 						>
-							Send Invitation
+							{isSubmitting ? "Sending..." : "Send Invitation"}
 						</Button>
 					</DialogFooter>
 				</form>

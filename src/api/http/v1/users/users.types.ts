@@ -189,7 +189,7 @@ export interface UserDetail {
 	last_name?: string;
 	phone_number?: string;
 	avatar_url?: string;
-	tenants: UserTenantMembership[];
+	tenants: UserTenantMembership | UserTenantMembership[] | null;
 	is_active?: boolean;
 	last_login?: string | null;
 	created_at: string;

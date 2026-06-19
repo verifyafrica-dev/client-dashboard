@@ -12,6 +12,8 @@ export function getStatusIcon(status: InvitationStatus) {
 			return <CheckCircle className="size-4 text-green-500" />;
 		case "expired":
 			return <XCircle className="size-4 text-red-500" />;
+		case "cancelled":
+			return <XCircle className="size-4 text-gray-500" />;
 		default:
 			return <AlertCircle className="size-4 text-gray-500" />;
 	}
@@ -28,6 +30,8 @@ export function getStatusBadgeClassName(status: InvitationStatus) {
 			return cn(baseClasses, "bg-green-100 text-green-800");
 		case "expired":
 			return cn(baseClasses, "bg-red-100 text-red-800");
+		case "cancelled":
+			return cn(baseClasses, "bg-gray-100 text-gray-800");
 		default:
 			return cn(baseClasses, "bg-gray-100 text-gray-800");
 	}

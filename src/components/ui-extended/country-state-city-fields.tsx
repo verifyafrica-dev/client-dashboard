@@ -44,7 +44,7 @@ function LocationSelect({
 	disabled?: boolean;
 }) {
 	return (
-		<div className="space-y-2">
+		<div className="space-y-1.5">
 			<Label htmlFor={id}>{label}</Label>
 			<Select
 				value={value}
@@ -148,7 +148,7 @@ export function CountryStateCityFields({
 
 	return (
 		<div className={cn("flex flex-col gap-4", className)}>
-			<div className="space-y-2">
+			<div className="space-y-1.5">
 				<Label htmlFor="billing-country">Country</Label>
 				<div className="relative">
 					<GlobeHemisphereWestIcon className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -183,7 +183,7 @@ export function CountryStateCityFields({
 						disabled={disabled}
 					/>
 				) : (
-					<div className="space-y-2">
+					<div className="space-y-1.5">
 						<Label htmlFor="billing-state">State/Province</Label>
 						<Input
 							id="billing-state"
@@ -208,7 +208,7 @@ export function CountryStateCityFields({
 						disabled={disabled || (showStateSelect && !stateCode)}
 					/>
 				) : (
-					<div className="space-y-2">
+					<div className="space-y-1.5">
 						<Label htmlFor="billing-city">City</Label>
 						<Input
 							id="billing-city"
@@ -228,7 +228,7 @@ export function CountryStateCityFields({
 					</div>
 				)}
 
-				<div className="space-y-2">
+				<div className="space-y-1.5">
 					<Label htmlFor="billing-postal">Postal Code</Label>
 					<Input
 						id="billing-postal"

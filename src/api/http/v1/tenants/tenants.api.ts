@@ -39,6 +39,8 @@ const TENANT_ENDPOINTS = {
 	webhook: (tenantId: string) => `/tenants/${tenantId}/webhook/`,
 	delete: (tenantId: string) => `/tenants/${tenantId}/delete/`,
 	invitations: (tenantId: string) => `/tenants/${tenantId}/invitations/`,
+	invitationDetail: (tenantId: string, invitationId: string) =>
+		`/tenants/${tenantId}/invitations/${invitationId}/`,
 	invitationAccept: "/tenants/invitations/accept/",
 	invitationComplete: "/tenants/invitations/complete/",
 	users: (tenantId: string) => `/tenants/${tenantId}/users/`,
@@ -141,6 +143,11 @@ export const TENANTS_API = {
 	) =>
 		await $http
 			.post<Invitation>(TENANT_ENDPOINTS.invitations(tenantId), data)
+			.then((res) => res.data),
+
+	INVITATION_DELETE: async (tenantId: string, invitationId: string) =>
+		await $http
+			.delete(TENANT_ENDPOINTS.invitationDetail(tenantId, invitationId))
 			.then((res) => res.data),
 
 	INVITATION_ACCEPT: async (data: InvitationAcceptPayload) =>

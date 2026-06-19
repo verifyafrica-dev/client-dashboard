@@ -138,7 +138,7 @@ export function AddCreditsDialog({
 						</form.Field>
 					</FieldGroup>
 
-					<div className="space-y-2">
+					<div className="space-y-1.5">
 						<p className="text-sm text-muted-foreground">Quick select</p>
 						<div className="flex flex-wrap gap-2">
 							{suggestedAmounts.map((suggestedAmount) => (
@@ -148,7 +148,9 @@ export function AddCreditsDialog({
 									variant="outline"
 									size="sm"
 									className="cursor-pointer"
-									onClick={() => form.setFieldValue("amount", String(suggestedAmount))}
+									onClick={() =>
+										form.setFieldValue("amount", String(suggestedAmount))
+									}
 								>
 									{formatTopUpAmountLabel(suggestedAmount)}
 								</Button>

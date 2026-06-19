@@ -4,9 +4,9 @@ import {
 	TrashIcon,
 	UserIcon,
 } from "@phosphor-icons/react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useTenantInvitationsQuery } from "#/api/http/v1/tenants/tenants.hooks";
 import { Avatar, AvatarFallback } from "#/components/ui/avatar";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -28,33 +28,32 @@ import {
 	TableRow,
 } from "#/components/ui/table";
 import {
-	DeleteUserDialog,
-	type DeleteUserDialogTarget,
-} from "../-components/delete-user-dialog";
-import {
 	paginateItems,
 	TablePagination,
 	TablePaginationSkeleton,
 } from "#/components/table-pagination";
+import {
+	DeleteUserDialog,
+	type DeleteUserDialogTarget,
+} from "../-components/delete-user-dialog";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
+import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
+import type { TenantUserRole } from "../-data";
 import {
 	InvitationRoleBadge,
 	InvitationStatusBadge,
 } from "./-components/invitation-badges";
 import { InviteUserDialog } from "./-components/invite-user-dialog";
 import {
-	fetchInvitations,
 	formatInvitationExpiry,
 	INVITATION_ROLES,
 	type InvitationStatus,
+	mapInvitationsToUserInvitations,
 	ROLE_LABELS,
 	STATUS_LABELS,
 	TEAM_PAGE_SIZE,
-	type TenantUserRole,
 	type UserInvitation,
 } from "./-data";
-
-const INVITATIONS_QUERY_KEY = ["team", "invitations"] as const;
 
 const INVITATION_TABLE_COLUMNS = [
 	"User Details",
@@ -71,7 +70,7 @@ export const Route = createFileRoute(
 });
 
 function InvitationsPage() {
-	const queryClient = useQueryClient();
+	const { tenantId, isTenantAdmin } = useCurrentTenant();
 	const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [invitationToDelete, setInvitationToDelete] =
@@ -83,13 +82,18 @@ function InvitationsPage() {
 	const [roleFilter, setRoleFilter] = useState<TenantUserRole | "all">("all");
 	const [page, setPage] = useState(1);
 
-	const { data, isPending, isFetching } = useQuery({
-		queryKey: INVITATIONS_QUERY_KEY,
-		queryFn: fetchInvitations,
-	});
+	const invitationsQuery = useTenantInvitationsQuery(
+		tenantId,
+		{ page_size: TEAM_LIST_PAGE_SIZE },
+		Boolean(tenantId),
+	);
 
-	const invitations = data ?? [];
-	const isLoading = isPending || isFetching;
+	const invitations = useMemo(
+		() => mapInvitationsToUserInvitations(invitationsQuery.data?.results ?? []),
+		[invitationsQuery.data?.results],
+	);
+
+	const isLoading = invitationsQuery.isPending || invitationsQuery.isFetching;
 
 	const filteredInvitations = useMemo(() => {
 		const query = search.trim().toLowerCase();
@@ -111,32 +115,12 @@ function InvitationsPage() {
 		[filteredInvitations, page],
 	);
 
-	function handleInvite(payload: { email: string; role: TenantUserRole }) {
-		const newInvitation: UserInvitation = {
-			id: crypto.randomUUID(),
-			email: payload.email,
-			role: payload.role,
-			status: "pending",
-			expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-		};
-
-		queryClient.setQueryData<UserInvitation[]>(
-			INVITATIONS_QUERY_KEY,
-			(current) => [newInvitation, ...(current ?? [])],
-		);
-		setPage(1);
-	}
-
 	function openDeleteDialog(invitation: UserInvitation) {
 		setInvitationToDelete(invitation);
 		setDeleteDialogOpen(true);
 	}
 
-	function handleDeleteInvitation(target: DeleteUserDialogTarget) {
-		queryClient.setQueryData<UserInvitation[]>(
-			INVITATIONS_QUERY_KEY,
-			(current) => current?.filter((item) => item.id !== target.id) ?? [],
-		);
+	function handleDeleteSuccess(_target: DeleteUserDialogTarget) {
 		setInvitationToDelete(null);
 	}
 
@@ -154,7 +138,7 @@ function InvitationsPage() {
 				<Button
 					className="cursor-pointer tracking-wide"
 					onClick={() => setInviteDialogOpen(true)}
-					disabled={isPending}
+					disabled={!tenantId || !isTenantAdmin || isLoading}
 				>
 					Invite User
 				</Button>
@@ -234,11 +218,15 @@ function InvitationsPage() {
 					</div>
 				</CardHeader>
 				<CardContent className="p-0">
-					{isPending ? (
+					{invitationsQuery.isPending ? (
 						<>
 							<TeamTableSkeleton columns={INVITATION_TABLE_COLUMNS} />
 							<TablePaginationSkeleton />
 						</>
+					) : invitationsQuery.isError ? (
+						<div className="flex h-24 items-center justify-center px-6 text-sm text-muted-foreground">
+							Failed to load invitations. Please try again.
+						</div>
 					) : (
 						<>
 							<Table>
@@ -298,16 +286,18 @@ function InvitationsPage() {
 													</div>
 												</TableCell>
 												<TableCell className="pr-4 sm:pr-6">
-													<Button
-														type="button"
-														variant="destructive"
-														size="sm"
-														className="cursor-pointer tracking-wide"
-														onClick={() => openDeleteDialog(invitation)}
-													>
-														<TrashIcon className="size-4" />
-														Delete
-													</Button>
+													{isTenantAdmin && (
+														<Button
+															type="button"
+															variant="destructive"
+															size="sm"
+															className="cursor-pointer tracking-wide"
+															onClick={() => openDeleteDialog(invitation)}
+														>
+															<TrashIcon className="size-4" />
+															Delete
+														</Button>
+													)}
 												</TableCell>
 											</TableRow>
 										))
@@ -328,7 +318,7 @@ function InvitationsPage() {
 			<InviteUserDialog
 				open={inviteDialogOpen}
 				onOpenChange={setInviteDialogOpen}
-				onInvite={handleInvite}
+				tenantId={tenantId}
 			/>
 
 			<DeleteUserDialog
@@ -341,6 +331,7 @@ function InvitationsPage() {
 						: null
 				}
 				type="invitation"
+				tenantId={tenantId}
 				open={deleteDialogOpen}
 				onOpenChange={(open) => {
 					setDeleteDialogOpen(open);
@@ -348,7 +339,7 @@ function InvitationsPage() {
 						setInvitationToDelete(null);
 					}
 				}}
-				onConfirm={handleDeleteInvitation}
+				onSuccess={handleDeleteSuccess}
 			/>
 		</div>
 	);

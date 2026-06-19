@@ -1,3 +1,9 @@
+import { toast } from "sonner";
+
+import {
+	useDeleteTenantInvitationMutation,
+	useRemoveTenantUserMutation,
+} from "#/api/http/v1/tenants/tenants.hooks";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -18,24 +24,59 @@ export type DeleteUserDialogTarget = {
 type DeleteUserDialogProps = {
 	target: DeleteUserDialogTarget | null;
 	type: "invitation" | "user";
+	tenantId?: string;
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	onConfirm?: (target: DeleteUserDialogTarget) => void;
+	onSuccess?: (target: DeleteUserDialogTarget) => void;
 };
 
 export function DeleteUserDialog({
 	target,
 	type,
+	tenantId,
 	open,
 	onOpenChange,
-	onConfirm,
+	onSuccess,
 }: DeleteUserDialogProps) {
+	const removeUserMutation = useRemoveTenantUserMutation(tenantId ?? "");
+	const deleteInvitationMutation = useDeleteTenantInvitationMutation(
+		tenantId ?? "",
+	);
+
 	if (!target) {
 		return null;
 	}
 
 	const isInvitation = type === "invitation";
 	const displayName = target.name ?? target.email;
+	const isDeleting =
+		removeUserMutation.isPending || deleteInvitationMutation.isPending;
+
+	async function handleConfirm() {
+		if (!tenantId) {
+			toast.error("Tenant information is unavailable");
+			return;
+		}
+
+		try {
+			if (isInvitation) {
+				await deleteInvitationMutation.mutateAsync(target.id);
+				toast.success("Invitation deleted successfully");
+			} else {
+				await removeUserMutation.mutateAsync(target.id);
+				toast.success("User removed successfully");
+			}
+
+			onSuccess?.(target);
+			onOpenChange(false);
+		} catch {
+			toast.error(
+				isInvitation
+					? "Failed to delete invitation. Please try again."
+					: "Failed to remove user. Please try again.",
+			);
+		}
+	}
 
 	return (
 		<AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -55,22 +96,27 @@ export function DeleteUserDialog({
 							</>
 						) : (
 							<>
-								This will permanently remove{" "}
+								Removing a user will also remove their access to the tenant.
+								Are you sure you want to remove{" "}
 								<span className="font-medium text-foreground">
 									{displayName}
-								</span>{" "}
-								from your team. This action cannot be undone.
+								</span>
+								? This action cannot be undone.
 							</>
 						)}
 					</AlertDialogDescription>
 				</AlertDialogHeader>
 				<AlertDialogFooter>
-					<AlertDialogCancel>Cancel</AlertDialogCancel>
+					<AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
 					<AlertDialogAction
 						variant="destructive"
-						onClick={() => onConfirm?.(target)}
+						disabled={isDeleting || !tenantId}
+						onClick={(event) => {
+							event.preventDefault();
+							void handleConfirm();
+						}}
 					>
-						Delete
+						{isDeleting ? "Deleting..." : "Delete"}
 					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>

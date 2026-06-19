@@ -18,9 +18,12 @@ export function IconField({
 	type?: ComponentProps<"input">["type"];
 	placeholder?: string;
 	className?: string;
-} & Omit<ComponentProps<"input">, "id" | "type" | "placeholder" | "className">) {
+} & Omit<
+	ComponentProps<"input">,
+	"id" | "type" | "placeholder" | "className"
+>) {
 	return (
-		<div className={cn("space-y-2", className)}>
+		<div className={cn("space-y-1.5", className)}>
 			<Label htmlFor={id}>{label}</Label>
 			<div className="relative">
 				<Icon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />

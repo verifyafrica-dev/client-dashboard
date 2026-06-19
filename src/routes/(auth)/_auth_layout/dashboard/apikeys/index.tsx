@@ -147,7 +147,7 @@ function ApiKeysPage() {
 					</CardHeader>
 
 					<CardContent className="flex flex-col gap-6">
-						<div className="space-y-2">
+						<div className="space-y-1.5">
 							<Label htmlFor="api-key">API Key</Label>
 							<div className="flex gap-2">
 								<Input
@@ -279,7 +279,7 @@ function ApiKeyCardSkeleton() {
 			<CardHeader className="flex flex-col items-start justify-between gap-4 space-y-0 sm:flex-row">
 				<div className="flex items-start gap-3">
 					<Skeleton className="size-10 rounded-lg" />
-					<div className="space-y-2">
+					<div className="space-y-1.5">
 						<Skeleton className="h-5 w-40" />
 						<Skeleton className="h-4 w-32" />
 					</div>
@@ -287,7 +287,7 @@ function ApiKeyCardSkeleton() {
 				<Skeleton className="h-6 w-16 rounded-full" />
 			</CardHeader>
 			<CardContent className="flex flex-col gap-6">
-				<div className="space-y-2">
+				<div className="space-y-1.5">
 					<Skeleton className="h-4 w-16" />
 					<Skeleton className="h-10 w-full" />
 				</div>

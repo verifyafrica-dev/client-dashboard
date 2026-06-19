@@ -3,9 +3,9 @@ import {
 	MagnifyingGlassIcon,
 	TrashIcon,
 } from "@phosphor-icons/react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useTenantUsersQuery } from "#/api/http/v1/tenants/tenants.hooks";
 import { Avatar, AvatarFallback } from "#/components/ui/avatar";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -27,16 +27,17 @@ import {
 	TableRow,
 } from "#/components/ui/table";
 import {
-	DeleteUserDialog,
-	type DeleteUserDialogTarget,
-} from "../-components/delete-user-dialog";
-import {
 	paginateItems,
 	TablePagination,
 	TablePaginationSkeleton,
 } from "#/components/table-pagination";
+import {
+	DeleteUserDialog,
+	type DeleteUserDialogTarget,
+} from "../-components/delete-user-dialog";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { UserRoleBadge } from "../-components/user-role-badge";
+import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
 import type { TenantUserRole } from "../-data";
 import { InviteUserDialog } from "../invitations/-components/invite-user-dialog";
 import { ActiveUserStatusBadge } from "./-components/user-status-badge";
@@ -45,15 +46,13 @@ import {
 	ACTIVE_USER_STATUSES,
 	type ActiveUser,
 	type ActiveUserStatus,
-	fetchActiveUsers,
 	formatTeamDate,
 	getUserInitials,
+	mapUserDetailsToActiveUsers,
 	ROLE_LABELS,
 	TEAM_PAGE_SIZE,
 	TEAM_ROLES,
 } from "./-data";
-
-const ACTIVE_USERS_QUERY_KEY = ["team", "active-users"] as const;
 
 const ACTIVE_USER_TABLE_COLUMNS = [
 	"Customer",
@@ -71,7 +70,7 @@ export const Route = createFileRoute(
 });
 
 function ActiveUsersPage() {
-	const queryClient = useQueryClient();
+	const { user, tenantId, isTenantAdmin } = useCurrentTenant();
 	const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [userToDelete, setUserToDelete] = useState<ActiveUser | null>(null);
@@ -82,25 +81,36 @@ function ActiveUsersPage() {
 	const [roleFilter, setRoleFilter] = useState<TenantUserRole | "all">("all");
 	const [page, setPage] = useState(1);
 
-	const { data, isPending, isFetching } = useQuery({
-		queryKey: ACTIVE_USERS_QUERY_KEY,
-		queryFn: fetchActiveUsers,
-	});
+	const usersQuery = useTenantUsersQuery(
+		tenantId,
+		{ page_size: TEAM_LIST_PAGE_SIZE },
+		Boolean(tenantId),
+	);
 
-	const users = data ?? [];
-	const isLoading = isPending || isFetching;
+	const users = useMemo(
+		() =>
+			mapUserDetailsToActiveUsers(
+				usersQuery.data?.results ?? [],
+				tenantId ?? "",
+				user?.id,
+			),
+		[usersQuery.data?.results, tenantId, user?.id],
+	);
+
+	const isLoading = usersQuery.isPending || usersQuery.isFetching;
 
 	const filteredUsers = useMemo(() => {
 		const query = search.trim().toLowerCase();
 
-		return users.filter((user) => {
+		return users.filter((activeUser) => {
 			const matchesSearch =
 				query.length === 0 ||
-				user.name.toLowerCase().includes(query) ||
-				user.email.toLowerCase().includes(query);
+				activeUser.name.toLowerCase().includes(query) ||
+				activeUser.email.toLowerCase().includes(query);
 			const matchesStatus =
-				statusFilter === "all" || user.status === statusFilter;
-			const matchesRole = roleFilter === "all" || user.role === roleFilter;
+				statusFilter === "all" || activeUser.status === statusFilter;
+			const matchesRole =
+				roleFilter === "all" || activeUser.role === roleFilter;
 
 			return matchesSearch && matchesStatus && matchesRole;
 		});
@@ -111,16 +121,12 @@ function ActiveUsersPage() {
 		[filteredUsers, page],
 	);
 
-	function openDeleteDialog(user: ActiveUser) {
-		setUserToDelete(user);
+	function openDeleteDialog(activeUser: ActiveUser) {
+		setUserToDelete(activeUser);
 		setDeleteDialogOpen(true);
 	}
 
-	function handleDeleteUser(target: DeleteUserDialogTarget) {
-		queryClient.setQueryData<ActiveUser[]>(
-			ACTIVE_USERS_QUERY_KEY,
-			(current) => current?.filter((item) => item.id !== target.id) ?? [],
-		);
+	function handleDeleteSuccess(_target: DeleteUserDialogTarget) {
 		setUserToDelete(null);
 	}
 
@@ -138,7 +144,7 @@ function ActiveUsersPage() {
 				<Button
 					className="cursor-pointer tracking-wide"
 					onClick={() => setInviteDialogOpen(true)}
-					disabled={isPending}
+					disabled={!tenantId || !isTenantAdmin || isLoading}
 				>
 					Invite User
 				</Button>
@@ -214,11 +220,15 @@ function ActiveUsersPage() {
 					</div>
 				</CardHeader>
 				<CardContent className="p-0">
-					{isPending ? (
+					{usersQuery.isPending ? (
 						<>
 							<TeamTableSkeleton columns={ACTIVE_USER_TABLE_COLUMNS} />
 							<TablePaginationSkeleton />
 						</>
+					) : usersQuery.isError ? (
+						<div className="flex h-24 items-center justify-center px-6 text-sm text-muted-foreground">
+							Failed to load users. Please try again.
+						</div>
 					) : (
 						<>
 							<Table>
@@ -253,18 +263,18 @@ function ActiveUsersPage() {
 											</TableCell>
 										</TableRow>
 									) : (
-										paginatedUsers.map((user) => (
-											<TableRow key={user.id}>
+										paginatedUsers.map((activeUser) => (
+											<TableRow key={activeUser.id}>
 												<TableCell className="pl-4 sm:pl-6">
 													<div className="flex items-center gap-3">
 														<Avatar size="sm">
 															<AvatarFallback className="bg-primary/10 text-xs font-semibold text-primary">
-																{getUserInitials(user.name)}
+																{getUserInitials(activeUser.name)}
 															</AvatarFallback>
 														</Avatar>
 														<span className="text-sm font-medium">
-															{user.name}
-															{user.isCurrentUser && (
+															{activeUser.name}
+															{activeUser.isCurrentUser && (
 																<span className="font-normal text-muted-foreground">
 																	{" "}
 																	(You)
@@ -273,31 +283,35 @@ function ActiveUsersPage() {
 														</span>
 													</div>
 												</TableCell>
-												<TableCell className="text-sm">{user.email}</TableCell>
+												<TableCell className="text-sm">
+													{activeUser.email}
+												</TableCell>
 												<TableCell>
-													<UserRoleBadge role={user.role} />
+													<UserRoleBadge role={activeUser.role} />
 												</TableCell>
 												<TableCell>
 													<div className="flex items-center gap-2 text-sm text-muted-foreground">
 														<CalendarBlankIcon className="size-4 shrink-0" />
-														{formatTeamDate(user.joinedAt)}
+														{formatTeamDate(activeUser.joinedAt)}
 													</div>
 												</TableCell>
 												<TableCell>
-													<ActiveUserStatusBadge status={user.status} />
+													<ActiveUserStatusBadge status={activeUser.status} />
 												</TableCell>
 												<TableCell className="pr-4 sm:pr-6">
-													<Button
-														type="button"
-														variant="destructive"
-														size="sm"
-														className="cursor-pointer tracking-wide"
-														disabled={user.isCurrentUser}
-														onClick={() => openDeleteDialog(user)}
-													>
-														<TrashIcon className="size-4" />
-														Delete
-													</Button>
+													{isTenantAdmin && (
+														<Button
+															type="button"
+															variant="destructive"
+															size="sm"
+															className="cursor-pointer tracking-wide"
+															disabled={activeUser.isCurrentUser}
+															onClick={() => openDeleteDialog(activeUser)}
+														>
+															<TrashIcon className="size-4" />
+															Delete
+														</Button>
+													)}
 												</TableCell>
 											</TableRow>
 										))
@@ -318,6 +332,7 @@ function ActiveUsersPage() {
 			<InviteUserDialog
 				open={inviteDialogOpen}
 				onOpenChange={setInviteDialogOpen}
+				tenantId={tenantId}
 			/>
 
 			<DeleteUserDialog
@@ -331,6 +346,7 @@ function ActiveUsersPage() {
 						: null
 				}
 				type="user"
+				tenantId={tenantId}
 				open={deleteDialogOpen}
 				onOpenChange={(open) => {
 					setDeleteDialogOpen(open);
@@ -338,7 +354,7 @@ function ActiveUsersPage() {
 						setUserToDelete(null);
 					}
 				}}
-				onConfirm={handleDeleteUser}
+				onSuccess={handleDeleteSuccess}
 			/>
 		</div>
 	);

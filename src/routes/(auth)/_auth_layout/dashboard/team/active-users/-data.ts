@@ -1,6 +1,9 @@
+import type { UserDetail } from "#/api/http/v1/users/users.types";
 import {
 	formatTeamDate,
+	getUserFullName,
 	getUserInitials,
+	getUserTenantMembership,
 	ROLE_LABELS,
 	TEAM_PAGE_SIZE,
 	TEAM_ROLES,
@@ -26,66 +29,6 @@ export const ACTIVE_USER_STATUS_LABELS: Record<ActiveUserStatus, string> = {
 	inactive: "Inactive",
 };
 
-export const MOCK_ACTIVE_USERS: ActiveUser[] = [
-	{
-		id: "user-1",
-		name: "VerifyAfrica Sales",
-		email: "support@verifyafrica.io",
-		role: "admin",
-		status: "active",
-		joinedAt: new Date("2026-05-06T10:06:00"),
-		isCurrentUser: true,
-	},
-	{
-		id: "user-2",
-		name: "Jane Doe",
-		email: "jane.doe@verifyafrica.io",
-		role: "member",
-		status: "active",
-		joinedAt: new Date("2026-04-18T14:22:00"),
-	},
-	{
-		id: "user-3",
-		name: "Michael Okonkwo",
-		email: "michael@verifyafrica.io",
-		role: "admin",
-		status: "active",
-		joinedAt: new Date("2026-03-12T09:15:00"),
-	},
-	{
-		id: "user-4",
-		name: "Sarah Johnson",
-		email: "sarah.j@verifyafrica.io",
-		role: "member",
-		status: "inactive",
-		joinedAt: new Date("2026-02-05T16:40:00"),
-	},
-	{
-		id: "user-5",
-		name: "David Chen",
-		email: "david.chen@verifyafrica.io",
-		role: "member",
-		status: "active",
-		joinedAt: new Date("2026-01-20T11:30:00"),
-	},
-	{
-		id: "user-6",
-		name: "Amara Okafor",
-		email: "amara@verifyafrica.io",
-		role: "member",
-		status: "active",
-		joinedAt: new Date("2025-12-08T08:50:00"),
-	},
-	{
-		id: "user-7",
-		name: "James Wilson",
-		email: "james.w@verifyafrica.io",
-		role: "admin",
-		status: "inactive",
-		joinedAt: new Date("2025-11-15T13:05:00"),
-	},
-];
-
 export {
 	formatTeamDate,
 	getUserInitials,
@@ -108,11 +51,30 @@ export function getActiveUserStatusBadgeClassName(status: ActiveUserStatus) {
 	}
 }
 
-export async function fetchActiveUsers(): Promise<ActiveUser[]> {
-	await new Promise((resolve) => setTimeout(resolve, 600));
+export function mapUserDetailToActiveUser(
+	user: UserDetail,
+	tenantId: string,
+	currentUserId?: string,
+): ActiveUser {
+	const membership = getUserTenantMembership(user, tenantId);
 
-	return MOCK_ACTIVE_USERS.map((user) => ({
-		...user,
-		joinedAt: new Date(user.joinedAt),
-	}));
+	return {
+		id: user.id,
+		name: getUserFullName(user),
+		email: user.email,
+		role: membership?.role ?? "member",
+		status: user.is_active === false ? "inactive" : "active",
+		joinedAt: new Date(membership?.date_added ?? user.created_at),
+		isCurrentUser: user.id === currentUserId,
+	};
+}
+
+export function mapUserDetailsToActiveUsers(
+	users: UserDetail[],
+	tenantId: string,
+	currentUserId?: string,
+): ActiveUser[] {
+	return users.map((user) =>
+		mapUserDetailToActiveUser(user, tenantId, currentUserId),
+	);
 }

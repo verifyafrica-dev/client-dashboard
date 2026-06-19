@@ -16,7 +16,6 @@ import {
 	usePartialUpdateBillingInformationMutation,
 } from "#/api/http/v1/billing/billing.hooks";
 import type { BillingInformation } from "#/api/http/v1/billing/billing.types";
-import { CountryStateCityFields } from "#/components/ui-extended/country-state-city-fields";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -27,6 +26,7 @@ import {
 } from "#/components/ui/dialog";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
+import { CountryStateCityFields } from "#/components/ui-extended/country-state-city-fields";
 import { cn } from "#/lib/utils.ts";
 
 type BillingFormState = {
@@ -83,7 +83,7 @@ function IconField({
 	disabled?: boolean;
 }) {
 	return (
-		<div className={cn("space-y-2", className)}>
+		<div className={cn("space-y-1.5", className)}>
 			<Label htmlFor={id}>{label}</Label>
 			<div className="relative">
 				{Icon && (

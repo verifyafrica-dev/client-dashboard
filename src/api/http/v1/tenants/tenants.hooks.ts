@@ -226,6 +226,20 @@ export const useCreateTenantInvitationMutation = (tenantId: string) => {
 	});
 };
 
+export const useDeleteTenantInvitationMutation = (tenantId: string) => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (invitationId: string) =>
+			TENANTS_API.INVITATION_DELETE(tenantId, invitationId),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["tenants", "invitations", tenantId],
+			});
+		},
+	});
+};
+
 export const useAcceptInvitationMutation = () =>
 	useMutation({
 		mutationFn: (payload: InvitationAcceptPayload) =>

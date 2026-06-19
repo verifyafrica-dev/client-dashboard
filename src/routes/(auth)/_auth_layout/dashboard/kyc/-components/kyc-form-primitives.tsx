@@ -72,7 +72,7 @@ export function KycFormField({
 	description?: string;
 }) {
 	return (
-		<div className={cn("space-y-2", className)}>
+		<div className={cn("space-y-1.5", className)}>
 			<Label htmlFor={id}>
 				{label}
 				{required && <span className="text-destructive"> *</span>}

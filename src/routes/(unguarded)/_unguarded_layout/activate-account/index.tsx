@@ -186,7 +186,7 @@ function ActivateAccountPage() {
 					</Button>
 				</Field>
 
-				<div className="space-y-2 text-center">
+				<div className="space-y-1.5 text-center">
 					<p className="text-sm text-muted-foreground">
 						Didn&apos;t receive the code?
 					</p>
