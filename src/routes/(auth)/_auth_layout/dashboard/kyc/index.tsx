@@ -94,11 +94,15 @@ function KycPageInner({
 	kycData,
 	isKycApproved,
 	complianceStatus,
+	rejectedAt,
+	rejectedReason,
 }: {
 	activeSection?: (typeof sections)[number];
 	kycData: KYBApplication;
 	isKycApproved: boolean;
 	complianceStatus?: string;
+	rejectedAt?: string | null;
+	rejectedReason?: string | null;
 }) {
 	const status = getKycDisplayStatus({
 		isKycApproved,
@@ -112,6 +116,12 @@ function KycPageInner({
 
 	return (
 		<div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
+			<KycRejectedAlert
+				show={status === "rejected"}
+				rejectedAt={rejectedAt}
+				rejectedReason={rejectedReason}
+			/>
+
 			{activeSection ? (
 				<div className="flex flex-col gap-6">
 					<Button
@@ -145,7 +155,6 @@ function KycPageInner({
 						<KycStatusBadge status={status} />
 					</div>
 
-					<KycRejectedAlert show={status === "rejected"} />
 					<KycSectionList sections={sections} />
 					<KycSubmitPanel />
 				</>
@@ -193,6 +202,7 @@ function KycPage() {
 			tenantId={tenantId}
 			kycData={kycQuery.data.kycData}
 			isKycApproved={kycQuery.data.isKycApproved}
+			complianceStatus={kycQuery.data.complianceStatus}
 			onNavigateToSection={navigateToSection}
 		>
 			<KycPageInner
@@ -200,6 +210,8 @@ function KycPage() {
 				kycData={kycQuery.data.kycData}
 				isKycApproved={kycQuery.data.isKycApproved}
 				complianceStatus={kycQuery.data.complianceStatus}
+				rejectedAt={kycQuery.data.rejectedAt}
+				rejectedReason={kycQuery.data.rejectedReason}
 			/>
 		</KycProvider>
 	);

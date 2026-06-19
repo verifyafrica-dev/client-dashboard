@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { useSubmitKycForReviewMutation } from "#/api/http/v1/kyc/kyc.hooks";
 import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Button } from "#/components/ui/button";
+import { formatRejectedAt, parseRejectedReasons } from "../-utils";
 import { useKyc } from "./kyc-provider";
 
 export function KycSubmitPanel() {
@@ -113,18 +114,41 @@ export function KycSubmitPanel() {
 	);
 }
 
-export function KycRejectedAlert({ show }: { show: boolean }) {
+export function KycRejectedAlert({
+	show,
+	rejectedAt,
+	rejectedReason,
+}: {
+	show: boolean;
+	rejectedAt?: string | null;
+	rejectedReason?: string | null;
+}) {
 	if (!show) {
 		return null;
 	}
+
+	const reasons = parseRejectedReasons(rejectedReason);
+	const formattedRejectedAt = formatRejectedAt(rejectedAt);
 
 	return (
 		<Alert variant="destructive">
 			<WarningCircleIcon className="size-4" />
 			<AlertTitle>KYC Rejected</AlertTitle>
-			<AlertDescription>
-				Your KYC submission was rejected. Please review the requirements and
-				resubmit with correct documents.
+			<AlertDescription className="space-y-3">
+				<p>
+					Your KYC submission was rejected. Please review the issues below,
+					update your application, and resubmit.
+				</p>
+				{formattedRejectedAt && (
+					<p className="text-xs opacity-90">Rejected on: {formattedRejectedAt}</p>
+				)}
+				{reasons.length > 0 && (
+					<ul className="list-disc space-y-1.5 pl-5 text-sm">
+						{reasons.map((reason, index) => (
+							<li key={`${index}-${reason}`}>{reason}</li>
+						))}
+					</ul>
+				)}
 			</AlertDescription>
 		</Alert>
 	);

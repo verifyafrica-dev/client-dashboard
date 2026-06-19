@@ -24,6 +24,11 @@ export const useKycTenantQuery = (tenantId: string | undefined, enabled = true) 
 			kycData: normalizeComplianceData(tenant.compliance_data),
 			isKycApproved: Boolean(tenant.kyc_verified),
 			complianceStatus: tenant.compliance_status?.status,
+			rejectedAt: tenant.compliance_status?.rejected_at ?? null,
+			rejectedReason:
+				tenant.compliance_status?.rejected_reason ??
+				tenant.reject_reason ??
+				null,
 		}),
 	});
 

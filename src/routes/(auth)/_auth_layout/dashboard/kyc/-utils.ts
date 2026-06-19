@@ -183,3 +183,29 @@ export function getKycDisplayStatus({
 
 	return "pending" as const;
 }
+
+export function parseRejectedReasons(reason?: string | null) {
+	if (!reason?.trim()) {
+		return [];
+	}
+
+	return reason
+		.split(/\r?\n/)
+		.map((line) => line.trim())
+		.filter(Boolean)
+		.map((line) => line.replace(/^\d+\.\s*/, ""));
+}
+
+export function formatRejectedAt(rejectedAt?: string | null) {
+	if (!rejectedAt) {
+		return null;
+	}
+
+	return new Date(rejectedAt).toLocaleString("en-US", {
+		year: "numeric",
+		month: "long",
+		day: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+	});
+}

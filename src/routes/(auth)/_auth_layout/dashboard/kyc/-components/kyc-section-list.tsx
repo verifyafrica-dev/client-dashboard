@@ -29,7 +29,7 @@ export function KycSectionList({ sections }: { sections: KycSection[] }) {
 	const { completionStatus, isKycApproved, isKycSubmitted } = useKyc();
 
 	return (
-		<div className="space-y-3">
+		<ul className="space-y-3">
 			{sections.map((section) => {
 				const isCompleted = isKycSectionCompleted(
 					section.path,
@@ -37,7 +37,7 @@ export function KycSectionList({ sections }: { sections: KycSection[] }) {
 				);
 
 				return (
-					<div
+					<li
 						key={section.path}
 						className="flex items-center gap-4 rounded-xl border bg-card px-4 py-5 sm:px-5"
 					>
@@ -58,13 +58,13 @@ export function KycSectionList({ sections }: { sections: KycSection[] }) {
 								asChild
 							>
 								<Link to="/dashboard/kyc" search={{ section: section.path }}>
-									{isKycSubmitted ? "View" : "Edit"}
+									Edit
 								</Link>
 							</Button>
 						)}
-					</div>
+					</li>
 				);
 			})}
-		</div>
+		</ul>
 	);
 }

@@ -24,6 +24,7 @@ type KycContextValue = {
 	kycData: KYBApplication;
 	isKycApproved: boolean;
 	isKycSubmitted: boolean;
+	complianceStatus?: string;
 	isReadOnly: boolean;
 	isSaving: boolean;
 	completionStatus: ReturnType<typeof getKycCompletionStatus>;
@@ -42,17 +43,21 @@ export function KycProvider({
 	tenantId,
 	kycData,
 	isKycApproved,
+	complianceStatus,
 	onNavigateToSection,
 }: {
 	children: ReactNode;
 	tenantId: string;
 	kycData: KYBApplication;
 	isKycApproved: boolean;
+	complianceStatus?: string;
 	onNavigateToSection: (path: KycSectionPath | null) => void;
 }) {
 	const saveMutation = useSaveKycComplianceMutation(tenantId);
 	const isKycSubmitted = Boolean(kycData.submittedForReview);
-	const isReadOnly = isKycApproved || isKycSubmitted;
+	const isReadOnly =
+		isKycApproved ||
+		(isKycSubmitted && complianceStatus !== "rejected");
 
 	const completionStatus = useMemo(
 		() => getKycCompletionStatus(kycData),
@@ -103,6 +108,7 @@ export function KycProvider({
 			kycData,
 			isKycApproved,
 			isKycSubmitted,
+			complianceStatus,
 			isReadOnly,
 			isSaving: saveMutation.isPending,
 			completionStatus,
@@ -115,6 +121,7 @@ export function KycProvider({
 			kycData,
 			isKycApproved,
 			isKycSubmitted,
+			complianceStatus,
 			isReadOnly,
 			saveMutation.isPending,
 			completionStatus,
