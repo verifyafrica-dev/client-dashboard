@@ -111,7 +111,7 @@ export function BasicInformationForm() {
 				<KycFormGrid>
 					<form.Field name="legalName">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
 								<FieldLabel htmlFor="legalName">
 									Legal Name <span className="text-destructive">*</span>
 								</FieldLabel>
@@ -130,7 +130,7 @@ export function BasicInformationForm() {
 					</form.Field>
 					<form.Field name="tradingName">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
 								<FieldLabel htmlFor="tradingName">Trading Name</FieldLabel>
 								<Input
 									id="tradingName"
@@ -149,7 +149,7 @@ export function BasicInformationForm() {
 				<KycFormGrid>
 					<form.Field name="countryOfIncorporation">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
 								<FieldLabel htmlFor="countryOfIncorporation">
 									Country of Incorporation{" "}
 									<span className="text-destructive">*</span>
@@ -166,7 +166,7 @@ export function BasicInformationForm() {
 					</form.Field>
 					<form.Field name="registrationNumber">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
 								<FieldLabel htmlFor="registrationNumber">
 									Registration Number{" "}
 									<span className="text-destructive">*</span>
@@ -188,7 +188,7 @@ export function BasicInformationForm() {
 				<KycFormGrid>
 					<form.Field name="dateOfIncorporation">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
 								<FieldLabel htmlFor="dateOfIncorporation">
 									Date of Incorporation{" "}
 									<span className="text-destructive">*</span>
@@ -209,7 +209,7 @@ export function BasicInformationForm() {
 					</form.Field>
 					<form.Field name="website">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
 								<FieldLabel htmlFor="website">Website</FieldLabel>
 								<Input
 									id="website"
@@ -231,7 +231,7 @@ export function BasicInformationForm() {
 
 			<form.Field name="registeredAddress">
 				{(field) => (
-					<Field data-invalid={field.state.meta.errors.length > 0}>
+					<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
 						<FieldLabel htmlFor="registeredAddress">
 							Registered Address <span className="text-destructive">*</span>
 						</FieldLabel>
@@ -284,7 +284,7 @@ export function BasicInformationForm() {
 
 			<form.Field name="businessAddress">
 				{(field) => (
-					<Field data-invalid={field.state.meta.errors.length > 0}>
+					<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
 						<FieldLabel htmlFor="businessAddress">Business Address</FieldLabel>
 						<Textarea
 							id="businessAddress"

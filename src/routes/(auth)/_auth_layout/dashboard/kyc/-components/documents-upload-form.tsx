@@ -1,8 +1,4 @@
-import {
-	CheckCircleIcon,
-	InfoIcon,
-	TrashIcon,
-} from "@phosphor-icons/react";
+import { CheckCircleIcon, InfoIcon, TrashIcon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -22,8 +18,9 @@ import {
 	readFileAsDataUrl,
 	validateKycFile,
 } from "../-upload-utils";
-import { useKyc } from "./kyc-provider";
+import { KycDocumentPreviewDialog } from "./kyc-document-preview-dialog";
 import { KycFileUpload, KycSectionHeader } from "./kyc-form-primitives";
+import { useKyc } from "./kyc-provider";
 
 type DocumentCategoryKey = (typeof KYC_DOCUMENT_CATEGORIES)[number]["key"];
 
@@ -66,53 +63,69 @@ function DocumentList({
 	isReadOnly: boolean;
 	onDelete: (documentId: string) => void;
 }) {
+	const [previewIndex, setPreviewIndex] = useState<number | null>(null);
+
 	if (documents.length === 0) {
 		return null;
 	}
 
 	return (
-		<div className="space-y-2 border-t pt-4">
-			<p className="text-sm font-medium">
-				Uploaded Files ({documents.length})
-			</p>
-			<ul className="space-y-2">
-				{documents.map((document) => (
-					<li
-						key={document.id}
-						className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm"
-					>
-						<div className="min-w-0 flex-1">
-							<p className="truncate font-medium">{document.fileName}</p>
-							<p className="text-xs text-muted-foreground">
-								{formatFileSize(document.fileSize)} • Uploaded on{" "}
-								{formatUploadDate(document.uploadedAt)}
-							</p>
-						</div>
-						<div className="flex items-center gap-2">
-							<a
-								href={document.url}
-								target="_blank"
-								rel="noreferrer"
-								className="text-primary hover:underline"
-							>
-								View
-							</a>
-							{!isReadOnly && (
+		<>
+			<div className="space-y-2 border-t pt-4">
+				<p className="text-sm font-medium">
+					Uploaded Files ({documents.length})
+				</p>
+				<ul className="space-y-2">
+					{documents.map((document, index) => (
+						<li
+							key={document.id}
+							className="flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm"
+						>
+							<div className="min-w-0 flex-1">
+								<p className="truncate font-medium">{document.fileName}</p>
+								<p className="text-xs text-muted-foreground">
+									{formatFileSize(document.fileSize)} • Uploaded on{" "}
+									{formatUploadDate(document.uploadedAt)}
+								</p>
+							</div>
+							<div className="flex items-center gap-2">
 								<Button
 									type="button"
-									variant="ghost"
-									size="icon-xs"
-									onClick={() => onDelete(document.id)}
-									aria-label={`Remove ${document.fileName}`}
+									variant="link"
+									className="h-auto p-0"
+									onClick={() => setPreviewIndex(index)}
 								>
-									<TrashIcon className="size-4 text-destructive" />
+									View
 								</Button>
-							)}
-						</div>
-					</li>
-				))}
-			</ul>
-		</div>
+								{!isReadOnly && (
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon-xs"
+										onClick={() => onDelete(document.id)}
+										aria-label={`Remove ${document.fileName}`}
+									>
+										<TrashIcon className="size-4 text-destructive" />
+									</Button>
+								)}
+							</div>
+						</li>
+					))}
+				</ul>
+			</div>
+
+			<KycDocumentPreviewDialog
+				open={previewIndex !== null}
+				onOpenChange={(open) => {
+					if (!open) {
+						setPreviewIndex(null);
+					}
+				}}
+				documents={documents}
+				currentIndex={previewIndex ?? 0}
+				onNavigate={setPreviewIndex}
+			/>
+		</>
 	);
 }
 
@@ -133,7 +146,10 @@ function DocumentCategoryCard({
 	isReadOnly: boolean;
 	isSaving: boolean;
 	onUpload: (categoryKey: DocumentCategoryKey, files: File[]) => Promise<void>;
-	onDelete: (categoryKey: DocumentCategoryKey, documentId: string) => Promise<void>;
+	onDelete: (
+		categoryKey: DocumentCategoryKey,
+		documentId: string,
+	) => Promise<void>;
 }) {
 	const [pendingFiles, setPendingFiles] = useState<File[]>([]);
 	const [isUploading, setIsUploading] = useState(false);
@@ -171,9 +187,7 @@ function DocumentCategoryCard({
 
 	return (
 		<Card
-			className={
-				hasFiles ? "border-emerald-200 bg-emerald-50/40" : undefined
-			}
+			className={hasFiles ? "border-emerald-200 bg-emerald-50/40" : undefined}
 		>
 			<CardHeader className="gap-1 pb-3">
 				<div className="flex flex-wrap items-center gap-2">
@@ -355,7 +369,7 @@ export function DocumentsUploadForm() {
 				<div className="flex justify-end">
 					<Button
 						type="button"
-						className="cursor-pointer uppercase tracking-wide"
+						className="cursor-pointer tracking-wide"
 						onClick={() => void handleContinue()}
 						disabled={isSaving}
 					>

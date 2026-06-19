@@ -25,7 +25,6 @@ import {
 	KYC_VERIFICATION_VOLUMES,
 } from "../-constants";
 import { SECTION_NAMES } from "../-data";
-import { useKyc } from "./kyc-provider";
 import {
 	CountrySelect,
 	Input,
@@ -35,6 +34,7 @@ import {
 	KycSectionHeader,
 	Textarea,
 } from "./kyc-form-primitives";
+import { useKyc } from "./kyc-provider";
 
 function getDefaultValues(
 	kycData: ReturnType<typeof useKyc>["kycData"],
@@ -69,7 +69,8 @@ export function BusinessActivityForm() {
 						...current.company,
 						businessActivity: {
 							natureOfBusiness: value.natureOfBusiness,
-							descriptionOfProductsServices: value.descriptionOfProductsServices,
+							descriptionOfProductsServices:
+								value.descriptionOfProductsServices,
 							expectedMonthlyVerificationVolume:
 								value.expectedMonthlyVerificationVolume,
 							mainGeographiesOfClients: value.mainGeographiesOfClients,
@@ -101,10 +102,13 @@ export function BusinessActivityForm() {
 				description="Provide your business activity details."
 			/>
 
-			<FieldGroup>
+			<FieldGroup className="flex flex-col gap-4">
 				<form.Field name="natureOfBusiness">
 					{(field) => (
-						<Field data-invalid={field.state.meta.errors.length > 0}>
+						<Field
+							className="gap-1.5"
+							data-invalid={field.state.meta.errors.length > 0}
+						>
 							<FieldLabel htmlFor="natureOfBusiness">
 								Nature of Business <span className="text-destructive">*</span>
 							</FieldLabel>
@@ -122,7 +126,10 @@ export function BusinessActivityForm() {
 
 				<form.Field name="descriptionOfProductsServices">
 					{(field) => (
-						<Field data-invalid={field.state.meta.errors.length > 0}>
+						<Field
+							className="gap-1.5"
+							data-invalid={field.state.meta.errors.length > 0}
+						>
 							<FieldLabel htmlFor="productsDescription">
 								Description of Products/Services{" "}
 								<span className="text-destructive">*</span>
@@ -143,7 +150,10 @@ export function BusinessActivityForm() {
 				<KycFormGrid>
 					<form.Field name="expectedMonthlyVerificationVolume">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="verificationVolume">
 									Expected Monthly Verification Volume{" "}
 									<span className="text-destructive">*</span>
@@ -171,7 +181,10 @@ export function BusinessActivityForm() {
 
 					<form.Field name="mainGeographiesOfClients">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="clientGeographies">
 									Main Geographies of Clients{" "}
 									<span className="text-destructive">*</span>
@@ -203,7 +216,9 @@ export function BusinessActivityForm() {
 				{(licensesField) => (
 					<section className="space-y-4">
 						<div className="flex flex-wrap items-center justify-between gap-3">
-							<h3 className="text-base font-semibold">Regulatory Licenses Held</h3>
+							<h3 className="text-base font-semibold">
+								Regulatory Licenses Held
+							</h3>
 							{!isReadOnly && (
 								<Button
 									type="button"
@@ -239,7 +254,10 @@ export function BusinessActivityForm() {
 										name={`regulatoryLicensesHeld[${index}].license_name`}
 									>
 										{(field) => (
-											<Field data-invalid={field.state.meta.errors.length > 0}>
+											<Field
+												className="gap-1.5"
+												data-invalid={field.state.meta.errors.length > 0}
+											>
 												<FieldLabel>License Name</FieldLabel>
 												<Input
 													value={field.state.value}
@@ -259,6 +277,7 @@ export function BusinessActivityForm() {
 										>
 											{(field) => (
 												<Field
+													className="gap-1.5"
 													data-invalid={field.state.meta.errors.length > 0}
 												>
 													<FieldLabel>License Number</FieldLabel>
@@ -279,6 +298,7 @@ export function BusinessActivityForm() {
 										>
 											{(field) => (
 												<Field
+													className="gap-1.5"
 													data-invalid={field.state.meta.errors.length > 0}
 												>
 													<FieldLabel>Country</FieldLabel>

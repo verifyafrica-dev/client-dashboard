@@ -77,3 +77,11 @@ export function isDataUrlSignature(value: string) {
 export function inferSignatureMethod(signature: string): "type" | "upload" {
 	return isDataUrlSignature(signature) ? "upload" : "type";
 }
+
+export function getDocumentPreviewType(fileType: string): "pdf" | "image" {
+	if (fileType === "application/pdf") {
+		return "pdf";
+	}
+
+	return "image";
+}

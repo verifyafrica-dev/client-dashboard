@@ -1,12 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
 import {
 	CalendarBlankIcon,
 	MagnifyingGlassIcon,
 	TrashIcon,
 } from "@phosphor-icons/react";
-import { cn } from "#/lib/utils.ts";
+import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-
 import { useTenantUsersQuery } from "#/api/http/v1/tenants/tenants.hooks";
 import {
 	paginateItems,
@@ -33,12 +31,13 @@ import {
 	TableHeader,
 	TableRow,
 } from "#/components/ui/table";
+import { cn } from "#/lib/utils.ts";
 import {
 	DeleteUserDialog,
 	type DeleteUserDialogTarget,
 } from "../-components/delete-user-dialog";
-import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { TeamTableShell } from "../-components/team-table-shell";
+import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { UserRoleBadge } from "../-components/user-role-badge";
 import type { TenantUserRole } from "../-data";
 import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";

@@ -70,7 +70,7 @@ export function ComplianceDeclarationsForm() {
 				{KYC_DECLARATIONS.map((declaration) => (
 					<form.Field key={declaration.key} name={declaration.key}>
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
 								<div className="flex items-start gap-3">
 									<Checkbox
 										id={declaration.key}

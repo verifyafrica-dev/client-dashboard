@@ -79,7 +79,7 @@ export function PrimaryContactForm() {
 				description="Provide your primary contact details."
 			/>
 
-			<FieldGroup>
+			<FieldGroup className="flex flex-col gap-4">
 				<form.Field name="name">
 					{(field) => (
 						<Field

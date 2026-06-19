@@ -20,7 +20,6 @@ import {
 } from "@/components/ui/field";
 import { KYC_TARGET_CLIENTS } from "../-constants";
 import { SECTION_NAMES } from "../-data";
-import { useKyc } from "./kyc-provider";
 import {
 	Input,
 	KycFormGrid,
@@ -28,6 +27,7 @@ import {
 	KycSectionHeader,
 	Textarea,
 } from "./kyc-form-primitives";
+import { useKyc } from "./kyc-provider";
 
 function getDefaultValues(
 	kycData: ReturnType<typeof useKyc>["kycData"],
@@ -97,10 +97,13 @@ export function OnboardingQuestionnaireForm() {
 				description="Answer the onboarding questionnaire to get started."
 			/>
 
-			<FieldGroup>
+			<FieldGroup className="flex flex-col gap-4">
 				<form.Field name="purposeOfAccount">
 					{(field) => (
-						<Field data-invalid={field.state.meta.errors.length > 0}>
+						<Field
+							className="gap-1.5"
+							data-invalid={field.state.meta.errors.length > 0}
+						>
 							<FieldLabel htmlFor="purposeOfAccount">
 								Purpose of Account <span className="text-destructive">*</span>
 							</FieldLabel>
@@ -120,7 +123,10 @@ export function OnboardingQuestionnaireForm() {
 
 				<form.Field name="targetClients">
 					{(field) => (
-						<Field data-invalid={field.state.meta.errors.length > 0}>
+						<Field
+							className="gap-1.5"
+							data-invalid={field.state.meta.errors.length > 0}
+						>
 							<FieldLabel htmlFor="targetClients">
 								Target Clients <span className="text-destructive">*</span>
 							</FieldLabel>
@@ -148,7 +154,10 @@ export function OnboardingQuestionnaireForm() {
 				<KycFormGrid>
 					<form.Field name="averageClientTransactionSizeEur">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="averageTransactionSize">
 									Average Client Transaction Size (EUR){" "}
 									<span className="text-destructive">*</span>
@@ -170,7 +179,10 @@ export function OnboardingQuestionnaireForm() {
 					</form.Field>
 					<form.Field name="highRiskJurisdictionsFATFExposure">
 						{(field) => (
-							<Field data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="highRiskJurisdictions">
 									High Risk Jurisdictions (FATF){" "}
 									<span className="text-destructive">*</span>
@@ -190,7 +202,10 @@ export function OnboardingQuestionnaireForm() {
 
 				<form.Field name="mainBankingPaymentPartners">
 					{(field) => (
-						<Field data-invalid={field.state.meta.errors.length > 0}>
+						<Field
+							className="gap-1.5"
+							data-invalid={field.state.meta.errors.length > 0}
+						>
 							<FieldLabel htmlFor="bankingPartners">
 								Main Banking/Payment Partners{" "}
 								<span className="text-destructive">*</span>
@@ -214,15 +229,16 @@ export function OnboardingQuestionnaireForm() {
 					<KycFormGrid>
 						<form.Field name="amlCtfOfficerName">
 							{(field) => (
-								<Field data-invalid={field.state.meta.errors.length > 0}>
+								<Field
+									className="gap-1.5"
+									data-invalid={field.state.meta.errors.length > 0}
+								>
 									<FieldLabel htmlFor="amlOfficerName">Name</FieldLabel>
 									<Input
 										id="amlOfficerName"
 										value={field.state.value}
 										onBlur={field.handleBlur}
-										onChange={(event) =>
-											field.handleChange(event.target.value)
-										}
+										onChange={(event) => field.handleChange(event.target.value)}
 										disabled={isReadOnly}
 									/>
 									<FieldError errors={field.state.meta.errors} />
@@ -231,16 +247,17 @@ export function OnboardingQuestionnaireForm() {
 						</form.Field>
 						<form.Field name="amlCtfOfficerEmail">
 							{(field) => (
-								<Field data-invalid={field.state.meta.errors.length > 0}>
+								<Field
+									className="gap-1.5"
+									data-invalid={field.state.meta.errors.length > 0}
+								>
 									<FieldLabel htmlFor="amlOfficerEmail">Email</FieldLabel>
 									<Input
 										id="amlOfficerEmail"
 										type="email"
 										value={field.state.value}
 										onBlur={field.handleBlur}
-										onChange={(event) =>
-											field.handleChange(event.target.value)
-										}
+										onChange={(event) => field.handleChange(event.target.value)}
 										disabled={isReadOnly}
 									/>
 									<FieldError errors={field.state.meta.errors} />
@@ -252,7 +269,10 @@ export function OnboardingQuestionnaireForm() {
 
 				<form.Field name="kycKybProcess">
 					{(field) => (
-						<Field data-invalid={field.state.meta.errors.length > 0}>
+						<Field
+							className="gap-1.5"
+							data-invalid={field.state.meta.errors.length > 0}
+						>
 							<FieldLabel htmlFor="kycKybProcess">
 								KYC/KYB Process <span className="text-destructive">*</span>
 							</FieldLabel>

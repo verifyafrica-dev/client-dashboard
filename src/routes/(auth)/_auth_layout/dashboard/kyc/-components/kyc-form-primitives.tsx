@@ -72,7 +72,7 @@ export function KycFormField({
 	description?: string;
 }) {
 	return (
-		<div className={cn("space-y-1.5", className)}>
+		<div className={cn("flex flex-col gap-1.5", className)}>
 			<Label htmlFor={id}>
 				{label}
 				{required && <span className="text-destructive"> *</span>}
@@ -107,7 +107,7 @@ export function KycSaveButton({
 	return (
 		<Button
 			type="submit"
-			className={cn("cursor-pointer uppercase tracking-wide", className)}
+			className={cn("cursor-pointer tracking-wide", className)}
 			disabled={disabled || isSaving}
 		>
 			{isSaving ? "Saving..." : label}

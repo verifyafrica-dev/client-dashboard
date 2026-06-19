@@ -15,7 +15,6 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { SECTION_NAMES } from "../-data";
-import { useKyc } from "./kyc-provider";
 import {
 	CountrySelect,
 	Input,
@@ -26,6 +25,7 @@ import {
 	KycSectionHeader,
 	Textarea,
 } from "./kyc-form-primitives";
+import { useKyc } from "./kyc-provider";
 
 function normalizeDirectorAddress(
 	address: KycDirectorsAndShareholdersFormValues["directors"][number]["address"],
@@ -115,136 +115,120 @@ export function DirectorsAndShareholdersForm() {
 
 			<form.Field name="directors" mode="array">
 				{(directorsField) => (
-					<section className="space-y-4">
+					<section className="flex flex-col gap-4">
 						<h3 className="text-base font-semibold">Directors</h3>
 						{directorsField.state.value.map((director, index) => (
-								<KycEntryCard
-									key={`director-${index}`}
-									title={`Director ${index + 1}`}
-									onRemove={
-										!isReadOnly && directorsField.state.value.length > 1
-											? () => directorsField.removeValue(index)
-											: undefined
-									}
-								>
-									<FieldGroup className="space-y-4">
-										<form.Field name={`directors[${index}].name`}>
-											{(field) => (
-												<Field
-													data-invalid={field.state.meta.errors.length > 0}
-												>
-													<FieldLabel>Full Name</FieldLabel>
-													<Input
-														value={field.state.value}
-														onBlur={field.handleBlur}
-														onChange={(event) =>
-															field.handleChange(event.target.value)
-														}
-														disabled={isReadOnly}
-													/>
-													<FieldError errors={field.state.meta.errors} />
-												</Field>
-											)}
-										</form.Field>
-										<KycFormGrid>
-											<form.Field name={`directors[${index}].dateOfBirth`}>
-												{(field) => (
-													<Field
-														data-invalid={field.state.meta.errors.length > 0}
-													>
-														<FieldLabel>Date of Birth</FieldLabel>
-														<KycDatePicker
-															value={field.state.value}
-															onChange={(date) =>
-																field.handleChange(
-																	date ? format(date, "yyyy-MM-dd") : "",
-																)
-															}
-															disabled={isReadOnly}
-														/>
-														<FieldError errors={field.state.meta.errors} />
-													</Field>
-												)}
-											</form.Field>
-											<form.Field name={`directors[${index}].nationality`}>
-												{(field) => (
-													<Field
-														data-invalid={field.state.meta.errors.length > 0}
-													>
-														<FieldLabel>Nationality</FieldLabel>
-														<CountrySelect
-															value={field.state.value}
-															onValueChange={field.handleChange}
-															placeholder="Select nationality"
-															disabled={isReadOnly}
-														/>
-														<FieldError errors={field.state.meta.errors} />
-													</Field>
-												)}
-											</form.Field>
-										</KycFormGrid>
-										<form.Field name={`directors[${index}].address.address`}>
-											{(field) => (
-												<Field
-													data-invalid={field.state.meta.errors.length > 0}
-												>
-													<FieldLabel>Address</FieldLabel>
-													<Textarea
-														value={field.state.value}
-														onBlur={field.handleBlur}
-														onChange={(event) =>
-															field.handleChange(event.target.value)
-														}
-														rows={3}
-														disabled={isReadOnly}
-													/>
-													<FieldError errors={field.state.meta.errors} />
-												</Field>
-											)}
-										</form.Field>
-										<KycFormGrid>
-											<form.Field
-												name={`directors[${index}].address.postalCode`}
+							<KycEntryCard
+								key={`director-${director.name}`}
+								title={`Director ${index + 1}`}
+								onRemove={
+									!isReadOnly && directorsField.state.value.length > 1
+										? () => directorsField.removeValue(index)
+										: undefined
+								}
+							>
+								<FieldGroup className="flex flex-col gap-4">
+									<form.Field name={`directors[${index}].name`}>
+										{(field) => (
+											<Field
+												className="gap-1.5"
+												data-invalid={field.state.meta.errors.length > 0}
 											>
-												{(field) => (
-													<Field
-														data-invalid={field.state.meta.errors.length > 0}
-													>
-														<FieldLabel>Postal Code</FieldLabel>
-														<Input
-															value={field.state.value}
-															onBlur={field.handleBlur}
-															onChange={(event) =>
-																field.handleChange(event.target.value)
-															}
-															disabled={isReadOnly}
-														/>
-														<FieldError errors={field.state.meta.errors} />
-													</Field>
-												)}
-											</form.Field>
-											<form.Field name={`directors[${index}].address.country`}>
-												{(field) => (
-													<Field
-														data-invalid={field.state.meta.errors.length > 0}
-													>
-														<FieldLabel>Country</FieldLabel>
-														<CountrySelect
-															value={field.state.value}
-															onValueChange={field.handleChange}
-															disabled={isReadOnly}
-														/>
-														<FieldError errors={field.state.meta.errors} />
-													</Field>
-												)}
-											</form.Field>
-										</KycFormGrid>
-										<form.Field name={`directors[${index}].idNumber`}>
+												<FieldLabel>
+													Full Name{" "}
+													<span className="text-destructive">*</span>
+												</FieldLabel>
+												<Input
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(event) =>
+														field.handleChange(event.target.value)
+													}
+													disabled={isReadOnly}
+												/>
+												<FieldError errors={field.state.meta.errors} />
+											</Field>
+										)}
+									</form.Field>
+									<KycFormGrid>
+										<form.Field name={`directors[${index}].dateOfBirth`}>
 											{(field) => (
 												<Field
+													className="gap-1.5"
 													data-invalid={field.state.meta.errors.length > 0}
 												>
-													<FieldLabel>ID Number</FieldLabel>
+													<FieldLabel>
+														Date of Birth{" "}
+														<span className="text-destructive">*</span>
+													</FieldLabel>
+													<KycDatePicker
+														value={field.state.value}
+														onChange={(date) =>
+															field.handleChange(
+																date ? format(date, "yyyy-MM-dd") : "",
+															)
+														}
+														disabled={isReadOnly}
+													/>
+													<FieldError errors={field.state.meta.errors} />
+												</Field>
+											)}
+										</form.Field>
+										<form.Field name={`directors[${index}].nationality`}>
+											{(field) => (
+												<Field
+													className="gap-1.5"
+													data-invalid={field.state.meta.errors.length > 0}
+												>
+													<FieldLabel>
+														Nationality{" "}
+														<span className="text-destructive">*</span>
+													</FieldLabel>
+													<CountrySelect
+														value={field.state.value}
+														onValueChange={field.handleChange}
+														placeholder="Select nationality"
+														disabled={isReadOnly}
+													/>
+													<FieldError errors={field.state.meta.errors} />
+												</Field>
+											)}
+										</form.Field>
+									</KycFormGrid>
+									<form.Field name={`directors[${index}].address.address`}>
+										{(field) => (
+											<Field
+												className="gap-1.5"
+												data-invalid={field.state.meta.errors.length > 0}
+											>
+												<FieldLabel>
+													Address{" "}
+													<span className="text-destructive">*</span>
+												</FieldLabel>
+												<Textarea
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(event) =>
+														field.handleChange(event.target.value)
+													}
+													rows={3}
+													disabled={isReadOnly}
+												/>
+												<FieldError errors={field.state.meta.errors} />
+											</Field>
+										)}
+									</form.Field>
+									<KycFormGrid>
+										<form.Field name={`directors[${index}].address.postalCode`}>
+											{(field) => (
+												<Field
+													className="gap-1.5"
+													data-invalid={field.state.meta.errors.length > 0}
+												>
+													<FieldLabel>
+														Postal Code{" "}
+														<span className="text-destructive">*</span>
+													</FieldLabel>
 													<Input
 														value={field.state.value}
 														onBlur={field.handleBlur}
@@ -257,8 +241,50 @@ export function DirectorsAndShareholdersForm() {
 												</Field>
 											)}
 										</form.Field>
-									</FieldGroup>
-								</KycEntryCard>
+										<form.Field name={`directors[${index}].address.country`}>
+											{(field) => (
+												<Field
+													className="gap-1.5"
+													data-invalid={field.state.meta.errors.length > 0}
+												>
+													<FieldLabel>
+														Country{" "}
+														<span className="text-destructive">*</span>
+													</FieldLabel>
+													<CountrySelect
+														value={field.state.value}
+														onValueChange={field.handleChange}
+														disabled={isReadOnly}
+													/>
+													<FieldError errors={field.state.meta.errors} />
+												</Field>
+											)}
+										</form.Field>
+									</KycFormGrid>
+									<form.Field name={`directors[${index}].idNumber`}>
+										{(field) => (
+											<Field
+												className="gap-1.5"
+												data-invalid={field.state.meta.errors.length > 0}
+											>
+												<FieldLabel>
+													ID Number{" "}
+													<span className="text-destructive">*</span>
+												</FieldLabel>
+												<Input
+													value={field.state.value}
+													onBlur={field.handleBlur}
+													onChange={(event) =>
+														field.handleChange(event.target.value)
+													}
+													disabled={isReadOnly}
+												/>
+												<FieldError errors={field.state.meta.errors} />
+											</Field>
+										)}
+									</form.Field>
+								</FieldGroup>
+							</KycEntryCard>
 						))}
 						{!isReadOnly && (
 							<Button
@@ -289,21 +315,27 @@ export function DirectorsAndShareholdersForm() {
 						<h3 className="text-base font-semibold">
 							Ultimate Beneficial Owners (UBOs)
 						</h3>
-						{ubosField.state.value.map((_, index) => (
+						{ubosField.state.value.map((ubo, index) => (
 							<KycEntryCard
-								key={`ubo-${index}`}
-								title={`UBO ${index + 1}`}
+								key={`ubo-${ubo.name}`}
+								title={`UBO ${ubo.name}`}
 								onRemove={
 									!isReadOnly && ubosField.state.value.length > 1
 										? () => ubosField.removeValue(index)
 										: undefined
 								}
 							>
-								<FieldGroup className="space-y-4">
+								<FieldGroup className="flex flex-col gap-4">
 									<form.Field name={`ubos[${index}].name`}>
 										{(field) => (
-											<Field data-invalid={field.state.meta.errors.length > 0}>
-												<FieldLabel>Full Name</FieldLabel>
+											<Field
+												className="gap-1.5"
+												data-invalid={field.state.meta.errors.length > 0}
+											>
+												<FieldLabel>
+													Full Name{" "}
+													<span className="text-destructive">*</span>
+												</FieldLabel>
 												<Input
 													value={field.state.value}
 													onBlur={field.handleBlur}
@@ -320,9 +352,13 @@ export function DirectorsAndShareholdersForm() {
 										<form.Field name={`ubos[${index}].ownershipPercentage`}>
 											{(field) => (
 												<Field
+													className="gap-1.5"
 													data-invalid={field.state.meta.errors.length > 0}
 												>
-													<FieldLabel>Ownership Percentage</FieldLabel>
+													<FieldLabel>
+														Ownership Percentage{" "}
+														<span className="text-destructive">*</span>
+													</FieldLabel>
 													<Input
 														type="number"
 														min={0}
@@ -341,9 +377,13 @@ export function DirectorsAndShareholdersForm() {
 										<form.Field name={`ubos[${index}].idNumber`}>
 											{(field) => (
 												<Field
+													className="gap-1.5"
 													data-invalid={field.state.meta.errors.length > 0}
 												>
-													<FieldLabel>ID Number</FieldLabel>
+													<FieldLabel>
+													ID Number{" "}
+													<span className="text-destructive">*</span>
+												</FieldLabel>
 													<Input
 														value={field.state.value}
 														onBlur={field.handleBlur}
