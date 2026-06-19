@@ -5,7 +5,13 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+
 import { useTenantUsersQuery } from "#/api/http/v1/tenants/tenants.hooks";
+import {
+	paginateItems,
+	TablePagination,
+	TablePaginationSkeleton,
+} from "#/components/table-pagination";
 import { Avatar, AvatarFallback } from "#/components/ui/avatar";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -27,18 +33,13 @@ import {
 	TableRow,
 } from "#/components/ui/table";
 import {
-	paginateItems,
-	TablePagination,
-	TablePaginationSkeleton,
-} from "#/components/table-pagination";
-import {
 	DeleteUserDialog,
 	type DeleteUserDialogTarget,
 } from "../-components/delete-user-dialog";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { UserRoleBadge } from "../-components/user-role-badge";
-import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
 import type { TenantUserRole } from "../-data";
+import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
 import { InviteUserDialog } from "../invitations/-components/invite-user-dialog";
 import { ActiveUserStatusBadge } from "./-components/user-status-badge";
 import {
