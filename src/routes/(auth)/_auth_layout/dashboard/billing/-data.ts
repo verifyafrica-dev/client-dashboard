@@ -290,3 +290,39 @@ export function downloadTransactionsCsv(
 export function getInvoiceFilename(invoice: Invoice) {
 	return invoice.invoice_id ?? invoice.id;
 }
+
+export const TOP_UP_DEFAULT_MIN_AMOUNT = 300;
+export const TOP_UP_EXCLUDED_USER_MIN_AMOUNT = 30;
+export const TOP_UP_MAX_AMOUNT = 50_000;
+
+export const TOP_UP_EXCLUDED_USER_EMAILS = [
+	"info@cjsolutionsltd.com",
+	"kenovienadu@gmail.com",
+] as const;
+
+export const TOP_UP_SUGGESTED_AMOUNTS = {
+	default: [500, 1000, 2500, 5000, 10_000],
+	excluded: [50, 100, 250, 500, 1000],
+} as const;
+
+export function isTopUpExcludedUser(email?: string | null) {
+	return TOP_UP_EXCLUDED_USER_EMAILS.includes(
+		email as (typeof TOP_UP_EXCLUDED_USER_EMAILS)[number],
+	);
+}
+
+export function getTopUpMinAmount(email?: string | null) {
+	return isTopUpExcludedUser(email)
+		? TOP_UP_EXCLUDED_USER_MIN_AMOUNT
+		: TOP_UP_DEFAULT_MIN_AMOUNT;
+}
+
+export function getTopUpSuggestedAmounts(email?: string | null) {
+	return isTopUpExcludedUser(email)
+		? TOP_UP_SUGGESTED_AMOUNTS.excluded
+		: TOP_UP_SUGGESTED_AMOUNTS.default;
+}
+
+export function formatTopUpAmountLabel(amount: number) {
+	return `$${amount.toLocaleString()}`;
+}

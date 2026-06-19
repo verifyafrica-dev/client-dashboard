@@ -40,6 +40,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { cn } from "#/lib/utils.ts";
 import { useAuthStore } from "#/stores/auth-store";
 import { ExportTransactionsDialog } from "./-components/export-transactions-dialog";
+import { AddCreditsDialog } from "./-components/add-credits-dialog";
 import { TransactionDetailsDialog } from "./-components/transaction-details-dialog";
 import { UpdateBillingDialog } from "./-components/update-billing-dialog";
 import {
@@ -73,6 +74,7 @@ function BillingPage() {
 	const [transactionPage, setTransactionPage] = useState(1);
 	const [invoicePage, setInvoicePage] = useState(1);
 	const [billingOpen, setBillingOpen] = useState(false);
+	const [topUpOpen, setTopUpOpen] = useState(false);
 	const [exportOpen, setExportOpen] = useState(false);
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const [selectedTransaction, setSelectedTransaction] =
@@ -191,6 +193,13 @@ function BillingPage() {
 										</p>
 									</div>
 								</div>
+								<Button
+									type="button"
+									className="cursor-pointer"
+									onClick={() => setTopUpOpen(true)}
+								>
+									Top Up Balance
+								</Button>
 							</CardHeader>
 						</Card>
 
@@ -500,6 +509,11 @@ function BillingPage() {
 				</CardContent>
 			</Card>
 
+			<AddCreditsDialog
+				open={topUpOpen}
+				onOpenChange={setTopUpOpen}
+				userEmail={user?.email}
+			/>
 			<UpdateBillingDialog
 				open={billingOpen}
 				onOpenChange={setBillingOpen}
