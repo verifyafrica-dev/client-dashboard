@@ -143,8 +143,11 @@ export function TransactionDetailsDialog({
 										<DetailRow
 											key={key}
 											label={formatMetadataLabel(key)}
-											value={formatMetaValue(value)}
-											valueClassName="max-w-[220px] break-all font-mono text-xs"
+											value={formatMetadataValue(key, value)}
+											valueClassName={cn(
+												"max-w-[220px] break-all",
+												isMetadataIdKey(key) && "font-mono text-xs",
+											)}
 										/>
 									))}
 								</div>
@@ -190,6 +193,27 @@ function DetailRow({
 
 function formatMetadataLabel(key: string) {
 	return key
+		.replaceAll("_", " ")
+		.replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function isMetadataIdKey(key: string) {
+	const normalized = key.toLowerCase();
+	return normalized === "id" || normalized.endsWith("_id");
+}
+
+function shouldFormatMetadataValue(value: string) {
+	return /^[a-z]+(_[a-z]+)*$/.test(value);
+}
+
+function formatMetadataValue(key: string, value: unknown) {
+	const raw = formatMetaValue(value);
+
+	if (raw === "—" || isMetadataIdKey(key) || !shouldFormatMetadataValue(raw)) {
+		return raw;
+	}
+
+	return raw
 		.replaceAll("_", " ")
 		.replace(/\b\w/g, (char) => char.toUpperCase());
 }
