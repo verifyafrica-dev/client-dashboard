@@ -311,7 +311,7 @@ function BillingPage() {
 												<TableRow>
 													<TableCell
 														colSpan={8}
-														className="h-full text-center text-muted-foreground"
+														className="h-24 text-center text-sm text-muted-foreground"
 													>
 														No transactions found.
 													</TableCell>
@@ -432,15 +432,11 @@ function BillingPage() {
 										Failed to load invoices. Please try again.
 									</p>
 								</div>
-							) : invoices.length === 0 ? (
-								<div className="flex min-h-40 items-center justify-center rounded-lg border border-dashed">
-									<p className="text-sm text-muted-foreground">
-										No invoices available yet.
-									</p>
-								</div>
 							) : (
 								<div className="min-h-[320px] flex flex-col justify-between">
-									<Table>
+									<Table
+										className={cn(invoices.length === 0 && "h-full flex-1")}
+									>
 										<TableHeader>
 											<TableRow>
 												<TableHead>Invoice</TableHead>
@@ -452,31 +448,42 @@ function BillingPage() {
 											</TableRow>
 										</TableHeader>
 										<TableBody>
-											{invoices.map((invoice) => (
-												<TableRow key={invoice.id}>
-													<TableCell className="font-mono text-xs">
-														{getInvoiceFilename(invoice)}
-													</TableCell>
-													<TableCell>{invoice.description ?? "—"}</TableCell>
-													<TableCell>
-														{formatInvoiceAmount(
-															invoice.amount,
-															invoice.currency ?? currency,
-														)}
-													</TableCell>
-													<TableCell>
-														<Badge variant="outline" className="capitalize">
-															{invoice.payment_status ?? "unknown"}
-														</Badge>
-													</TableCell>
-													<TableCell>
-														{formatInvoiceDate(invoice.created_at)}
-													</TableCell>
-													<TableCell>
-														{formatInvoiceDate(invoice.due_at)}
+											{invoices.length === 0 ? (
+												<TableRow>
+													<TableCell
+														colSpan={6}
+														className="h-24 text-center text-sm text-muted-foreground"
+													>
+														No invoices available yet.
 													</TableCell>
 												</TableRow>
-											))}
+											) : (
+												invoices.map((invoice) => (
+													<TableRow key={invoice.id}>
+														<TableCell className="font-mono text-xs">
+															{getInvoiceFilename(invoice)}
+														</TableCell>
+														<TableCell>{invoice.description ?? "—"}</TableCell>
+														<TableCell>
+															{formatInvoiceAmount(
+																invoice.amount,
+																invoice.currency ?? currency,
+															)}
+														</TableCell>
+														<TableCell>
+															<Badge variant="outline" className="capitalize">
+																{invoice.payment_status ?? "unknown"}
+															</Badge>
+														</TableCell>
+														<TableCell>
+															{formatInvoiceDate(invoice.created_at)}
+														</TableCell>
+														<TableCell>
+															{formatInvoiceDate(invoice.due_at)}
+														</TableCell>
+													</TableRow>
+												))
+											)}
 										</TableBody>
 									</Table>
 

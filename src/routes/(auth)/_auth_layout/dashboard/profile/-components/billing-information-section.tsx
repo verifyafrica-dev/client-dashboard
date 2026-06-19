@@ -2,7 +2,6 @@ import {
 	BuildingsIcon,
 	EnvelopeSimpleIcon,
 	FloppyDiskIcon,
-	GlobeHemisphereWestIcon,
 	HouseIcon,
 } from "@phosphor-icons/react";
 import { type FormEvent, useEffect, useState } from "react";
@@ -14,18 +13,11 @@ import {
 	usePartialUpdateBillingInformationMutation,
 } from "#/api/http/v1/billing/billing.hooks";
 import type { BillingInformation } from "#/api/http/v1/billing/billing.types";
+import { CountryStateCityFields } from "#/components/ui-extended/country-state-city-fields";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "#/components/ui/select";
 import { Separator } from "#/components/ui/separator";
 import { Skeleton } from "#/components/ui/skeleton";
-import { COUNTRIES } from "#/lib/constants.ts";
 import { cn } from "#/lib/utils.ts";
 import {
 	Field,
@@ -217,69 +209,18 @@ export function BillingInformationSection({
 						</div>
 					</Field>
 
-					<div className="grid gap-4 sm:grid-cols-3">
-						<Field className="flex flex-col gap-2">
-							<FieldLabel htmlFor="billing-city">City</FieldLabel>
-							<div className="relative">
-								<BuildingsIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-								<Input
-									id="billing-city"
-									placeholder="City"
-									className="pl-10"
-									value={form.billing_city}
-									onChange={(event) =>
-										updateField("billing_city", event.target.value)
-									}
-								/>
-							</div>
-						</Field>
-
-						<Field className="flex flex-col gap-2">
-							<FieldLabel htmlFor="billing-state">State/Province</FieldLabel>
-							<Input
-								id="billing-state"
-								placeholder="State or province"
-								value={form.billing_state}
-								onChange={(event) =>
-									updateField("billing_state", event.target.value)
-								}
-							/>
-						</Field>
-
-						<Field className="flex flex-col gap-2">
-							<FieldLabel htmlFor="billing-postal">Postal Code</FieldLabel>
-							<Input
-								id="billing-postal"
-								placeholder="Postal code"
-								value={form.billing_postal_code}
-								onChange={(event) =>
-									updateField("billing_postal_code", event.target.value)
-								}
-							/>
-						</Field>
-					</div>
-
-					<Field className="flex flex-col gap-2">
-						<FieldLabel htmlFor="billing-country">Country</FieldLabel>
-						<div className="relative">
-							<GlobeHemisphereWestIcon className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
-							<Select
-								value={form.billing_country}
-								onValueChange={(value) => updateField("billing_country", value)}
-							>
-								<SelectTrigger id="billing-country" className="w-full pl-10">
-									<SelectValue placeholder="Select country" />
-								</SelectTrigger>
-								<SelectContent>
-									{COUNTRIES.map((country) => (
-										<SelectItem key={country.code} value={country.name}>
-											{country.name}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-					</Field>
+					<CountryStateCityFields
+						country={form.billing_country}
+						state={form.billing_state}
+						city={form.billing_city}
+						postalCode={form.billing_postal_code}
+						onCountryChange={(value) => updateField("billing_country", value)}
+						onStateChange={(value) => updateField("billing_state", value)}
+						onCityChange={(value) => updateField("billing_city", value)}
+						onPostalCodeChange={(value) =>
+							updateField("billing_postal_code", value)
+						}
+					/>
 				</FieldGroup>
 
 				<Button type="submit" className="w-full" disabled={isSaving}>
