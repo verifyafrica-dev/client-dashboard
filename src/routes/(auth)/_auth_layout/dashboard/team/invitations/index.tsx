@@ -32,11 +32,13 @@ import {
 	TablePagination,
 	TablePaginationSkeleton,
 } from "#/components/table-pagination";
+import { cn } from "#/lib/utils.ts";
 import {
 	DeleteUserDialog,
 	type DeleteUserDialogTarget,
 } from "../-components/delete-user-dialog";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
+import { TeamTableShell } from "../-components/team-table-shell";
 import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
 import type { TenantUserRole } from "../-data";
 import {
@@ -219,17 +221,21 @@ function InvitationsPage() {
 				</CardHeader>
 				<CardContent className="p-0">
 					{invitationsQuery.isPending ? (
-						<>
+						<TeamTableShell>
 							<TeamTableSkeleton columns={INVITATION_TABLE_COLUMNS} />
 							<TablePaginationSkeleton />
-						</>
+						</TeamTableShell>
 					) : invitationsQuery.isError ? (
-						<div className="flex h-24 items-center justify-center px-6 text-sm text-muted-foreground">
+						<div className="flex min-h-[320px] items-center justify-center px-6 text-sm text-muted-foreground">
 							Failed to load invitations. Please try again.
 						</div>
 					) : (
-						<>
-							<Table>
+						<TeamTableShell>
+							<Table
+								className={cn(
+									paginatedInvitations.length === 0 && "h-full flex-1",
+								)}
+							>
 								<TableHeader>
 									<TableRow className="hover:bg-transparent">
 										{INVITATION_TABLE_COLUMNS.map((column, index) => (
@@ -310,7 +316,7 @@ function InvitationsPage() {
 								total={filteredInvitations.length}
 								onPageChange={setPage}
 							/>
-						</>
+						</TeamTableShell>
 					)}
 				</CardContent>
 			</Card>

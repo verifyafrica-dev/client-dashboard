@@ -1,9 +1,10 @@
+import { createFileRoute } from '@tanstack/react-router'
 import {
 	CalendarBlankIcon,
 	MagnifyingGlassIcon,
 	TrashIcon,
 } from "@phosphor-icons/react";
-import { createFileRoute } from "@tanstack/react-router";
+import { cn } from "#/lib/utils.ts";
 import { useMemo, useState } from "react";
 
 import { useTenantUsersQuery } from "#/api/http/v1/tenants/tenants.hooks";
@@ -37,6 +38,7 @@ import {
 	type DeleteUserDialogTarget,
 } from "../-components/delete-user-dialog";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
+import { TeamTableShell } from "../-components/team-table-shell";
 import { UserRoleBadge } from "../-components/user-role-badge";
 import type { TenantUserRole } from "../-data";
 import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
@@ -222,17 +224,19 @@ function ActiveUsersPage() {
 				</CardHeader>
 				<CardContent className="p-0">
 					{usersQuery.isPending ? (
-						<>
+						<TeamTableShell>
 							<TeamTableSkeleton columns={ACTIVE_USER_TABLE_COLUMNS} />
 							<TablePaginationSkeleton />
-						</>
+						</TeamTableShell>
 					) : usersQuery.isError ? (
-						<div className="flex h-24 items-center justify-center px-6 text-sm text-muted-foreground">
+						<div className="flex min-h-[320px] items-center justify-center px-6 text-sm text-muted-foreground">
 							Failed to load users. Please try again.
 						</div>
 					) : (
-						<>
-							<Table>
+						<TeamTableShell>
+							<Table
+								className={cn(paginatedUsers.length === 0 && "h-full flex-1")}
+							>
 								<TableHeader>
 									<TableRow className="hover:bg-transparent">
 										{ACTIVE_USER_TABLE_COLUMNS.map((column, index) => (
@@ -325,7 +329,7 @@ function ActiveUsersPage() {
 								total={filteredUsers.length}
 								onPageChange={setPage}
 							/>
-						</>
+						</TeamTableShell>
 					)}
 				</CardContent>
 			</Card>
