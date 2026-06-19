@@ -5,6 +5,7 @@
     "jsx": "react-jsx",
     "module": "ESNext",
     "paths": {
+      "country-state-city": ["./src/lib/country-state-city.ts"],
       "#/*": ["./src/*"],
       "@/*": ["./src/*"]
     },

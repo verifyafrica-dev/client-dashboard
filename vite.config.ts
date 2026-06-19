@@ -1,29 +1,38 @@
-import { defineConfig } from 'vite'
-import { devtools } from '@tanstack/devtools-vite'
-
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
-
-import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
-import babel from '@rolldown/plugin-babel'
-import tailwindcss from '@tailwindcss/vite'
+import babel from "@rolldown/plugin-babel";
+import tailwindcss from "@tailwindcss/vite";
+import { devtools } from "@tanstack/devtools-vite";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
+import path from "node:path";
+import { defineConfig } from "vite";
 
 const config = defineConfig({
-  resolve: {
-    tsconfigPaths: true,
-    alias: {
-      html2canvas: 'html2canvas-pro',
-    },
-  },
-  optimizeDeps: {
-    include: ['html2canvas-pro'],
-  },
-  plugins: [
-    devtools(),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-    babel({ presets: [reactCompilerPreset()] }),
-  ],
-})
+	resolve: {
+		tsconfigPaths: true,
+		alias: [
+			{
+				find: /^country-state-city$/,
+				replacement: path.resolve(
+					import.meta.dirname,
+					"src/lib/country-state-city.ts",
+				),
+			},
+			{
+				find: "html2canvas",
+				replacement: "html2canvas-pro",
+			},
+		],
+	},
+	optimizeDeps: {
+		include: ["html2canvas-pro"],
+	},
+	plugins: [
+		devtools(),
+		tailwindcss(),
+		tanstackStart(),
+		viteReact(),
+		babel({ presets: [reactCompilerPreset()] }),
+	],
+});
 
-export default config
+export default config;

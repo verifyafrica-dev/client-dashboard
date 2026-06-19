@@ -190,7 +190,9 @@ export function CountryStateCityFields({
 							value={state}
 							onChange={(event) => onStateChange(event.target.value)}
 							disabled={disabled || !countryCode}
-							placeholder={countryCode ? "Enter state or province" : "Select country first"}
+							placeholder={
+								countryCode ? "Enter state or province" : "Select country first"
+							}
 						/>
 					</div>
 				)}
@@ -213,9 +215,7 @@ export function CountryStateCityFields({
 							value={city}
 							onChange={(event) => onCityChange(event.target.value)}
 							disabled={
-								disabled ||
-								!countryCode ||
-								(showStateSelect && !stateCode)
+								disabled || !countryCode || (showStateSelect && !stateCode)
 							}
 							placeholder={
 								!countryCode
