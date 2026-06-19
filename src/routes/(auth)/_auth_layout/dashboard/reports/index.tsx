@@ -30,7 +30,7 @@ import { cn } from "#/lib/utils.ts";
 import {
 	paginateItems,
 	TablePagination,
-} from "../team/-components/table-pagination";
+} from "#/components/table-pagination";
 import { ReportsTableShell } from "./-components/reports-table-shell";
 import {
 	ReportsPaginationSkeleton,

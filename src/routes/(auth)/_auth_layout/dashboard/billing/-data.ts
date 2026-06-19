@@ -1,18 +1,9 @@
-export const BALANCE = {
-	amount: 8.3,
-	currency: "USD",
-} as const;
+import { subDays } from "date-fns";
+import type { DateRange } from "react-day-picker";
 
-export const BILLING_INFO = {
-	name: "VerifyAfrica",
-	email: "info@verifyafrica.io",
-	address: "—",
-	city: "—",
-	state: "—",
-	postalCode: "—",
-	country: "Cyprus",
-	displayAddress: "--, --, Cyprus",
-} as const;
+import type { BillingInformation } from "#/api/http/v1/billing/billing.types";
+import type { WalletTransaction } from "#/api/http/v1/billing/billing.types";
+import type { Invoice } from "#/api/http/v1/billing/billing.types";
 
 export type TransactionType = "debit" | "credit";
 
@@ -27,98 +18,73 @@ export type Transaction = {
 	balanceBefore: number;
 	balanceAfter: number;
 	transactionId: string;
-	meta: {
-		type: string;
-		isCustom: boolean;
-		journeyId: string | null;
-		mixedVerificationId: string | null;
-	};
+	currency: string;
+	meta: Record<string, unknown>;
 };
 
-export const TRANSACTIONS: Transaction[] = [
-	{
-		id: "1",
-		reference: "a994b7cd28",
-		date: "6/3/2026",
-		dateTime: "June 3, 2026 at 10:12 AM",
-		description: "Mixed verification",
-		amount: -4.1,
-		type: "debit",
-		balanceBefore: 12.4,
-		balanceAfter: 8.3,
-		transactionId: "06a1fefe-2c26-7315-8000-a41b349f84cd",
-		meta: {
-			type: "mixed_verification",
-			isCustom: true,
-			journeyId: null,
-			mixedVerificationId: "06a1fefd-ae92-74e8-8000-eabe105efa69",
-		},
-	},
-	{
-		id: "2",
-		reference: "20f1a510a2",
-		date: "6/2/2026",
-		dateTime: "June 2, 2026 at 3:45 PM",
-		description: "Verification",
-		amount: -4.0,
-		type: "debit",
-		balanceBefore: 16.4,
-		balanceAfter: 12.4,
-		transactionId: "12b2fefa-3a27-8316-9000-b52c460g95de",
-		meta: {
-			type: "verification",
-			isCustom: false,
-			journeyId: "journey-abc-123",
-			mixedVerificationId: null,
-		},
-	},
-	{
-		id: "3",
-		reference: "cded54629d",
-		date: "5/30/2026",
-		dateTime: "May 30, 2026 at 9:00 AM",
-		description: "Admin Credit",
-		amount: 20.0,
-		type: "credit",
-		balanceBefore: 6.4,
-		balanceAfter: 26.4,
-		transactionId: "34c4gffc-5b48-9427-a111-d74e682h17fg",
-		meta: {
-			type: "admin_credit",
-			isCustom: false,
-			journeyId: null,
-			mixedVerificationId: null,
-		},
-	},
-	{
-		id: "4",
-		reference: "c8dde51b3a",
-		date: "5/30/2026",
-		dateTime: "May 30, 2026 at 8:30 AM",
-		description: "Admin Credit",
-		amount: 20.0,
-		type: "credit",
-		balanceBefore: -13.6,
-		balanceAfter: 6.4,
-		transactionId: "56e6hhhe-7c69-a638-b333-f96g804j39hi",
-		meta: {
-			type: "admin_credit",
-			isCustom: false,
-			journeyId: null,
-			mixedVerificationId: null,
-		},
-	},
+export type ExportDurationPreset =
+	| "custom"
+	| "7d"
+	| "14d"
+	| "30d"
+	| "90d"
+	| "alltime";
+
+export const EXPORT_DURATION_OPTIONS: {
+	value: ExportDurationPreset;
+	label: string;
+}[] = [
+	{ value: "custom", label: "Custom" },
+	{ value: "7d", label: "Last 7 days" },
+	{ value: "14d", label: "Last 14 days" },
+	{ value: "30d", label: "Last 30 days" },
+	{ value: "90d", label: "Last 90 days" },
+	{ value: "alltime", label: "All time" },
 ];
 
-export const QUICK_AMOUNTS = [500, 1000, 2500, 5000, 10000] as const;
-
-export const MIN_TOPUP = 300;
-export const MAX_TOPUP = 50_000;
+export const TRANSACTIONS_PAGE_SIZE = 10;
+export const INVOICES_PAGE_SIZE = 10;
 
 const moneyFormatter = new Intl.NumberFormat("en-US", {
 	minimumFractionDigits: 2,
 	maximumFractionDigits: 2,
 });
+
+const shortDateFormatter = new Intl.DateTimeFormat("en-US", {
+	month: "numeric",
+	day: "numeric",
+	year: "numeric",
+});
+
+const longDateTimeFormatter = new Intl.DateTimeFormat("en-US", {
+	month: "long",
+	day: "numeric",
+	year: "numeric",
+	hour: "numeric",
+	minute: "2-digit",
+});
+
+const invoiceDateFormatter = new Intl.DateTimeFormat("en-US", {
+	month: "short",
+	day: "numeric",
+	year: "numeric",
+});
+
+const isoDateFormatter = new Intl.DateTimeFormat("en-CA", {
+	year: "numeric",
+	month: "2-digit",
+	day: "2-digit",
+});
+
+const EXPORT_DURATION_DAYS: Record<
+	Exclude<ExportDurationPreset, "custom" | "alltime">,
+	number
+> = {
+	"7d": 7,
+	"14d": 14,
+	"30d": 30,
+	"90d": 90,
+};
 
 function getCurrencyFormatter(currency: string) {
 	return new Intl.NumberFormat("en-US", {
@@ -129,73 +95,196 @@ function getCurrencyFormatter(currency: string) {
 	});
 }
 
+function startOfDay(date: Date) {
+	const normalized = new Date(date);
+	normalized.setHours(0, 0, 0, 0);
+	return normalized;
+}
+
 export function formatMoney(amount: number) {
 	return moneyFormatter.format(amount);
 }
 
-export function formatSignedAmount(amount: number, currency = BALANCE.currency) {
+export function formatSignedAmount(amount: number, currency = "USD") {
 	const sign = amount < 0 ? "-" : "+";
 	const formatted = getCurrencyFormatter(currency).format(Math.abs(amount));
 	return `${sign}${formatted}`;
 }
 
-export const TRANSACTIONS_PAGE_SIZE = 10;
-
-export type BillingFilters = {
-	search: string;
-	type: string;
-	page: number;
-};
-
-export type BillingTransactionsResult = {
-	transactions: Transaction[];
-	total: number;
-	page: number;
-	pageSize: number;
-	totalPages: number;
-};
-
-export type BillingData = {
-	balance: typeof BALANCE;
-	billingInfo: typeof BILLING_INFO;
-	transactions: BillingTransactionsResult;
-};
-
-function filterTransactions(search: string, type: string) {
-	const query = search.trim().toLowerCase();
-
-	return TRANSACTIONS.filter((transaction) => {
-		const matchesType = type === "all" || transaction.type === type;
-		const matchesSearch =
-			query.length === 0 ||
-			transaction.reference.toLowerCase().includes(query) ||
-			transaction.description.toLowerCase().includes(query);
-
-		return matchesType && matchesSearch;
-	});
+export function formatIsoDate(date: Date) {
+	return isoDateFormatter.format(date);
 }
 
-export async function fetchBillingData(
-	filters: BillingFilters,
-): Promise<BillingData> {
-	// Replace with a real API call when the billing endpoint is available.
-	await new Promise((resolve) => setTimeout(resolve, 600));
+export function formatBillingDisplayAddress(
+	billingInfo: BillingInformation | undefined,
+) {
+	if (!billingInfo) {
+		return "No billing address on file";
+	}
 
-	const filtered = filterTransactions(filters.search, filters.type);
-	const total = filtered.length;
-	const totalPages = Math.max(1, Math.ceil(total / TRANSACTIONS_PAGE_SIZE));
-	const page = Math.min(Math.max(filters.page, 1), totalPages);
-	const start = (page - 1) * TRANSACTIONS_PAGE_SIZE;
+	const parts = [
+		billingInfo.billing_address,
+		billingInfo.billing_city,
+		billingInfo.billing_state,
+		billingInfo.billing_postal_code,
+		billingInfo.billing_country,
+	].filter(Boolean);
+
+	return parts.length > 0 ? parts.join(", ") : "No billing address on file";
+}
+
+export function mapWalletTransaction(
+	transaction: WalletTransaction,
+	currency = "USD",
+): Transaction {
+	const isDebit = transaction.type.toUpperCase() === "DEBIT";
+	const amount = Number.parseFloat(transaction.amount);
+	const signedAmount = isDebit ? -Math.abs(amount) : Math.abs(amount);
+	const createdAt = new Date(transaction.created_at);
+
+	const {
+		id,
+		reference,
+		reason,
+		balance_before,
+		balance_after,
+		type,
+		...meta
+	} = transaction;
 
 	return {
-		balance: BALANCE,
-		billingInfo: BILLING_INFO,
-		transactions: {
-			transactions: filtered.slice(start, start + TRANSACTIONS_PAGE_SIZE),
-			total,
-			page,
-			pageSize: TRANSACTIONS_PAGE_SIZE,
-			totalPages,
+		id,
+		reference,
+		date: shortDateFormatter.format(createdAt),
+		dateTime: longDateTimeFormatter.format(createdAt),
+		description: reason,
+		amount: signedAmount,
+		type: isDebit ? "debit" : "credit",
+		balanceBefore: Number.parseFloat(balance_before),
+		balanceAfter: Number.parseFloat(balance_after),
+		transactionId: id,
+		currency,
+		meta: {
+			type,
+			...meta,
 		},
 	};
+}
+
+export function formatInvoiceDate(value: string | null | undefined) {
+	if (!value) {
+		return "—";
+	}
+
+	return invoiceDateFormatter.format(new Date(value));
+}
+
+export function formatInvoiceAmount(
+	amount: string | undefined,
+	currency = "USD",
+) {
+	if (!amount) {
+		return "—";
+	}
+
+	return getCurrencyFormatter(currency).format(Number.parseFloat(amount));
+}
+
+export function getDefaultExportDateRange(
+	_accountCreatedAt: Date,
+	today = new Date(),
+): DateRange {
+	return {
+		from: startOfDay(subDays(today, 7)),
+		to: startOfDay(today),
+	};
+}
+
+export function getExportDateRangeForPreset(
+	preset: ExportDurationPreset,
+	accountCreatedAt: Date,
+	today = new Date(),
+): DateRange {
+	const endDate = startOfDay(today);
+
+	if (preset === "alltime") {
+		return {
+			from: startOfDay(accountCreatedAt),
+			to: endDate,
+		};
+	}
+
+	if (preset === "custom") {
+		return getDefaultExportDateRange(accountCreatedAt, today);
+	}
+
+	return {
+		from: startOfDay(subDays(today, EXPORT_DURATION_DAYS[preset])),
+		to: endDate,
+	};
+}
+
+export function getExportQueryDates(range: DateRange | undefined) {
+	if (!range?.from || !range?.to) {
+		return undefined;
+	}
+
+	return {
+		from_date: formatIsoDate(range.from),
+		to_date: formatIsoDate(range.to),
+	};
+}
+
+function escapeCsvValue(value: string) {
+	if (/[",\n]/.test(value)) {
+		return `"${value.replaceAll('"', '""')}"`;
+	}
+
+	return value;
+}
+
+export function downloadTransactionsCsv(
+	transactions: WalletTransaction[],
+	filename: string,
+	currency = "USD",
+) {
+	const headers = [
+		"Reference",
+		"Date",
+		"Description",
+		"Amount",
+		"Type",
+		"Balance Before",
+		"Balance After",
+	];
+
+	const rows = transactions.map((transaction) => {
+		const mapped = mapWalletTransaction(transaction, currency);
+
+		return [
+			mapped.reference,
+			mapped.dateTime,
+			mapped.description,
+			mapped.amount.toFixed(2),
+			mapped.type,
+			mapped.balanceBefore.toFixed(2),
+			mapped.balanceAfter.toFixed(2),
+		];
+	});
+
+	const csv = [headers, ...rows]
+		.map((row) => row.map((value) => escapeCsvValue(String(value))).join(","))
+		.join("\n");
+
+	const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+	const url = URL.createObjectURL(blob);
+	const link = document.createElement("a");
+	link.href = url;
+	link.download = filename;
+	link.click();
+	URL.revokeObjectURL(url);
+}
+
+export function getInvoiceFilename(invoice: Invoice) {
+	return invoice.invoice_id ?? invoice.id;
 }

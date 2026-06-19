@@ -47,6 +47,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { getProfileInitials } from "./-data";
+import { BillingInformationSection } from "./-components/billing-information-section";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/profile/")(
 	{
@@ -96,7 +97,11 @@ function ProfilePage() {
 						</TabsList>
 
 						<TabsContent value="profile">
-							<UpdateProfileTab key={user.id} user={user} />
+							<UpdateProfileTab
+								key={user.id}
+								user={user}
+								tenantId={user.tenants[0]?.id}
+							/>
 						</TabsContent>
 						<TabsContent value="password">
 							<ChangePasswordTab />
@@ -108,7 +113,13 @@ function ProfilePage() {
 	);
 }
 
-function UpdateProfileTab({ user }: { user: UserDetail }) {
+function UpdateProfileTab({
+	user,
+	tenantId,
+}: {
+	user: UserDetail;
+	tenantId?: string;
+}) {
 	const updateMeMutation = useUpdateMeMutation();
 
 	const form = useForm({
@@ -150,13 +161,14 @@ function UpdateProfileTab({ user }: { user: UserDetail }) {
 	const isSubmitting = updateMeMutation.isPending;
 
 	return (
-		<form
-			className="flex flex-col gap-6"
-			onSubmit={(event) => {
-				event.preventDefault();
-				form.handleSubmit();
-			}}
-		>
+		<div className="flex flex-col gap-8">
+			<form
+				className="flex flex-col gap-6"
+				onSubmit={(event) => {
+					event.preventDefault();
+					form.handleSubmit();
+				}}
+			>
 			<div className="flex flex-col items-center gap-2 text-center">
 				<Avatar className="size-24">
 					{user.avatar_url ? (
@@ -260,7 +272,10 @@ function UpdateProfileTab({ user }: { user: UserDetail }) {
 				/>
 				{isSubmitting ? "Updating Profile..." : "Update Profile"}
 			</Button>
-		</form>
+			</form>
+
+			<BillingInformationSection tenantId={tenantId} />
+		</div>
 	);
 }
 

@@ -1,5 +1,6 @@
-import { ReportsTableShell } from "./reports-table-shell";
+import { TablePaginationSkeleton } from "#/components/table-pagination";
 import { Skeleton } from "#/components/ui/skeleton";
+import { ReportsTableShell } from "./reports-table-shell";
 import {
 	Table,
 	TableBody,
@@ -95,11 +96,4 @@ function ReportsCellSkeleton({
 	return <Skeleton className="h-4 w-24" />;
 }
 
-export function ReportsPaginationSkeleton() {
-	return (
-		<div className="flex flex-col gap-3 border-t px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-			<Skeleton className="h-4 w-44" />
-			<Skeleton className="h-9 w-56" />
-		</div>
-	);
-}
+export { TablePaginationSkeleton as ReportsPaginationSkeleton };

@@ -34,11 +34,9 @@ import {
 import {
 	paginateItems,
 	TablePagination,
-} from "../-components/table-pagination";
-import {
-	TeamTablePaginationSkeleton,
-	TeamTableSkeleton,
-} from "../-components/team-table-skeleton";
+	TablePaginationSkeleton,
+} from "#/components/table-pagination";
+import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import {
 	InvitationRoleBadge,
 	InvitationStatusBadge,
@@ -239,7 +237,7 @@ function InvitationsPage() {
 					{isPending ? (
 						<>
 							<TeamTableSkeleton columns={INVITATION_TABLE_COLUMNS} />
-							<TeamTablePaginationSkeleton />
+							<TablePaginationSkeleton />
 						</>
 					) : (
 						<>

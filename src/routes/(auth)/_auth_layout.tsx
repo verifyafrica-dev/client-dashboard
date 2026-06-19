@@ -70,7 +70,7 @@ function AuthLayout() {
 						<PopoverTrigger asChild>
 							<button
 								type="button"
-								className="flex items-center gap-4 rounded-lg text-left outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring"
+								className="flex items-center gap-4 rounded-lg text-left outline-none transition-opacity hover:opacity-80 focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
 							>
 								<Avatar>
 									{user?.avatar_url ? (

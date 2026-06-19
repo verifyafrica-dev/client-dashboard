@@ -4,7 +4,19 @@ import {
 	GlobeHemisphereWestIcon,
 	HouseIcon,
 } from "@phosphor-icons/react";
-import { type ComponentProps, type ComponentType } from "react";
+import {
+	type ComponentProps,
+	type ComponentType,
+	useEffect,
+	useState,
+} from "react";
+import { toast } from "sonner";
+
+import {
+	useCreateBillingInformationMutation,
+	usePartialUpdateBillingInformationMutation,
+} from "#/api/http/v1/billing/billing.hooks";
+import type { BillingInformation } from "#/api/http/v1/billing/billing.types";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -22,22 +34,61 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
-import { cn } from "#/lib/utils.ts";
 import { COUNTRIES } from "#/lib/constants.ts";
-import { BILLING_INFO } from "../-data";
+import { cn } from "#/lib/utils.ts";
+
+type BillingFormState = {
+	billing_name: string;
+	billing_email: string;
+	billing_address: string;
+	billing_city: string;
+	billing_state: string;
+	billing_postal_code: string;
+	billing_country: string;
+};
+
+const EMPTY_FORM: BillingFormState = {
+	billing_name: "",
+	billing_email: "",
+	billing_address: "",
+	billing_city: "",
+	billing_state: "",
+	billing_postal_code: "",
+	billing_country: "",
+};
+
+function getFormState(billingInfo?: BillingInformation): BillingFormState {
+	if (!billingInfo) {
+		return EMPTY_FORM;
+	}
+
+	return {
+		billing_name: billingInfo.billing_name ?? "",
+		billing_email: billingInfo.billing_email ?? "",
+		billing_address: billingInfo.billing_address ?? "",
+		billing_city: billingInfo.billing_city ?? "",
+		billing_state: billingInfo.billing_state ?? "",
+		billing_postal_code: billingInfo.billing_postal_code ?? "",
+		billing_country: billingInfo.billing_country ?? "",
+	};
+}
 
 function IconField({
 	id,
 	label,
 	icon: Icon,
-	defaultValue,
+	value,
+	onChange,
 	className,
+	disabled,
 }: {
 	id: string;
 	label: string;
 	icon?: ComponentType<{ className?: string }>;
-	defaultValue?: string;
+	value: string;
+	onChange: (value: string) => void;
 	className?: string;
+	disabled?: boolean;
 }) {
 	return (
 		<div className={cn("space-y-2", className)}>
@@ -48,8 +99,10 @@ function IconField({
 				)}
 				<Input
 					id={id}
-					defaultValue={defaultValue}
+					value={value}
+					onChange={(event) => onChange(event.target.value)}
 					className={Icon ? "pl-10" : undefined}
+					disabled={disabled}
 				/>
 			</div>
 		</div>
@@ -59,12 +112,72 @@ function IconField({
 export function UpdateBillingDialog({
 	open,
 	onOpenChange,
-}: ComponentProps<typeof Dialog>) {
+	billingInfo,
+	tenantId,
+}: ComponentProps<typeof Dialog> & {
+	billingInfo?: BillingInformation;
+	tenantId?: string;
+}) {
+	const [form, setForm] = useState<BillingFormState>(EMPTY_FORM);
+	const createMutation = useCreateBillingInformationMutation();
+	const updateMutation = usePartialUpdateBillingInformationMutation(tenantId);
+
+	const isSaving = createMutation.isPending || updateMutation.isPending;
+
+	useEffect(() => {
+		if (open) {
+			setForm(getFormState(billingInfo));
+		}
+	}, [open, billingInfo]);
+
+	function updateField<K extends keyof BillingFormState>(
+		field: K,
+		value: BillingFormState[K],
+	) {
+		setForm((current) => ({ ...current, [field]: value }));
+	}
+
+	function handleSubmit() {
+		const payload = {
+			...form,
+			...(billingInfo ? {} : { tenant: tenantId }),
+		};
+
+		if (billingInfo) {
+			const { billing_email: _billingEmail, ...updatePayload } = payload;
+			updateMutation.mutate(updatePayload, {
+				onSuccess: () => {
+					toast.success("Billing information updated");
+					onOpenChange?.(false);
+				},
+				onError: () => {
+					toast.error("Failed to update billing information");
+				},
+			});
+			return;
+		}
+
+		if (!tenantId) {
+			toast.error("Tenant information is unavailable");
+			return;
+		}
+
+		createMutation.mutate(payload, {
+			onSuccess: () => {
+				toast.success("Billing information saved");
+				onOpenChange?.(false);
+			},
+			onError: () => {
+				toast.error("Failed to save billing information");
+			},
+		});
+	}
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
-					<DialogTitle className="flex items-center gap-2">
+					<DialogTitle className="flex items-center gap-2 font-semibold">
 						<BuildingsIcon className="size-5 text-primary" weight="duotone" />
 						Update Billing Information
 					</DialogTitle>
@@ -75,45 +188,55 @@ export function UpdateBillingDialog({
 						id="billing-name"
 						label="Billing Name"
 						icon={BuildingsIcon}
-						defaultValue={BILLING_INFO.name}
+						value={form.billing_name}
+						onChange={(value) => updateField("billing_name", value)}
 					/>
 					<IconField
 						id="billing-email"
 						label="Billing Email"
 						icon={EnvelopeSimpleIcon}
-						defaultValue={BILLING_INFO.email}
+						value={form.billing_email}
+						onChange={(value) => updateField("billing_email", value)}
+						disabled={Boolean(billingInfo)}
 					/>
 					<IconField
 						id="billing-address"
 						label="Billing Address"
 						icon={HouseIcon}
-						defaultValue={BILLING_INFO.address}
+						value={form.billing_address}
+						onChange={(value) => updateField("billing_address", value)}
 					/>
 					<div className="grid gap-4 sm:grid-cols-3">
 						<IconField
 							id="billing-city"
 							label="City"
 							icon={BuildingsIcon}
-							defaultValue={BILLING_INFO.city}
+							value={form.billing_city}
+							onChange={(value) => updateField("billing_city", value)}
 						/>
 						<IconField
 							id="billing-state"
 							label="State/Province"
-							defaultValue={BILLING_INFO.state}
+							value={form.billing_state}
+							onChange={(value) => updateField("billing_state", value)}
 						/>
 						<IconField
 							id="billing-postal"
 							label="Postal Code"
-							defaultValue={BILLING_INFO.postalCode}
+							value={form.billing_postal_code}
+							onChange={(value) => updateField("billing_postal_code", value)}
 						/>
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="billing-country">Country</Label>
 						<div className="relative">
 							<GlobeHemisphereWestIcon className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
-							<Select defaultValue={BILLING_INFO.country}>
+							<Select
+								value={form.billing_country}
+								onValueChange={(value) => updateField("billing_country", value)}
+							>
 								<SelectTrigger id="billing-country" className="w-full pl-10">
-									<SelectValue />
+									<SelectValue placeholder="Select country" />
 								</SelectTrigger>
 								<SelectContent>
 									{COUNTRIES.map((country) => (
@@ -136,8 +259,13 @@ export function UpdateBillingDialog({
 					>
 						Cancel
 					</Button>
-					<Button type="button" className="cursor-pointer">
-						Update Billing Info
+					<Button
+						type="button"
+						className="cursor-pointer"
+						disabled={isSaving}
+						onClick={handleSubmit}
+					>
+						{isSaving ? "Saving..." : "Update Billing Info"}
 					</Button>
 				</DialogFooter>
 			</DialogContent>

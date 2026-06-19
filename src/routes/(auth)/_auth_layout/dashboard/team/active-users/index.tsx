@@ -33,11 +33,9 @@ import {
 import {
 	paginateItems,
 	TablePagination,
-} from "../-components/table-pagination";
-import {
-	TeamTablePaginationSkeleton,
-	TeamTableSkeleton,
-} from "../-components/team-table-skeleton";
+	TablePaginationSkeleton,
+} from "#/components/table-pagination";
+import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { UserRoleBadge } from "../-components/user-role-badge";
 import type { TenantUserRole } from "../-data";
 import { InviteUserDialog } from "../invitations/-components/invite-user-dialog";
@@ -219,7 +217,7 @@ function ActiveUsersPage() {
 					{isPending ? (
 						<>
 							<TeamTableSkeleton columns={ACTIVE_USER_TABLE_COLUMNS} />
-							<TeamTablePaginationSkeleton />
+							<TablePaginationSkeleton />
 						</>
 					) : (
 						<>

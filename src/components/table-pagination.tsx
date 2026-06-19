@@ -7,6 +7,7 @@ import {
 	PaginationNext,
 	PaginationPrevious,
 } from "#/components/ui/pagination";
+import { Skeleton } from "#/components/ui/skeleton";
 import { cn } from "#/lib/utils.ts";
 
 function getVisiblePages(
@@ -114,6 +115,15 @@ export function TablePagination({
 					</PaginationContent>
 				</Pagination>
 			)}
+		</div>
+	);
+}
+
+export function TablePaginationSkeleton() {
+	return (
+		<div className="flex flex-col gap-3 border-t px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
+			<Skeleton className="h-4 w-44" />
+			<Skeleton className="h-9 w-56" />
 		</div>
 	);
 }

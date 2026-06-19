@@ -94,12 +94,3 @@ function TeamTableCellSkeleton({
 
 	return <Skeleton className="h-4 w-28" />;
 }
-
-export function TeamTablePaginationSkeleton() {
-	return (
-		<div className="flex flex-col gap-3 border-t px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-			<Skeleton className="h-4 w-44" />
-			<Skeleton className="h-9 w-56" />
-		</div>
-	);
-}

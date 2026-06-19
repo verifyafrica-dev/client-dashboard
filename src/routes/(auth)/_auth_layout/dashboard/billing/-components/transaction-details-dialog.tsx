@@ -33,6 +33,18 @@ function DetailRow({
 	);
 }
 
+function formatMetaValue(value: unknown) {
+	if (value === null || value === undefined || value === "") {
+		return "—";
+	}
+
+	if (typeof value === "boolean") {
+		return value ? "true" : "false";
+	}
+
+	return String(value);
+}
+
 export function TransactionDetailsDialog({
 	open,
 	onOpenChange,
@@ -57,7 +69,15 @@ export function TransactionDetailsDialog({
 	if (!transaction) return null;
 
 	const isDebit = transaction.type === "debit";
-	const formattedAmount = formatSignedAmount(transaction.amount);
+	const formattedAmount = formatSignedAmount(
+		transaction.amount,
+		transaction.currency,
+	);
+
+	const additionalFields = Object.entries(transaction.meta).filter(
+		([key]) =>
+			!["created_at", "updated_at", "id", "reference", "reason"].includes(key),
+	);
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
@@ -128,7 +148,10 @@ export function TransactionDetailsDialog({
 							<h3 className="mb-2 font-medium">Balance Impact</h3>
 							<DetailRow
 								label="Balance Before"
-								value={formatSignedAmount(transaction.balanceBefore)}
+								value={formatSignedAmount(
+									transaction.balanceBefore,
+									transaction.currency,
+								)}
 							/>
 							<DetailRow
 								label="Transaction Amount"
@@ -137,30 +160,32 @@ export function TransactionDetailsDialog({
 							/>
 							<DetailRow
 								label="Balance After"
-								value={formatSignedAmount(transaction.balanceAfter)}
+								value={formatSignedAmount(
+									transaction.balanceAfter,
+									transaction.currency,
+								)}
 								valueClassName="font-semibold text-primary"
 							/>
 						</div>
 
-						<Separator />
-
-						<div>
-							<h3 className="mb-2 font-medium">Additional Information</h3>
-							<DetailRow label="Type" value={transaction.meta.type} />
-							<DetailRow
-								label="Is Custom"
-								value={transaction.meta.isCustom ? "true" : "false"}
-							/>
-							<DetailRow
-								label="Journey Id"
-								value={transaction.meta.journeyId ?? "null"}
-							/>
-							<DetailRow
-								label="Mixed Verification Id"
-								value={transaction.meta.mixedVerificationId ?? "null"}
-								valueClassName="max-w-[220px] break-all font-mono text-xs"
-							/>
-						</div>
+						{additionalFields.length > 0 && (
+							<>
+								<Separator />
+								<div>
+									<h3 className="mb-2 font-medium">Additional Information</h3>
+									{additionalFields.map(([key, value]) => (
+										<DetailRow
+											key={key}
+											label={key
+												.replaceAll("_", " ")
+												.replace(/\b\w/g, (char) => char.toUpperCase())}
+											value={formatMetaValue(value)}
+											valueClassName="max-w-[220px] break-all font-mono text-xs"
+										/>
+									))}
+								</div>
+							</>
+						)}
 					</div>
 				</div>
 
