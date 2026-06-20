@@ -179,7 +179,7 @@ $http.interceptors.response.use(
 		if (
 			isTokenExpiredError(error) &&
 			!originalRequest._retry &&
-			!originalRequest.url?.includes("/api/users/login")
+			shouldUseAccessToken(originalRequest.url as string)
 		) {
 			originalRequest._retry = true;
 
