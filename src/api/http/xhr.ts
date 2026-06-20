@@ -176,7 +176,11 @@ $http.interceptors.response.use(
 	async (error) => {
 		const originalRequest = error.config;
 		console.log(error.response);
-		if (isTokenExpiredError(error) && !originalRequest._retry) {
+		if (
+			isTokenExpiredError(error) &&
+			!originalRequest._retry &&
+			!originalRequest.url?.includes("/api/users/login")
+		) {
 			originalRequest._retry = true;
 
 			if (!isRefreshing) {
