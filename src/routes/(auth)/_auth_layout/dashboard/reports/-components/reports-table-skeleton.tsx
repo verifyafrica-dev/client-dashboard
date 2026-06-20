@@ -1,6 +1,5 @@
 import { TablePaginationSkeleton } from "#/components/table-pagination";
 import { Skeleton } from "#/components/ui/skeleton";
-import { ReportsTableShell } from "./reports-table-shell";
 import {
 	Table,
 	TableBody,
@@ -9,6 +8,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "#/components/ui/table";
+import { ReportsTableShell } from "./reports-table-shell";
 
 const skeletonRowIds = ["one", "two", "three", "four", "five"];
 

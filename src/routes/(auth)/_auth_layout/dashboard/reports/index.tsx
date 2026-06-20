@@ -1,24 +1,21 @@
 import {
 	ArrowsClockwiseIcon,
 	EyeIcon,
-	FunnelIcon,
 	StackIcon,
 } from "@phosphor-icons/react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
+import {
+	useVerificationBatchesQuery,
+	useVerificationRequestsQuery,
+	VERIFICATIONS_QUERY_KEYS,
+} from "#/api/http/v1/verifications/verifications.hooks";
+import type { ReportsFiltersFormValues } from "#/api/http/v1/verifications/verifications.types";
 import { paginateItems, TablePagination } from "#/components/table-pagination";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
-import { Label } from "#/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "#/components/ui/select";
 import {
 	Table,
 	TableBody,
@@ -29,6 +26,8 @@ import {
 } from "#/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { cn } from "#/lib/utils.ts";
+import { useCurrentTenant } from "../team/-data";
+import { ReportsFiltersForm } from "./-components/reports-filters-form";
 import { ReportsTableShell } from "./-components/reports-table-shell";
 import {
 	ReportsPaginationSkeleton,
@@ -40,24 +39,20 @@ import {
 	VerificationTypeBadge,
 } from "./-components/verification-badges";
 import {
+	BATCH_VERIFICATIONS_LIST_PAGE_SIZE,
 	type BatchVerificationReport,
-	fetchBatchVerifications,
-	fetchVerifications,
 	filterVerifications,
 	formatReportDate,
 	formatVerificationType,
 	getVerificationCountries,
 	getVerificationStatuses,
 	getVerificationTypes,
+	mapVerificationBatchesToReports,
+	mapVerificationRequestsToReports,
 	REPORTS_PAGE_SIZE,
 	type VerificationReport,
+	VERIFICATIONS_LIST_PAGE_SIZE,
 } from "./-data";
-
-const VERIFICATIONS_QUERY_KEY = ["reports", "verifications"] as const;
-const BATCH_VERIFICATIONS_QUERY_KEY = [
-	"reports",
-	"batch-verifications",
-] as const;
 
 const INDIVIDUAL_COLUMNS = [
 	"ID",
@@ -84,6 +79,13 @@ const BATCH_COLUMNS = [
 	"Actions",
 ];
 
+const DEFAULT_FILTERS: ReportsFiltersFormValues = {
+	search: "",
+	verificationType: "all",
+	status: "all",
+	country: "all",
+};
+
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/reports/")(
 	{
 		component: ReportsPage,
@@ -92,39 +94,60 @@ export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/reports/")(
 
 function ReportsPage() {
 	const queryClient = useQueryClient();
+	const { tenantId } = useCurrentTenant();
 	const [activeTab, setActiveTab] = useState<"individual" | "batch">(
 		"individual",
 	);
-	const [verificationType, setVerificationType] = useState("all");
-	const [statusFilter, setStatusFilter] = useState("all");
-	const [countryFilter, setCountryFilter] = useState("all");
+	const [filters, setFilters] =
+		useState<ReportsFiltersFormValues>(DEFAULT_FILTERS);
 	const [individualPage, setIndividualPage] = useState(1);
 	const [batchPage, setBatchPage] = useState(1);
 
-	const {
-		data: verifications = [],
-		isPending: isVerificationsPending,
-		isFetching: isVerificationsFetching,
-	} = useQuery({
-		queryKey: VERIFICATIONS_QUERY_KEY,
-		queryFn: fetchVerifications,
-	});
+	const verificationRequestsQuery = useVerificationRequestsQuery(
+		tenantId,
+		{
+			has_batch: false,
+			page_size: VERIFICATIONS_LIST_PAGE_SIZE,
+		},
+		Boolean(tenantId),
+	);
 
-	const {
-		data: batchVerifications = [],
-		isPending: isBatchPending,
-		isFetching: isBatchFetching,
-	} = useQuery({
-		queryKey: BATCH_VERIFICATIONS_QUERY_KEY,
-		queryFn: fetchBatchVerifications,
-	});
+	const verificationBatchesQuery = useVerificationBatchesQuery(
+		tenantId,
+		{
+			page_size: BATCH_VERIFICATIONS_LIST_PAGE_SIZE,
+			is_test: false,
+		},
+		Boolean(tenantId),
+	);
 
-	const isIndividualLoading = isVerificationsPending || isVerificationsFetching;
-	const isBatchLoading = isBatchPending || isBatchFetching;
+	const verifications = useMemo(
+		() =>
+			mapVerificationRequestsToReports(
+				verificationRequestsQuery.data?.results ?? [],
+				"live",
+			),
+		[verificationRequestsQuery.data?.results],
+	);
+
+	const batchVerifications = useMemo(
+		() =>
+			mapVerificationBatchesToReports(
+				verificationBatchesQuery.data?.results ?? [],
+			),
+		[verificationBatchesQuery.data?.results],
+	);
+
+	const isIndividualLoading =
+		verificationRequestsQuery.isPending || verificationRequestsQuery.isFetching;
+	const isBatchLoading =
+		verificationBatchesQuery.isPending || verificationBatchesQuery.isFetching;
 	const isRefreshing =
 		activeTab === "individual"
-			? isVerificationsFetching && !isVerificationsPending
-			: isBatchFetching && !isBatchPending;
+			? verificationRequestsQuery.isFetching &&
+				!verificationRequestsQuery.isPending
+			: verificationBatchesQuery.isFetching &&
+				!verificationBatchesQuery.isPending;
 
 	const verificationTypes = useMemo(
 		() => getVerificationTypes(verifications),
@@ -140,13 +163,8 @@ function ReportsPage() {
 	);
 
 	const filteredVerifications = useMemo(
-		() =>
-			filterVerifications(verifications, {
-				verificationType,
-				status: statusFilter,
-				country: countryFilter,
-			}),
-		[verifications, verificationType, statusFilter, countryFilter],
+		() => filterVerifications(verifications, filters),
+		[verifications, filters],
 	);
 
 	const { items: paginatedVerifications, safePage: individualSafePage } =
@@ -161,16 +179,21 @@ function ReportsPage() {
 		[batchVerifications, batchPage],
 	);
 
+	const handleFiltersChange = useCallback((values: ReportsFiltersFormValues) => {
+		setFilters(values);
+		setIndividualPage(1);
+	}, []);
+
 	async function handleRefresh() {
 		if (activeTab === "individual") {
 			await queryClient.invalidateQueries({
-				queryKey: VERIFICATIONS_QUERY_KEY,
+				queryKey: VERIFICATIONS_QUERY_KEYS.requests(tenantId ?? ""),
 			});
 			return;
 		}
 
 		await queryClient.invalidateQueries({
-			queryKey: BATCH_VERIFICATIONS_QUERY_KEY,
+			queryKey: VERIFICATIONS_QUERY_KEYS.batches(tenantId ?? ""),
 		});
 	}
 
@@ -188,7 +211,7 @@ function ReportsPage() {
 						type="button"
 						variant="outline"
 						className="cursor-pointer tracking-wide"
-						disabled={isIndividualLoading || isBatchLoading}
+						disabled={isIndividualLoading || isBatchLoading || !tenantId}
 						onClick={() => void handleRefresh()}
 					>
 						<ArrowsClockwiseIcon
@@ -227,100 +250,25 @@ function ReportsPage() {
 							value="individual"
 							className="flex min-w-0 flex-col gap-6"
 						>
-							<Card className="border bg-muted/30 py-0 shadow-none">
-								<CardContent className="flex flex-col gap-4 p-4">
-									<div className="flex items-center gap-2">
-										<FunnelIcon className="size-5 text-muted-foreground" />
-										<p className="font-semibold">Filters</p>
-									</div>
-									<div className="grid gap-4 md:grid-cols-3">
-										<div className="space-y-1.5">
-											<Label htmlFor="verification-type-filter">
-												Verification Type
-											</Label>
-											<Select
-												value={verificationType}
-												onValueChange={(value) => {
-													setVerificationType(value);
-													setIndividualPage(1);
-												}}
-												disabled={isIndividualLoading}
-											>
-												<SelectTrigger
-													id="verification-type-filter"
-													className="w-full"
-												>
-													<SelectValue placeholder="All Types" />
-												</SelectTrigger>
-												<SelectContent>
-													<SelectItem value="all">All Types</SelectItem>
-													{verificationTypes.map((type) => (
-														<SelectItem key={type} value={type}>
-															{type}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-										<div className="space-y-1.5">
-											<Label htmlFor="status-filter">Status</Label>
-											<Select
-												value={statusFilter}
-												onValueChange={(value) => {
-													setStatusFilter(value);
-													setIndividualPage(1);
-												}}
-												disabled={isIndividualLoading}
-											>
-												<SelectTrigger id="status-filter" className="w-full">
-													<SelectValue placeholder="All Statuses" />
-												</SelectTrigger>
-												<SelectContent>
-													<SelectItem value="all">All Statuses</SelectItem>
-													{verificationStatuses.map((status) => (
-														<SelectItem key={status} value={status}>
-															{status}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-										<div className="space-y-1.5">
-											<Label htmlFor="country-filter">Country</Label>
-											<Select
-												value={countryFilter}
-												onValueChange={(value) => {
-													setCountryFilter(value);
-													setIndividualPage(1);
-												}}
-												disabled={isIndividualLoading}
-											>
-												<SelectTrigger id="country-filter" className="w-full">
-													<SelectValue placeholder="All Countries" />
-												</SelectTrigger>
-												<SelectContent>
-													<SelectItem value="all">All Countries</SelectItem>
-													{countries.map((country) => (
-														<SelectItem key={country} value={country}>
-															{country}
-														</SelectItem>
-													))}
-												</SelectContent>
-											</Select>
-										</div>
-									</div>
-									<p className="text-sm text-muted-foreground">
-										Showing {filteredVerifications.length} of{" "}
-										{verifications.length} results
-									</p>
-								</CardContent>
-							</Card>
+							<ReportsFiltersForm
+								verificationTypes={verificationTypes}
+								statuses={verificationStatuses}
+								countries={countries}
+								totalCount={verifications.length}
+								filteredCount={filteredVerifications.length}
+								disabled={verificationRequestsQuery.isPending}
+								onChange={handleFiltersChange}
+							/>
 
-							{isVerificationsPending ? (
+							{verificationRequestsQuery.isPending ? (
 								<>
 									<ReportsTableSkeleton columns={INDIVIDUAL_COLUMNS} />
 									<ReportsPaginationSkeleton />
 								</>
+							) : verificationRequestsQuery.isError ? (
+								<div className="flex min-h-[320px] items-center justify-center px-6 text-sm text-muted-foreground">
+									Failed to load verifications. Please try again.
+								</div>
 							) : (
 								<>
 									<ReportsTableShell>
@@ -351,7 +299,7 @@ function ReportsPage() {
 														>
 															{verifications.length === 0
 																? "No verifications found. Start by creating your first verification."
-																: "No verifications match your filters."}
+																: "No verifications match your search or filters."}
 														</TableCell>
 													</TableRow>
 												) : (
@@ -376,11 +324,15 @@ function ReportsPage() {
 						</TabsContent>
 
 						<TabsContent value="batch" className="flex min-w-0 flex-col gap-6">
-							{isBatchPending ? (
+							{verificationBatchesQuery.isPending ? (
 								<>
 									<ReportsTableSkeleton columns={BATCH_COLUMNS} />
 									<ReportsPaginationSkeleton />
 								</>
+							) : verificationBatchesQuery.isError ? (
+								<div className="flex min-h-[320px] items-center justify-center px-6 text-sm text-muted-foreground">
+									Failed to load batch verifications. Please try again.
+								</div>
 							) : (
 								<>
 									<ReportsTableShell>

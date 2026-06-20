@@ -1,3 +1,10 @@
+import type {
+	ReportsFiltersFormValues,
+	VerificationBatch,
+	VerificationRequestList,
+} from "#/api/http/v1/verifications/verifications.types";
+import { isPlainObject } from "#/lib/validators";
+
 export type VerificationReport = {
 	id: string;
 	batch_id: string | null;
@@ -22,6 +29,8 @@ export type BatchVerificationReport = {
 };
 
 export const REPORTS_PAGE_SIZE = 5;
+export const VERIFICATIONS_LIST_PAGE_SIZE = 1000;
+export const BATCH_VERIFICATIONS_LIST_PAGE_SIZE = 500;
 
 export const COUNTRY_CODE_MAP: Record<string, string> = {
 	ng: "Nigeria",
@@ -30,179 +39,168 @@ export const COUNTRY_CODE_MAP: Record<string, string> = {
 	za: "South Africa",
 };
 
-export const MOCK_VERIFICATIONS: VerificationReport[] = [
-	{
-		id: "6651ba5bc2bc8f9b5e473420",
-		batch_id: null,
-		verification_type: "mixed_verification",
-		mixed_verification_name: "Pasport In",
-		status: "SUCCESS",
-		name: "management@verifyafrica.io",
-		mode: "live",
-		created_at: "2026-06-03T10:12:00",
-		currency: "USD",
-		cost_charged: "4.10",
-		country: "Nigeria",
-	},
-	{
-		id: "8f9b5e473420a1c2d3e4f5a6",
-		batch_id: null,
-		verification_type: "kyb_screening",
-		status: "SUCCESS",
-		name: "VerifyAfrica Ltd",
-		mode: "live",
-		created_at: "2026-06-02T15:30:00",
-		currency: "USD",
-		cost_charged: "2.50",
-		country: "Nigeria",
-	},
-	{
-		id: "a1c2d3e4f5a68f9b5e473420",
-		batch_id: null,
-		verification_type: "aml_screening",
-		status: "ERROR",
-		name: "Vladimir putin",
-		mode: "live",
-		created_at: "2026-06-01T09:45:00",
-		currency: "USD",
-		cost_charged: "1.80",
-	},
-	{
-		id: "b2c3d4e5f6a78f9b5e473421",
-		batch_id: null,
-		verification_type: "face_match",
-		status: "FAILED",
-		name: "john.doe@example.com",
-		mode: "live",
-		created_at: "2026-05-30T14:20:00",
-		currency: "USD",
-		cost_charged: "0.90",
-		country: "Ghana",
-	},
-	{
-		id: "c3d4e5f6a7b88f9b5e473422",
-		batch_id: null,
-		verification_type: "id_document",
-		status: "SUCCESS",
-		name: "Amara Okafor",
-		mode: "live",
-		created_at: "2026-05-28T11:05:00",
-		currency: "USD",
-		cost_charged: "1.20",
-		country: "Nigeria",
-	},
-	{
-		id: "d4e5f6a7b8c98f9b5e473423",
-		batch_id: "batch-001",
-		verification_type: "ng_nin_verification",
-		status: "SUCCESS",
-		name: "Chidi Eze",
-		mode: "live",
-		created_at: "2026-05-25T08:15:00",
-		currency: "USD",
-		cost_charged: "0.75",
-		country: "Nigeria",
-	},
-	{
-		id: "e5f6a7b8c9d08f9b5e473424",
-		batch_id: null,
-		verification_type: "aml_screening",
-		status: "SUCCESS",
-		name: "Sarah Johnson",
-		mode: "live",
-		created_at: "2026-05-22T16:40:00",
-		currency: "USD",
-		cost_charged: "1.80",
-		country: "Kenya",
-	},
-	{
-		id: "f6a7b8c9d0e18f9b5e473425",
-		batch_id: null,
-		verification_type: "kyb_screening",
-		status: "FAILED",
-		name: "Acme Holdings",
-		mode: "live",
-		created_at: "2026-05-20T13:25:00",
-		currency: "USD",
-		cost_charged: "2.50",
-		country: "South Africa",
-	},
-	{
-		id: "a7b8c9d0e1f28f9b5e473426",
-		batch_id: null,
-		verification_type: "face_match",
-		status: "SUCCESS",
-		name: "david.chen@verifyafrica.io",
-		mode: "live",
-		created_at: "2026-05-18T10:50:00",
-		currency: "USD",
-		cost_charged: "0.90",
-		country: "Ghana",
-	},
-	{
-		id: "b8c9d0e1f2a38f9b5e473427",
-		batch_id: "batch-002",
-		verification_type: "id_document",
-		status: "ERROR",
-		name: "Michael Okonkwo",
-		mode: "live",
-		created_at: "2026-05-15T07:35:00",
-		currency: "USD",
-		cost_charged: "1.20",
-		country: "Nigeria",
-	},
-];
+function capitalize(value: string) {
+	return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
-export const MOCK_BATCH_VERIFICATIONS: BatchVerificationReport[] = [
-	{
-		id: "batch-001-abc12345",
-		status: "SUCCESS",
-		total_count: 120,
-		success_count: 115,
-		failed_count: 5,
-		created_at: "2026-06-01T08:00:00",
-	},
-	{
-		id: "batch-002-def67890",
-		status: "FAILED",
-		total_count: 50,
-		success_count: 32,
-		failed_count: 18,
-		created_at: "2026-05-28T14:30:00",
-	},
-	{
-		id: "batch-003-ghi11223",
-		status: "SUCCESS",
-		total_count: 200,
-		success_count: 198,
-		failed_count: 2,
-		created_at: "2026-05-20T09:15:00",
-	},
-	{
-		id: "batch-004-jkl44556",
-		status: "ERROR",
-		total_count: 75,
-		success_count: 40,
-		failed_count: 35,
-		created_at: "2026-05-12T16:45:00",
-	},
-	{
-		id: "batch-005-mno77889",
-		status: "SUCCESS",
-		total_count: 30,
-		success_count: 30,
-		failed_count: 0,
-		created_at: "2026-05-05T11:20:00",
-	},
-	{
-		id: "batch-006-pqr99001",
-		status: "SUCCESS",
-		total_count: 88,
-		success_count: 82,
-		failed_count: 6,
-		created_at: "2026-04-28T13:10:00",
-	},
-];
+function isValidWalletAddress(walletAddress: string | null | undefined) {
+	const evmWalletPattern = /^0x[a-fA-F0-9]{40}$/;
+	const bitcoinWalletPattern =
+		/^(bc1[p-z0-9]{11,71}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$/;
+	const tronWalletPattern = /^T[1-9A-HJ-NP-Za-km-z]{33}$/;
+	const solanaWalletPattern = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+	const value = (walletAddress ?? "").trim();
+
+	return (
+		evmWalletPattern.test(value) ||
+		bitcoinWalletPattern.test(value) ||
+		tronWalletPattern.test(value) ||
+		solanaWalletPattern.test(value)
+	);
+}
+
+function getResponseDataRecord(verification: VerificationRequestList) {
+	return isPlainObject(verification.response_data)
+		? (verification.response_data as Record<string, unknown>)
+		: {};
+}
+
+function getResponseInnerData(verification: VerificationRequestList) {
+	const responseData = getResponseDataRecord(verification);
+	return isPlainObject(responseData.data)
+		? (responseData.data as Record<string, unknown>)
+		: {};
+}
+
+export function getVerificationCountry(
+	verification: VerificationRequestList,
+): string | undefined {
+	const innerData = getResponseInnerData(verification);
+	const idType = innerData.id_type;
+
+	if (typeof idType === "string" && idType.length >= 2) {
+		const prefix = idType.substring(0, 2).toLowerCase();
+		return COUNTRY_CODE_MAP[prefix];
+	}
+
+	return undefined;
+}
+
+export function getVerificationTargetName(
+	verification: VerificationRequestList,
+): string {
+	const { input_data } = verification;
+	const innerData = getResponseInnerData(verification);
+
+	if (
+		typeof innerData.first_name === "string" &&
+		typeof innerData.last_name === "string"
+	) {
+		return `${innerData.first_name} ${innerData.last_name}`;
+	}
+
+	if (typeof innerData.name_on_card === "string") {
+		return innerData.name_on_card;
+	}
+
+	if (isPlainObject(input_data?.background_checks)) {
+		const backgroundChecks = input_data.background_checks as Record<
+			string,
+			unknown
+		>;
+		if (isPlainObject(backgroundChecks.name)) {
+			const name = backgroundChecks.name as Record<string, unknown>;
+			const firstName = name.first_name;
+			const lastName = name.last_name;
+			const fullName = name.full_name;
+
+			if (typeof firstName === "string" && typeof lastName === "string") {
+				return capitalize(`${firstName} ${lastName}`);
+			}
+
+			if (typeof fullName === "string") {
+				return isValidWalletAddress(fullName)
+					? fullName.slice(0, 10)
+					: capitalize(fullName);
+			}
+		}
+	}
+
+	if (isPlainObject(input_data?.aml_for_businesses)) {
+		const aml = input_data.aml_for_businesses as Record<string, unknown>;
+		if (typeof aml.business_name === "string") {
+			return capitalize(aml.business_name);
+		}
+	}
+
+	if (isPlainObject(input_data?.kyb)) {
+		const kyb = input_data.kyb as Record<string, unknown>;
+		if (typeof kyb.company_name === "string") {
+			return capitalize(kyb.company_name);
+		}
+	}
+
+	if (typeof input_data?.email === "string") {
+		return input_data.email;
+	}
+
+	return "N/A";
+}
+
+export function mapVerificationRequestToReport(
+	verification: VerificationRequestList,
+	mode: "live" | "test",
+): VerificationReport {
+	const inputData = isPlainObject(verification.input_data)
+		? verification.input_data
+		: {};
+	const mixedVerificationName =
+		typeof inputData.mixed_verification_name === "string"
+			? inputData.mixed_verification_name
+			: undefined;
+
+	return {
+		id: verification.id,
+		batch_id: verification.batch_id,
+		verification_type: verification.verification_type,
+		mixed_verification_name: mixedVerificationName,
+		status: verification.status,
+		name: getVerificationTargetName(verification),
+		mode,
+		created_at: verification.created_at,
+		currency: verification.currency,
+		cost_charged: verification.cost_charged,
+		country: getVerificationCountry(verification),
+	};
+}
+
+export function mapVerificationRequestsToReports(
+	verifications: VerificationRequestList[],
+	mode: "live" | "test" = "live",
+): VerificationReport[] {
+	return verifications.map((verification) =>
+		mapVerificationRequestToReport(verification, mode),
+	);
+}
+
+export function mapVerificationBatchToReport(
+	batch: VerificationBatch,
+): BatchVerificationReport {
+	return {
+		id: batch.id,
+		status: batch.status,
+		total_count: batch.total_count,
+		success_count: batch.success_count,
+		failed_count: batch.failed_count,
+		created_at: batch.created_at,
+	};
+}
+
+export function mapVerificationBatchesToReports(
+	batches: VerificationBatch[],
+): BatchVerificationReport[] {
+	return batches.map(mapVerificationBatchToReport);
+}
 
 export function formatVerificationType(report: VerificationReport) {
 	const formattedType = report.verification_type
@@ -251,13 +249,16 @@ export function getVerificationCountries(reports: VerificationReport[]) {
 
 export function filterVerifications(
 	reports: VerificationReport[],
-	filters: {
-		verificationType: string;
-		status: string;
-		country: string;
-	},
+	filters: ReportsFiltersFormValues,
 ) {
+	const query = filters.search.trim().toLowerCase();
+
 	return reports.filter((report) => {
+		const matchesSearch =
+			query.length === 0 ||
+			report.name.toLowerCase().includes(query) ||
+			report.id.toLowerCase().includes(query) ||
+			(report.batch_id?.toLowerCase().includes(query) ?? false);
 		const matchesType =
 			filters.verificationType === "all" ||
 			report.verification_type === filters.verificationType;
@@ -266,18 +267,6 @@ export function filterVerifications(
 		const matchesCountry =
 			filters.country === "all" || report.country === filters.country;
 
-		return matchesType && matchesStatus && matchesCountry;
+		return matchesSearch && matchesType && matchesStatus && matchesCountry;
 	});
-}
-
-export async function fetchVerifications(): Promise<VerificationReport[]> {
-	await new Promise((resolve) => setTimeout(resolve, 600));
-	return MOCK_VERIFICATIONS.map((report) => ({ ...report }));
-}
-
-export async function fetchBatchVerifications(): Promise<
-	BatchVerificationReport[]
-> {
-	await new Promise((resolve) => setTimeout(resolve, 600));
-	return MOCK_BATCH_VERIFICATIONS.map((report) => ({ ...report }));
 }
