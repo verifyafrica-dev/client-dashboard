@@ -1,9 +1,10 @@
+import path from "node:path";
 import babel from "@rolldown/plugin-babel";
 import tailwindcss from "@tailwindcss/vite";
 import { devtools } from "@tanstack/devtools-vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
-import path from "node:path";
+import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 const config = defineConfig({
@@ -28,6 +29,7 @@ const config = defineConfig({
 	},
 	plugins: [
 		devtools(),
+		nitro(),
 		tailwindcss(),
 		tanstackStart(),
 		viteReact(),
