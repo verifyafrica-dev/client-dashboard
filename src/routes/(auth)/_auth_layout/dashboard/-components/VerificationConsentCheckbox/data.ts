@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 export type VerificationMode = "link" | "direct";
 
 export const VERIFICATION_MODES = [
@@ -14,3 +16,7 @@ export const VERIFICATION_URL_LIMITS = [
 ] as const;
 
 export const DEFAULT_VERIFICATION_URL_LIMIT = "60";
+
+export const verificationConsentSchema = z
+	.boolean()
+	.refine((value) => value, "You must confirm consent before submitting");

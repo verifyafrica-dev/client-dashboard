@@ -31,6 +31,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
+import { Textarea } from "#/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "#/components/ui/toggle-group";
 import { cn } from "#/lib/utils.ts";
 import {
@@ -50,6 +51,8 @@ import {
 
 const linkFormSchema = z.object({
 	email: z.email("Enter a valid email address"),
+	country: z.string().min(1, "Select a country"),
+	address: z.string().trim().min(1, "Address is required"),
 	urlLimit: z.string().min(1, "Select a verification URL limit"),
 	consent: verificationConsentSchema,
 });
@@ -57,14 +60,13 @@ const linkFormSchema = z.object({
 const directFormSchema = z.object({
 	email: z.email("Enter a valid email address"),
 	country: z.string().min(1, "Select a country"),
-	firstName: z.string().trim().min(1, "First name is required"),
-	lastName: z.string().trim().min(1, "Last name is required"),
+	address: z.string().trim().min(1, "Address is required"),
 	consent: verificationConsentSchema,
 });
 
-export function DocumentVerificationForm() {
+export function AddressVerificationForm() {
 	const [mode, setMode] = useState<VerificationMode>("link");
-	const [documentFile, setDocumentFile] = useState<File[]>([]);
+	const [proofOfAddressFile, setProofOfAddressFile] = useState<File[]>([]);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const countriesQuery = useSupportedCountriesQuery();
 
@@ -76,6 +78,8 @@ export function DocumentVerificationForm() {
 	const linkForm = useForm({
 		defaultValues: {
 			email: "",
+			country: "",
+			address: "",
 			urlLimit: DEFAULT_VERIFICATION_URL_LIMIT,
 			consent: false,
 		},
@@ -97,8 +101,7 @@ export function DocumentVerificationForm() {
 		defaultValues: {
 			email: "",
 			country: "",
-			firstName: "",
-			lastName: "",
+			address: "",
 			consent: false,
 		},
 		validators: {
@@ -106,8 +109,8 @@ export function DocumentVerificationForm() {
 			onSubmit: directFormSchema,
 		},
 		onSubmit: async () => {
-			if (documentFile.length === 0) {
-				toast.error("Please upload a document");
+			if (proofOfAddressFile.length === 0) {
+				toast.error("Please upload a proof-of-address document");
 				return;
 			}
 
@@ -123,7 +126,7 @@ export function DocumentVerificationForm() {
 	const activeForm = mode === "link" ? linkForm : directForm;
 	const canSubmit =
 		activeForm.state.canSubmit &&
-		(mode === "direct" ? documentFile.length > 0 : true);
+		(mode === "direct" ? proofOfAddressFile.length > 0 : true);
 
 	return (
 		<Card>
@@ -137,9 +140,7 @@ export function DocumentVerificationForm() {
 					}}
 				>
 					<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<p className="text-sm font-medium text-muted-foreground">
-							Verification Mode
-						</p>
+						<p className="text-sm font-medium text-muted-foreground">Mode</p>
 						<ToggleGroup
 							type="single"
 							value={mode}
@@ -171,15 +172,15 @@ export function DocumentVerificationForm() {
 					</div>
 
 					{mode === "link" ? (
-						<FieldGroup>
+						<FieldGroup className="gap-4">
 							<linkForm.Field name="email">
 								{(field) => (
 									<Field className="gap-1.5">
-										<FieldLabel htmlFor="document-verification-email">
+										<FieldLabel htmlFor="address-verification-link-email">
 											Email Address
 										</FieldLabel>
 										<Input
-											id="document-verification-email"
+											id="address-verification-link-email"
 											type="email"
 											autoComplete="email"
 											placeholder="Email Address"
@@ -193,64 +194,10 @@ export function DocumentVerificationForm() {
 								)}
 							</linkForm.Field>
 
-							<linkForm.Field name="urlLimit">
+							<linkForm.Field name="country">
 								{(field) => (
 									<Field className="gap-1.5">
-										<FieldLabel htmlFor="document-verification-url-limit">
-											Verification URL Limit
-										</FieldLabel>
-										<Select
-											value={field.state.value}
-											onValueChange={field.handleChange}
-										>
-											<SelectTrigger
-												id="document-verification-url-limit"
-												className="w-full"
-											>
-												<SelectValue placeholder="Select duration" />
-											</SelectTrigger>
-											<SelectContent>
-												{VERIFICATION_URL_LIMITS.map((option) => (
-													<SelectItem key={option.value} value={option.value}>
-														{option.label}
-													</SelectItem>
-												))}
-											</SelectContent>
-										</Select>
-										<FieldDescription>
-											How long the verification link stays active
-										</FieldDescription>
-									</Field>
-								)}
-							</linkForm.Field>
-						</FieldGroup>
-					) : (
-						<FieldGroup className="gap-4">
-							<directForm.Field name="email">
-								{(field) => (
-									<Field className="gap-1.5">
-										<FieldLabel htmlFor="document-verification-direct-email">
-											Email Address
-										</FieldLabel>
-										<Input
-											id="document-verification-direct-email"
-											type="email"
-											autoComplete="email"
-											placeholder="Email Address"
-											value={field.state.value}
-											onBlur={field.handleBlur}
-											onChange={(event) =>
-												field.handleChange(event.target.value)
-											}
-										/>
-									</Field>
-								)}
-							</directForm.Field>
-
-							<directForm.Field name="country">
-								{(field) => (
-									<Field className="gap-1.5">
-										<FieldLabel htmlFor="document-verification-country">
+										<FieldLabel htmlFor="address-verification-link-country">
 											Country
 										</FieldLabel>
 										<Select
@@ -259,7 +206,7 @@ export function DocumentVerificationForm() {
 											disabled={countriesQuery.isPending}
 										>
 											<SelectTrigger
-												id="document-verification-country"
+												id="address-verification-link-country"
 												className="w-full"
 											>
 												<SelectValue
@@ -280,19 +227,73 @@ export function DocumentVerificationForm() {
 										</Select>
 									</Field>
 								)}
-							</directForm.Field>
+							</linkForm.Field>
 
-							<div className="grid gap-4 sm:grid-cols-2">
-								<directForm.Field name="firstName">
+							<linkForm.Field name="address">
+								{(field) => (
+									<Field className="gap-1.5">
+										<FieldLabel htmlFor="address-verification-link-address">
+											Address
+										</FieldLabel>
+										<Textarea
+											id="address-verification-link-address"
+											placeholder="Address"
+											rows={3}
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={(event) =>
+												field.handleChange(event.target.value)
+											}
+										/>
+									</Field>
+								)}
+							</linkForm.Field>
+
+							<linkForm.Field name="urlLimit">
+								{(field) => (
+									<Field className="gap-1.5">
+										<FieldLabel htmlFor="address-verification-url-limit">
+											Verification URL Limit
+										</FieldLabel>
+										<Select
+											value={field.state.value}
+											onValueChange={field.handleChange}
+										>
+											<SelectTrigger
+												id="address-verification-url-limit"
+												className="w-full"
+											>
+												<SelectValue placeholder="Select duration" />
+											</SelectTrigger>
+											<SelectContent>
+												{VERIFICATION_URL_LIMITS.map((option) => (
+													<SelectItem key={option.value} value={option.value}>
+														{option.label}
+													</SelectItem>
+												))}
+											</SelectContent>
+										</Select>
+										<FieldDescription>
+											How long the verification link stays active
+										</FieldDescription>
+									</Field>
+								)}
+							</linkForm.Field>
+						</FieldGroup>
+					) : (
+						<>
+							<FieldGroup className="gap-4">
+								<directForm.Field name="email">
 									{(field) => (
 										<Field className="gap-1.5">
-											<FieldLabel htmlFor="document-verification-first-name">
-												First Name
+											<FieldLabel htmlFor="address-verification-direct-email">
+												Email Address
 											</FieldLabel>
 											<Input
-												id="document-verification-first-name"
-												autoComplete="given-name"
-												placeholder="First Name"
+												id="address-verification-direct-email"
+												type="email"
+												autoComplete="email"
+												placeholder="Email Address"
 												value={field.state.value}
 												onBlur={field.handleBlur}
 												onChange={(event) =>
@@ -303,16 +304,51 @@ export function DocumentVerificationForm() {
 									)}
 								</directForm.Field>
 
-								<directForm.Field name="lastName">
+								<directForm.Field name="country">
 									{(field) => (
 										<Field className="gap-1.5">
-											<FieldLabel htmlFor="document-verification-last-name">
-												Last Name
+											<FieldLabel htmlFor="address-verification-direct-country">
+												Country
 											</FieldLabel>
-											<Input
-												id="document-verification-last-name"
-												autoComplete="family-name"
-												placeholder="Last Name"
+											<Select
+												value={field.state.value}
+												onValueChange={field.handleChange}
+												disabled={countriesQuery.isPending}
+											>
+												<SelectTrigger
+													id="address-verification-direct-country"
+													className="w-full"
+												>
+													<SelectValue
+														placeholder={
+															countriesQuery.isPending
+																? "Loading countries..."
+																: "Select a country"
+														}
+													/>
+												</SelectTrigger>
+												<SelectContent className="max-h-60">
+													{countries.map((country) => (
+														<SelectItem key={country.code} value={country.code}>
+															{country.name}
+														</SelectItem>
+													))}
+												</SelectContent>
+											</Select>
+										</Field>
+									)}
+								</directForm.Field>
+
+								<directForm.Field name="address">
+									{(field) => (
+										<Field className="gap-1.5">
+											<FieldLabel htmlFor="address-verification-direct-address">
+												Address
+											</FieldLabel>
+											<Textarea
+												id="address-verification-direct-address"
+												placeholder="Address"
+												rows={3}
 												value={field.state.value}
 												onBlur={field.handleBlur}
 												onChange={(event) =>
@@ -322,15 +358,15 @@ export function DocumentVerificationForm() {
 										</Field>
 									)}
 								</directForm.Field>
-							</div>
+							</FieldGroup>
 
 							<Field className="gap-1.5">
-								<FieldLabel htmlFor="document-verification-document">
-									Document
+								<FieldLabel htmlFor="address-verification-proof">
+									Proof of Address
 								</FieldLabel>
 								<FileUpload
-									value={documentFile}
-									onValueChange={setDocumentFile}
+									value={proofOfAddressFile}
+									onValueChange={setProofOfAddressFile}
 									accept="image/*,.pdf"
 									maxFiles={1}
 									maxSize={10 * 1024 * 1024}
@@ -338,7 +374,7 @@ export function DocumentVerificationForm() {
 									<FileUploadDropzone className="flex min-h-36 flex-col items-center justify-center gap-2 border-dashed py-8">
 										<CloudArrowUpIcon className="size-8 text-secondary" />
 										<p className="text-sm text-muted-foreground">
-											Click to upload a document (image or PDF)
+											Click to upload proof-of-address document (image or PDF)
 										</p>
 										<FileUploadTrigger asChild>
 											<Button
@@ -350,9 +386,9 @@ export function DocumentVerificationForm() {
 											</Button>
 										</FileUploadTrigger>
 									</FileUploadDropzone>
-									{documentFile.length > 0 && (
+									{proofOfAddressFile.length > 0 && (
 										<FileUploadList>
-											{documentFile.map((file) => (
+											{proofOfAddressFile.map((file) => (
 												<FileUploadItem
 													key={`${file.name}-${file.lastModified}`}
 													value={file}
@@ -375,14 +411,14 @@ export function DocumentVerificationForm() {
 									)}
 								</FileUpload>
 							</Field>
-						</FieldGroup>
+						</>
 					)}
 
 					{mode === "link" ? (
 						<linkForm.Field name="consent">
 							{(field) => (
 								<VerificationConsentCheckbox
-									id="document-verification-link-consent"
+									id="address-verification-link-consent"
 									checked={field.state.value}
 									onCheckedChange={field.handleChange}
 								/>
@@ -392,7 +428,7 @@ export function DocumentVerificationForm() {
 						<directForm.Field name="consent">
 							{(field) => (
 								<VerificationConsentCheckbox
-									id="document-verification-direct-consent"
+									id="address-verification-direct-consent"
 									checked={field.state.value}
 									onCheckedChange={field.handleChange}
 								/>
