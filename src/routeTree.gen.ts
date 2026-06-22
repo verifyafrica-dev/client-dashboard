@@ -15,6 +15,7 @@ import { Route as authAuth_layoutRouteImport } from './routes/(auth)/_auth_layou
 import { Route as unguardedUnguarded_layoutResetPasswordIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/reset-password/index'
 import { Route as unguardedUnguarded_layoutRegisterIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/register/index'
 import { Route as unguardedUnguarded_layoutLoginIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/login/index'
+import { Route as unguardedUnguarded_layoutInviteIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/invite/index'
 import { Route as unguardedUnguarded_layoutForgotPasswordIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/forgot-password/index'
 import { Route as unguardedUnguarded_layoutActivateAccountIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/activate-account/index'
 import { Route as authAuth_layoutDashboardIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/index'
@@ -67,6 +68,12 @@ const unguardedUnguarded_layoutLoginIndexRoute =
   unguardedUnguarded_layoutLoginIndexRouteImport.update({
     id: '/login/',
     path: '/login/',
+    getParentRoute: () => unguardedUnguarded_layoutRoute,
+  } as any)
+const unguardedUnguarded_layoutInviteIndexRoute =
+  unguardedUnguarded_layoutInviteIndexRouteImport.update({
+    id: '/invite/',
+    path: '/invite/',
     getParentRoute: () => unguardedUnguarded_layoutRoute,
   } as any)
 const unguardedUnguarded_layoutForgotPasswordIndexRoute =
@@ -203,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/': typeof authAuth_layoutDashboardIndexRoute
   '/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   '/forgot-password/': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
+  '/invite/': typeof unguardedUnguarded_layoutInviteIndexRoute
   '/login/': typeof unguardedUnguarded_layoutLoginIndexRoute
   '/register/': typeof unguardedUnguarded_layoutRegisterIndexRoute
   '/reset-password/': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
@@ -230,6 +238,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof authAuth_layoutDashboardIndexRoute
   '/activate-account': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   '/forgot-password': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
+  '/invite': typeof unguardedUnguarded_layoutInviteIndexRoute
   '/login': typeof unguardedUnguarded_layoutLoginIndexRoute
   '/register': typeof unguardedUnguarded_layoutRegisterIndexRoute
   '/reset-password': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
@@ -260,6 +269,7 @@ export interface FileRoutesById {
   '/(auth)/_auth_layout/dashboard/': typeof authAuth_layoutDashboardIndexRoute
   '/(unguarded)/_unguarded_layout/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   '/(unguarded)/_unguarded_layout/forgot-password/': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
+  '/(unguarded)/_unguarded_layout/invite/': typeof unguardedUnguarded_layoutInviteIndexRoute
   '/(unguarded)/_unguarded_layout/login/': typeof unguardedUnguarded_layoutLoginIndexRoute
   '/(unguarded)/_unguarded_layout/register/': typeof unguardedUnguarded_layoutRegisterIndexRoute
   '/(unguarded)/_unguarded_layout/reset-password/': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
@@ -289,6 +299,7 @@ export interface FileRouteTypes {
     | '/dashboard/'
     | '/activate-account/'
     | '/forgot-password/'
+    | '/invite/'
     | '/login/'
     | '/register/'
     | '/reset-password/'
@@ -316,6 +327,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/activate-account'
     | '/forgot-password'
+    | '/invite'
     | '/login'
     | '/register'
     | '/reset-password'
@@ -345,6 +357,7 @@ export interface FileRouteTypes {
     | '/(auth)/_auth_layout/dashboard/'
     | '/(unguarded)/_unguarded_layout/activate-account/'
     | '/(unguarded)/_unguarded_layout/forgot-password/'
+    | '/(unguarded)/_unguarded_layout/invite/'
     | '/(unguarded)/_unguarded_layout/login/'
     | '/(unguarded)/_unguarded_layout/register/'
     | '/(unguarded)/_unguarded_layout/reset-password/'
@@ -416,6 +429,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login/'
       preLoaderRoute: typeof unguardedUnguarded_layoutLoginIndexRouteImport
+      parentRoute: typeof unguardedUnguarded_layoutRoute
+    }
+    '/(unguarded)/_unguarded_layout/invite/': {
+      id: '/(unguarded)/_unguarded_layout/invite/'
+      path: '/invite'
+      fullPath: '/invite/'
+      preLoaderRoute: typeof unguardedUnguarded_layoutInviteIndexRouteImport
       parentRoute: typeof unguardedUnguarded_layoutRoute
     }
     '/(unguarded)/_unguarded_layout/forgot-password/': {
@@ -636,6 +656,7 @@ const authAuth_layoutRouteWithChildren = authAuth_layoutRoute._addFileChildren(
 interface unguardedUnguarded_layoutRouteChildren {
   unguardedUnguarded_layoutActivateAccountIndexRoute: typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   unguardedUnguarded_layoutForgotPasswordIndexRoute: typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
+  unguardedUnguarded_layoutInviteIndexRoute: typeof unguardedUnguarded_layoutInviteIndexRoute
   unguardedUnguarded_layoutLoginIndexRoute: typeof unguardedUnguarded_layoutLoginIndexRoute
   unguardedUnguarded_layoutRegisterIndexRoute: typeof unguardedUnguarded_layoutRegisterIndexRoute
   unguardedUnguarded_layoutResetPasswordIndexRoute: typeof unguardedUnguarded_layoutResetPasswordIndexRoute
@@ -647,6 +668,8 @@ const unguardedUnguarded_layoutRouteChildren: unguardedUnguarded_layoutRouteChil
       unguardedUnguarded_layoutActivateAccountIndexRoute,
     unguardedUnguarded_layoutForgotPasswordIndexRoute:
       unguardedUnguarded_layoutForgotPasswordIndexRoute,
+    unguardedUnguarded_layoutInviteIndexRoute:
+      unguardedUnguarded_layoutInviteIndexRoute,
     unguardedUnguarded_layoutLoginIndexRoute:
       unguardedUnguarded_layoutLoginIndexRoute,
     unguardedUnguarded_layoutRegisterIndexRoute:

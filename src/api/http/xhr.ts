@@ -141,7 +141,6 @@ const shouldUseAccessToken = (url: string) => {
 		"/users/lookup",
 		"/users/activate-account/",
 		"/tenants/invitations/complete",
-		"/tenants/invitations/accept",
 	];
 	const matchFound = urlsToIgnore.some((ignoredUrl) =>
 		url.includes(ignoredUrl),
