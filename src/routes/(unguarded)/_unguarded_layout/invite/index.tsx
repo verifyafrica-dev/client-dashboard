@@ -18,8 +18,8 @@ import {
 	useAcceptInvitationMutation,
 	useCompleteInvitationMutation,
 } from "#/api/http/v1/tenants/tenants.hooks";
-import type { UserLoginError } from "#/api/http/v1/users/users.types";
 import { useUserLookupQuery } from "#/api/http/v1/users/users.hooks";
+import type { UserLoginError } from "#/api/http/v1/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Spinner } from "#/components/ui/spinner";
@@ -38,8 +38,8 @@ import { AuthPageShell } from "../-components";
 import { PasswordField } from "../-components/password-field";
 import {
 	AcceptInvitationNewUserFormSchema,
-	AcceptInvitationSearchSchema,
 	type AcceptInvitationNewUserFormValues,
+	AcceptInvitationSearchSchema,
 } from "./-data";
 
 export const Route = createFileRoute("/(unguarded)/_unguarded_layout/invite/")({
@@ -54,9 +54,7 @@ function AcceptInvitationPage() {
 	const lookupQuery = useUserLookupQuery({ email }, Boolean(email && token));
 	const isNewUser = lookupQuery.data ? !lookupQuery.data.exists : null;
 	const isLoading =
-		lookupQuery.isPending ||
-		lookupQuery.isFetching ||
-		isNewUser === null;
+		lookupQuery.isPending || lookupQuery.isFetching || isNewUser === null;
 
 	if (!email || !token || !search.tenant) {
 		return <Navigate to="/login" />;
@@ -201,9 +199,7 @@ function NewUserInvitationForm({
 										className="pl-10"
 										value={field.state.value}
 										onBlur={field.handleBlur}
-										onChange={(event) =>
-											field.handleChange(event.target.value)
-										}
+										onChange={(event) => field.handleChange(event.target.value)}
 										disabled={completeInvitationMutation.isPending}
 										aria-invalid={
 											field.state.meta.isTouched && !field.state.meta.isValid
@@ -230,9 +226,7 @@ function NewUserInvitationForm({
 										className="pl-10"
 										value={field.state.value}
 										onBlur={field.handleBlur}
-										onChange={(event) =>
-											field.handleChange(event.target.value)
-										}
+										onChange={(event) => field.handleChange(event.target.value)}
 										disabled={completeInvitationMutation.isPending}
 										aria-invalid={
 											field.state.meta.isTouched && !field.state.meta.isValid
@@ -364,8 +358,8 @@ function ExistingUserInvitationPrompt({
 				</div>
 				<p className="text-sm text-muted-foreground">
 					Hi <span className="font-medium text-foreground">{email}</span>,
-					you&apos;ve been invited to join a team on VerifyAfrica. Would you like
-					to accept this invitation?
+					you&apos;ve been invited to join a team on VerifyAfrica. Would you
+					like to accept this invitation?
 				</p>
 			</div>
 

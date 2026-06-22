@@ -1,9 +1,4 @@
-import {
-	createFileRoute,
-	Link,
-	Navigate,
-	Outlet,
-} from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate, Outlet, useLocation } from "@tanstack/react-router";
 import { Loader2Icon } from "lucide-react";
 import { useMeQuery } from "#/api/http/v1/users/users.hooks";
 import { AppSidebar } from "#/components/app-sidebar";
@@ -21,9 +16,10 @@ import {
 } from "#/components/ui/sidebar";
 import { useLogout } from "#/hooks/use-logout";
 import { deleteAllCookies } from "#/lib/cookies";
+import { buildLoginRedirectUrl } from "#/lib/redirect";
+import { useAuthStore } from "#/stores/auth-store";
 import { cn } from "#/lib/utils.ts";
 import { getUserInitials } from "#/routes/(auth)/_auth_layout/dashboard/team/-data";
-import { useAuthStore } from "#/stores/auth-store";
 
 const userMenuLinks = [
 	{ label: "Profile", to: "/dashboard/profile" },
@@ -35,6 +31,7 @@ export const Route = createFileRoute("/(auth)/_auth_layout")({
 });
 
 function AuthLayout() {
+	const location = useLocation();
 	const getUserQuery = useMeQuery();
 	const { logout, isLoggingOut } = useLogout();
 
@@ -49,8 +46,7 @@ function AuthLayout() {
 	if (!getUserQuery.isLoading && !getUserQuery.data?.id) {
 		deleteAllCookies();
 		useAuthStore.getState().clearAuth();
-
-		return <Navigate to="/login" />;
+		return <Navigate to={buildLoginRedirectUrl(location.pathname)} replace />;
 	}
 
 	const user = getUserQuery.data;

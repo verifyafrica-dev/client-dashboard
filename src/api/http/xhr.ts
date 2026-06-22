@@ -7,7 +7,14 @@ import {
 	ReasonPhrases,
 	StatusCodes,
 } from "http-status-codes";
-import { deleteCookie, getCookie, setCookie } from "#/lib/cookies";
+import {
+	deleteAllCookies,
+	deleteCookie,
+	getCookie,
+	setCookie,
+} from "#/lib/cookies";
+import { buildLoginRedirectUrl } from "#/lib/redirect";
+import { useAuthStore } from "#/stores/auth-store";
 import { COUNTRY_NAME_BY_ISO_CODE } from "@/lib/country-state-city";
 import { isPlainObject } from "@/lib/validators";
 import { env } from "../../config/env";
@@ -86,9 +93,9 @@ export const setTokens = (
 const clearTokensAndLogout = () => {
 	if (!isBrowser) return;
 
-	deleteCookie(getAccessTokenKey());
-	deleteCookie(getRefreshTokenKey());
-	window.location.href = "/login";
+	deleteAllCookies();
+	useAuthStore.getState().clearAuth();
+	window.location.href = buildLoginRedirectUrl(location.pathname);
 };
 
 const $http = axios.create({

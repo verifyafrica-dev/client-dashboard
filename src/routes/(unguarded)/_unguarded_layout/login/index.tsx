@@ -3,12 +3,13 @@ import { useForm } from "@tanstack/react-form";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
 import { useUserLoginMutation } from "#/api/http/v1/users/users.hooks";
 import {
+	type UserLoginError,
 	type UserLoginPayload,
 	UserLoginSchema,
-	type UserLoginError,
 } from "#/api/http/v1/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
@@ -19,15 +20,22 @@ import {
 	toUserLoginError,
 } from "#/lib/api-errors";
 import { deleteAllCookies } from "#/lib/cookies";
+import { getPostLoginPath } from "#/lib/redirect";
 import { useAuthStore } from "#/stores/auth-store";
 import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
 
+const loginSearchSchema = z.object({
+	redirect_to: z.string().optional(),
+});
+
 export const Route = createFileRoute("/(unguarded)/_unguarded_layout/login/")({
+	validateSearch: loginSearchSchema,
 	component: LoginPage,
 });
 
 function LoginPage() {
+	const { redirect_to } = Route.useSearch();
 	const [rememberMe, setRememberMe] = useState(true);
 	const navigate = useNavigate();
 	const userLoginMutation = useUserLoginMutation();
@@ -62,7 +70,7 @@ function LoginPage() {
 						}
 
 						toast.success("Login successful");
-						navigate({ to: "/dashboard" });
+						navigate({ to: getPostLoginPath(redirect_to) });
 					},
 					onError: (error) => {
 						setFormError(toUserLoginError(error));

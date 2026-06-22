@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import type { StateStorage } from "zustand/middleware";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import type { UserDetail } from "#/api/http/v1/users/users.types";
