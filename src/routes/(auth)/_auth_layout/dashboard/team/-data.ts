@@ -16,7 +16,7 @@ export const TEAM_ROLES: TenantUserRole[] = ["admin", "member"];
 
 export const TEAM_PAGE_SIZE = 5;
 
-export const TEAM_LIST_PAGE_SIZE = 500;
+export const TEAM_LIST_PAGE_SIZE = 10;
 
 export function formatTeamDate(date: Date) {
 	return new Intl.DateTimeFormat("en-US", {
@@ -38,8 +38,13 @@ export function getUserInitials(name: string) {
 		.toUpperCase();
 }
 
-export function getUserFullName(user: Pick<UserDetail, "first_name" | "last_name" | "email">) {
-	const name = [user.first_name, user.last_name].filter(Boolean).join(" ").trim();
+export function getUserFullName(
+	user: Pick<UserDetail, "first_name" | "last_name" | "email">,
+) {
+	const name = [user.first_name, user.last_name]
+		.filter(Boolean)
+		.join(" ")
+		.trim();
 
 	return name || user.email;
 }
@@ -61,7 +66,9 @@ export function getUserTenantMembership(
 	const memberships = normalizeUserTenants(user.tenants);
 
 	if (tenantId) {
-		return memberships.find((tenant) => tenant.id === tenantId) ?? memberships[0];
+		return (
+			memberships.find((tenant) => tenant.id === tenantId) ?? memberships[0]
+		);
 	}
 
 	return memberships[0];
