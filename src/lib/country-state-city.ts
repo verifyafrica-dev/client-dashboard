@@ -31,3 +31,35 @@ export function getCountryIsoCodeByName(name: string) {
 		sortedCountries.find((country) => country.name === name)?.isoCode ?? ""
 	);
 }
+
+export function normalizeCountryName(value?: string | null) {
+	if (!value) {
+		return "";
+	}
+
+	const trimmed = value.trim();
+
+	if (!trimmed) {
+		return "";
+	}
+
+	const fromIsoCode = COUNTRY_NAME_BY_ISO_CODE[trimmed.toUpperCase()];
+
+	if (fromIsoCode) {
+		return fromIsoCode;
+	}
+
+	const exactMatch = sortedCountries.find(
+		(country) => country.name === trimmed,
+	);
+
+	if (exactMatch) {
+		return exactMatch.name;
+	}
+
+	const caseInsensitiveMatch = sortedCountries.find(
+		(country) => country.name.toLowerCase() === trimmed.toLowerCase(),
+	);
+
+	return caseInsensitiveMatch?.name ?? trimmed;
+}

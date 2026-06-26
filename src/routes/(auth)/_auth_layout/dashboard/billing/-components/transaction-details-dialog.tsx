@@ -35,19 +35,19 @@ export function TransactionDetailsDialog({
 		}
 	}
 
-	if (!transaction) return null;
-
-	const isDebit = transaction.type === "debit";
-	const formattedAmount = formatSignedAmount(
-		transaction.amount,
-		transaction.currency,
-	);
-
-	const metadataFields = getMetadataFields(transaction.meta.metadata);
+	const isDebit = transaction?.type === "debit";
+	const formattedAmount = transaction
+		? formatSignedAmount(transaction.amount, transaction.currency)
+		: "";
+	const metadataFields = getMetadataFields(transaction?.meta);
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="sm:max-w-lg">
+		<Dialog
+			open={open && Boolean(transaction)}
+			onOpenChange={onOpenChange}
+		>
+			{transaction ? (
+				<DialogContent className="sm:max-w-lg">
 				<div ref={receiptRef} className="flex flex-col gap-6 bg-popover">
 					<DialogHeader>
 						<div className="flex items-start gap-3">
@@ -168,6 +168,7 @@ export function TransactionDetailsDialog({
 					</Button>
 				</DialogFooter>
 			</DialogContent>
+			) : null}
 		</Dialog>
 	);
 }

@@ -4,7 +4,7 @@ import { type ComponentProps, useEffect, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { toast } from "sonner";
 
-import { useExportWalletTransactionsMutation } from "#/api/http/v1/wallet/wallet.hooks";
+import { useExportWalletTransactionsV2Mutation } from "#/api/http/v2/wallet/wallet.hooks";
 import { Button } from "#/components/ui/button";
 import { Calendar } from "#/components/ui/calendar";
 import {
@@ -21,6 +21,7 @@ import {
 	downloadTransactionsCsv,
 	EXPORT_DURATION_OPTIONS,
 	type ExportDurationPreset,
+	filterTransactionsByDateRange,
 	formatIsoDate,
 	getDefaultExportDateRange,
 	getExportDateRangeForPreset,
@@ -45,7 +46,7 @@ export function ExportTransactionsDialog({
 		getDefaultExportDateRange(accountCreatedAt),
 	);
 
-	const exportMutation = useExportWalletTransactionsMutation();
+	const exportMutation = useExportWalletTransactionsV2Mutation();
 	const today = new Date();
 
 	useEffect(() => {
@@ -88,10 +89,12 @@ export function ExportTransactionsDialog({
 		}
 
 		try {
-			const transactions = await exportMutation.mutateAsync({
-				...queryDates,
-				tenant_id: tenantId,
-			});
+			const allTransactions = await exportMutation.mutateAsync({ tenantId });
+			const transactions = filterTransactionsByDateRange(
+				allTransactions,
+				queryDates.from_date,
+				queryDates.to_date,
+			);
 
 			if (transactions.length === 0) {
 				toast.info("No transactions found for the selected date range");

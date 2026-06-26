@@ -1,9 +1,4 @@
-import {
-	BuildingsIcon,
-	EnvelopeSimpleIcon,
-	FloppyDiskIcon,
-	HouseIcon,
-} from "@phosphor-icons/react";
+import { FloppyDiskIcon } from "@phosphor-icons/react";
 import { type FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -12,52 +7,20 @@ import {
 	useTenantBillingInformationV2Query,
 	useUpdateTenantBillingInformationV2Mutation,
 } from "#/api/http/v2/billing/billing.hooks";
-import type { BillingInformation } from "#/api/http/v2/billing/billing.types";
 import { Button } from "#/components/ui/button";
-import { Input } from "#/components/ui/input";
 import { Separator } from "#/components/ui/separator";
 import { Skeleton } from "#/components/ui/skeleton";
-import { CountryStateCityFields } from "#/components/ui-extended/country-state-city-fields";
 import { cn } from "#/lib/utils.ts";
-import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
-import { isBillingNotFoundError } from "../../billing/-data";
+import { BillingInformationFormFields } from "../../billing/-components/billing-information-form-fields";
+import {
+	type BillingFormState,
+	EMPTY_BILLING_FORM,
+	getBillingFormState,
+	getBillingInformationCreatePayload,
+	getBillingInformationUpdatePayload,
+	isBillingNotFoundError,
+} from "../../billing/-data";
 import { useCurrentTenant } from "../../team/-data";
-
-type BillingFormState = {
-	billing_name: string;
-	billing_email: string;
-	billing_address: string;
-	billing_city: string;
-	billing_state: string;
-	billing_postal_code: string;
-	billing_country: string;
-};
-
-const EMPTY_FORM: BillingFormState = {
-	billing_name: "",
-	billing_email: "",
-	billing_address: "",
-	billing_city: "",
-	billing_state: "",
-	billing_postal_code: "",
-	billing_country: "",
-};
-
-function getFormState(billingInfo?: BillingInformation): BillingFormState {
-	if (!billingInfo) {
-		return EMPTY_FORM;
-	}
-
-	return {
-		billing_name: billingInfo.billing_name ?? "",
-		billing_email: billingInfo.billing_email ?? "",
-		billing_address: billingInfo.billing_address ?? "",
-		billing_city: billingInfo.billing_city ?? "",
-		billing_state: billingInfo.billing_state ?? "",
-		billing_postal_code: billingInfo.billing_postal_code ?? "",
-		billing_country: billingInfo.billing_country ?? "",
-	};
-}
 
 export function BillingInformationSection() {
 	const { tenantId } = useCurrentTenant();
@@ -68,7 +31,7 @@ export function BillingInformationSection() {
 	const billingInfo = billingInformationQuery.data;
 	const isBillingNotFound = isBillingNotFoundError(billingInformationQuery.error);
 
-	const [form, setForm] = useState<BillingFormState>(EMPTY_FORM);
+	const [form, setForm] = useState<BillingFormState>(EMPTY_BILLING_FORM);
 	const createMutation = useCreateBillingInformationV2Mutation();
 	const updateMutation = useUpdateTenantBillingInformationV2Mutation(
 		tenantId ?? "",
@@ -79,7 +42,7 @@ export function BillingInformationSection() {
 	const isSaving = createMutation.isPending || updateMutation.isPending;
 
 	useEffect(() => {
-		setForm(getFormState(billingInfo));
+		setForm(getBillingFormState(billingInfo));
 	}, [billingInfo]);
 
 	function updateField<K extends keyof BillingFormState>(
@@ -93,8 +56,7 @@ export function BillingInformationSection() {
 		event.preventDefault();
 
 		if (billingInfo) {
-			const { billing_email: _billingEmail, ...updatePayload } = form;
-			updateMutation.mutate(updatePayload, {
+			updateMutation.mutate(getBillingInformationUpdatePayload(form), {
 				onSuccess: () => {
 					toast.success("Billing information updated");
 				},
@@ -110,21 +72,14 @@ export function BillingInformationSection() {
 			return;
 		}
 
-		createMutation.mutate(
-			{
-				tenant: tenantId,
-				billing_plan: "payg",
-				...form,
+		createMutation.mutate(getBillingInformationCreatePayload(form, tenantId), {
+			onSuccess: () => {
+				toast.success("Billing information saved");
 			},
-			{
-				onSuccess: () => {
-					toast.success("Billing information saved");
-				},
-				onError: () => {
-					toast.error("Failed to save billing information");
-				},
+			onError: () => {
+				toast.error("Failed to save billing information");
 			},
-		);
+		});
 	}
 
 	if (billingInformationQuery.isError && !isBillingNotFound) {
@@ -156,70 +111,11 @@ export function BillingInformationSection() {
 			</div>
 
 			<form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-				<FieldGroup className="grid gap-4">
-					<Field className="flex flex-col gap-2">
-						<FieldLabel htmlFor="billing-name">Billing Name</FieldLabel>
-						<div className="relative">
-							<BuildingsIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-							<Input
-								id="billing-name"
-								placeholder="Enter billing name"
-								className="pl-10"
-								value={form.billing_name}
-								onChange={(event) =>
-									updateField("billing_name", event.target.value)
-								}
-							/>
-						</div>
-					</Field>
-
-					<Field className="flex flex-col gap-2">
-						<FieldLabel htmlFor="billing-email">Billing Email</FieldLabel>
-						<div className="relative">
-							<EnvelopeSimpleIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-							<Input
-								id="billing-email"
-								type="email"
-								placeholder="Enter billing email"
-								className="pl-10"
-								value={form.billing_email}
-								onChange={(event) =>
-									updateField("billing_email", event.target.value)
-								}
-								disabled={Boolean(billingInfo)}
-							/>
-						</div>
-					</Field>
-
-					<Field className="flex flex-col gap-2">
-						<FieldLabel htmlFor="billing-address">Billing Address</FieldLabel>
-						<div className="relative">
-							<HouseIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-							<Input
-								id="billing-address"
-								placeholder="Enter billing address"
-								className="pl-10"
-								value={form.billing_address}
-								onChange={(event) =>
-									updateField("billing_address", event.target.value)
-								}
-							/>
-						</div>
-					</Field>
-
-					<CountryStateCityFields
-						country={form.billing_country}
-						state={form.billing_state}
-						city={form.billing_city}
-						postalCode={form.billing_postal_code}
-						onCountryChange={(value) => updateField("billing_country", value)}
-						onStateChange={(value) => updateField("billing_state", value)}
-						onCityChange={(value) => updateField("billing_city", value)}
-						onPostalCodeChange={(value) =>
-							updateField("billing_postal_code", value)
-						}
-					/>
-				</FieldGroup>
+				<BillingInformationFormFields
+					form={form}
+					onFieldChange={updateField}
+					isEmailDisabled={Boolean(billingInfo)}
+				/>
 
 				<Button type="submit" className="w-full" disabled={isSaving}>
 					<FloppyDiskIcon

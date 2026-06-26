@@ -4,9 +4,68 @@ import type { AxiosError } from "axios";
 
 import type {
 	BillingInformation,
+	BillingInformationCreatePayload,
+	BillingInformationUpdatePayload,
 	Invoice,
 } from "#/api/http/v2/billing/billing.types";
-import type { WalletTransaction } from "#/api/http/v1/wallet/wallet.types";
+import type { WalletTransaction } from "#/api/http/v2/wallet/wallet.types";
+import { normalizeCountryName } from "#/lib/country-state-city";
+
+export type BillingFormState = {
+	billing_name: string;
+	billing_email: string;
+	billing_address: string;
+	billing_city: string;
+	billing_state: string;
+	billing_postal_code: string;
+	billing_country: string;
+};
+
+export const EMPTY_BILLING_FORM: BillingFormState = {
+	billing_name: "",
+	billing_email: "",
+	billing_address: "",
+	billing_city: "",
+	billing_state: "",
+	billing_postal_code: "",
+	billing_country: "",
+};
+
+export function getBillingFormState(
+	billingInfo?: BillingInformation,
+): BillingFormState {
+	if (!billingInfo) {
+		return EMPTY_BILLING_FORM;
+	}
+
+	return {
+		billing_name: billingInfo.billing_name ?? "",
+		billing_email: billingInfo.billing_email ?? "",
+		billing_address: billingInfo.billing_address ?? "",
+		billing_city: billingInfo.billing_city ?? "",
+		billing_state: billingInfo.billing_state ?? "",
+		billing_postal_code: billingInfo.billing_postal_code ?? "",
+		billing_country: normalizeCountryName(billingInfo.billing_country),
+	};
+}
+
+export function getBillingInformationUpdatePayload(
+	form: BillingFormState,
+): BillingInformationUpdatePayload {
+	const { billing_email: _billingEmail, ...updatePayload } = form;
+	return updatePayload;
+}
+
+export function getBillingInformationCreatePayload(
+	form: BillingFormState,
+	tenantId: string,
+): BillingInformationCreatePayload {
+	return {
+		tenant: tenantId,
+		billing_plan: "payg",
+		...form,
+	};
+}
 
 export function isBillingNotFoundError(error: unknown) {
 	return (error as AxiosError | null)?.response?.status === 404;
@@ -190,8 +249,9 @@ export function mapWalletTransaction(
 		reason,
 		balance_before,
 		balance_after,
-		type,
-		...meta
+		type: _type,
+		metadata: _metadata,
+		..._rest
 	} = transaction;
 
 	return {
@@ -206,10 +266,7 @@ export function mapWalletTransaction(
 		balanceAfter: Number.parseFloat(balance_after),
 		transactionId: id,
 		currency,
-		meta: {
-			type,
-			...meta,
-		},
+		meta: transaction.metadata ?? {},
 	};
 }
 
@@ -271,6 +328,21 @@ export function getExportQueryDates(range: DateRange | undefined) {
 		from_date: formatIsoDate(range.from),
 		to_date: formatIsoDate(range.to),
 	};
+}
+
+export function filterTransactionsByDateRange(
+	transactions: WalletTransaction[],
+	fromDate: string,
+	toDate: string,
+) {
+	const from = startOfDay(parseValidDate(fromDate));
+	const to = startOfDay(parseValidDate(toDate));
+	to.setHours(23, 59, 59, 999);
+
+	return transactions.filter((transaction) => {
+		const createdAt = parseValidDate(transaction.created_at);
+		return createdAt >= from && createdAt <= to;
+	});
 }
 
 function escapeCsvValue(value: string) {

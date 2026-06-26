@@ -14,9 +14,10 @@ import {
 	useTenantInvoicesV2Query,
 } from "#/api/http/v2/billing/billing.hooks";
 import {
-	useWalletBalanceQuery,
-	useWalletTransactionsQuery,
-} from "#/api/http/v1/wallet/wallet.hooks";
+	useTenantTransactionsV2Query,
+	useWalletBalanceV2Query,
+	WALLET_V2_QUERY_KEYS,
+} from "#/api/http/v2/wallet/wallet.hooks";
 import {
 	TablePagination,
 	TablePaginationSkeleton,
@@ -78,16 +79,16 @@ function BillingPage() {
 	const [selectedTransaction, setSelectedTransaction] =
 		useState<Transaction | null>(null);
 
-	const walletBalanceQuery = useWalletBalanceQuery(tenantId);
+	const walletBalanceQuery = useWalletBalanceV2Query(tenantId, Boolean(tenantId));
 	const billingInformationQuery = useTenantBillingInformationV2Query(
 		tenantId,
 		Boolean(tenantId),
 	);
-	const transactionsQuery = useWalletTransactionsQuery(
+	const transactionsQuery = useTenantTransactionsV2Query(
+		tenantId,
 		{
-			tenant_id: tenantId,
-			offset: (transactionPage - 1) * TRANSACTIONS_PAGE_SIZE,
-			page_size: TRANSACTIONS_PAGE_SIZE,
+			page: transactionPage,
+			per_page: TRANSACTIONS_PAGE_SIZE,
 		},
 		Boolean(tenantId),
 	);
@@ -108,13 +109,14 @@ function BillingPage() {
 
 	const transactions = useMemo(
 		() =>
-			(transactionsQuery.data?.results ?? []).map((transaction) =>
+			(transactionsQuery.data?.items ?? []).map((transaction) =>
 				mapWalletTransaction(transaction, currency),
 			),
-		[transactionsQuery.data?.results, currency],
+		[transactionsQuery.data?.items, currency],
 	);
 
-	const transactionTotal = transactionsQuery.data?.count ?? transactions.length;
+	const transactionTotal =
+		transactionsQuery.data?.meta.pagination.total ?? transactions.length;
 
 	const invoices = invoicesQuery.data?.items ?? [];
 	const invoiceTotal =
@@ -142,7 +144,10 @@ function BillingPage() {
 	}
 
 	async function handleRefresh() {
-		await queryClient.invalidateQueries({ queryKey: BILLING_V2_QUERY_KEYS.all });
+		await Promise.all([
+			queryClient.invalidateQueries({ queryKey: BILLING_V2_QUERY_KEYS.all }),
+			queryClient.invalidateQueries({ queryKey: WALLET_V2_QUERY_KEYS.all }),
+		]);
 	}
 
 	if (
@@ -337,7 +342,13 @@ function BillingPage() {
 													const isDebit = transaction.type === "debit";
 
 													return (
-														<TableRow key={transaction.id}>
+														<TableRow
+															key={transaction.id}
+															className="cursor-pointer"
+															onClick={() =>
+																openTransactionDetails(transaction)
+															}
+														>
 															<TableCell className="font-mono text-xs">
 																{transaction.reference}
 															</TableCell>
@@ -379,7 +390,9 @@ function BillingPage() {
 																	transaction.currency,
 																)}
 															</TableCell>
-															<TableCell>
+															<TableCell
+																onClick={(event) => event.stopPropagation()}
+															>
 																<Button
 																	type="button"
 																	variant="outline"
@@ -536,7 +549,12 @@ function BillingPage() {
 			/>
 			<TransactionDetailsDialog
 				open={detailsOpen}
-				onOpenChange={setDetailsOpen}
+				onOpenChange={(open) => {
+					setDetailsOpen(open);
+					if (!open) {
+						setSelectedTransaction(null);
+					}
+				}}
 				transaction={selectedTransaction}
 			/>
 		</div>
