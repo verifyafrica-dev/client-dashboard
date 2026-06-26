@@ -12,9 +12,7 @@ import {
 import type { ActiveUser } from "../active-users/-data";
 import { ActiveUserStatusBadge } from "../active-users/-components/user-status-badge";
 import { formatTeamDate, getUserInitials } from "../-data";
-import {
-	InvitationStatusBadge,
-} from "../invitations/-components/invitation-badges";
+import { InvitationStatusBadge } from "../invitations/-components/invitation-badges";
 import type { UserInvitation } from "../invitations/-data";
 import { UserRoleBadge } from "./user-role-badge";
 
@@ -28,13 +26,7 @@ type TeamMemberDetailsDialogProps = {
 	onOpenChange: (open: boolean) => void;
 };
 
-function DetailRow({
-	label,
-	value,
-}: {
-	label: string;
-	value: ReactNode;
-}) {
+function DetailRow({ label, value }: { label: string; value: ReactNode }) {
 	return (
 		<div className="grid gap-1 border-b border-border/60 py-3 last:border-b-0 sm:grid-cols-[140px_1fr] sm:gap-4">
 			<dt className="text-sm text-muted-foreground">{label}</dt>
@@ -70,12 +62,15 @@ export function TeamMemberDetailsDialog({
 
 	const subtitle = isUser
 		? user!.isCurrentUser
-			? "Active team member (you)"
+			? "Active team member (You)"
 			: "Active team member"
 		: "Pending invitation";
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog
+			open={open}
+			onOpenChange={onOpenChange}
+		>
 			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
 					<div className="flex items-center gap-4">
@@ -104,7 +99,10 @@ export function TeamMemberDetailsDialog({
 				<dl className="mt-2">
 					{isUser ? (
 						<>
-							<DetailRow label="Email" value={user!.email} />
+							<DetailRow
+								label="Email"
+								value={user!.email}
+							/>
 							<DetailRow
 								label="Role"
 								value={<UserRoleBadge role={user!.role} />}
@@ -132,9 +130,15 @@ export function TeamMemberDetailsDialog({
 						</>
 					) : (
 						<>
-							<DetailRow label="Email" value={invitation!.email} />
+							<DetailRow
+								label="Email"
+								value={invitation!.email}
+							/>
 							{invitation!.name?.trim() ? (
-								<DetailRow label="Name" value={invitation!.name} />
+								<DetailRow
+									label="Name"
+									value={invitation!.name}
+								/>
 							) : null}
 							<DetailRow
 								label="Role"
