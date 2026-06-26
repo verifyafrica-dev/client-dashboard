@@ -8,6 +8,9 @@ import { nitro } from "nitro/vite";
 import { defineConfig } from "vite";
 
 const config = defineConfig({
+	server: {
+		allowedHosts: ["client.verifyafrica.localhost"],
+	},
 	resolve: {
 		tsconfigPaths: true,
 		alias: [

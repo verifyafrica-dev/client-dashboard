@@ -192,5 +192,3 @@ function LoginPage() {
 		</AuthPageShell>
 	);
 }
-
-export default LoginPage;
