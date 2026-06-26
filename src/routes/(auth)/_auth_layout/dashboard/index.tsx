@@ -105,7 +105,7 @@ function DashboardPage() {
 		isKycVerified &&
 		(tenantsAnalyticsQuery.isPending || tenantsAnalyticsQuery.isFetching);
 	const chartKey = `${tenantId ?? "tenant"}-${timeRange}`;
-
+	console.log(tenantQuery.data);
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -127,7 +127,10 @@ function DashboardPage() {
 							</SelectTrigger>
 							<SelectContent>
 								{TIME_RANGE_OPTIONS.map((option) => (
-									<SelectItem key={option.value} value={option.value}>
+									<SelectItem
+										key={option.value}
+										value={option.value}
+									>
 										{option.label}
 									</SelectItem>
 								))}
@@ -180,7 +183,12 @@ function DashboardKycLoadingState() {
 
 function VerificationTypeSector(props: PieSectorShapeProps) {
 	const type = String(props.payload?.type ?? "");
-	return <Sector {...props} fill={`var(--color-${type})`} />;
+	return (
+		<Sector
+			{...props}
+			fill={`var(--color-${type})`}
+		/>
+	);
 }
 
 function formatCurrency(value: number) {
@@ -211,7 +219,10 @@ function MetricCard({
 						iconClassName,
 					)}
 				>
-					<Icon className="size-5" weight="fill" />
+					<Icon
+						className="size-5"
+						weight="fill"
+					/>
 				</div>
 				<div>
 					<p className="text-2xl font-semibold tracking-tight">{value}</p>
@@ -265,7 +276,10 @@ function VerificationTypesSkeleton() {
 				</div>
 				<div className="mt-4 grid grid-cols-2 gap-2">
 					{["id", "passport", "faceMatch", "address"].map((type) => (
-						<div key={type} className="flex items-center justify-between gap-2">
+						<div
+							key={type}
+							className="flex items-center justify-between gap-2"
+						>
 							<Skeleton className="h-4 w-24" />
 							<Skeleton className="h-4 w-10" />
 						</div>
@@ -394,7 +408,10 @@ function DashboardContent({
 								data={trendData}
 								margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
 							>
-								<CartesianGrid vertical={false} strokeDasharray="3 3" />
+								<CartesianGrid
+									vertical={false}
+									strokeDasharray="3 3"
+								/>
 								<XAxis
 									dataKey="label"
 									tickLine={false}
@@ -480,7 +497,10 @@ function DashboardContent({
 					<div className="grid gap-6 sm:grid-cols-3">
 						<div className="flex flex-col items-center gap-2 text-center">
 							<div className="flex size-12 items-center justify-center rounded-full bg-emerald-100 text-emerald-600">
-								<TrendUpIcon className="size-6" weight="fill" />
+								<TrendUpIcon
+									className="size-6"
+									weight="fill"
+								/>
 							</div>
 							<p className="text-2xl font-semibold">
 								{formatCurrency(stats.topUps)}
@@ -492,7 +512,10 @@ function DashboardContent({
 						</div>
 						<div className="flex flex-col items-center gap-2 text-center">
 							<div className="flex size-12 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-								<LightningIcon className="size-6" weight="fill" />
+								<LightningIcon
+									className="size-6"
+									weight="fill"
+								/>
 							</div>
 							<p className="text-2xl font-semibold">
 								{stats.creditsUsed.toLocaleString()}
@@ -501,7 +524,10 @@ function DashboardContent({
 						</div>
 						<div className="flex flex-col items-center gap-2 text-center">
 							<div className="flex size-12 items-center justify-center rounded-full bg-amber-100 text-amber-600">
-								<ArrowsCounterClockwiseIcon className="size-6" weight="fill" />
+								<ArrowsCounterClockwiseIcon
+									className="size-6"
+									weight="fill"
+								/>
 							</div>
 							<p className="text-2xl font-semibold">
 								{formatCurrency(stats.refunds.amount)}
