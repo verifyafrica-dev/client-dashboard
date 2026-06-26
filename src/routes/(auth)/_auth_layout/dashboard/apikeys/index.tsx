@@ -13,10 +13,10 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
-	useRotateTenantApiKeyMutation,
-	useTenantApiKeyQuery,
-	useUpdateTenantApiKeyMutation,
-} from "#/api/http/v1/tenants/tenants.hooks";
+	useReplaceTenantApiKeyV2Mutation,
+	useTenantApiKeyV2Query,
+	useUpdateTenantApiKeyV2Mutation,
+} from "#/api/http/v2/tenants/tenants.hooks";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import {
@@ -33,7 +33,7 @@ import { Skeleton } from "#/components/ui/skeleton";
 import { Switch } from "#/components/ui/switch";
 import { useClipboard } from "#/hooks/use-clipboard";
 import { cn } from "#/lib/utils.ts";
-import { useAuthStore } from "#/stores/auth-store";
+import { useCurrentTenant } from "../team/-data";
 import { formatApiKeyDate, getApiKeyPreview, maskApiKey } from "./-data";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/apikeys/")(
@@ -45,12 +45,11 @@ export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/apikeys/")(
 function ApiKeysPage() {
 	const [isKeyVisible, setIsKeyVisible] = useState(false);
 	const { copied, copy } = useClipboard();
-	const user = useAuthStore((state) => state.user);
-	const tenantId = user?.tenants[0]?.id;
+	const { tenantId } = useCurrentTenant();
 
-	const apiKeyQuery = useTenantApiKeyQuery(tenantId, Boolean(tenantId));
-	const updateApiKeyMutation = useUpdateTenantApiKeyMutation(tenantId ?? "");
-	const rotateApiKeyMutation = useRotateTenantApiKeyMutation(tenantId ?? "");
+	const apiKeyQuery = useTenantApiKeyV2Query(tenantId, Boolean(tenantId));
+	const updateApiKeyMutation = useUpdateTenantApiKeyV2Mutation(tenantId ?? "");
+	const rotateApiKeyMutation = useReplaceTenantApiKeyV2Mutation(tenantId ?? "");
 
 	const apiKey = apiKeyQuery.data;
 
