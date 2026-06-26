@@ -347,14 +347,14 @@ export const useRemoveTenantUserV2Mutation = (tenantId: string) => {
 	});
 };
 
-export const useUpdateTenantUserMembershipV2Mutation = (
-	tenantId: string,
-	userId: string,
-) => {
+export const useUpdateTenantUserMembershipV2Mutation = (tenantId: string) => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (payload: TenantUserMembershipUpdatePayload) =>
+		mutationFn: ({
+			userId,
+			...payload
+		}: TenantUserMembershipUpdatePayload & { userId: string }) =>
 			TENANTS_V2_API.UPDATE_USER_MEMBERSHIP(tenantId, userId, payload),
 		onSuccess: () => {
 			queryClient.invalidateQueries({

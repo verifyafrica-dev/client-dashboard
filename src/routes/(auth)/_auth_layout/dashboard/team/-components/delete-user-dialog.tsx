@@ -1,9 +1,7 @@
 import { toast } from "sonner";
 
-import {
-	useDeleteTenantInvitationMutation,
-	useRemoveTenantUserMutation,
-} from "#/api/http/v1/tenants/tenants.hooks";
+import { useRemoveTenantUserV2Mutation } from "#/api/http/v2/tenants/tenants.hooks";
+import { useDeleteTenantInvitationMutation } from "#/api/http/v1/tenants/tenants.hooks";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -38,7 +36,7 @@ export function DeleteUserDialog({
 	onOpenChange,
 	onSuccess,
 }: DeleteUserDialogProps) {
-	const removeUserMutation = useRemoveTenantUserMutation(tenantId ?? "");
+	const removeUserMutation = useRemoveTenantUserV2Mutation(tenantId ?? "");
 	const deleteInvitationMutation = useDeleteTenantInvitationMutation(
 		tenantId ?? "",
 	);
@@ -53,21 +51,23 @@ export function DeleteUserDialog({
 		removeUserMutation.isPending || deleteInvitationMutation.isPending;
 
 	async function handleConfirm() {
-		if (!tenantId) {
+		if (!tenantId || !target) {
 			toast.error("Tenant information is unavailable");
 			return;
 		}
 
+		const deleteTarget = target;
+
 		try {
 			if (isInvitation) {
-				await deleteInvitationMutation.mutateAsync(target.id);
+				await deleteInvitationMutation.mutateAsync(deleteTarget.id);
 				toast.success("Invitation deleted successfully");
 			} else {
-				await removeUserMutation.mutateAsync(target.id);
+				await removeUserMutation.mutateAsync(deleteTarget.id);
 				toast.success("User removed successfully");
 			}
 
-			onSuccess?.(target);
+			onSuccess?.(deleteTarget);
 			onOpenChange(false);
 		} catch {
 			toast.error(

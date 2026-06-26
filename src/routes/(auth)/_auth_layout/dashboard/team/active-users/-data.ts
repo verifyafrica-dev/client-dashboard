@@ -1,9 +1,8 @@
-import type { UserDetail } from "#/api/http/v1/users/users.types";
+import type { TenantUser } from "#/api/http/v2/tenants/tenants.types";
 import {
 	formatTeamDate,
 	getUserFullName,
 	getUserInitials,
-	getUserTenantMembership,
 	ROLE_LABELS,
 	TEAM_PAGE_SIZE,
 	TEAM_ROLES,
@@ -20,6 +19,9 @@ export type ActiveUser = {
 	status: ActiveUserStatus;
 	joinedAt: Date;
 	isCurrentUser?: boolean;
+	phoneNumber?: string | null;
+	lastLogin?: Date | null;
+	accountActive?: boolean;
 };
 
 export const ACTIVE_USER_STATUSES: ActiveUserStatus[] = ["active", "inactive"];
@@ -51,30 +53,27 @@ export function getActiveUserStatusBadgeClassName(status: ActiveUserStatus) {
 	}
 }
 
-export function mapUserDetailToActiveUser(
-	user: UserDetail,
-	tenantId: string,
+export function mapTenantUserToActiveUser(
+	user: TenantUser,
 	currentUserId?: string,
 ): ActiveUser {
-	const membership = getUserTenantMembership(user, tenantId);
-
 	return {
 		id: user.id,
 		name: getUserFullName(user),
 		email: user.email,
-		role: membership?.role ?? "member",
-		status: user.is_active === false ? "inactive" : "active",
-		joinedAt: new Date(membership?.date_added ?? user.created_at),
+		role: user.role,
+		status: user.membership_active ? "active" : "inactive",
+		joinedAt: new Date(user.joined_at),
 		isCurrentUser: user.id === currentUserId,
+		phoneNumber: user.phone_number,
+		lastLogin: user.last_login ? new Date(user.last_login) : null,
+		accountActive: user.is_active,
 	};
 }
 
-export function mapUserDetailsToActiveUsers(
-	users: UserDetail[],
-	tenantId: string,
+export function mapTenantUsersToActiveUsers(
+	users: TenantUser[],
 	currentUserId?: string,
 ): ActiveUser[] {
-	return users.map((user) =>
-		mapUserDetailToActiveUser(user, tenantId, currentUserId),
-	);
+	return users.map((user) => mapTenantUserToActiveUser(user, currentUserId));
 }

@@ -1,12 +1,17 @@
 import {
 	CalendarBlankIcon,
 	MagnifyingGlassIcon,
+	PaperPlaneTiltIcon,
 	TrashIcon,
 	UserIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useTenantInvitationsQuery } from "#/api/http/v1/tenants/tenants.hooks";
+import { toast } from "sonner";
+import {
+	useResendTenantInvitationV2Mutation,
+	useTenantInvitationsV2Query,
+} from "#/api/http/v2/tenants/tenants.hooks";
 import { Avatar, AvatarFallback } from "#/components/ui/avatar";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -37,6 +42,11 @@ import {
 	DeleteUserDialog,
 	type DeleteUserDialogTarget,
 } from "../-components/delete-user-dialog";
+import { TeamIconActionButton } from "../-components/team-icon-action-button";
+import {
+	TeamMemberDetailsDialog,
+	type TeamMemberDetails,
+} from "../-components/team-member-details-dialog";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { TeamTableShell } from "../-components/team-table-shell";
 import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
@@ -47,6 +57,7 @@ import {
 } from "./-components/invitation-badges";
 import { InviteUserDialog } from "./-components/invite-user-dialog";
 import {
+	canResendInvitation,
 	formatInvitationExpiry,
 	INVITATION_ROLES,
 	type InvitationStatus,
@@ -83,16 +94,26 @@ function InvitationsPage() {
 	);
 	const [roleFilter, setRoleFilter] = useState<TenantUserRole | "all">("all");
 	const [page, setPage] = useState(1);
+	const [resendingInvitationId, setResendingInvitationId] = useState<
+		string | null
+	>(null);
+	const [detailsOpen, setDetailsOpen] = useState(false);
+	const [selectedMember, setSelectedMember] = useState<TeamMemberDetails | null>(
+		null,
+	);
 
-	const invitationsQuery = useTenantInvitationsQuery(
+	const invitationsQuery = useTenantInvitationsV2Query(
 		tenantId,
-		{ page_size: TEAM_LIST_PAGE_SIZE },
+		{ per_page: TEAM_LIST_PAGE_SIZE },
 		Boolean(tenantId),
+	);
+	const resendInvitationMutation = useResendTenantInvitationV2Mutation(
+		tenantId ?? "",
 	);
 
 	const invitations = useMemo(
-		() => mapInvitationsToUserInvitations(invitationsQuery.data?.results ?? []),
-		[invitationsQuery.data?.results],
+		() => mapInvitationsToUserInvitations(invitationsQuery.data?.items ?? []),
+		[invitationsQuery.data?.items],
 	);
 
 	const isLoading = invitationsQuery.isPending || invitationsQuery.isFetching;
@@ -122,8 +143,31 @@ function InvitationsPage() {
 		setDeleteDialogOpen(true);
 	}
 
+	function openMemberDetails(invitation: UserInvitation) {
+		setSelectedMember({ type: "invitation", data: invitation });
+		setDetailsOpen(true);
+	}
+
 	function handleDeleteSuccess(_target: DeleteUserDialogTarget) {
 		setInvitationToDelete(null);
+	}
+
+	async function handleResendInvitation(invitation: UserInvitation) {
+		if (!tenantId) {
+			toast.error("Tenant information is unavailable");
+			return;
+		}
+
+		setResendingInvitationId(invitation.id);
+
+		try {
+			await resendInvitationMutation.mutateAsync(invitation.id);
+			toast.success(`Invitation resent to ${invitation.email}`);
+		} catch {
+			toast.error("Failed to resend invitation. Please try again.");
+		} finally {
+			setResendingInvitationId(null);
+		}
 	}
 
 	return (
@@ -268,7 +312,11 @@ function InvitationsPage() {
 										</TableRow>
 									) : (
 										paginatedInvitations.map((invitation) => (
-											<TableRow key={invitation.id}>
+											<TableRow
+												key={invitation.id}
+												className="cursor-pointer"
+												onClick={() => openMemberDetails(invitation)}
+											>
 												<TableCell className="pl-4 sm:pl-6">
 													<div className="flex items-center gap-3">
 														<Avatar size="sm">
@@ -293,16 +341,33 @@ function InvitationsPage() {
 												</TableCell>
 												<TableCell className="pr-4 sm:pr-6">
 													{isTenantAdmin && (
-														<Button
-															type="button"
-															variant="destructive"
-															size="sm"
-															className="cursor-pointer tracking-wide"
-															onClick={() => openDeleteDialog(invitation)}
+														<div
+															className="flex items-center gap-1"
+															onClick={(event) => event.stopPropagation()}
 														>
-															<TrashIcon className="size-4" />
-															Delete
-														</Button>
+															{canResendInvitation(invitation.status) && (
+																<TeamIconActionButton
+																	label={
+																		resendingInvitationId === invitation.id
+																			? "Resending invitation..."
+																			: "Resend invitation"
+																	}
+																	icon={PaperPlaneTiltIcon}
+																	disabled={
+																		resendingInvitationId === invitation.id
+																	}
+																	onClick={() =>
+																		void handleResendInvitation(invitation)
+																	}
+																/>
+															)}
+															<TeamIconActionButton
+																label="Delete invitation"
+																icon={TrashIcon}
+																variant="destructive"
+																onClick={() => openDeleteDialog(invitation)}
+															/>
+														</div>
 													)}
 												</TableCell>
 											</TableRow>
@@ -325,6 +390,17 @@ function InvitationsPage() {
 				open={inviteDialogOpen}
 				onOpenChange={setInviteDialogOpen}
 				tenantId={tenantId}
+			/>
+
+			<TeamMemberDetailsDialog
+				member={selectedMember}
+				open={detailsOpen}
+				onOpenChange={(open) => {
+					setDetailsOpen(open);
+					if (!open) {
+						setSelectedMember(null);
+					}
+				}}
 			/>
 
 			<DeleteUserDialog

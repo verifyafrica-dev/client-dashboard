@@ -5,10 +5,13 @@ import {
 import { useForm } from "@tanstack/react-form";
 import { type ComponentProps, type ComponentType, useEffect } from "react";
 import { toast } from "sonner";
+import { z } from "zod";
 
-import { useCreateTenantInvitationMutation } from "#/api/http/v1/tenants/tenants.hooks";
-import type { InvitationCreateFormValues } from "#/api/http/v1/tenants/tenants.types";
-import { InvitationCreateFormSchema } from "#/api/http/v1/tenants/tenants.types";
+import { useCreateTenantInvitationV2Mutation } from "#/api/http/v2/tenants/tenants.hooks";
+import {
+	TenantInvitationCreateSchema,
+	TenantRoleSchema,
+} from "#/api/http/v2/tenants/tenants.types";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -32,7 +35,14 @@ import {
 	FieldGroup,
 	FieldLabel,
 } from "@/components/ui/field";
-import { INVITATION_ROLES, ROLE_LABELS } from "../-data";
+import { INVITATION_ROLES, ROLE_LABELS, type TenantUserRole } from "../-data";
+
+const InviteUserFormSchema = z.object({
+	email: z.email({ message: "Invalid email address" }),
+	role: TenantRoleSchema,
+});
+
+type InviteUserFormValues = z.infer<typeof InviteUserFormSchema>;
 
 type InviteUserDialogProps = ComponentProps<typeof Dialog> & {
 	tenantId?: string;
@@ -69,15 +79,15 @@ export function InviteUserDialog({
 	onOpenChange,
 	tenantId,
 }: InviteUserDialogProps) {
-	const inviteMutation = useCreateTenantInvitationMutation(tenantId ?? "");
+	const inviteMutation = useCreateTenantInvitationV2Mutation(tenantId ?? "");
 
 	const form = useForm({
 		defaultValues: {
 			email: "",
 			role: "member",
-		} satisfies InvitationCreateFormValues,
+		} as InviteUserFormValues,
 		validators: {
-			onSubmit: InvitationCreateFormSchema,
+			onSubmit: InviteUserFormSchema,
 		},
 		onSubmit: async ({ value }) => {
 			if (!tenantId) {
@@ -85,12 +95,9 @@ export function InviteUserDialog({
 				return;
 			}
 
-			await inviteMutation.mutateAsync(
-				{
-					email: value.email,
-					role: value.role,
-				},
-				{
+			const payload = TenantInvitationCreateSchema.parse(value);
+
+			await inviteMutation.mutateAsync(payload, {
 					onSuccess: () => {
 						toast.success("User invitation sent successfully");
 						onOpenChange?.(false);
@@ -171,9 +178,7 @@ export function InviteUserDialog({
 										<Select
 											value={field.state.value}
 											onValueChange={(value) =>
-												field.handleChange(
-													value as InvitationCreateFormValues["role"],
-												)
+												field.handleChange(value as TenantUserRole)
 											}
 											disabled={isSubmitting}
 										>

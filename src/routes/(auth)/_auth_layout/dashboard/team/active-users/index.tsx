@@ -2,10 +2,12 @@ import {
 	CalendarBlankIcon,
 	MagnifyingGlassIcon,
 	TrashIcon,
+	UserCheckIcon,
+	UserMinusIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useTenantUsersQuery } from "#/api/http/v1/tenants/tenants.hooks";
+import { useTenantUsersV2Query } from "#/api/http/v2/tenants/tenants.hooks";
 import {
 	paginateItems,
 	TablePagination,
@@ -36,6 +38,15 @@ import {
 	DeleteUserDialog,
 	type DeleteUserDialogTarget,
 } from "../-components/delete-user-dialog";
+import { TeamIconActionButton } from "../-components/team-icon-action-button";
+import {
+	TeamMembershipDialog,
+	type TeamMembershipAction,
+} from "../-components/team-membership-dialog";
+import {
+	TeamMemberDetailsDialog,
+	type TeamMemberDetails,
+} from "../-components/team-member-details-dialog";
 import { TeamTableShell } from "../-components/team-table-shell";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { UserRoleBadge } from "../-components/user-role-badge";
@@ -50,7 +61,7 @@ import {
 	type ActiveUserStatus,
 	formatTeamDate,
 	getUserInitials,
-	mapUserDetailsToActiveUsers,
+	mapTenantUsersToActiveUsers,
 	ROLE_LABELS,
 	TEAM_PAGE_SIZE,
 	TEAM_ROLES,
@@ -82,21 +93,30 @@ function ActiveUsersPage() {
 	);
 	const [roleFilter, setRoleFilter] = useState<TenantUserRole | "all">("all");
 	const [page, setPage] = useState(1);
+	const [detailsOpen, setDetailsOpen] = useState(false);
+	const [selectedMember, setSelectedMember] = useState<TeamMemberDetails | null>(
+		null,
+	);
+	const [membershipDialogOpen, setMembershipDialogOpen] = useState(false);
+	const [membershipAction, setMembershipAction] =
+		useState<TeamMembershipAction | null>(null);
+	const [userForMembership, setUserForMembership] = useState<ActiveUser | null>(
+		null,
+	);
 
-	const usersQuery = useTenantUsersQuery(
+	const usersQuery = useTenantUsersV2Query(
 		tenantId,
-		{ page_size: TEAM_LIST_PAGE_SIZE },
+		{ per_page: TEAM_LIST_PAGE_SIZE },
 		Boolean(tenantId),
 	);
 
 	const users = useMemo(
 		() =>
-			mapUserDetailsToActiveUsers(
-				usersQuery.data?.results ?? [],
-				tenantId ?? "",
+			mapTenantUsersToActiveUsers(
+				usersQuery.data?.items ?? [],
 				user?.id,
 			),
-		[usersQuery.data?.results, tenantId, user?.id],
+		[usersQuery.data?.items, user?.id],
 	);
 
 	const isLoading = usersQuery.isPending || usersQuery.isFetching;
@@ -126,6 +146,25 @@ function ActiveUsersPage() {
 	function openDeleteDialog(activeUser: ActiveUser) {
 		setUserToDelete(activeUser);
 		setDeleteDialogOpen(true);
+	}
+
+	function openMemberDetails(activeUser: ActiveUser) {
+		setSelectedMember({ type: "user", data: activeUser });
+		setDetailsOpen(true);
+	}
+
+	function openMembershipDialog(
+		activeUser: ActiveUser,
+		action: TeamMembershipAction,
+	) {
+		setUserForMembership(activeUser);
+		setMembershipAction(action);
+		setMembershipDialogOpen(true);
+	}
+
+	function handleMembershipSuccess() {
+		setUserForMembership(null);
+		setMembershipAction(null);
 	}
 
 	function handleDeleteSuccess(_target: DeleteUserDialogTarget) {
@@ -268,7 +307,11 @@ function ActiveUsersPage() {
 										</TableRow>
 									) : (
 										paginatedUsers.map((activeUser) => (
-											<TableRow key={activeUser.id}>
+											<TableRow
+												key={activeUser.id}
+												className="cursor-pointer"
+												onClick={() => openMemberDetails(activeUser)}
+											>
 												<TableCell className="pl-4 sm:pl-6">
 													<div className="flex items-center gap-3">
 														<Avatar size="sm">
@@ -304,17 +347,45 @@ function ActiveUsersPage() {
 												</TableCell>
 												<TableCell className="pr-4 sm:pr-6">
 													{isTenantAdmin && (
-														<Button
-															type="button"
-															variant="destructive"
-															size="sm"
-															className="cursor-pointer tracking-wide"
-															disabled={activeUser.isCurrentUser}
-															onClick={() => openDeleteDialog(activeUser)}
+														<div
+															className="flex items-center gap-1"
+															onClick={(event) => event.stopPropagation()}
 														>
-															<TrashIcon className="size-4" />
-															Delete
-														</Button>
+															{activeUser.status === "active" ? (
+																<TeamIconActionButton
+																	label="Deactivate user"
+																	icon={UserMinusIcon}
+																	variant="outline"
+																	disabled={activeUser.isCurrentUser}
+																	onClick={() =>
+																		openMembershipDialog(
+																			activeUser,
+																			"deactivate",
+																		)
+																	}
+																/>
+															) : (
+																<TeamIconActionButton
+																	label="Reactivate user"
+																	icon={UserCheckIcon}
+																	onClick={() =>
+																		openMembershipDialog(
+																			activeUser,
+																			"activate",
+																		)
+																	}
+																/>
+															)}
+															<TeamIconActionButton
+																label="Remove user"
+																icon={TrashIcon}
+																variant="destructive"
+																disabled={activeUser.isCurrentUser}
+																onClick={() =>
+																	openDeleteDialog(activeUser)
+																}
+															/>
+														</div>
 													)}
 												</TableCell>
 											</TableRow>
@@ -337,6 +408,32 @@ function ActiveUsersPage() {
 				open={inviteDialogOpen}
 				onOpenChange={setInviteDialogOpen}
 				tenantId={tenantId}
+			/>
+
+			<TeamMemberDetailsDialog
+				member={selectedMember}
+				open={detailsOpen}
+				onOpenChange={(open) => {
+					setDetailsOpen(open);
+					if (!open) {
+						setSelectedMember(null);
+					}
+				}}
+			/>
+
+			<TeamMembershipDialog
+				user={userForMembership}
+				action={membershipAction}
+				tenantId={tenantId}
+				open={membershipDialogOpen}
+				onOpenChange={(open) => {
+					setMembershipDialogOpen(open);
+					if (!open) {
+						setUserForMembership(null);
+						setMembershipAction(null);
+					}
+				}}
+				onSuccess={handleMembershipSuccess}
 			/>
 
 			<DeleteUserDialog
