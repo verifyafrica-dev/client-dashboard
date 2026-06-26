@@ -5,23 +5,18 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { useUserLoginMutation } from "#/api/http/v1/users/users.hooks";
+import { useUserV2LoginMutation } from "#/api/http/v2/users/users.hooks";
 import {
-	type UserLoginError,
 	type UserLoginPayload,
 	UserLoginSchema,
-} from "#/api/http/v1/users/users.types";
+} from "#/api/http/v2/users/users.types";
 import { Button } from "#/components/ui/button";
-import { Checkbox } from "#/components/ui/checkbox";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
-import {
-	getUserLoginErrorFieldErrors,
-	toUserLoginError,
-} from "#/lib/api-errors";
 import { deleteAllCookies } from "#/lib/cookies";
 import { getPostLoginPath } from "#/lib/redirect";
 import { useAuthStore } from "#/stores/auth-store";
+import type { V2AxiosError } from "#/api/http/shared";
 import { Field, FieldError, FieldGroup } from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
 
@@ -36,10 +31,9 @@ export const Route = createFileRoute("/(unguarded)/_unguarded_layout/login/")({
 
 function LoginPage() {
 	const { redirect_to } = Route.useSearch();
-	const [rememberMe, setRememberMe] = useState(true);
 	const navigate = useNavigate();
-	const userLoginMutation = useUserLoginMutation();
-	const [formError, setFormError] = useState<UserLoginError | null>(null);
+	const userLoginMutation = useUserV2LoginMutation();
+	const [formErrors, setFormErrors] = useState<Array<{ message: string }>>([]);
 
 	const form = useForm({
 		defaultValues: {
@@ -50,11 +44,11 @@ function LoginPage() {
 			onSubmit: UserLoginSchema,
 		},
 		onSubmit: async ({ value }) => {
-			setFormError(null);
+			setFormErrors([]);
 			deleteAllCookies();
 
 			await userLoginMutation.mutateAsync(
-				{ payload: value, rememberMe },
+				{ payload: value },
 				{
 					onSuccess: () => {
 						const user = useAuthStore.getState().user;
@@ -73,7 +67,22 @@ function LoginPage() {
 						navigate({ to: getPostLoginPath(redirect_to) });
 					},
 					onError: (error) => {
-						setFormError(toUserLoginError(error));
+						const axiosError = error as V2AxiosError;
+						const data = axiosError.response?.data;
+
+						if (data?.errors?.length) {
+							setFormErrors(data.errors.map((message) => ({ message })));
+							return;
+						}
+
+						if (data?.message) {
+							setFormErrors([{ message: data.message }]);
+							return;
+						}
+
+						setFormErrors([
+							{ message: axiosError.message || "Something went wrong" },
+						]);
 					},
 				},
 			);
@@ -157,20 +166,8 @@ function LoginPage() {
 						</Field>
 					)}
 				</form.Field>
-				{formError && (
-					<FieldError errors={getUserLoginErrorFieldErrors(formError)} />
-				)}
-				<div className="flex items-center justify-between gap-4">
-					<div className="flex items-center gap-2">
-						<Checkbox
-							id="remember-me"
-							checked={rememberMe}
-							onCheckedChange={(checked) => setRememberMe(checked === true)}
-						/>
-						<Label htmlFor="remember-me" className="font-normal">
-							Remember me
-						</Label>
-					</div>
+				{formErrors.length > 0 && <FieldError errors={formErrors} />}
+				<div className="flex justify-end">
 					<Link
 						to="/forgot-password"
 						className="text-sm font-semibold text-foreground hover:underline"
@@ -185,7 +182,10 @@ function LoginPage() {
 						disabled={userLoginMutation.isPending}
 					>
 						Sign In
-						<ArrowRightIcon className="size-4" weight="bold" />
+						<ArrowRightIcon
+							className="size-4"
+							weight="bold"
+						/>
 					</Button>
 				</Field>
 			</form>

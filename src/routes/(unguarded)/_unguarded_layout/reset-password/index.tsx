@@ -9,23 +9,20 @@ import {
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { useUserResetPasswordMutation } from "#/api/http/v1/users/users.hooks";
 import {
-	type UserResetPasswordErrorResponse,
-	UserResetPasswordFormSchema,
-	type UserResetPasswordFormValues,
+	useUserV2ResetPasswordMutation,
+	useVerifyForgotPasswordTokenV2Query,
+} from "#/api/http/v2/users/users.hooks";
+import {
+	UserResetPasswordFormWithoutTokenSchema,
+	type UserResetPasswordFormWithoutTokenValues,
 	UserResetPasswordSearchSchema,
-} from "#/api/http/v1/users/users.types";
+} from "#/api/http/v2/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
-import {
-	InputOTP,
-	InputOTPGroup,
-	InputOTPSlot,
-} from "#/components/ui/input-otp";
-import { Label } from "#/components/ui/label";
-import { getUserResetPasswordErrorFieldErrors } from "#/lib/api-errors";
+import { Spinner } from "#/components/ui/spinner";
 import { deleteAllCookies } from "#/lib/cookies";
+import type { V2AxiosError } from "#/api/http/shared";
 import {
 	Field,
 	FieldError,
@@ -41,41 +38,30 @@ export const Route = createFileRoute(
 	component: ResetPasswordPage,
 });
 
-function maskEmail(email: string) {
-	const [localPart, domain] = email.split("@");
-	if (!localPart || !domain) {
-		return email;
-	}
-
-	return `${localPart.slice(0, 2)}***@${domain}`;
-}
-
 function ResetPasswordPage() {
 	const navigate = useNavigate();
-	const { email } = Route.useSearch();
-	const resetPasswordMutation = useUserResetPasswordMutation();
-	const [formError, setFormError] =
-		useState<UserResetPasswordErrorResponse | null>(null);
+	const { token } = Route.useSearch();
+	const resetPasswordMutation = useUserV2ResetPasswordMutation();
+	const tokenVerification = useVerifyForgotPasswordTokenV2Query(token);
+	const [formErrors, setFormErrors] = useState<Array<{ message: string }>>([]);
 
 	const form = useForm({
 		defaultValues: {
-			email,
-			code: "",
 			new_password: "",
-			confirm_password: "",
-		} satisfies UserResetPasswordFormValues,
+			confirm_new_password: "",
+		} satisfies UserResetPasswordFormWithoutTokenValues,
 		validators: {
-			onSubmit: UserResetPasswordFormSchema,
+			onSubmit: UserResetPasswordFormWithoutTokenSchema,
 		},
 		onSubmit: async ({ value }) => {
-			setFormError(null);
+			setFormErrors([]);
 			deleteAllCookies();
 
 			await resetPasswordMutation.mutateAsync(
 				{
-					email: value.email,
-					code: value.code,
+					token,
 					new_password: value.new_password,
+					confirm_new_password: value.confirm_new_password,
 				},
 				{
 					onSuccess: () => {
@@ -83,30 +69,91 @@ function ResetPasswordPage() {
 						navigate({ to: "/login", replace: true });
 					},
 					onError: (error) => {
-						setFormError(error);
+						const axiosError = error as V2AxiosError;
+						const data = axiosError.response?.data;
+
+						if (data?.errors?.length) {
+							setFormErrors(data.errors.map((message) => ({ message })));
+							return;
+						}
+
+						if (data?.message) {
+							setFormErrors([{ message: data.message }]);
+							return;
+						}
+
+						setFormErrors([
+							{ message: axiosError.message || "Something went wrong" },
+						]);
 					},
 				},
 			);
 		},
 	});
 
-	if (!email) {
+	if (!token) {
 		return <Navigate to="/forgot-password" />;
 	}
+
+	if (tokenVerification.isPending) {
+		return (
+			<AuthPageShell
+				title="Verifying reset link"
+				subtitle="Please wait while we validate your password reset link"
+			>
+				<div className="flex justify-center py-8">
+					<Spinner className="size-8 text-primary" />
+				</div>
+			</AuthPageShell>
+		);
+	}
+
+	if (tokenVerification.isError) {
+		const axiosError = tokenVerification.error as V2AxiosError;
+		const data = axiosError.response?.data;
+		const errors = data?.errors?.length
+			? data.errors.map((message) => ({ message }))
+			: [
+					{
+						message: data?.message || "This reset link is invalid or expired.",
+					},
+				];
+
+		return (
+			<AuthPageShell
+				title="Reset link unavailable"
+				subtitle="We couldn't verify this password reset link."
+				footer={
+					<p className="mt-6 text-center text-sm text-muted-foreground">
+						<Link
+							to="/forgot-password"
+							className="font-semibold text-foreground hover:underline"
+						>
+							Request a new reset link
+						</Link>
+					</p>
+				}
+			>
+				<FieldError errors={errors} />
+			</AuthPageShell>
+		);
+	}
+
+	const verifiedUser = tokenVerification.data;
 
 	return (
 		<AuthPageShell
 			title="Reset password"
-			subtitle={`Enter the code sent to ${maskEmail(email)} and choose a new password`}
+			subtitle={`Choose a new password for ${verifiedUser.email}`}
 			footer={
 				<p className="mt-6 text-center text-sm text-muted-foreground">
-					Didn&apos;t receive the code?{" "}
+					Need a new link?{" "}
 					<Link
 						to="/forgot-password"
 						className="font-semibold text-foreground hover:underline"
 						replace
 					>
-						Try again
+						Request another reset link
 					</Link>
 				</p>
 			}
@@ -119,33 +166,6 @@ function ResetPasswordPage() {
 				}}
 				className="flex flex-col gap-4"
 			>
-				<form.Field name="code">
-					{(field) => (
-						<Field className="flex flex-col gap-2">
-							<FieldLabel htmlFor="reset-code">Reset code</FieldLabel>
-							<InputOTP
-								id="reset-code"
-								maxLength={5}
-								value={field.state.value}
-								onChange={field.handleChange}
-								onBlur={field.handleBlur}
-								containerClassName="justify-center"
-							>
-								<InputOTPGroup>
-									<InputOTPSlot index={0} className="size-12 text-base" />
-									<InputOTPSlot index={1} className="size-12 text-base" />
-									<InputOTPSlot index={2} className="size-12 text-base" />
-									<InputOTPSlot index={3} className="size-12 text-base" />
-									<InputOTPSlot index={4} className="size-12 text-base" />
-								</InputOTPGroup>
-							</InputOTP>
-							{field.state.meta.isTouched && !field.state.meta.isValid && (
-								<FieldError errors={field.state.meta.errors} />
-							)}
-						</Field>
-					)}
-				</form.Field>
-
 				<FieldGroup className="flex flex-col gap-4">
 					<form.Field name="new_password">
 						{(field) => (
@@ -175,16 +195,16 @@ function ResetPasswordPage() {
 						)}
 					</form.Field>
 
-					<form.Field name="confirm_password">
+					<form.Field name="confirm_new_password">
 						{(field) => (
 							<Field className="flex flex-col gap-2">
-								<FieldLabel htmlFor="confirm-password">
+								<FieldLabel htmlFor="confirm-new-password">
 									Confirm New Password
 								</FieldLabel>
 								<div className="relative">
 									<LockIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input
-										id="confirm-password"
+										id="confirm-new-password"
 										type="password"
 										placeholder="Confirm your new password"
 										autoComplete="new-password"
@@ -206,11 +226,7 @@ function ResetPasswordPage() {
 					</form.Field>
 				</FieldGroup>
 
-				{formError && (
-					<FieldError
-						errors={getUserResetPasswordErrorFieldErrors(formError)}
-					/>
-				)}
+				{formErrors.length > 0 && <FieldError errors={formErrors} />}
 
 				<Field orientation="horizontal">
 					<Button
@@ -219,7 +235,10 @@ function ResetPasswordPage() {
 						disabled={resetPasswordMutation.isPending}
 					>
 						Reset Password
-						<ArrowRightIcon className="size-4" weight="bold" />
+						<ArrowRightIcon
+							className="size-4"
+							weight="bold"
+						/>
 					</Button>
 				</Field>
 			</form>

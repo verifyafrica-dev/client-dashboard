@@ -5,13 +5,13 @@ import type { UserDetail } from "#/api/http/v1/users/users.types";
 
 type AuthStoreState = {
 	access_token: string | null;
-	refresh_token: string | null;
+	// refresh_token: string | null;
 	user: UserDetail | null;
 };
 
 type AuthStoreActions = {
 	setAccessToken: (token: string) => void;
-	setRefreshToken: (token: string) => void;
+	// setRefreshToken: (token: string) => void;
 	setTokens: (tokens: { access_token: string; refresh_token: string }) => void;
 	setUser: (user: UserDetail | null) => void;
 	clearAuth: () => void;
@@ -31,7 +31,7 @@ export type AuthStore = AuthStoreState & AuthStoreActions;
 
 const initialState: AuthStoreState = {
 	access_token: null,
-	refresh_token: null,
+	// refresh_token: null,
 	user: null,
 };
 
@@ -40,9 +40,9 @@ export const useAuthStore = create<AuthStore>()(
 		(set) => ({
 			...initialState,
 			setAccessToken: (token) => set({ access_token: token }),
-			setRefreshToken: (token) => set({ refresh_token: token }),
-			setTokens: ({ access_token, refresh_token }) =>
-				set({ access_token, refresh_token }),
+			// setRefreshToken: (token) => set({ refresh_token: token }),
+			setTokens: ({ access_token }) =>
+				set({ access_token }),
 			setUser: (user) => set({ user }),
 			clearAuth: () => set(initialState),
 		}),

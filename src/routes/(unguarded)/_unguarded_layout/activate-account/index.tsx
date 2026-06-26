@@ -8,17 +8,16 @@ import {
 } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { z } from "zod";
 
 import {
-	useUserActivateAccountMutation,
-	useUserResendActivationCodeMutation,
-} from "#/api/http/v1/users/users.hooks";
+	useUserV2ActivateAccountMutation,
+	useUserV2ResendActivationCodeMutation,
+} from "#/api/http/v2/users/users.hooks";
 import {
 	type UserActivateAccountPayload,
 	UserActivateAccountSchema,
-	type UserLoginError,
-} from "#/api/http/v1/users/users.types";
+	UserActivateAccountSearchSchema,
+} from "#/api/http/v2/users/users.types";
 import { Button } from "#/components/ui/button";
 import {
 	InputOTP,
@@ -26,21 +25,15 @@ import {
 	InputOTPSlot,
 } from "#/components/ui/input-otp";
 import { Label } from "#/components/ui/label";
-import {
-	getUserLoginErrorFieldErrors,
-	toUserLoginError,
-} from "#/lib/api-errors";
+import { getPostLoginPath } from "#/lib/redirect";
+import type { V2AxiosError } from "#/api/http/shared";
 import { Field, FieldError } from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
-
-const activateAccountSearchSchema = z.object({
-	email: z.email({ message: "Invalid email address" }),
-});
 
 export const Route = createFileRoute(
 	"/(unguarded)/_unguarded_layout/activate-account/",
 )({
-	validateSearch: activateAccountSearchSchema,
+	validateSearch: UserActivateAccountSearchSchema,
 	component: ActivateAccountPage,
 });
 
@@ -56,10 +49,12 @@ function maskEmail(email: string) {
 function ActivateAccountPage() {
 	const navigate = useNavigate();
 	const { email } = Route.useSearch();
-	const activateAccountMutation = useUserActivateAccountMutation();
-	const resendActivationCodeMutation = useUserResendActivationCodeMutation();
-	// const [formError, setFormError] = useState<UserLoginError | null>(null);
-	const [resendError, setResendError] = useState<UserLoginError | null>(null);
+	const activateAccountMutation = useUserV2ActivateAccountMutation();
+	const resendActivationCodeMutation = useUserV2ResendActivationCodeMutation();
+	const [formErrors, setFormErrors] = useState<Array<{ message: string }>>([]);
+	const [resendErrors, setResendErrors] = useState<Array<{ message: string }>>(
+		[],
+	);
 
 	const form = useForm({
 		defaultValues: {
@@ -70,23 +65,37 @@ function ActivateAccountPage() {
 			onSubmit: UserActivateAccountSchema,
 		},
 		onSubmit: async ({ value }) => {
-			// setFormError(null);
+			setFormErrors([]);
 
 			await activateAccountMutation.mutateAsync(value, {
 				onSuccess: () => {
 					toast.success("Account activated successfully");
-					navigate({ to: "/login" });
+					navigate({ to: getPostLoginPath(undefined) });
 				},
-				onError: () => {
-					toast.error("Invalid activation code");
-					// setFormError(toUserLoginError(error));
+				onError: (error) => {
+					const axiosError = error as V2AxiosError;
+					const data = axiosError.response?.data;
+
+					if (data?.errors?.length) {
+						setFormErrors(data.errors.map((message) => ({ message })));
+						return;
+					}
+
+					if (data?.message) {
+						setFormErrors([{ message: data.message }]);
+						return;
+					}
+
+					setFormErrors([
+						{ message: axiosError.message || "Something went wrong" },
+					]);
 				},
 			});
 		},
 	});
 
 	const handleResendCode = async () => {
-		setResendError(null);
+		setResendErrors([]);
 
 		await resendActivationCodeMutation.mutateAsync(
 			{ email },
@@ -95,7 +104,22 @@ function ActivateAccountPage() {
 					toast.success("Verification code resent");
 				},
 				onError: (error) => {
-					setResendError(toUserLoginError(error));
+					const axiosError = error as V2AxiosError;
+					const data = axiosError.response?.data;
+
+					if (data?.errors?.length) {
+						setResendErrors(data.errors.map((message) => ({ message })));
+						return;
+					}
+
+					if (data?.message) {
+						setResendErrors([{ message: data.message }]);
+						return;
+					}
+
+					setResendErrors([
+						{ message: axiosError.message || "Something went wrong" },
+					]);
 				},
 			},
 		);
@@ -123,7 +147,10 @@ function ActivateAccountPage() {
 		>
 			<div className="flex flex-col items-center gap-3 text-center">
 				<div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-					<EnvelopeSimpleIcon className="size-7" weight="duotone" />
+					<EnvelopeSimpleIcon
+						className="size-7"
+						weight="duotone"
+					/>
 				</div>
 			</div>
 
@@ -153,11 +180,26 @@ function ActivateAccountPage() {
 								containerClassName="justify-center"
 							>
 								<InputOTPGroup>
-									<InputOTPSlot index={0} className="size-12 text-base" />
-									<InputOTPSlot index={1} className="size-12 text-base" />
-									<InputOTPSlot index={2} className="size-12 text-base" />
-									<InputOTPSlot index={3} className="size-12 text-base" />
-									<InputOTPSlot index={4} className="size-12 text-base" />
+									<InputOTPSlot
+										index={0}
+										className="size-12 text-base"
+									/>
+									<InputOTPSlot
+										index={1}
+										className="size-12 text-base"
+									/>
+									<InputOTPSlot
+										index={2}
+										className="size-12 text-base"
+									/>
+									<InputOTPSlot
+										index={3}
+										className="size-12 text-base"
+									/>
+									<InputOTPSlot
+										index={4}
+										className="size-12 text-base"
+									/>
 								</InputOTPGroup>
 							</InputOTP>
 							{field.state.meta.isTouched && !field.state.meta.isValid && (
@@ -167,13 +209,9 @@ function ActivateAccountPage() {
 					)}
 				</form.Field>
 
-				{/* {formError && (
-					<FieldError errors={getUserLoginErrorFieldErrors(formError)} />
-				)} */}
+				{formErrors.length > 0 && <FieldError errors={formErrors} />}
 
-				{resendError && (
-					<FieldError errors={getUserLoginErrorFieldErrors(resendError)} />
-				)}
+				{resendErrors.length > 0 && <FieldError errors={resendErrors} />}
 
 				<Field orientation="horizontal">
 					<Button
@@ -182,7 +220,10 @@ function ActivateAccountPage() {
 						disabled={activateAccountMutation.isPending}
 					>
 						Verify Code
-						<ArrowRightIcon className="size-4" weight="bold" />
+						<ArrowRightIcon
+							className="size-4"
+							weight="bold"
+						/>
 					</Button>
 				</Field>
 

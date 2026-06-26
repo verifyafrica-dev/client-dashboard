@@ -15,19 +15,20 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
-	useAcceptInvitationMutation,
-	useCompleteInvitationMutation,
-} from "#/api/http/v1/tenants/tenants.hooks";
-import { useUserLookupQuery } from "#/api/http/v1/users/users.hooks";
-import type { UserLoginError } from "#/api/http/v1/users/users.types";
+	useAcceptInvitationV2Mutation,
+	useCreateUserFromInvitationV2Mutation,
+	useUserV2LookupQuery,
+} from "#/api/http/v2/users/users.hooks";
+import {
+	AcceptInvitationNewUserFormSchema,
+	type AcceptInvitationNewUserFormValues,
+	AcceptInvitationSearchSchema,
+} from "#/api/http/v2/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Spinner } from "#/components/ui/spinner";
-import {
-	getUserLoginErrorFieldErrors,
-	toUserLoginError,
-} from "#/lib/api-errors";
 import { useAuthStore } from "#/stores/auth-store";
+import type { V2AxiosError } from "#/api/http/shared";
 import {
 	Field,
 	FieldError,
@@ -36,11 +37,6 @@ import {
 } from "@/components/ui/field";
 import { AuthPageShell } from "../-components";
 import { PasswordField } from "../-components/password-field";
-import {
-	AcceptInvitationNewUserFormSchema,
-	type AcceptInvitationNewUserFormValues,
-	AcceptInvitationSearchSchema,
-} from "./-data";
 
 export const Route = createFileRoute("/(unguarded)/_unguarded_layout/invite/")({
 	validateSearch: AcceptInvitationSearchSchema,
@@ -51,7 +47,7 @@ function AcceptInvitationPage() {
 	const search = Route.useSearch();
 	const { email, token } = search;
 
-	const lookupQuery = useUserLookupQuery({ email }, Boolean(email && token));
+	const lookupQuery = useUserV2LookupQuery({ email }, Boolean(email && token));
 	const isNewUser = lookupQuery.data ? !lookupQuery.data.exists : null;
 	const isLoading =
 		lookupQuery.isPending || lookupQuery.isFetching || isNewUser === null;
@@ -61,6 +57,12 @@ function AcceptInvitationPage() {
 	}
 
 	if (lookupQuery.isError) {
+		const axiosError = lookupQuery.error as V2AxiosError;
+		const data = axiosError.response?.data;
+		const errors = data?.errors?.length
+			? data.errors.map((message) => ({ message }))
+			: [{ message: data?.message || "Unable to load invitation details." }];
+
 		return (
 			<AuthPageShell
 				title="Invitation unavailable"
@@ -76,9 +78,7 @@ function AcceptInvitationPage() {
 					</p>
 				}
 			>
-				<FieldError
-					errors={[{ message: "Unable to load invitation details." }]}
-				/>
+				<FieldError errors={errors} />
 			</AuthPageShell>
 		);
 	}
@@ -97,10 +97,20 @@ function AcceptInvitationPage() {
 	}
 
 	if (isNewUser) {
-		return <NewUserInvitationForm email={email} token={token} />;
+		return (
+			<NewUserInvitationForm
+				email={email}
+				token={token}
+			/>
+		);
 	}
 
-	return <ExistingUserInvitationPrompt email={email} token={token} />;
+	return (
+		<ExistingUserInvitationPrompt
+			email={email}
+			token={token}
+		/>
+	);
 }
 
 function NewUserInvitationForm({
@@ -111,8 +121,8 @@ function NewUserInvitationForm({
 	token: string;
 }) {
 	const navigate = useNavigate();
-	const completeInvitationMutation = useCompleteInvitationMutation();
-	const [formError, setFormError] = useState<UserLoginError | null>(null);
+	const [formErrors, setFormErrors] = useState<Array<{ message: string }>>([]);
+	const createUserMutation = useCreateUserFromInvitationV2Mutation();
 
 	const form = useForm({
 		defaultValues: {
@@ -125,25 +135,32 @@ function NewUserInvitationForm({
 			onSubmit: AcceptInvitationNewUserFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			setFormError(null);
+			setFormErrors([]);
 
-			await completeInvitationMutation.mutateAsync(
-				{
-					token: value.token,
-					first_name: value.first_name,
-					last_name: value.last_name,
-					password: value.password,
+			await createUserMutation.mutateAsync(value, {
+				onSuccess: () => {
+					toast.success("Account created. You can now sign in.");
+					navigate({ to: "/login" });
 				},
-				{
-					onSuccess: () => {
-						toast.success("Account created. You can now sign in.");
-						navigate({ to: "/login" });
-					},
-					onError: (error) => {
-						setFormError(toUserLoginError(error));
-					},
+				onError: (error) => {
+					const axiosError = error as V2AxiosError;
+					const data = axiosError.response?.data;
+
+					if (data?.errors?.length) {
+						setFormErrors(data.errors.map((message) => ({ message })));
+						return;
+					}
+
+					if (data?.message) {
+						setFormErrors([{ message: data.message }]);
+						return;
+					}
+
+					setFormErrors([
+						{ message: axiosError.message || "Something went wrong" },
+					]);
 				},
-			);
+			});
 		},
 	});
 
@@ -200,7 +217,7 @@ function NewUserInvitationForm({
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={(event) => field.handleChange(event.target.value)}
-										disabled={completeInvitationMutation.isPending}
+										disabled={createUserMutation.isPending}
 										aria-invalid={
 											field.state.meta.isTouched && !field.state.meta.isValid
 										}
@@ -227,7 +244,7 @@ function NewUserInvitationForm({
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={(event) => field.handleChange(event.target.value)}
-										disabled={completeInvitationMutation.isPending}
+										disabled={createUserMutation.isPending}
 										aria-invalid={
 											field.state.meta.isTouched && !field.state.meta.isValid
 										}
@@ -260,20 +277,21 @@ function NewUserInvitationForm({
 					</form.Field>
 				</FieldGroup>
 
-				{formError && (
-					<FieldError errors={getUserLoginErrorFieldErrors(formError)} />
-				)}
+				{formErrors.length > 0 && <FieldError errors={formErrors} />}
 
 				<Field orientation="horizontal">
 					<Button
 						type="submit"
 						className="w-full cursor-pointer"
-						disabled={completeInvitationMutation.isPending}
+						disabled={createUserMutation.isPending}
 					>
-						{completeInvitationMutation.isPending
+						{createUserMutation.isPending
 							? "Creating account..."
 							: "Create Account"}
-						<ArrowRightIcon className="size-4" weight="bold" />
+						<ArrowRightIcon
+							className="size-4"
+							weight="bold"
+						/>
 					</Button>
 				</Field>
 			</form>
@@ -289,20 +307,20 @@ function ExistingUserInvitationPrompt({
 	token: string;
 }) {
 	const navigate = useNavigate();
-	const acceptInvitationMutation = useAcceptInvitationMutation();
 	const user = useAuthStore((state) => state.user);
 	const accessToken = useAuthStore((state) => state.access_token);
 	const isAuthenticated = Boolean(accessToken && user);
 	const emailMatches =
 		isAuthenticated && user?.email.toLowerCase() === email.toLowerCase();
-	const [formError, setFormError] = useState<UserLoginError | null>(null);
+	const [formErrors, setFormErrors] = useState<Array<{ message: string }>>([]);
+	const acceptInvitationMutation = useAcceptInvitationV2Mutation();
 
 	function handleDecline() {
 		navigate({ to: "/login" });
 	}
 
 	async function handleAccept() {
-		setFormError(null);
+		setFormErrors([]);
 
 		if (!isAuthenticated) {
 			toast.message("Sign in to accept your invitation");
@@ -311,11 +329,12 @@ function ExistingUserInvitationPrompt({
 		}
 
 		if (!emailMatches) {
-			setFormError({
-				message:
-					"You are signed in with a different email address. Sign in with the invited email to continue.",
-				status: 400,
-			});
+			setFormErrors([
+				{
+					message:
+						"You are signed in with a different email address. Sign in with the invited email to continue.",
+				},
+			]);
 			return;
 		}
 
@@ -327,7 +346,22 @@ function ExistingUserInvitationPrompt({
 					navigate({ to: "/dashboard" });
 				},
 				onError: (error) => {
-					setFormError(toUserLoginError(error));
+					const axiosError = error as V2AxiosError;
+					const data = axiosError.response?.data;
+
+					if (data?.errors?.length) {
+						setFormErrors(data.errors.map((message) => ({ message })));
+						return;
+					}
+
+					if (data?.message) {
+						setFormErrors([{ message: data.message }]);
+						return;
+					}
+
+					setFormErrors([
+						{ message: axiosError.message || "Something went wrong" },
+					]);
 				},
 			},
 		);
@@ -354,7 +388,10 @@ function ExistingUserInvitationPrompt({
 		>
 			<div className="flex flex-col items-center gap-3 text-center">
 				<div className="flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-					<UsersThreeIcon className="size-7" weight="duotone" />
+					<UsersThreeIcon
+						className="size-7"
+						weight="duotone"
+					/>
 				</div>
 				<p className="text-sm text-muted-foreground">
 					Hi <span className="font-medium text-foreground">{email}</span>,
@@ -363,9 +400,7 @@ function ExistingUserInvitationPrompt({
 				</p>
 			</div>
 
-			{formError && (
-				<FieldError errors={getUserLoginErrorFieldErrors(formError)} />
-			)}
+			{formErrors.length > 0 && <FieldError errors={formErrors} />}
 
 			<div className="grid gap-3 sm:grid-cols-2">
 				<Button

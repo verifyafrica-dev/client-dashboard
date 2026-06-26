@@ -11,12 +11,13 @@ import { useState } from "react";
 import { toast } from "sonner";
 import type { z } from "zod";
 
-import { useUserRegisterMutation } from "#/api/http/v1/users/users.hooks";
-import { UserRegisterSchema } from "#/api/http/v1/users/users.types";
+import { useUserV2RegisterMutation } from "#/api/http/v2/users/users.hooks";
+import { UserRegisterSchema } from "#/api/http/v2/users/users.types";
 import { Button } from "#/components/ui/button";
 import { Checkbox } from "#/components/ui/checkbox";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
+import type { V2AxiosError } from "#/api/http/shared";
 import {
 	Field,
 	FieldError,
@@ -37,8 +38,9 @@ export const Route = createFileRoute(
 
 function RegisterPage() {
 	const [acceptedTerms, setAcceptedTerms] = useState(false);
+	const [formErrors, setFormErrors] = useState<Array<{ message: string }>>([]);
 	const navigate = useNavigate();
-	const registerMutation = useUserRegisterMutation();
+	const registerMutation = useUserV2RegisterMutation();
 
 	const form = useForm({
 		defaultValues: {
@@ -52,6 +54,8 @@ function RegisterPage() {
 			onSubmit: RegisterFormSchema,
 		},
 		onSubmit: async ({ value }) => {
+			setFormErrors([]);
+
 			await registerMutation.mutateAsync(
 				{
 					...value,
@@ -68,7 +72,22 @@ function RegisterPage() {
 						});
 					},
 					onError: (error) => {
-						console.error("Registration failed:", error.message);
+						const axiosError = error as V2AxiosError;
+						const data = axiosError.response?.data;
+
+						if (data?.errors?.length) {
+							setFormErrors(data.errors.map((message) => ({ message })));
+							return;
+						}
+
+						if (data?.message) {
+							setFormErrors([{ message: data.message }]);
+							return;
+						}
+
+						setFormErrors([
+							{ message: axiosError.message || "Something went wrong" },
+						]);
 					},
 				},
 			);
@@ -240,9 +259,7 @@ function RegisterPage() {
 					</form.Field>
 				</FieldGroup>
 
-				{registerMutation.isError && (
-					<FieldError errors={[{ message: registerMutation.error.message }]} />
-				)}
+				{formErrors.length > 0 && <FieldError errors={formErrors} />}
 
 				<div className="flex items-start gap-3">
 					<Checkbox
@@ -266,7 +283,10 @@ function RegisterPage() {
 						disabled={!acceptedTerms || registerMutation.isPending}
 					>
 						Create Account
-						<ArrowRightIcon className="size-4" weight="bold" />
+						<ArrowRightIcon
+							className="size-4"
+							weight="bold"
+						/>
 					</Button>
 				</Field>
 			</form>

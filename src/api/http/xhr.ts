@@ -1,22 +1,11 @@
 import type { InternalAxiosRequestConfig } from "axios";
 import axios from "axios";
 
-import {
-	getReasonPhrase,
-	getStatusCode,
-	ReasonPhrases,
-	StatusCodes,
-} from "http-status-codes";
-import {
-	deleteAllCookies,
-	deleteCookie,
-	getCookie,
-	setCookie,
-} from "#/lib/cookies";
+import { StatusCodes } from "http-status-codes";
+import { deleteAllCookies, getCookie, setCookie } from "#/lib/cookies";
 import { buildLoginRedirectUrl } from "#/lib/redirect";
 import { useAuthStore } from "#/stores/auth-store";
-import { COUNTRY_NAME_BY_ISO_CODE } from "@/lib/country-state-city";
-import { isPlainObject } from "@/lib/validators";
+import type { V2SuccessResponse } from "#/api/http/shared";
 import { env } from "../../config/env";
 
 const isBrowser = typeof window !== "undefined";
@@ -32,7 +21,6 @@ const getBaseUrl = () => {
 	return env.apiBaseUrl;
 };
 
-// set the base url from the environment variable or default to a specific URL
 const BASE_URL = getBaseUrl();
 
 const getTokenPrefix = (): string => {
@@ -44,50 +32,27 @@ const getTokenPrefix = (): string => {
 };
 
 export const getAccessTokenKey = (): string => `${getTokenPrefix()}accessToken`;
-export const getRefreshTokenKey = (): string =>
-	`${getTokenPrefix()}refreshToken`;
 const ACCESS_TOKEN_COOKIE_EXPIRES_DAYS = 5 / 60 / 24; // 5 minutes
-const REFRESH_TOKEN_COOKIE_EXPIRES_DAYS = 2; // 2 days
+const REFRESH_TOKEN_ENDPOINT = "/v2/users/refresh-token/";
 
-const getTokens = () => {
-	if (!isBrowser) {
-		return {
-			accessToken: "",
-			refreshToken: "",
-		};
-	}
+const getAccessToken = () => {
+	if (!isBrowser) return "";
 
-	return {
-		accessToken: getCookie(getAccessTokenKey()) ?? "",
-		refreshToken: getCookie(getRefreshTokenKey()) ?? "",
-	};
+	return getCookie(getAccessTokenKey()) ?? "";
+};
+
+export const setAccessToken = (accessToken: string) => {
+	if (!isBrowser) return;
+
+	setCookie(getAccessTokenKey(), accessToken, ACCESS_TOKEN_COOKIE_EXPIRES_DAYS);
 };
 
 export const setTokens = (
 	accessToken: string,
-	refreshToken?: string,
-	options?: { rememberRefreshToken?: boolean },
+	_refreshToken?: string,
+	_options?: { rememberRefreshToken?: boolean },
 ) => {
-	if (!isBrowser) return;
-
-	setCookie(getAccessTokenKey(), accessToken, ACCESS_TOKEN_COOKIE_EXPIRES_DAYS);
-
-	if (refreshToken) {
-		if (options?.rememberRefreshToken ?? true) {
-			setCookie(
-				getRefreshTokenKey(),
-				refreshToken,
-				REFRESH_TOKEN_COOKIE_EXPIRES_DAYS,
-			);
-		} else {
-			deleteCookie(getRefreshTokenKey());
-		}
-		return;
-	}
-
-	if (options?.rememberRefreshToken === false) {
-		deleteCookie(getRefreshTokenKey());
-	}
+	setAccessToken(accessToken);
 };
 
 const clearTokensAndLogout = () => {
@@ -108,54 +73,46 @@ const $http = axios.create({
 });
 
 let isRefreshing = false;
-let failedRequestsQueue: any[] = [];
+let failedRequestsQueue: Array<{
+	resolve: (value: unknown) => void;
+	reject: (reason?: unknown) => void;
+	config: InternalAxiosRequestConfig;
+}> = [];
 
-const DISABLED_COUNTRY_PATTERN =
-	/Country '([A-Z]{2})' is not enabled for this tenant\./g;
-
-const mapCountryCodesToNamesInMessage = (message: string) => {
-	return message.replace(DISABLED_COUNTRY_PATTERN, (_, countryCode: string) => {
-		const countryName = COUNTRY_NAME_BY_ISO_CODE[countryCode] || countryCode;
-		return `Country '${countryName}' is not enabled for this tenant.`;
-	});
-};
-
-const normalizeErrorPayload = (payload: any): any => {
-	if (typeof payload === "string") {
-		return mapCountryCodesToNamesInMessage(payload);
-	}
-
-	if (Array.isArray(payload)) {
-		return payload.map((item) => normalizeErrorPayload(item));
-	}
-
-	if (isPlainObject(payload)) {
-		return Object.fromEntries(
-			Object.entries(payload).map(([key, value]) => [
-				key,
-				normalizeErrorPayload(value),
-			]),
-		);
-	}
-
-	return payload;
-};
+// TODO: Get them from the api.ts files
+const PUBLIC_ROUTE_FRAGMENTS = [
+	"/v2/users/register/",
+	"/v2/users/login/",
+	"/v2/users/lookup",
+	"/v2/users/activate-account/",
+	"/v2/users/forgot-password/",
+	"/v2/users/verify-forgot-password-token/",
+	"/v2/users/reset-password/",
+	"/v2/users/refresh-token/",
+	"/v2/users/resend-activation-code/",
+	"/v2/tenants/invitations/create-user/",
+];
 
 const shouldUseAccessToken = (url: string) => {
-	const urlsToIgnore = [
-		"/users/register/",
-		"/users/login/",
-		"/users/lookup",
-		"/users/activate-account/",
-		"/tenants/invitations/complete",
-	];
-	const matchFound = urlsToIgnore.some((ignoredUrl) =>
+	const matchFound = PUBLIC_ROUTE_FRAGMENTS.some((ignoredUrl) =>
 		url.includes(ignoredUrl),
 	);
 	return !matchFound;
 };
 
-const isTokenExpiredError = (error: any) => {
+const refreshAccessToken = async () => {
+	const response = await axios.post<
+		V2SuccessResponse<{ access_token: string }>
+	>(`${BASE_URL}${REFRESH_TOKEN_ENDPOINT}`, undefined, {
+		withCredentials: true,
+	});
+
+	return response.data.data.access_token;
+};
+
+const isTokenExpiredError = (error: {
+	response?: { status?: number; data?: { code?: string } };
+}) => {
 	return (
 		error?.response?.status === StatusCodes.UNAUTHORIZED ||
 		error?.response?.data?.code === "token_not_valid" ||
@@ -165,25 +122,26 @@ const isTokenExpiredError = (error: any) => {
 
 $http.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
-		const { accessToken } = getTokens();
-		if (accessToken && shouldUseAccessToken(config.url as string)) {
-			config.headers.Authorization = `JWT ${accessToken}`;
+		const accessToken = getAccessToken();
+		const requestUrl = config.url ?? "";
+
+		if (accessToken && shouldUseAccessToken(requestUrl)) {
+			config.headers.Authorization = `Bearer ${accessToken}`;
 		}
+
 		return config;
 	},
-	(error) => {
-		// Handle request errors
-		return Promise.reject(error);
-	},
+	(error) => Promise.reject(error),
 );
 
 $http.interceptors.response.use(
 	(response) => response,
 	async (error) => {
 		const originalRequest = error.config;
-		console.log(error.response);
+
 		if (
 			isTokenExpiredError(error) &&
+			originalRequest &&
 			!originalRequest._retry &&
 			shouldUseAccessToken(originalRequest.url as string)
 		) {
@@ -192,38 +150,31 @@ $http.interceptors.response.use(
 			if (!isRefreshing) {
 				isRefreshing = true;
 				try {
-					const { refreshToken } = getTokens();
-					const newTokenResponse = await axios.post(
-						`${BASE_URL}/users/token/refresh/`,
-						{ refresh: refreshToken },
-					);
-					const accessToken = newTokenResponse.data.access;
-					setTokens(accessToken);
+					const accessToken = await refreshAccessToken();
+					setAccessToken(accessToken);
 
 					isRefreshing = false;
-					// Retry all queued requests with the new access token
 					failedRequestsQueue.forEach((req) => {
 						req.resolve($http(req.config));
 					});
 					failedRequestsQueue = [];
-					return $http(originalRequest); // Retry the original failed request
+					return $http(originalRequest);
 				} catch (refreshError) {
 					isRefreshing = false;
-					// Handle refresh token failure (e.g., logout user)
 					clearTokensAndLogout();
 					return Promise.reject(refreshError);
 				}
-			} else {
-				// Queue the request if a refresh is already in progress
-				return new Promise((resolve, reject) => {
-					failedRequestsQueue.push({
-						resolve,
-						reject,
-						config: originalRequest,
-					});
-				});
 			}
+
+			return new Promise((resolve, reject) => {
+				failedRequestsQueue.push({
+					resolve,
+					reject,
+					config: originalRequest,
+				});
+			});
 		}
+
 		return Promise.reject(error);
 	},
 );
