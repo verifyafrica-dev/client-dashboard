@@ -4,9 +4,11 @@ import {
 	useQuery,
 	useQueryClient,
 } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 
 import type { UserDetail } from "#/api/http/v1/users/users.types";
+import { deleteAllCookies } from "#/lib/cookies";
 import { useAuthStore } from "#/stores/auth-store";
 import { setAccessToken } from "../../xhr";
 import { USERS_V2_API } from "./users.api";
@@ -192,10 +194,26 @@ export const useUserV2ChangePasswordMutation = () =>
 		mutationFn: USERS_V2_API.CHANGE_PASSWORD,
 	});
 
-export const useUserV2LogoutMutation = () =>
-	useMutation<string, UserLoginError, void>({
+export const useUserV2LogoutMutation = () => {
+	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+
+	const mutation = useMutation<string, UserLoginError, void>({
 		mutationFn: USERS_V2_API.LOGOUT,
+		onSettled: () => {
+			navigate({ to: "/login", replace: true });
+			deleteAllCookies();
+			localStorage.clear();
+			useAuthStore.getState().clearAuth();
+			queryClient.clear();
+		},
 	});
+
+	return {
+		logout: () => mutation.mutate(),
+		isLoggingOut: mutation.isPending,
+	};
+};
 
 export const useUpdateMeV2Mutation = () => {
 	const queryClient = useQueryClient();

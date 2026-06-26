@@ -1,7 +1,6 @@
 import { createFileRoute, Link, Navigate, Outlet, useLocation } from "@tanstack/react-router";
 import { Loader2Icon } from "lucide-react";
-import { useMeQuery } from "#/api/http/v1/users/users.hooks";
-import { AppSidebar } from "#/components/app-sidebar";
+import { useMeV2Query, useUserV2LogoutMutation } from "#/api/http/v2/users/users.hooks";
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
 import { Button } from "#/components/ui/button";
 import {
@@ -14,7 +13,7 @@ import {
 	SidebarProvider,
 	SidebarTrigger,
 } from "#/components/ui/sidebar";
-import { useLogout } from "#/hooks/use-logout";
+import { AppSidebar } from "#/components/app-sidebar";
 import { deleteAllCookies } from "#/lib/cookies";
 import { buildLoginRedirectUrl } from "#/lib/redirect";
 import { useAuthStore } from "#/stores/auth-store";
@@ -32,8 +31,8 @@ export const Route = createFileRoute("/(auth)/_auth_layout")({
 
 function AuthLayout() {
 	const location = useLocation();
-	const getUserQuery = useMeQuery();
-	const { logout, isLoggingOut } = useLogout();
+	const getUserQuery = useMeV2Query();
+	const { logout, isLoggingOut } = useUserV2LogoutMutation();
 
 	if (getUserQuery.isLoading) {
 		return (

@@ -20,8 +20,8 @@ import {
 	Sector,
 	XAxis,
 } from "recharts";
-import { useTenantAnalyticsQuery } from "#/api/http/v1/analytics/analytics.hooks";
-import { useKycTenantQuery } from "#/api/http/v1/kyc/kyc.hooks";
+import { useTenantAnalyticsV2Query } from "#/api/http/v2/analytics/analytics.hooks";
+import { useTenantV2DetailQuery } from "#/api/http/v2/tenants/tenants.hooks";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import {
@@ -75,17 +75,19 @@ const typeChartConfig = {
 function DashboardPage() {
 	const [timeRange, setTimeRange] = useState<TimeRange>("all");
 	const { tenantId } = useCurrentTenant();
-	const kycQuery = useKycTenantQuery(tenantId, Boolean(tenantId));
-	const isKycVerified = kycQuery.data?.isKycApproved ?? false;
-	const isKycLoading = kycQuery.isPending || kycQuery.isFetching;
+	const tenantQuery = useTenantV2DetailQuery(tenantId, Boolean(tenantId));
+	const isKycVerified = tenantQuery.data?.kyc_verified ?? false;
+	const isKycLoading = tenantQuery.isPending || tenantQuery.isFetching;
 	const showOnboarding =
-		!kycQuery.isError && !isKycLoading && shouldShowDashboardOnboarding(isKycVerified);
+		!tenantQuery.isError &&
+		!isKycLoading &&
+		shouldShowDashboardOnboarding(isKycVerified);
 	const analyticsDateRange = useMemo(
 		() => getAnalyticsDateRange(timeRange),
 		[timeRange],
 	);
 
-	const tenantsAnalyticsQuery = useTenantAnalyticsQuery(
+	const tenantsAnalyticsQuery = useTenantAnalyticsV2Query(
 		tenantId,
 		analyticsDateRange,
 		Boolean(tenantId) && isKycVerified,
@@ -145,7 +147,7 @@ function DashboardPage() {
 				)}
 			</div>
 
-			{kycQuery.isError ? (
+			{tenantQuery.isError ? (
 				<div className="rounded-lg border px-6 py-10 text-center text-sm text-muted-foreground">
 					Failed to load verification status. Please try again.
 				</div>

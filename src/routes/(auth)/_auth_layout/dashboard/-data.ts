@@ -1,7 +1,8 @@
 import type {
 	AnalyticsDateRangeQuery,
-	TenantAnalyticsResponse,
-} from "#/api/http/v1/analytics/analytics.types";
+	AnalyticsPayload,
+	TenantAnalyticsData,
+} from "#/api/http/v2/analytics/analytics.types";
 
 export type TimeRange = "all" | "7d" | "30d" | "90d";
 
@@ -132,7 +133,7 @@ function mapTypeDistribution(
 }
 
 function mapTrendData(
-	verificationVolume: TenantAnalyticsResponse["analytics"]["verifications"]["verification_volume"],
+	verificationVolume: TenantAnalyticsData["verifications"]["verification_volume"],
 	statusDistribution: Record<string, number>,
 ): TrendPoint[] {
 	const successRate = getSuccessRate(statusDistribution) / 100;
@@ -145,7 +146,7 @@ function mapTrendData(
 }
 
 export function mapTenantAnalyticsToDashboardData(
-	response: TenantAnalyticsResponse,
+	response: AnalyticsPayload,
 ): DashboardData {
 	const { verifications, financials } = response.analytics;
 	const successRate = getSuccessRate(verifications.status_distribution);
