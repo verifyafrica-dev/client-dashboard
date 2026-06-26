@@ -32,7 +32,9 @@ const getTokenPrefix = (): string => {
 };
 
 export const getAccessTokenKey = (): string => `${getTokenPrefix()}accessToken`;
-const ACCESS_TOKEN_COOKIE_EXPIRES_DAYS = 5 / 60 / 24; // 5 minutes
+const ACCESS_TOKEN_COOKIE_EXPIRES_DAYS = env.isDevelopment
+	? 1
+	: 5 / 60 / 24; // 1 day in dev, 5 minutes in production
 const REFRESH_TOKEN_ENDPOINT = "/v2/users/refresh-token/";
 
 const getAccessToken = () => {

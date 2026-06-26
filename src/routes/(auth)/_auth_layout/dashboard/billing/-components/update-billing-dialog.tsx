@@ -12,10 +12,10 @@ import {
 import { toast } from "sonner";
 
 import {
-	useCreateBillingInformationMutation,
-	usePartialUpdateBillingInformationMutation,
-} from "#/api/http/v1/billing/billing.hooks";
-import type { BillingInformation } from "#/api/http/v1/billing/billing.types";
+	useCreateBillingInformationV2Mutation,
+	useUpdateTenantBillingInformationV2Mutation,
+} from "#/api/http/v2/billing/billing.hooks";
+import type { BillingInformation } from "#/api/http/v2/billing/billing.types";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -111,9 +111,9 @@ export function UpdateBillingDialog({
 	tenantId?: string;
 }) {
 	const [form, setForm] = useState<BillingFormState>(EMPTY_FORM);
-	const createMutation = useCreateBillingInformationMutation();
-	const updateMutation = usePartialUpdateBillingInformationMutation(
-		billingInfo?.id,
+	const createMutation = useCreateBillingInformationV2Mutation();
+	const updateMutation = useUpdateTenantBillingInformationV2Mutation(
+		tenantId ?? "",
 	);
 
 	const isSaving = createMutation.isPending || updateMutation.isPending;
@@ -132,13 +132,8 @@ export function UpdateBillingDialog({
 	}
 
 	function handleSubmit() {
-		const payload = {
-			...form,
-			...(billingInfo ? {} : { tenant: tenantId }),
-		};
-
 		if (billingInfo) {
-			const { billing_email: _billingEmail, ...updatePayload } = payload;
+			const { billing_email: _billingEmail, ...updatePayload } = form;
 			updateMutation.mutate(updatePayload, {
 				onSuccess: () => {
 					toast.success("Billing information updated");
@@ -156,15 +151,22 @@ export function UpdateBillingDialog({
 			return;
 		}
 
-		createMutation.mutate(payload, {
-			onSuccess: () => {
-				toast.success("Billing information saved");
-				onOpenChange?.(false);
+		createMutation.mutate(
+			{
+				tenant: tenantId,
+				billing_plan: "payg",
+				...form,
 			},
-			onError: () => {
-				toast.error("Failed to save billing information");
+			{
+				onSuccess: () => {
+					toast.success("Billing information saved");
+					onOpenChange?.(false);
+				},
+				onError: () => {
+					toast.error("Failed to save billing information");
+				},
 			},
-		});
+		);
 	}
 
 	return (

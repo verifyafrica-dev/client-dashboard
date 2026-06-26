@@ -1,11 +1,16 @@
 import { subDays } from "date-fns";
 import type { DateRange } from "react-day-picker";
+import type { AxiosError } from "axios";
 
 import type {
 	BillingInformation,
 	Invoice,
-} from "#/api/http/v1/billing/billing.types";
+} from "#/api/http/v2/billing/billing.types";
 import type { WalletTransaction } from "#/api/http/v1/wallet/wallet.types";
+
+export function isBillingNotFoundError(error: unknown) {
+	return (error as AxiosError | null)?.response?.status === 404;
+}
 
 export type TransactionType = "debit" | "credit";
 
@@ -88,6 +93,41 @@ const EXPORT_DURATION_DAYS: Record<
 	"90d": 90,
 };
 
+export function parseValidDate(
+	value: string | number | Date | null | undefined,
+	fallback = new Date(),
+): Date {
+	if (value instanceof Date) {
+		return Number.isNaN(value.getTime()) ? fallback : value;
+	}
+
+	if (value == null || value === "") {
+		return fallback;
+	}
+
+	const date = new Date(value);
+
+	return Number.isNaN(date.getTime()) ? fallback : date;
+}
+
+function formatDateValue(
+	formatter: Intl.DateTimeFormat,
+	value: string | number | Date | null | undefined,
+	fallback = "—",
+) {
+	if (value == null || value === "") {
+		return fallback;
+	}
+
+	const date = new Date(value);
+
+	if (Number.isNaN(date.getTime())) {
+		return fallback;
+	}
+
+	return formatter.format(date);
+}
+
 function getCurrencyFormatter(currency: string) {
 	return new Intl.NumberFormat("en-US", {
 		style: "currency",
@@ -98,7 +138,7 @@ function getCurrencyFormatter(currency: string) {
 }
 
 function startOfDay(date: Date) {
-	const normalized = new Date(date);
+	const normalized = parseValidDate(date);
 	normalized.setHours(0, 0, 0, 0);
 	return normalized;
 }
@@ -114,7 +154,7 @@ export function formatSignedAmount(amount: number, currency = "USD") {
 }
 
 export function formatIsoDate(date: Date) {
-	return isoDateFormatter.format(date);
+	return isoDateFormatter.format(parseValidDate(date));
 }
 
 export function formatBillingDisplayAddress(
@@ -142,7 +182,7 @@ export function mapWalletTransaction(
 	const isDebit = transaction.type.toUpperCase() === "DEBIT";
 	const amount = Number.parseFloat(transaction.amount);
 	const signedAmount = isDebit ? -Math.abs(amount) : Math.abs(amount);
-	const createdAt = new Date(transaction.created_at);
+	const createdAt = parseValidDate(transaction.created_at);
 
 	const {
 		id,
@@ -174,11 +214,7 @@ export function mapWalletTransaction(
 }
 
 export function formatInvoiceDate(value: string | null | undefined) {
-	if (!value) {
-		return "—";
-	}
-
-	return invoiceDateFormatter.format(new Date(value));
+	return formatDateValue(invoiceDateFormatter, value);
 }
 
 export function formatInvoiceAmount(

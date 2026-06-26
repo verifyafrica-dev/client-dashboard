@@ -8,11 +8,11 @@ import { type FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
-	useBillingInformationListQuery,
-	useCreateBillingInformationMutation,
-	usePartialUpdateBillingInformationMutation,
-} from "#/api/http/v1/billing/billing.hooks";
-import type { BillingInformation } from "#/api/http/v1/billing/billing.types";
+	useCreateBillingInformationV2Mutation,
+	useTenantBillingInformationV2Query,
+	useUpdateTenantBillingInformationV2Mutation,
+} from "#/api/http/v2/billing/billing.hooks";
+import type { BillingInformation } from "#/api/http/v2/billing/billing.types";
 import { Button } from "#/components/ui/button";
 import { Input } from "#/components/ui/input";
 import { Separator } from "#/components/ui/separator";
@@ -20,6 +20,8 @@ import { Skeleton } from "#/components/ui/skeleton";
 import { CountryStateCityFields } from "#/components/ui-extended/country-state-city-fields";
 import { cn } from "#/lib/utils.ts";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { isBillingNotFoundError } from "../../billing/-data";
+import { useCurrentTenant } from "../../team/-data";
 
 type BillingFormState = {
 	billing_name: string;
@@ -57,17 +59,19 @@ function getFormState(billingInfo?: BillingInformation): BillingFormState {
 	};
 }
 
-export function BillingInformationSection({ tenantId }: { tenantId?: string }) {
-	const billingInformationQuery = useBillingInformationListQuery(
-		{ tenant_id: tenantId },
+export function BillingInformationSection() {
+	const { tenantId } = useCurrentTenant();
+	const billingInformationQuery = useTenantBillingInformationV2Query(
+		tenantId,
 		Boolean(tenantId),
 	);
-	const billingInfo = billingInformationQuery.data?.results[0];
+	const billingInfo = billingInformationQuery.data;
+	const isBillingNotFound = isBillingNotFoundError(billingInformationQuery.error);
 
 	const [form, setForm] = useState<BillingFormState>(EMPTY_FORM);
-	const createMutation = useCreateBillingInformationMutation();
-	const updateMutation = usePartialUpdateBillingInformationMutation(
-		billingInfo?.id,
+	const createMutation = useCreateBillingInformationV2Mutation();
+	const updateMutation = useUpdateTenantBillingInformationV2Mutation(
+		tenantId ?? "",
 	);
 
 	const isLoading =
@@ -88,13 +92,8 @@ export function BillingInformationSection({ tenantId }: { tenantId?: string }) {
 	function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 
-		const payload = {
-			...form,
-			...(billingInfo ? {} : { tenant: tenantId }),
-		};
-
 		if (billingInfo) {
-			const { billing_email: _billingEmail, ...updatePayload } = payload;
+			const { billing_email: _billingEmail, ...updatePayload } = form;
 			updateMutation.mutate(updatePayload, {
 				onSuccess: () => {
 					toast.success("Billing information updated");
@@ -111,17 +110,24 @@ export function BillingInformationSection({ tenantId }: { tenantId?: string }) {
 			return;
 		}
 
-		createMutation.mutate(payload, {
-			onSuccess: () => {
-				toast.success("Billing information saved");
+		createMutation.mutate(
+			{
+				tenant: tenantId,
+				billing_plan: "payg",
+				...form,
 			},
-			onError: () => {
-				toast.error("Failed to save billing information");
+			{
+				onSuccess: () => {
+					toast.success("Billing information saved");
+				},
+				onError: () => {
+					toast.error("Failed to save billing information");
+				},
 			},
-		});
+		);
 	}
 
-	if (billingInformationQuery.isError) {
+	if (billingInformationQuery.isError && !isBillingNotFound) {
 		return (
 			<div className="flex flex-col gap-4">
 				<Separator />

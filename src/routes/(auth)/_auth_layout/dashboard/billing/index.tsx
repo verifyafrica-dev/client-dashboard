@@ -5,21 +5,18 @@ import {
 	EyeIcon,
 	PencilSimpleIcon,
 } from "@phosphor-icons/react";
-import { type UseQueryResult, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import type { AxiosError } from "axios";
 import { useMemo, useState } from "react";
 import {
-	BILLING_QUERY_KEYS,
-	useBillingInformationListQuery,
-	useTenantInvoicesQuery,
-} from "#/api/http/v1/billing/billing.hooks";
-import type { TenantInvoicesListResponse } from "#/api/http/v1/billing/billing.types";
+	BILLING_V2_QUERY_KEYS,
+	useTenantBillingInformationV2Query,
+	useTenantInvoicesV2Query,
+} from "#/api/http/v2/billing/billing.hooks";
 import {
 	useWalletBalanceQuery,
 	useWalletTransactionsQuery,
 } from "#/api/http/v1/wallet/wallet.hooks";
-import type { WalletTransactionsListResponse } from "#/api/http/v1/wallet/wallet.types";
 import {
 	TablePagination,
 	TablePaginationSkeleton,
@@ -38,7 +35,7 @@ import {
 } from "#/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { cn } from "#/lib/utils.ts";
-import { useAuthStore } from "#/stores/auth-store";
+import { useCurrentTenant } from "../team/-data";
 import { AddCreditsDialog } from "./-components/add-credits-dialog";
 import { ExportTransactionsDialog } from "./-components/export-transactions-dialog";
 import { TransactionDetailsDialog } from "./-components/transaction-details-dialog";
@@ -51,7 +48,9 @@ import {
 	formatSignedAmount,
 	getInvoiceFilename,
 	INVOICES_PAGE_SIZE,
+	isBillingNotFoundError,
 	mapWalletTransaction,
+	parseValidDate,
 	TRANSACTIONS_PAGE_SIZE,
 	type Transaction,
 } from "./-data";
@@ -64,10 +63,9 @@ export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/billing/")(
 
 function BillingPage() {
 	const queryClient = useQueryClient();
-	const user = useAuthStore((state) => state.user);
-	const tenantId = user?.tenants[0]?.id;
+	const { user, tenantId } = useCurrentTenant();
 	const accountCreatedAt = useMemo(
-		() => new Date(user?.created_at ?? Date.now()),
+		() => parseValidDate(user?.created_at),
 		[user?.created_at],
 	);
 
@@ -81,8 +79,8 @@ function BillingPage() {
 		useState<Transaction | null>(null);
 
 	const walletBalanceQuery = useWalletBalanceQuery(tenantId);
-	const billingInformationQuery = useBillingInformationListQuery(
-		{ tenant_id: tenantId },
+	const billingInformationQuery = useTenantBillingInformationV2Query(
+		tenantId,
 		Boolean(tenantId),
 	);
 	const transactionsQuery = useWalletTransactionsQuery(
@@ -92,14 +90,19 @@ function BillingPage() {
 			page_size: TRANSACTIONS_PAGE_SIZE,
 		},
 		Boolean(tenantId),
-	) as UseQueryResult<WalletTransactionsListResponse, AxiosError>;
-	const invoicesQuery = useTenantInvoicesQuery(tenantId, {
-		offset: (invoicePage - 1) * INVOICES_PAGE_SIZE,
-		page_size: INVOICES_PAGE_SIZE,
-	}) as UseQueryResult<TenantInvoicesListResponse, AxiosError>;
+	);
+	const invoicesQuery = useTenantInvoicesV2Query(
+		tenantId,
+		{
+			page: invoicePage,
+			per_page: INVOICES_PAGE_SIZE,
+		},
+		Boolean(tenantId),
+	);
 
 	const wallet = walletBalanceQuery.data;
-	const billingInfo = billingInformationQuery.data?.results[0];
+	const billingInfo = billingInformationQuery.data;
+	const isBillingNotFound = isBillingNotFoundError(billingInformationQuery.error);
 	const currency = wallet?.currency ?? "USD";
 	const balanceAmount = Number.parseFloat(wallet?.balance ?? "0");
 
@@ -113,8 +116,9 @@ function BillingPage() {
 
 	const transactionTotal = transactionsQuery.data?.count ?? transactions.length;
 
-	const invoices = invoicesQuery.data?.results ?? [];
-	const invoiceTotal = invoicesQuery.data?.count ?? invoices.length;
+	const invoices = invoicesQuery.data?.items ?? [];
+	const invoiceTotal =
+		invoicesQuery.data?.meta.pagination.total ?? invoices.length;
 
 	const isSummaryLoading =
 		walletBalanceQuery.isPending ||
@@ -138,10 +142,13 @@ function BillingPage() {
 	}
 
 	async function handleRefresh() {
-		await queryClient.invalidateQueries({ queryKey: BILLING_QUERY_KEYS.all });
+		await queryClient.invalidateQueries({ queryKey: BILLING_V2_QUERY_KEYS.all });
 	}
 
-	if (walletBalanceQuery.isError || billingInformationQuery.isError) {
+	if (
+		walletBalanceQuery.isError ||
+		(billingInformationQuery.isError && !isBillingNotFound)
+	) {
 		return (
 			<div className="flex w-full flex-col gap-6">
 				<div className="flex flex-col gap-1">
@@ -475,7 +482,7 @@ function BillingPage() {
 														<TableCell>{invoice.description ?? "—"}</TableCell>
 														<TableCell>
 															{formatInvoiceAmount(
-																invoice.amount,
+																invoice.total_amount,
 																invoice.currency ?? currency,
 															)}
 														</TableCell>

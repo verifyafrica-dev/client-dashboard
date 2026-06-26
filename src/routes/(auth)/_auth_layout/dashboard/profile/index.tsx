@@ -13,18 +13,18 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
-	useMeQuery,
-	useUpdateMeMutation,
-	useUserChangePasswordMutation,
-} from "#/api/http/v1/users/users.hooks";
-import type { UserDetail } from "#/api/http/v1/users/users.types";
+	useMeV2Query,
+	useUpdateMeV2Mutation,
+	useUserV2ChangePasswordMutation,
+} from "#/api/http/v2/users/users.hooks";
 import {
-	type UserChangePasswordErrorResponse,
+	type UserSession,
 	UserChangePasswordFormSchema,
 	type UserChangePasswordFormValues,
 	UserProfileUpdateFormSchema,
 	type UserProfileUpdateFormValues,
-} from "#/api/http/v1/users/users.types";
+} from "#/api/http/v2/users/users.types";
+import type { V2AxiosError } from "#/api/http/shared";
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
 import { Button } from "#/components/ui/button";
 import {
@@ -38,7 +38,6 @@ import { Input } from "#/components/ui/input";
 import { Skeleton } from "#/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { PhoneInput } from "#/components/ui-extended/phone-input";
-import { getUserChangePasswordFieldError } from "#/lib/api-errors";
 import { cn } from "#/lib/utils.ts";
 import {
 	Field,
@@ -56,7 +55,7 @@ export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/profile/")(
 );
 
 function ProfilePage() {
-	const meQuery = useMeQuery();
+	const meQuery = useMeV2Query();
 	const user = meQuery.data;
 	const isLoading = meQuery.isPending || meQuery.isFetching;
 
@@ -97,11 +96,7 @@ function ProfilePage() {
 						</TabsList>
 
 						<TabsContent value="profile">
-							<UpdateProfileTab
-								key={user.id}
-								user={user}
-								tenantId={user.tenants[0]?.id}
-							/>
+							<UpdateProfileTab key={user.id} user={user} />
 						</TabsContent>
 						<TabsContent value="password">
 							<ChangePasswordTab />
@@ -113,14 +108,8 @@ function ProfilePage() {
 	);
 }
 
-function UpdateProfileTab({
-	user,
-	tenantId,
-}: {
-	user: UserDetail;
-	tenantId?: string;
-}) {
-	const updateMeMutation = useUpdateMeMutation();
+function UpdateProfileTab({ user }: { user: UserSession }) {
+	const updateMeMutation = useUpdateMeV2Mutation();
 
 	const form = useForm({
 		defaultValues: {
@@ -274,15 +263,14 @@ function UpdateProfileTab({
 				</Button>
 			</form>
 
-			<BillingInformationSection tenantId={tenantId} />
+			<BillingInformationSection />
 		</div>
 	);
 }
 
 function ChangePasswordTab() {
-	const changePasswordMutation = useUserChangePasswordMutation();
-	const [formError, setFormError] =
-		useState<UserChangePasswordErrorResponse | null>(null);
+	const changePasswordMutation = useUserV2ChangePasswordMutation();
+	const [formErrors, setFormErrors] = useState<Array<{ message: string }>>([]);
 	const [showOldPassword, setShowOldPassword] = useState(false);
 	const [showNewPassword, setShowNewPassword] = useState(false);
 	const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -297,7 +285,7 @@ function ChangePasswordTab() {
 			onSubmit: UserChangePasswordFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			setFormError(null);
+			setFormErrors([]);
 
 			await changePasswordMutation.mutateAsync(
 				{
@@ -313,7 +301,19 @@ function ChangePasswordTab() {
 						setShowConfirmPassword(false);
 					},
 					onError: (error) => {
-						setFormError(error as UserChangePasswordErrorResponse);
+						const axiosError = error as V2AxiosError;
+						const data = axiosError.response?.data;
+
+						if (data?.errors?.length) {
+							setFormErrors(data.errors.map((message) => ({ message })));
+						} else if (data?.message) {
+							setFormErrors([{ message: data.message }]);
+						} else {
+							setFormErrors([
+								{ message: "Failed to change password. Please try again." },
+							]);
+						}
+
 						toast.error("Failed to change password. Please try again.");
 					},
 				},
@@ -334,10 +334,7 @@ function ChangePasswordTab() {
 			<FieldGroup className="grid gap-4">
 				<form.Field name="old_password">
 					{(field) => {
-						const errors = [
-							...field.state.meta.errors,
-							...getUserChangePasswordFieldError(formError, "old_password"),
-						];
+						const errors = [...field.state.meta.errors, ...formErrors];
 
 						return (
 							<Field
@@ -383,10 +380,7 @@ function ChangePasswordTab() {
 
 				<form.Field name="new_password">
 					{(field) => {
-						const errors = [
-							...field.state.meta.errors,
-							...getUserChangePasswordFieldError(formError, "new_password"),
-						];
+						const errors = field.state.meta.errors;
 
 						return (
 							<Field
