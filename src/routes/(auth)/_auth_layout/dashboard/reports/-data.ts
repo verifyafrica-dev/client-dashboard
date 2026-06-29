@@ -1,7 +1,4 @@
 import type {
-	ReportsFiltersFormValues,
-} from "#/api/http/v1/verifications/verifications.types";
-import type {
 	VerificationBatch,
 	VerificationRequest,
 } from "#/api/http/v2/verifications/verifications.types";
@@ -31,8 +28,6 @@ export type BatchVerificationReport = {
 };
 
 export const REPORTS_PAGE_SIZE = 5;
-export const VERIFICATIONS_LIST_PAGE_SIZE = 10;
-export const BATCH_VERIFICATIONS_LIST_PAGE_SIZE = 10;
 
 export const COUNTRY_CODE_MAP: Record<string, string> = {
 	ng: "Nigeria",
@@ -227,48 +222,4 @@ export function formatReportDate(dateString: string) {
 		hour: "numeric",
 		minute: "2-digit",
 	}).format(new Date(dateString));
-}
-
-export function getVerificationTypes(reports: VerificationReport[]) {
-	return Array.from(
-		new Set(reports.map((report) => report.verification_type)),
-	).sort();
-}
-
-export function getVerificationStatuses(reports: VerificationReport[]) {
-	return Array.from(new Set(reports.map((report) => report.status))).sort();
-}
-
-export function getVerificationCountries(reports: VerificationReport[]) {
-	return Array.from(
-		new Set(
-			reports
-				.map((report) => report.country)
-				.filter((country): country is string => Boolean(country)),
-		),
-	).sort();
-}
-
-export function filterVerifications(
-	reports: VerificationReport[],
-	filters: ReportsFiltersFormValues,
-) {
-	const query = filters.search.trim().toLowerCase();
-
-	return reports.filter((report) => {
-		const matchesSearch =
-			query.length === 0 ||
-			report.name.toLowerCase().includes(query) ||
-			report.id.toLowerCase().includes(query) ||
-			(report.batch_id?.toLowerCase().includes(query) ?? false);
-		const matchesType =
-			filters.verificationType === "all" ||
-			report.verification_type === filters.verificationType;
-		const matchesStatus =
-			filters.status === "all" || report.status === filters.status;
-		const matchesCountry =
-			filters.country === "all" || report.country === filters.country;
-
-		return matchesSearch && matchesType && matchesStatus && matchesCountry;
-	});
 }

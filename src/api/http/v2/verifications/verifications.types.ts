@@ -24,6 +24,9 @@ export const VerificationListQuerySchema = z.object({
 	status: VerificationStatusSchema.optional(),
 	verification_type: VerificationTypeSchema.optional(),
 	has_batch: z.boolean().optional(),
+	search: z.string().optional(),
+	country: z.string().optional(),
+	tenant_id: z.string().uuid().optional(),
 });
 
 export type VerificationListQuery = z.infer<typeof VerificationListQuerySchema>;
@@ -33,6 +36,9 @@ export const VerificationBatchListQuerySchema = z.object({
 	per_page: z.number().int().positive().optional(),
 	total_in_page: z.number().int().positive().optional(),
 	is_test: z.boolean().optional(),
+	status: VerificationStatusSchema.optional(),
+	search: z.string().optional(),
+	tenant_id: z.string().uuid().optional(),
 });
 
 export type VerificationBatchListQuery = z.infer<

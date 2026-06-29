@@ -1,7 +1,6 @@
 import { FunnelIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
 
-import type { ReportsFiltersFormValues } from "#/api/http/v1/verifications/verifications.types";
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
@@ -12,8 +11,14 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
+import {
+	formatVerificationTypeLabel,
+	type ReportsFiltersFormValues,
+	type ReportsListFilterScope,
+} from "../-filter-utils";
 
 type ReportsFiltersFormProps = {
+	scope: ReportsListFilterScope;
 	verificationTypes: string[];
 	statuses: string[];
 	countries: string[];
@@ -24,6 +29,7 @@ type ReportsFiltersFormProps = {
 };
 
 export function ReportsFiltersForm({
+	scope,
 	verificationTypes,
 	statuses,
 	countries,
@@ -54,7 +60,13 @@ export function ReportsFiltersForm({
 					<p className="font-semibold">Filters</p>
 				</div>
 
-				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+				<div
+					className={
+						scope === "requests"
+							? "grid gap-4 md:grid-cols-2 xl:grid-cols-4"
+							: "grid gap-4 md:grid-cols-2"
+					}
+				>
 					<form.Field name="search">
 						{(field) => (
 							<div className="space-y-1.5">
@@ -63,12 +75,14 @@ export function ReportsFiltersForm({
 									<MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input
 										id="reports-search"
-										placeholder="Search by name or ID..."
+										placeholder={
+											scope === "requests"
+												? "Search by name or ID..."
+												: "Search by batch ID..."
+										}
 										value={field.state.value}
 										onBlur={field.handleBlur}
-										onChange={(event) =>
-											field.handleChange(event.target.value)
-										}
+										onChange={(event) => field.handleChange(event.target.value)}
 										className="pl-9"
 										disabled={disabled}
 									/>
@@ -77,35 +91,37 @@ export function ReportsFiltersForm({
 						)}
 					</form.Field>
 
-					<form.Field name="verificationType">
-						{(field) => (
-							<div className="space-y-1.5">
-								<Label htmlFor="verification-type-filter">
-									Verification Type
-								</Label>
-								<Select
-									value={field.state.value}
-									onValueChange={field.handleChange}
-									disabled={disabled}
-								>
-									<SelectTrigger
-										id="verification-type-filter"
-										className="w-full"
+					{scope === "requests" ? (
+						<form.Field name="verificationType">
+							{(field) => (
+								<div className="space-y-1.5">
+									<Label htmlFor="verification-type-filter">
+										Verification Type
+									</Label>
+									<Select
+										value={field.state.value}
+										onValueChange={field.handleChange}
+										disabled={disabled}
 									>
-										<SelectValue placeholder="All Types" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="all">All Types</SelectItem>
-										{verificationTypes.map((type) => (
-											<SelectItem key={type} value={type}>
-												{type}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						)}
-					</form.Field>
+										<SelectTrigger
+											id="verification-type-filter"
+											className="w-full"
+										>
+											<SelectValue placeholder="All Types" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="all">All Types</SelectItem>
+											{verificationTypes.map((type) => (
+												<SelectItem key={type} value={type}>
+													{formatVerificationTypeLabel(type)}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+							)}
+						</form.Field>
+					) : null}
 
 					<form.Field name="status">
 						{(field) => (
@@ -132,30 +148,32 @@ export function ReportsFiltersForm({
 						)}
 					</form.Field>
 
-					<form.Field name="country">
-						{(field) => (
-							<div className="space-y-1.5">
-								<Label htmlFor="country-filter">Country</Label>
-								<Select
-									value={field.state.value}
-									onValueChange={field.handleChange}
-									disabled={disabled}
-								>
-									<SelectTrigger id="country-filter" className="w-full">
-										<SelectValue placeholder="All Countries" />
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="all">All Countries</SelectItem>
-										{countries.map((country) => (
-											<SelectItem key={country} value={country}>
-												{country}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
-							</div>
-						)}
-					</form.Field>
+					{scope === "requests" ? (
+						<form.Field name="country">
+							{(field) => (
+								<div className="space-y-1.5">
+									<Label htmlFor="country-filter">Country</Label>
+									<Select
+										value={field.state.value}
+										onValueChange={field.handleChange}
+										disabled={disabled}
+									>
+										<SelectTrigger id="country-filter" className="w-full">
+											<SelectValue placeholder="All Countries" />
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="all">All Countries</SelectItem>
+											{countries.map((country) => (
+												<SelectItem key={country} value={country}>
+													{country}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+							)}
+						</form.Field>
+					) : null}
 				</div>
 
 				<p className="text-sm text-muted-foreground">

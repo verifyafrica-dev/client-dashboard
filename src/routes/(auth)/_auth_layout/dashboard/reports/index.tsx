@@ -1,8 +1,4 @@
-import {
-	ArrowsClockwiseIcon,
-	EyeIcon,
-	StackIcon,
-} from "@phosphor-icons/react";
+import { ArrowsClockwiseIcon, EyeIcon, StackIcon } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
@@ -12,8 +8,7 @@ import {
 	useTenantVerificationRequestsV2Query,
 	VERIFICATIONS_V2_QUERY_KEYS,
 } from "#/api/http/v2/verifications/verifications.hooks";
-import type { ReportsFiltersFormValues } from "#/api/http/v1/verifications/verifications.types";
-import { paginateItems, TablePagination } from "#/components/table-pagination";
+import { TablePagination } from "#/components/table-pagination";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import {
@@ -25,6 +20,7 @@ import {
 	TableRow,
 } from "#/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
+import { useDebouncedValue } from "#/hooks/use-debounced-value";
 import { cn } from "#/lib/utils.ts";
 import { useCurrentTenant } from "../team/-data";
 import { ReportsFiltersForm } from "./-components/reports-filters-form";
@@ -39,20 +35,21 @@ import {
 	VerificationTypeBadge,
 } from "./-components/verification-badges";
 import {
-	BATCH_VERIFICATIONS_LIST_PAGE_SIZE,
 	type BatchVerificationReport,
-	filterVerifications,
+	COUNTRY_CODE_MAP,
 	formatReportDate,
 	formatVerificationType,
-	getVerificationCountries,
-	getVerificationStatuses,
-	getVerificationTypes,
 	mapVerificationBatchesToReports,
 	mapVerificationRequestsToReports,
 	REPORTS_PAGE_SIZE,
 	type VerificationReport,
-	VERIFICATIONS_LIST_PAGE_SIZE,
 } from "./-data";
+import {
+	buildReportsListQuery,
+	REPORTS_VERIFICATION_STATUSES,
+	REPORTS_VERIFICATION_TYPES,
+	type ReportsFiltersFormValues,
+} from "./-filter-utils";
 
 const INDIVIDUAL_COLUMNS = [
 	"ID",
@@ -86,6 +83,8 @@ const DEFAULT_FILTERS: ReportsFiltersFormValues = {
 	country: "all",
 };
 
+const REPORTS_COUNTRIES = Object.values(COUNTRY_CODE_MAP).sort();
+
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/reports/")(
 	{
 		component: ReportsPage,
@@ -102,23 +101,46 @@ function ReportsPage() {
 		useState<ReportsFiltersFormValues>(DEFAULT_FILTERS);
 	const [individualPage, setIndividualPage] = useState(1);
 	const [batchPage, setBatchPage] = useState(1);
+	const debouncedSearch = useDebouncedValue(filters.search);
+
+	const queryFilters = useMemo(
+		() => ({
+			...filters,
+			search: debouncedSearch,
+		}),
+		[filters, debouncedSearch],
+	);
+
+	const individualQueryParams = useMemo(
+		() =>
+			buildReportsListQuery(queryFilters, {
+				page: individualPage,
+				perPage: REPORTS_PAGE_SIZE,
+				scope: "requests",
+			}),
+		[queryFilters, individualPage],
+	);
+
+	const batchQueryParams = useMemo(
+		() =>
+			buildReportsListQuery(queryFilters, {
+				page: batchPage,
+				perPage: REPORTS_PAGE_SIZE,
+				scope: "batches",
+			}),
+		[queryFilters, batchPage],
+	);
 
 	const verificationRequestsQuery = useTenantVerificationRequestsV2Query(
 		tenantId,
-		{
-			has_batch: false,
-			per_page: VERIFICATIONS_LIST_PAGE_SIZE,
-		},
-		Boolean(tenantId),
+		individualQueryParams,
+		Boolean(tenantId) && activeTab === "individual",
 	);
 
 	const verificationBatchesQuery = useTenantVerificationBatchesV2Query(
 		tenantId,
-		{
-			per_page: BATCH_VERIFICATIONS_LIST_PAGE_SIZE,
-			is_test: false,
-		},
-		Boolean(tenantId),
+		batchQueryParams,
+		Boolean(tenantId) && activeTab === "batch",
 	);
 
 	const verifications = useMemo(
@@ -138,6 +160,10 @@ function ReportsPage() {
 		[verificationBatchesQuery.data?.items],
 	);
 
+	const individualTotal =
+		verificationRequestsQuery.data?.meta.pagination.total ?? 0;
+	const batchTotal = verificationBatchesQuery.data?.meta.pagination.total ?? 0;
+
 	const isIndividualLoading =
 		verificationRequestsQuery.isPending || verificationRequestsQuery.isFetching;
 	const isBatchLoading =
@@ -149,40 +175,14 @@ function ReportsPage() {
 			: verificationBatchesQuery.isFetching &&
 				!verificationBatchesQuery.isPending;
 
-	const verificationTypes = useMemo(
-		() => getVerificationTypes(verifications),
-		[verifications],
+	const handleFiltersChange = useCallback(
+		(values: ReportsFiltersFormValues) => {
+			setFilters(values);
+			setIndividualPage(1);
+			setBatchPage(1);
+		},
+		[],
 	);
-	const verificationStatuses = useMemo(
-		() => getVerificationStatuses(verifications),
-		[verifications],
-	);
-	const countries = useMemo(
-		() => getVerificationCountries(verifications),
-		[verifications],
-	);
-
-	const filteredVerifications = useMemo(
-		() => filterVerifications(verifications, filters),
-		[verifications, filters],
-	);
-
-	const { items: paginatedVerifications, safePage: individualSafePage } =
-		useMemo(
-			() =>
-				paginateItems(filteredVerifications, individualPage, REPORTS_PAGE_SIZE),
-			[filteredVerifications, individualPage],
-		);
-
-	const { items: paginatedBatches, safePage: batchSafePage } = useMemo(
-		() => paginateItems(batchVerifications, batchPage, REPORTS_PAGE_SIZE),
-		[batchVerifications, batchPage],
-	);
-
-	const handleFiltersChange = useCallback((values: ReportsFiltersFormValues) => {
-		setFilters(values);
-		setIndividualPage(1);
-	}, []);
 
 	async function handleRefresh() {
 		if (activeTab === "individual") {
@@ -251,11 +251,12 @@ function ReportsPage() {
 							className="flex min-w-0 flex-col gap-6"
 						>
 							<ReportsFiltersForm
-								verificationTypes={verificationTypes}
-								statuses={verificationStatuses}
-								countries={countries}
-								totalCount={verifications.length}
-								filteredCount={filteredVerifications.length}
+								scope="requests"
+								verificationTypes={REPORTS_VERIFICATION_TYPES}
+								statuses={REPORTS_VERIFICATION_STATUSES}
+								countries={REPORTS_COUNTRIES}
+								totalCount={individualTotal}
+								filteredCount={individualTotal}
 								disabled={verificationRequestsQuery.isPending}
 								onChange={handleFiltersChange}
 							/>
@@ -291,19 +292,19 @@ function ReportsPage() {
 												</TableRow>
 											</TableHeader>
 											<TableBody>
-												{paginatedVerifications.length === 0 ? (
+												{verifications.length === 0 ? (
 													<TableRow>
 														<TableCell
 															colSpan={INDIVIDUAL_COLUMNS.length}
 															className="h-24 text-center text-sm text-muted-foreground"
 														>
-															{verifications.length === 0
+															{individualTotal === 0
 																? "No verifications found. Start by creating your first verification."
 																: "No verifications match your search or filters."}
 														</TableCell>
 													</TableRow>
 												) : (
-													paginatedVerifications.map((verification) => (
+													verifications.map((verification) => (
 														<IndividualVerificationRow
 															key={verification.id}
 															verification={verification}
@@ -314,9 +315,9 @@ function ReportsPage() {
 										</Table>
 									</ReportsTableShell>
 									<TablePagination
-										page={individualSafePage}
+										page={individualPage}
 										pageSize={REPORTS_PAGE_SIZE}
-										total={filteredVerifications.length}
+										total={individualTotal}
 										onPageChange={setIndividualPage}
 									/>
 								</>
@@ -324,6 +325,17 @@ function ReportsPage() {
 						</TabsContent>
 
 						<TabsContent value="batch" className="flex min-w-0 flex-col gap-6">
+							<ReportsFiltersForm
+								scope="batches"
+								verificationTypes={REPORTS_VERIFICATION_TYPES}
+								statuses={REPORTS_VERIFICATION_STATUSES}
+								countries={REPORTS_COUNTRIES}
+								totalCount={batchTotal}
+								filteredCount={batchTotal}
+								disabled={verificationBatchesQuery.isPending}
+								onChange={handleFiltersChange}
+							/>
+
 							{verificationBatchesQuery.isPending ? (
 								<>
 									<ReportsTableSkeleton columns={BATCH_COLUMNS} />
@@ -355,17 +367,19 @@ function ReportsPage() {
 												</TableRow>
 											</TableHeader>
 											<TableBody>
-												{paginatedBatches.length === 0 ? (
+												{batchVerifications.length === 0 ? (
 													<TableRow>
 														<TableCell
 															colSpan={BATCH_COLUMNS.length}
 															className="h-24 text-center text-sm text-muted-foreground"
 														>
-															No batch verifications found.
+															{batchTotal === 0
+																? "No batch verifications found."
+																: "No batch verifications match your search or filters."}
 														</TableCell>
 													</TableRow>
 												) : (
-													paginatedBatches.map((batch) => (
+													batchVerifications.map((batch) => (
 														<BatchVerificationRow
 															key={batch.id}
 															batch={batch}
@@ -376,9 +390,9 @@ function ReportsPage() {
 										</Table>
 									</ReportsTableShell>
 									<TablePagination
-										page={batchSafePage}
+										page={batchPage}
 										pageSize={REPORTS_PAGE_SIZE}
-										total={batchVerifications.length}
+										total={batchTotal}
 										onPageChange={setBatchPage}
 									/>
 								</>
