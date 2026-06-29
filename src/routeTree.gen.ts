@@ -19,6 +19,8 @@ import { Route as unguardedUnguarded_layoutInviteIndexRouteImport } from './rout
 import { Route as unguardedUnguarded_layoutForgotPasswordIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/forgot-password/index'
 import { Route as unguardedUnguarded_layoutActivateAccountIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/activate-account/index'
 import { Route as authAuth_layoutDashboardIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/index'
+import { Route as unguardedUnguarded_layoutVerifyResultRouteImport } from './routes/(unguarded)/_unguarded_layout/verify/result'
+import { Route as unguardedUnguarded_layoutVerifyLinkIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/verify/$link/index'
 import { Route as authAuth_layoutDashboardTeamIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/index'
 import { Route as authAuth_layoutDashboardReportsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/reports/index'
 import { Route as authAuth_layoutDashboardProfileIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/profile/index'
@@ -94,6 +96,18 @@ const authAuth_layoutDashboardIndexRoute =
     id: '/dashboard/',
     path: '/dashboard/',
     getParentRoute: () => authAuth_layoutRoute,
+  } as any)
+const unguardedUnguarded_layoutVerifyResultRoute =
+  unguardedUnguarded_layoutVerifyResultRouteImport.update({
+    id: '/verify/result',
+    path: '/verify/result',
+    getParentRoute: () => unguardedUnguarded_layoutRoute,
+  } as any)
+const unguardedUnguarded_layoutVerifyLinkIndexRoute =
+  unguardedUnguarded_layoutVerifyLinkIndexRouteImport.update({
+    id: '/verify/$link/',
+    path: '/verify/$link/',
+    getParentRoute: () => unguardedUnguarded_layoutRoute,
   } as any)
 const authAuth_layoutDashboardTeamIndexRoute =
   authAuth_layoutDashboardTeamIndexRouteImport.update({
@@ -214,6 +228,7 @@ const authAuth_layoutDashboardProductsAddressVerificationIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/verify/result': typeof unguardedUnguarded_layoutVerifyResultRoute
   '/dashboard/': typeof authAuth_layoutDashboardIndexRoute
   '/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   '/forgot-password/': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
@@ -228,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
   '/dashboard/reports/': typeof authAuth_layoutDashboardReportsIndexRoute
   '/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
+  '/verify/$link/': typeof unguardedUnguarded_layoutVerifyLinkIndexRoute
   '/dashboard/products/address-verification/': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
   '/dashboard/products/aml-screening/': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
   '/dashboard/products/business-aml-screening/': typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -243,6 +259,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/verify/result': typeof unguardedUnguarded_layoutVerifyResultRoute
   '/dashboard': typeof authAuth_layoutDashboardIndexRoute
   '/activate-account': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   '/forgot-password': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
@@ -257,6 +274,7 @@ export interface FileRoutesByTo {
   '/dashboard/profile': typeof authAuth_layoutDashboardProfileIndexRoute
   '/dashboard/reports': typeof authAuth_layoutDashboardReportsIndexRoute
   '/dashboard/team': typeof authAuth_layoutDashboardTeamIndexRoute
+  '/verify/$link': typeof unguardedUnguarded_layoutVerifyLinkIndexRoute
   '/dashboard/products/address-verification': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
   '/dashboard/products/aml-screening': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
   '/dashboard/products/business-aml-screening': typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -275,6 +293,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/(auth)/_auth_layout': typeof authAuth_layoutRouteWithChildren
   '/(unguarded)/_unguarded_layout': typeof unguardedUnguarded_layoutRouteWithChildren
+  '/(unguarded)/_unguarded_layout/verify/result': typeof unguardedUnguarded_layoutVerifyResultRoute
   '/(auth)/_auth_layout/dashboard/': typeof authAuth_layoutDashboardIndexRoute
   '/(unguarded)/_unguarded_layout/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   '/(unguarded)/_unguarded_layout/forgot-password/': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
@@ -289,6 +308,7 @@ export interface FileRoutesById {
   '/(auth)/_auth_layout/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
   '/(auth)/_auth_layout/dashboard/reports/': typeof authAuth_layoutDashboardReportsIndexRoute
   '/(auth)/_auth_layout/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
+  '/(unguarded)/_unguarded_layout/verify/$link/': typeof unguardedUnguarded_layoutVerifyLinkIndexRoute
   '/(auth)/_auth_layout/dashboard/products/address-verification/': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
   '/(auth)/_auth_layout/dashboard/products/aml-screening/': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
   '/(auth)/_auth_layout/dashboard/products/business-aml-screening/': typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
@@ -306,6 +326,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/verify/result'
     | '/dashboard/'
     | '/activate-account/'
     | '/forgot-password/'
@@ -320,6 +341,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile/'
     | '/dashboard/reports/'
     | '/dashboard/team/'
+    | '/verify/$link/'
     | '/dashboard/products/address-verification/'
     | '/dashboard/products/aml-screening/'
     | '/dashboard/products/business-aml-screening/'
@@ -335,6 +357,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/verify/result'
     | '/dashboard'
     | '/activate-account'
     | '/forgot-password'
@@ -349,6 +372,7 @@ export interface FileRouteTypes {
     | '/dashboard/profile'
     | '/dashboard/reports'
     | '/dashboard/team'
+    | '/verify/$link'
     | '/dashboard/products/address-verification'
     | '/dashboard/products/aml-screening'
     | '/dashboard/products/business-aml-screening'
@@ -366,6 +390,7 @@ export interface FileRouteTypes {
     | '/'
     | '/(auth)/_auth_layout'
     | '/(unguarded)/_unguarded_layout'
+    | '/(unguarded)/_unguarded_layout/verify/result'
     | '/(auth)/_auth_layout/dashboard/'
     | '/(unguarded)/_unguarded_layout/activate-account/'
     | '/(unguarded)/_unguarded_layout/forgot-password/'
@@ -380,6 +405,7 @@ export interface FileRouteTypes {
     | '/(auth)/_auth_layout/dashboard/profile/'
     | '/(auth)/_auth_layout/dashboard/reports/'
     | '/(auth)/_auth_layout/dashboard/team/'
+    | '/(unguarded)/_unguarded_layout/verify/$link/'
     | '/(auth)/_auth_layout/dashboard/products/address-verification/'
     | '/(auth)/_auth_layout/dashboard/products/aml-screening/'
     | '/(auth)/_auth_layout/dashboard/products/business-aml-screening/'
@@ -471,6 +497,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof authAuth_layoutDashboardIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
+    }
+    '/(unguarded)/_unguarded_layout/verify/result': {
+      id: '/(unguarded)/_unguarded_layout/verify/result'
+      path: '/verify/result'
+      fullPath: '/verify/result'
+      preLoaderRoute: typeof unguardedUnguarded_layoutVerifyResultRouteImport
+      parentRoute: typeof unguardedUnguarded_layoutRoute
+    }
+    '/(unguarded)/_unguarded_layout/verify/$link/': {
+      id: '/(unguarded)/_unguarded_layout/verify/$link/'
+      path: '/verify/$link'
+      fullPath: '/verify/$link/'
+      preLoaderRoute: typeof unguardedUnguarded_layoutVerifyLinkIndexRouteImport
+      parentRoute: typeof unguardedUnguarded_layoutRoute
     }
     '/(auth)/_auth_layout/dashboard/team/': {
       id: '/(auth)/_auth_layout/dashboard/team/'
@@ -677,16 +717,20 @@ const authAuth_layoutRouteWithChildren = authAuth_layoutRoute._addFileChildren(
 )
 
 interface unguardedUnguarded_layoutRouteChildren {
+  unguardedUnguarded_layoutVerifyResultRoute: typeof unguardedUnguarded_layoutVerifyResultRoute
   unguardedUnguarded_layoutActivateAccountIndexRoute: typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   unguardedUnguarded_layoutForgotPasswordIndexRoute: typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
   unguardedUnguarded_layoutInviteIndexRoute: typeof unguardedUnguarded_layoutInviteIndexRoute
   unguardedUnguarded_layoutLoginIndexRoute: typeof unguardedUnguarded_layoutLoginIndexRoute
   unguardedUnguarded_layoutRegisterIndexRoute: typeof unguardedUnguarded_layoutRegisterIndexRoute
   unguardedUnguarded_layoutResetPasswordIndexRoute: typeof unguardedUnguarded_layoutResetPasswordIndexRoute
+  unguardedUnguarded_layoutVerifyLinkIndexRoute: typeof unguardedUnguarded_layoutVerifyLinkIndexRoute
 }
 
 const unguardedUnguarded_layoutRouteChildren: unguardedUnguarded_layoutRouteChildren =
   {
+    unguardedUnguarded_layoutVerifyResultRoute:
+      unguardedUnguarded_layoutVerifyResultRoute,
     unguardedUnguarded_layoutActivateAccountIndexRoute:
       unguardedUnguarded_layoutActivateAccountIndexRoute,
     unguardedUnguarded_layoutForgotPasswordIndexRoute:
@@ -699,6 +743,8 @@ const unguardedUnguarded_layoutRouteChildren: unguardedUnguarded_layoutRouteChil
       unguardedUnguarded_layoutRegisterIndexRoute,
     unguardedUnguarded_layoutResetPasswordIndexRoute:
       unguardedUnguarded_layoutResetPasswordIndexRoute,
+    unguardedUnguarded_layoutVerifyLinkIndexRoute:
+      unguardedUnguarded_layoutVerifyLinkIndexRoute,
   }
 
 const unguardedUnguarded_layoutRouteWithChildren =
