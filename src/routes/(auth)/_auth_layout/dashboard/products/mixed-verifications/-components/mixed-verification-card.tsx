@@ -48,7 +48,7 @@ export function MixedVerificationCard({
 							<h3 className="text-base font-semibold leading-tight">
 								{template.name}
 							</h3>
-							<Badge variant={isCustom ? "default" : "secondary"}>
+							<Badge >
 								{isCustom ? "Custom" : "Platform"}
 							</Badge>
 							{!template.is_active && (
@@ -59,7 +59,7 @@ export function MixedVerificationCard({
 							{template.description?.trim() || "No description provided."}
 						</p>
 					</div>
-					<div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+					<div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
 						<StackIcon className="size-5" weight="duotone" />
 					</div>
 				</div>
@@ -71,7 +71,7 @@ export function MixedVerificationCard({
 						<Badge
 							key={verificationType}
 							variant="outline"
-							className="border-primary/20 bg-primary/5 text-primary"
+							className="border-primary/20 bg-primary/5 text-secondary"
 						>
 							{formatVerificationTypeLabel(verificationType)}
 						</Badge>

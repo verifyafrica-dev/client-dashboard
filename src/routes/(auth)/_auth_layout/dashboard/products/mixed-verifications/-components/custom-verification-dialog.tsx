@@ -8,7 +8,6 @@ import {
 } from "#/api/http/v2/verifications/verifications.hooks";
 import type { MixedVerification } from "#/api/http/v2/verifications/verifications.types";
 import { Button } from "#/components/ui/button";
-import { Checkbox } from "#/components/ui/checkbox";
 import {
 	Dialog,
 	DialogContent,
@@ -36,9 +35,10 @@ import {
 } from "../-data";
 
 const verificationTypePillClassName = cn(
-	"inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors",
+	"inline-flex cursor-pointer items-center rounded-full border px-3 py-1.5 text-sm transition-colors",
 	"border-border bg-muted/30 text-muted-foreground hover:bg-muted/50",
-	"has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary/10 has-[[data-state=checked]]:text-primary",
+	"focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none",
+	"aria-pressed:border-primary aria-pressed:bg-primary/10 aria-pressed:text-primary",
 );
 
 type CustomVerificationDialogProps = {
@@ -191,36 +191,35 @@ export function CustomVerificationDialog({
 										</p>
 									</div>
 
-									<div className="flex flex-wrap gap-2">
-										{CUSTOM_MIXED_VERIFICATION_TYPE_OPTIONS.map((type) => (
-											<label
-												key={type}
-												htmlFor={`custom-verification-type-${type}`}
-												className={verificationTypePillClassName}
-											>
-												<Checkbox
-													id={`custom-verification-type-${type}`}
-													checked={field.state.value.includes(type)}
-													onCheckedChange={(checked) => {
+									<div
+										className="flex flex-wrap gap-2"
+										role="group"
+										aria-label="Included verification types"
+									>
+										{CUSTOM_MIXED_VERIFICATION_TYPE_OPTIONS.map((type) => {
+											const isSelected = field.state.value.includes(type);
+
+											return (
+												<button
+													key={type}
+													type="button"
+													aria-pressed={isSelected}
+													disabled={isSaving}
+													className={verificationTypePillClassName}
+													onClick={() => {
 														const current = field.state.value;
 
 														field.handleChange(
-															checked === true
-																? current.includes(type)
-																	? current
-																	: [...current, type]
-																: current.filter(
-																		(item) => item !== type,
-																	),
+															isSelected
+																? current.filter((item) => item !== type)
+																: [...current, type],
 														);
 													}}
-													disabled={isSaving}
-													className="sr-only size-3.5"
-													hidden
-												/>
-												<span>{formatVerificationTypeLabel(type)}</span>
-											</label>
-										))}
+												>
+													{formatVerificationTypeLabel(type)}
+												</button>
+											);
+										})}
 									</div>
 									<FieldError errors={field.state.meta.errors} />
 								</Field>

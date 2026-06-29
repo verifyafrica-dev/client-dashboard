@@ -23,10 +23,10 @@ export const Route = createFileRoute(
 	component: MixedVerificationsPage,
 });
 
-function MixedVerificationsPageSkeleton() {
+function MixedVerificationSectionCardsSkeleton({ count = 2 }: { count?: number }) {
 	return (
 		<div className="grid gap-4 md:grid-cols-2">
-			{Array.from({ length: 4 }).map((_, index) => (
+			{Array.from({ length: count }).map((_, index) => (
 				<Skeleton key={index} className="h-56 w-full rounded-xl" />
 			))}
 		</div>
@@ -37,6 +37,7 @@ function MixedVerificationSection({
 	title,
 	description,
 	templates,
+	isLoading = false,
 	canManageCustom,
 	onStart,
 	onEdit,
@@ -45,6 +46,7 @@ function MixedVerificationSection({
 	title: string;
 	description: string;
 	templates: MixedVerification[];
+	isLoading?: boolean;
 	canManageCustom: boolean;
 	onStart: (template: MixedVerification) => void;
 	onEdit: (template: MixedVerification) => void;
@@ -57,7 +59,9 @@ function MixedVerificationSection({
 				<p className="text-sm text-muted-foreground">{description}</p>
 			</div>
 
-			{templates.length === 0 ? (
+			{isLoading ? (
+				<MixedVerificationSectionCardsSkeleton />
+			) : templates.length === 0 ? (
 				<div className="rounded-xl border border-dashed px-6 py-10 text-center text-sm text-muted-foreground">
 					No templates available in this group yet.
 				</div>
@@ -151,8 +155,6 @@ function MixedVerificationsPage() {
 				<div className="rounded-xl border px-6 py-10 text-center text-sm text-muted-foreground">
 					Tenant information is unavailable.
 				</div>
-			) : mixedVerificationsQuery.isPending ? (
-				<MixedVerificationsPageSkeleton />
 			) : mixedVerificationsQuery.isError ? (
 				<div className="rounded-xl border px-6 py-10 text-center text-sm text-muted-foreground">
 					Failed to load mixed verifications. Please try again.
@@ -163,6 +165,7 @@ function MixedVerificationsPage() {
 						title="Platform Mixed Verifications"
 						description="Predefined verification journeys provided by VerifyAfrica."
 						templates={groupedTemplates.platform}
+						isLoading={mixedVerificationsQuery.isPending}
 						canManageCustom={isTenantAdmin}
 						onStart={setStartingTemplate}
 						onEdit={openEditDialog}
@@ -177,6 +180,7 @@ function MixedVerificationsPage() {
 								: "Custom templates available to your tenant."
 						}
 						templates={groupedTemplates.custom}
+						isLoading={mixedVerificationsQuery.isPending}
 						canManageCustom={isTenantAdmin}
 						onStart={setStartingTemplate}
 						onEdit={openEditDialog}

@@ -42,7 +42,7 @@ export function DeleteCustomVerificationDialog({
 		<AlertDialog open={Boolean(template)} onOpenChange={onOpenChange}>
 			<AlertDialogContent>
 				<AlertDialogHeader>
-					<AlertDialogTitle>Delete Custom Verification</AlertDialogTitle>
+					<AlertDialogTitle className="font-semibold">Delete Custom Verification</AlertDialogTitle>
 					<AlertDialogDescription>
 						Delete <strong>{template?.name}</strong>? This removes it from your
 						tenant catalog.
