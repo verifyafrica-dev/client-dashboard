@@ -78,6 +78,7 @@ export function useCurrentTenant() {
 
 	return {
 		user,
+		tenant,
 		tenantId: tenant?.id,
 		tenantRole: tenant?.role,
 		isTenantAdmin: tenant?.role === "admin",

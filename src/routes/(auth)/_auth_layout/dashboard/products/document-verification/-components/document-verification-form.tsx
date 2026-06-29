@@ -8,9 +8,13 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
+import { useCreateVerificationRequestV2Mutation } from "#/api/http/v2/verifications/verifications.hooks";
+import type { VerificationRequest } from "#/api/http/v2/verifications/verifications.types";
 import { useSupportedCountriesV2Query } from "#/api/http/v2/tenants/tenants.hooks";
 import type { SupportedCountry } from "#/api/http/v2/tenants/tenants.types";
-import { useAuthStore } from "#/stores/auth-store";
+import { getV2ErrorMessage } from "#/lib/api-errors";
+import type { HostedLinkResult } from "#/lib/verification-links";
+import { buildLinkResult } from "#/lib/verification-links";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
@@ -31,7 +35,13 @@ import {
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
 import { ProductProofUpload } from "../../-components/product-proof-upload";
+import { VerificationResultDialog } from "../../-components/verification-result-dialog";
 import { PRODUCT_UPLOAD_FOLDERS } from "../../-upload-utils";
+import { useCurrentTenant } from "../../../team/-data";
+import {
+	buildDocumentVerificationDirectPayload,
+	buildDocumentVerificationLinkPayload,
+} from "../-data";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
 	VERIFICATION_MODES,
@@ -39,7 +49,6 @@ import {
 	type VerificationMode,
 	verificationConsentSchema,
 } from "../../../-components/VerificationConsentCheckbox/data";
-import { getUserTenantMembership } from "../../../team/-data";
 
 function filterCountriesByTenant(
 	countries: SupportedCountry[],
@@ -78,19 +87,73 @@ export function DocumentVerificationForm() {
 	const [mode, setMode] = useState<VerificationMode>("link");
 	const [documentProofUrl, setDocumentProofUrl] = useState<string | null>(null);
 	const [isDocumentUploading, setIsDocumentUploading] = useState(false);
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const user = useAuthStore((state) => state.user);
-	const tenant = user ? getUserTenantMembership(user) : undefined;
+	const [linkResult, setLinkResult] = useState<HostedLinkResult | null>(null);
+	const [verificationResult, setVerificationResult] =
+		useState<VerificationRequest | null>(null);
+	const [isResultDialogOpen, setIsResultDialogOpen] = useState(false);
+	const { tenantId, tenant } = useCurrentTenant();
+	const createVerificationMutation = useCreateVerificationRequestV2Mutation();
 	const countriesQuery = useSupportedCountriesV2Query();
+	const isSubmitting = createVerificationMutation.isPending;
+
+	const enabledCountries =
+		tenant?.enabled_countries && tenant.enabled_countries.length > 0
+			? tenant.enabled_countries
+			: undefined;
 
 	const countries = useMemo(() => {
 		const supportedCountries = countriesQuery.data ?? [];
 
-		return filterCountriesByTenant(
-			supportedCountries,
-			tenant?.enabled_countries,
-		).sort((left, right) => left.name.localeCompare(right.name));
-	}, [countriesQuery.data, tenant?.enabled_countries]);
+		return filterCountriesByTenant(supportedCountries, enabledCountries).sort(
+			(left, right) => left.name.localeCompare(right.name),
+		);
+	}, [countriesQuery.data, enabledCountries]);
+
+	async function submitVerification(
+		payload: ReturnType<typeof buildDocumentVerificationLinkPayload>,
+		options:
+			| {
+					mode: "link";
+					email: string;
+					urlLimit: string;
+			  }
+			| {
+					mode: "direct";
+			  },
+	) {
+		if (!tenantId) {
+			toast.error("No tenant selected.");
+			return;
+		}
+
+		try {
+			const verification = await createVerificationMutation.mutateAsync({
+				tenantId,
+				payload,
+			});
+
+			if (options.mode === "link") {
+				setLinkResult(
+					buildLinkResult(
+						verification,
+						options.email,
+						Number(options.urlLimit),
+					),
+				);
+				setVerificationResult(null);
+			} else {
+				setVerificationResult(verification);
+				setLinkResult(null);
+			}
+
+			setIsResultDialogOpen(true);
+			resetForms();
+		} catch (error) {
+			toast.error(
+				getV2ErrorMessage(error, "Failed to submit document verification."),
+			);
+		}
+	}
 
 	const linkForm = useForm({
 		defaultValues: {
@@ -102,13 +165,15 @@ export function DocumentVerificationForm() {
 			onChange: linkFormSchema,
 			onSubmit: linkFormSchema,
 		},
-		onSubmit: async () => {
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
-			}
+		onSubmit: async ({ value }) => {
+			await submitVerification(
+				buildDocumentVerificationLinkPayload(value),
+				{
+					mode: "link",
+					email: value.email,
+					urlLimit: value.urlLimit,
+				},
+			);
 		},
 	});
 
@@ -124,20 +189,32 @@ export function DocumentVerificationForm() {
 			onChange: directFormSchema,
 			onSubmit: directFormSchema,
 		},
-		onSubmit: async () => {
+		onSubmit: async ({ value }) => {
 			if (!documentProofUrl) {
 				toast.error("Please upload a document");
 				return;
 			}
 
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
-			}
+			await submitVerification(
+				buildDocumentVerificationDirectPayload(value, documentProofUrl),
+				{ mode: "direct" },
+			);
 		},
 	});
+
+	function resetForms() {
+		linkForm.reset();
+		directForm.reset();
+		setDocumentProofUrl(null);
+		setIsDocumentUploading(false);
+	}
+
+	function handleStartNewVerification() {
+		setIsResultDialogOpen(false);
+		setLinkResult(null);
+		setVerificationResult(null);
+		resetForms();
+	}
 
 	const activeForm = mode === "link" ? linkForm : directForm;
 
@@ -434,6 +511,14 @@ export function DocumentVerificationForm() {
 					)}
 				</form>
 			</CardContent>
+
+			<VerificationResultDialog
+				open={isResultDialogOpen}
+				onOpenChange={setIsResultDialogOpen}
+				linkResult={linkResult}
+				verification={verificationResult}
+				onStartNew={handleStartNewVerification}
+			/>
 		</Card>
 	);
 }

@@ -5,6 +5,7 @@ import type {
 	UserLoginError,
 	UserResetPasswordErrorResponse,
 } from "#/api/http/v1/users/users.types";
+import type { V2ErrorResponse } from "#/api/http/shared";
 import { isPlainObject } from "#/lib/validators";
 
 function isUserLoginError(error: unknown): error is UserLoginError {
@@ -103,4 +104,23 @@ export function getUserChangePasswordFieldError(
 	}
 
 	return [];
+}
+
+export function getV2ErrorMessage(error: unknown, fallback = "Something went wrong") {
+	const axiosError = error as AxiosError<V2ErrorResponse>;
+	const data = axiosError.response?.data;
+
+	if (data?.errors?.length) {
+		return data.errors.join(", ");
+	}
+
+	if (data?.message) {
+		return data.message;
+	}
+
+	if (error instanceof Error && error.message) {
+		return error.message;
+	}
+
+	return fallback;
 }
