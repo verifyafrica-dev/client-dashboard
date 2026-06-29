@@ -5,12 +5,13 @@ import {
 	PaperPlaneTiltIcon,
 } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { useSupportedCountriesQuery } from "#/api/http/v1/tenants/tenants.hooks";
-import type { SupportedCountry } from "#/api/http/v1/tenants/tenants.types";
+import { useSupportedCountriesV2Query } from "#/api/http/v2/tenants/tenants.hooks";
+import type { SupportedCountry } from "#/api/http/v2/tenants/tenants.types";
+import { useAuthStore } from "#/stores/auth-store";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import {
@@ -47,6 +48,26 @@ import {
 	type VerificationMode,
 	verificationConsentSchema,
 } from "../../../-components/VerificationConsentCheckbox/data";
+import { getUserTenantMembership } from "../../../team/-data";
+
+function filterCountriesByTenant(
+	countries: SupportedCountry[],
+	enabledCountries: string[] | undefined,
+) {
+	if (enabledCountries === undefined) {
+		return countries;
+	}
+
+	const enabledCodes = new Set(
+		enabledCountries
+			.map((code) => code.trim().toLowerCase())
+			.filter(Boolean),
+	);
+
+	return countries.filter((country) =>
+		enabledCodes.has(country.code.trim().toLowerCase()),
+	);
+}
 
 const linkFormSchema = z.object({
 	email: z.email("Enter a valid email address"),
@@ -66,12 +87,18 @@ export function DocumentVerificationForm() {
 	const [mode, setMode] = useState<VerificationMode>("link");
 	const [documentFile, setDocumentFile] = useState<File[]>([]);
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const countriesQuery = useSupportedCountriesQuery();
+	const user = useAuthStore((state) => state.user);
+	const tenant = user ? getUserTenantMembership(user) : undefined;
+	const countriesQuery = useSupportedCountriesV2Query();
 
-	const countries = useMemo(
-		() => (countriesQuery.data as SupportedCountry[]) ?? [],
-		[countriesQuery.data],
-	);
+	const countries = useMemo(() => {
+		const supportedCountries = countriesQuery.data ?? [];
+
+		return filterCountriesByTenant(
+			supportedCountries,
+			tenant?.enabled_countries,
+		).sort((left, right) => left.name.localeCompare(right.name));
+	}, [countriesQuery.data, tenant?.enabled_countries]);
 
 	const linkForm = useForm({
 		defaultValues: {
@@ -124,6 +151,25 @@ export function DocumentVerificationForm() {
 	const canSubmit =
 		activeForm.state.canSubmit &&
 		(mode === "direct" ? documentFile.length > 0 : true);
+
+	useEffect(() => {
+		if (mode !== "direct") {
+			return;
+		}
+
+		const selectedCountry = directForm.getFieldValue("country");
+		if (!selectedCountry) {
+			return;
+		}
+
+		const isSelectedCountryEnabled = countries.some(
+			(country) => country.code === selectedCountry,
+		);
+
+		if (!isSelectedCountryEnabled) {
+			directForm.setFieldValue("country", "");
+		}
+	}, [countries, mode, directForm]);
 
 	return (
 		<Card>
