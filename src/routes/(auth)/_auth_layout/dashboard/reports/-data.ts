@@ -1,8 +1,10 @@
 import type {
 	ReportsFiltersFormValues,
-	VerificationBatch,
-	VerificationRequestList,
 } from "#/api/http/v1/verifications/verifications.types";
+import type {
+	VerificationBatch,
+	VerificationRequest,
+} from "#/api/http/v2/verifications/verifications.types";
 import { isPlainObject } from "#/lib/validators";
 
 export type VerificationReport = {
@@ -59,13 +61,13 @@ function isValidWalletAddress(walletAddress: string | null | undefined) {
 	);
 }
 
-function getResponseDataRecord(verification: VerificationRequestList) {
+function getResponseDataRecord(verification: VerificationRequest) {
 	return isPlainObject(verification.response_data)
 		? (verification.response_data as Record<string, unknown>)
 		: {};
 }
 
-function getResponseInnerData(verification: VerificationRequestList) {
+function getResponseInnerData(verification: VerificationRequest) {
 	const responseData = getResponseDataRecord(verification);
 	return isPlainObject(responseData.data)
 		? (responseData.data as Record<string, unknown>)
@@ -73,7 +75,7 @@ function getResponseInnerData(verification: VerificationRequestList) {
 }
 
 export function getVerificationCountry(
-	verification: VerificationRequestList,
+	verification: VerificationRequest,
 ): string | undefined {
 	const innerData = getResponseInnerData(verification);
 	const idType = innerData.id_type;
@@ -87,7 +89,7 @@ export function getVerificationCountry(
 }
 
 export function getVerificationTargetName(
-	verification: VerificationRequestList,
+	verification: VerificationRequest,
 ): string {
 	const { input_data } = verification;
 	const innerData = getResponseInnerData(verification);
@@ -148,7 +150,7 @@ export function getVerificationTargetName(
 }
 
 export function mapVerificationRequestToReport(
-	verification: VerificationRequestList,
+	verification: VerificationRequest,
 	mode: "live" | "test",
 ): VerificationReport {
 	const inputData = isPlainObject(verification.input_data)
@@ -175,7 +177,7 @@ export function mapVerificationRequestToReport(
 }
 
 export function mapVerificationRequestsToReports(
-	verifications: VerificationRequestList[],
+	verifications: VerificationRequest[],
 	mode: "live" | "test" = "live",
 ): VerificationReport[] {
 	return verifications.map((verification) =>

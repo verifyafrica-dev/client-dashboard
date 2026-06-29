@@ -8,10 +8,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 
 import {
-	useVerificationBatchesQuery,
-	useVerificationRequestsQuery,
-	VERIFICATIONS_QUERY_KEYS,
-} from "#/api/http/v1/verifications/verifications.hooks";
+	useTenantVerificationBatchesV2Query,
+	useTenantVerificationRequestsV2Query,
+	VERIFICATIONS_V2_QUERY_KEYS,
+} from "#/api/http/v2/verifications/verifications.hooks";
 import type { ReportsFiltersFormValues } from "#/api/http/v1/verifications/verifications.types";
 import { paginateItems, TablePagination } from "#/components/table-pagination";
 import { Button } from "#/components/ui/button";
@@ -103,19 +103,19 @@ function ReportsPage() {
 	const [individualPage, setIndividualPage] = useState(1);
 	const [batchPage, setBatchPage] = useState(1);
 
-	const verificationRequestsQuery = useVerificationRequestsQuery(
+	const verificationRequestsQuery = useTenantVerificationRequestsV2Query(
 		tenantId,
 		{
 			has_batch: false,
-			page_size: VERIFICATIONS_LIST_PAGE_SIZE,
+			per_page: VERIFICATIONS_LIST_PAGE_SIZE,
 		},
 		Boolean(tenantId),
 	);
 
-	const verificationBatchesQuery = useVerificationBatchesQuery(
+	const verificationBatchesQuery = useTenantVerificationBatchesV2Query(
 		tenantId,
 		{
-			page_size: BATCH_VERIFICATIONS_LIST_PAGE_SIZE,
+			per_page: BATCH_VERIFICATIONS_LIST_PAGE_SIZE,
 			is_test: false,
 		},
 		Boolean(tenantId),
@@ -124,18 +124,18 @@ function ReportsPage() {
 	const verifications = useMemo(
 		() =>
 			mapVerificationRequestsToReports(
-				verificationRequestsQuery.data?.results ?? [],
+				verificationRequestsQuery.data?.items ?? [],
 				"live",
 			),
-		[verificationRequestsQuery.data?.results],
+		[verificationRequestsQuery.data?.items],
 	);
 
 	const batchVerifications = useMemo(
 		() =>
 			mapVerificationBatchesToReports(
-				verificationBatchesQuery.data?.results ?? [],
+				verificationBatchesQuery.data?.items ?? [],
 			),
-		[verificationBatchesQuery.data?.results],
+		[verificationBatchesQuery.data?.items],
 	);
 
 	const isIndividualLoading =
@@ -187,13 +187,13 @@ function ReportsPage() {
 	async function handleRefresh() {
 		if (activeTab === "individual") {
 			await queryClient.invalidateQueries({
-				queryKey: VERIFICATIONS_QUERY_KEYS.requests(tenantId ?? ""),
+				queryKey: VERIFICATIONS_V2_QUERY_KEYS.tenantRequests(tenantId ?? ""),
 			});
 			return;
 		}
 
 		await queryClient.invalidateQueries({
-			queryKey: VERIFICATIONS_QUERY_KEYS.batches(tenantId ?? ""),
+			queryKey: VERIFICATIONS_V2_QUERY_KEYS.tenantBatches(tenantId ?? ""),
 		});
 	}
 

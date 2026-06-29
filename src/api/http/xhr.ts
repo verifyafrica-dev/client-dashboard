@@ -93,6 +93,7 @@ const PUBLIC_ROUTE_FRAGMENTS = [
 	"/v2/users/refresh-token/",
 	"/v2/users/resend-activation-code/",
 	"/v2/tenants/invitations/create-user/",
+	"/v2/verifications/links/",
 ];
 
 const shouldUseAccessToken = (url: string) => {
