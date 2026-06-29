@@ -1,5 +1,6 @@
 import { FunnelIcon, MagnifyingGlassIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
+import { useEffect } from "react";
 
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
@@ -19,6 +20,7 @@ import {
 
 type ReportsFiltersFormProps = {
 	scope: ReportsListFilterScope;
+	values: ReportsFiltersFormValues;
 	verificationTypes: string[];
 	statuses: string[];
 	countries: string[];
@@ -30,6 +32,7 @@ type ReportsFiltersFormProps = {
 
 export function ReportsFiltersForm({
 	scope,
+	values,
 	verificationTypes,
 	statuses,
 	countries,
@@ -39,18 +42,17 @@ export function ReportsFiltersForm({
 	onChange,
 }: ReportsFiltersFormProps) {
 	const form = useForm({
-		defaultValues: {
-			search: "",
-			verificationType: "all",
-			status: "all",
-			country: "all",
-		} satisfies ReportsFiltersFormValues,
+		defaultValues: values,
 		listeners: {
 			onChange: ({ formApi }) => {
 				onChange(formApi.state.values);
 			},
 		},
 	});
+
+	useEffect(() => {
+		form.reset(values);
+	}, [form, values]);
 
 	return (
 		<Card className="border bg-muted/30 py-0 shadow-none">
@@ -70,11 +72,11 @@ export function ReportsFiltersForm({
 					<form.Field name="search">
 						{(field) => (
 							<div className="space-y-1.5">
-								<Label htmlFor="reports-search">Search</Label>
+								<Label htmlFor={`reports-search-${scope}`}>Search</Label>
 								<div className="relative">
 									<MagnifyingGlassIcon className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 									<Input
-										id="reports-search"
+										id={`reports-search-${scope}`}
 										placeholder={
 											scope === "requests"
 												? "Search by name or ID..."
@@ -126,13 +128,16 @@ export function ReportsFiltersForm({
 					<form.Field name="status">
 						{(field) => (
 							<div className="space-y-1.5">
-								<Label htmlFor="status-filter">Status</Label>
+								<Label htmlFor={`status-filter-${scope}`}>Status</Label>
 								<Select
 									value={field.state.value}
 									onValueChange={field.handleChange}
 									disabled={disabled}
 								>
-									<SelectTrigger id="status-filter" className="w-full">
+									<SelectTrigger
+										id={`status-filter-${scope}`}
+										className="w-full"
+									>
 										<SelectValue placeholder="All Statuses" />
 									</SelectTrigger>
 									<SelectContent>

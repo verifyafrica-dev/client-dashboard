@@ -1,7 +1,7 @@
 import { ArrowsClockwiseIcon, EyeIcon, StackIcon } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
 	useTenantVerificationBatchesV2Query,
@@ -46,9 +46,14 @@ import {
 } from "./-data";
 import {
 	buildReportsListQuery,
+	getBatchFiltersFromSearch,
+	getIndividualFiltersFromSearch,
+	mergeReportsSearchParams,
 	REPORTS_VERIFICATION_STATUSES,
 	REPORTS_VERIFICATION_TYPES,
 	type ReportsFiltersFormValues,
+	type ReportsSearchParams,
+	reportsSearchSchema,
 } from "./-filter-utils";
 
 const INDIVIDUAL_COLUMNS = [
@@ -76,59 +81,125 @@ const BATCH_COLUMNS = [
 	"Actions",
 ];
 
-const DEFAULT_FILTERS: ReportsFiltersFormValues = {
-	search: "",
-	verificationType: "all",
-	status: "all",
-	country: "all",
-};
-
 const REPORTS_COUNTRIES = Object.values(COUNTRY_CODE_MAP).sort();
 
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/reports/")(
 	{
+		validateSearch: reportsSearchSchema,
 		component: ReportsPage,
 	},
 );
 
 function ReportsPage() {
 	const queryClient = useQueryClient();
+	const navigate = useNavigate({ from: Route.fullPath });
+	const urlSearch = Route.useSearch();
 	const { tenantId } = useCurrentTenant();
-	const [activeTab, setActiveTab] = useState<"individual" | "batch">(
-		"individual",
-	);
-	const [filters, setFilters] =
-		useState<ReportsFiltersFormValues>(DEFAULT_FILTERS);
-	const [individualPage, setIndividualPage] = useState(1);
-	const [batchPage, setBatchPage] = useState(1);
-	const debouncedSearch = useDebouncedValue(filters.search);
 
-	const queryFilters = useMemo(
+	const activeTab = urlSearch.tab ?? "individual";
+	const individualPage = urlSearch.page ?? 1;
+	const batchPage = urlSearch.batch_page ?? 1;
+
+	const [individualSearchDraft, setIndividualSearchDraft] = useState(
+		urlSearch.search ?? "",
+	);
+	const [batchSearchDraft, setBatchSearchDraft] = useState(
+		urlSearch.batch_search ?? "",
+	);
+
+	const debouncedIndividualSearch = useDebouncedValue(individualSearchDraft);
+	const debouncedBatchSearch = useDebouncedValue(batchSearchDraft);
+
+	useEffect(() => {
+		setIndividualSearchDraft(urlSearch.search ?? "");
+	}, [urlSearch.search]);
+
+	useEffect(() => {
+		setBatchSearchDraft(urlSearch.batch_search ?? "");
+	}, [urlSearch.batch_search]);
+
+	const updateSearchParams = useCallback(
+		(patch: Partial<ReportsSearchParams>) => {
+			void navigate({
+				search: (current) => mergeReportsSearchParams(current, patch),
+				replace: true,
+			});
+		},
+		[navigate],
+	);
+
+	useEffect(() => {
+		const nextSearch = debouncedIndividualSearch.trim();
+		const currentSearch = (urlSearch.search ?? "").trim();
+
+		if (nextSearch === currentSearch) {
+			return;
+		}
+
+		updateSearchParams({
+			search: nextSearch || undefined,
+			page: undefined,
+		});
+	}, [debouncedIndividualSearch, updateSearchParams, urlSearch.search]);
+
+	useEffect(() => {
+		const nextSearch = debouncedBatchSearch.trim();
+		const currentSearch = (urlSearch.batch_search ?? "").trim();
+
+		if (nextSearch === currentSearch) {
+			return;
+		}
+
+		updateSearchParams({
+			batch_search: nextSearch || undefined,
+			batch_page: undefined,
+		});
+	}, [debouncedBatchSearch, updateSearchParams, urlSearch.batch_search]);
+
+	const individualFilters = useMemo(
+		() => getIndividualFiltersFromSearch(urlSearch, individualSearchDraft),
+		[urlSearch, individualSearchDraft],
+	);
+
+	const batchFilters = useMemo(
+		() => getBatchFiltersFromSearch(urlSearch, batchSearchDraft),
+		[urlSearch, batchSearchDraft],
+	);
+
+	const individualQueryFilters = useMemo(
 		() => ({
-			...filters,
-			search: debouncedSearch,
+			...individualFilters,
+			search: debouncedIndividualSearch,
 		}),
-		[filters, debouncedSearch],
+		[individualFilters, debouncedIndividualSearch],
+	);
+
+	const batchQueryFilters = useMemo(
+		() => ({
+			...batchFilters,
+			search: debouncedBatchSearch,
+		}),
+		[batchFilters, debouncedBatchSearch],
 	);
 
 	const individualQueryParams = useMemo(
 		() =>
-			buildReportsListQuery(queryFilters, {
+			buildReportsListQuery(individualQueryFilters, {
 				page: individualPage,
 				perPage: REPORTS_PAGE_SIZE,
 				scope: "requests",
 			}),
-		[queryFilters, individualPage],
+		[individualQueryFilters, individualPage],
 	);
 
 	const batchQueryParams = useMemo(
 		() =>
-			buildReportsListQuery(queryFilters, {
+			buildReportsListQuery(batchQueryFilters, {
 				page: batchPage,
 				perPage: REPORTS_PAGE_SIZE,
 				scope: "batches",
 			}),
-		[queryFilters, batchPage],
+		[batchQueryFilters, batchPage],
 	);
 
 	const verificationRequestsQuery = useTenantVerificationRequestsV2Query(
@@ -175,13 +246,33 @@ function ReportsPage() {
 			: verificationBatchesQuery.isFetching &&
 				!verificationBatchesQuery.isPending;
 
-	const handleFiltersChange = useCallback(
+	const handleIndividualFiltersChange = useCallback(
 		(values: ReportsFiltersFormValues) => {
-			setFilters(values);
-			setIndividualPage(1);
-			setBatchPage(1);
+			setIndividualSearchDraft(values.search);
+			updateSearchParams({
+				tab: "individual",
+				verification_type:
+					values.verificationType === "all"
+						? undefined
+						: values.verificationType,
+				status: values.status === "all" ? undefined : values.status,
+				country: values.country === "all" ? undefined : values.country,
+				page: undefined,
+			});
 		},
-		[],
+		[updateSearchParams],
+	);
+
+	const handleBatchFiltersChange = useCallback(
+		(values: ReportsFiltersFormValues) => {
+			setBatchSearchDraft(values.search);
+			updateSearchParams({
+				tab: "batch",
+				status: values.status === "all" ? undefined : values.status,
+				batch_page: undefined,
+			});
+		},
+		[updateSearchParams],
 	);
 
 	async function handleRefresh() {
@@ -232,7 +323,9 @@ function ReportsPage() {
 						className="min-w-0 w-full"
 						value={activeTab}
 						onValueChange={(value) =>
-							setActiveTab(value as "individual" | "batch")
+							updateSearchParams({
+								tab: value as ReportsSearchParams["tab"],
+							})
 						}
 					>
 						<TabsList className="mb-6 w-full justify-start">
@@ -252,13 +345,14 @@ function ReportsPage() {
 						>
 							<ReportsFiltersForm
 								scope="requests"
+								values={individualFilters}
 								verificationTypes={REPORTS_VERIFICATION_TYPES}
 								statuses={REPORTS_VERIFICATION_STATUSES}
 								countries={REPORTS_COUNTRIES}
 								totalCount={individualTotal}
 								filteredCount={individualTotal}
 								disabled={verificationRequestsQuery.isPending}
-								onChange={handleFiltersChange}
+								onChange={handleIndividualFiltersChange}
 							/>
 
 							{verificationRequestsQuery.isPending ? (
@@ -318,7 +412,7 @@ function ReportsPage() {
 										page={individualPage}
 										pageSize={REPORTS_PAGE_SIZE}
 										total={individualTotal}
-										onPageChange={setIndividualPage}
+										onPageChange={(page) => updateSearchParams({ page })}
 									/>
 								</>
 							)}
@@ -327,13 +421,14 @@ function ReportsPage() {
 						<TabsContent value="batch" className="flex min-w-0 flex-col gap-6">
 							<ReportsFiltersForm
 								scope="batches"
+								values={batchFilters}
 								verificationTypes={REPORTS_VERIFICATION_TYPES}
 								statuses={REPORTS_VERIFICATION_STATUSES}
 								countries={REPORTS_COUNTRIES}
 								totalCount={batchTotal}
 								filteredCount={batchTotal}
 								disabled={verificationBatchesQuery.isPending}
-								onChange={handleFiltersChange}
+								onChange={handleBatchFiltersChange}
 							/>
 
 							{verificationBatchesQuery.isPending ? (
@@ -393,7 +488,9 @@ function ReportsPage() {
 										page={batchPage}
 										pageSize={REPORTS_PAGE_SIZE}
 										total={batchTotal}
-										onPageChange={setBatchPage}
+										onPageChange={(page) =>
+											updateSearchParams({ batch_page: page })
+										}
 									/>
 								</>
 							)}
