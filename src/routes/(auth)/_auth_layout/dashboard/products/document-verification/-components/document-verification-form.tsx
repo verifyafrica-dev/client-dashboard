@@ -1,5 +1,4 @@
 import {
-	CloudArrowUpIcon,
 	LinkIcon,
 	MagnifyingGlassIcon,
 	PaperPlaneTiltIcon,
@@ -14,16 +13,6 @@ import type { SupportedCountry } from "#/api/http/v2/tenants/tenants.types";
 import { useAuthStore } from "#/stores/auth-store";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
-import {
-	FileUpload,
-	FileUploadDropzone,
-	FileUploadItem,
-	FileUploadItemDelete,
-	FileUploadItemMetadata,
-	FileUploadItemPreview,
-	FileUploadList,
-	FileUploadTrigger,
-} from "#/components/ui/file-upload";
 import { Input } from "#/components/ui/input";
 import {
 	Select,
@@ -41,6 +30,8 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
+import { ProductProofUpload } from "../../-components/product-proof-upload";
+import { PRODUCT_UPLOAD_FOLDERS } from "../../-upload-utils";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
 	VERIFICATION_MODES,
@@ -85,7 +76,8 @@ const directFormSchema = z.object({
 
 export function DocumentVerificationForm() {
 	const [mode, setMode] = useState<VerificationMode>("link");
-	const [documentFile, setDocumentFile] = useState<File[]>([]);
+	const [documentProofUrl, setDocumentProofUrl] = useState<string | null>(null);
+	const [isDocumentUploading, setIsDocumentUploading] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const user = useAuthStore((state) => state.user);
 	const tenant = user ? getUserTenantMembership(user) : undefined;
@@ -133,7 +125,7 @@ export function DocumentVerificationForm() {
 			onSubmit: directFormSchema,
 		},
 		onSubmit: async () => {
-			if (documentFile.length === 0) {
+			if (!documentProofUrl) {
 				toast.error("Please upload a document");
 				return;
 			}
@@ -148,9 +140,6 @@ export function DocumentVerificationForm() {
 	});
 
 	const activeForm = mode === "link" ? linkForm : directForm;
-	const canSubmit =
-		activeForm.state.canSubmit &&
-		(mode === "direct" ? documentFile.length > 0 : true);
 
 	useEffect(() => {
 		if (mode !== "direct") {
@@ -190,8 +179,15 @@ export function DocumentVerificationForm() {
 							type="single"
 							value={mode}
 							onValueChange={(value) => {
-								if (value) {
-									setMode(value as VerificationMode);
+								if (!value) {
+									return;
+								}
+
+								setMode(value as VerificationMode);
+
+								if (value === "link") {
+									setDocumentProofUrl(null);
+									setIsDocumentUploading(false);
 								}
 							}}
 							variant="outline"
@@ -370,57 +366,15 @@ export function DocumentVerificationForm() {
 								</directForm.Field>
 							</div>
 
-							<Field className="gap-1.5">
-								<FieldLabel htmlFor="document-verification-document">
-									Document
-								</FieldLabel>
-								<FileUpload
-									value={documentFile}
-									onValueChange={setDocumentFile}
-									accept="image/*,.pdf"
-									maxFiles={1}
-									maxSize={10 * 1024 * 1024}
-								>
-									<FileUploadDropzone className="flex min-h-36 flex-col items-center justify-center gap-2 border-dashed py-8">
-										<CloudArrowUpIcon className="size-8 text-secondary" />
-										<p className="text-sm text-muted-foreground">
-											Click to upload a document (image or PDF)
-										</p>
-										<FileUploadTrigger asChild>
-											<Button
-												type="button"
-												variant="link"
-												className="h-auto p-0"
-											>
-												Choose file
-											</Button>
-										</FileUploadTrigger>
-									</FileUploadDropzone>
-									{documentFile.length > 0 && (
-										<FileUploadList>
-											{documentFile.map((file) => (
-												<FileUploadItem
-													key={`${file.name}-${file.lastModified}`}
-													value={file}
-													className="p-2"
-												>
-													<FileUploadItemPreview className="size-8" />
-													<FileUploadItemMetadata size="sm" />
-													<FileUploadItemDelete asChild>
-														<Button
-															type="button"
-															variant="ghost"
-															size="icon-xs"
-														>
-															Remove
-														</Button>
-													</FileUploadItemDelete>
-												</FileUploadItem>
-											))}
-										</FileUploadList>
-									)}
-								</FileUpload>
-							</Field>
+							<ProductProofUpload
+								label="Document"
+								folder={PRODUCT_UPLOAD_FOLDERS.documentVerification}
+								proofUrl={documentProofUrl}
+								onProofUrlChange={setDocumentProofUrl}
+								onUploadingChange={setIsDocumentUploading}
+								emptyStateText="Click to upload a document (image or PDF)"
+								disabled={isSubmitting}
+							/>
 						</FieldGroup>
 					)}
 
@@ -446,14 +400,38 @@ export function DocumentVerificationForm() {
 						</directForm.Field>
 					)}
 
-					<Button
-						type="submit"
-						className="w-full cursor-pointer"
-						disabled={!canSubmit || isSubmitting}
-					>
-						<PaperPlaneTiltIcon className="size-4" />
-						{isSubmitting ? "Submitting..." : "Submit Verification"}
-					</Button>
+					{mode === "link" ? (
+						<linkForm.Subscribe selector={(state) => state.canSubmit}>
+							{(canSubmit) => (
+								<Button
+									type="submit"
+									className="w-full cursor-pointer"
+									disabled={!canSubmit || isSubmitting}
+								>
+									<PaperPlaneTiltIcon className="size-4" />
+									{isSubmitting ? "Submitting..." : "Submit Verification"}
+								</Button>
+							)}
+						</linkForm.Subscribe>
+					) : (
+						<directForm.Subscribe selector={(state) => state.canSubmit}>
+							{(canSubmit) => (
+								<Button
+									type="submit"
+									className="w-full cursor-pointer"
+									disabled={
+										!canSubmit ||
+										!documentProofUrl ||
+										isDocumentUploading ||
+										isSubmitting
+									}
+								>
+									<PaperPlaneTiltIcon className="size-4" />
+									{isSubmitting ? "Submitting..." : "Submit Verification"}
+								</Button>
+							)}
+						</directForm.Subscribe>
+					)}
 				</form>
 			</CardContent>
 		</Card>

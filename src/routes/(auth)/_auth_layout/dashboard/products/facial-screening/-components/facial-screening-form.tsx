@@ -1,5 +1,4 @@
 import {
-	CloudArrowUpIcon,
 	LinkIcon,
 	MagnifyingGlassIcon,
 	PaperPlaneTiltIcon,
@@ -11,16 +10,6 @@ import { z } from "zod";
 
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
-import {
-	FileUpload,
-	FileUploadDropzone,
-	FileUploadItem,
-	FileUploadItemDelete,
-	FileUploadItemMetadata,
-	FileUploadItemPreview,
-	FileUploadList,
-	FileUploadTrigger,
-} from "#/components/ui/file-upload";
 import { Input } from "#/components/ui/input";
 import {
 	Select,
@@ -38,6 +27,11 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
+import { ProductProofUpload } from "../../-components/product-proof-upload";
+import {
+	IMAGE_UPLOAD_MIME_TYPES,
+	PRODUCT_UPLOAD_FOLDERS,
+} from "../../-upload-utils";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
 	VERIFICATION_MODES,
@@ -65,7 +59,7 @@ const directFormSchema = z.object({
 
 export function FacialScreeningForm() {
 	const [mode, setMode] = useState<VerificationMode>("link");
-	const [facePhotoFile, setFacePhotoFile] = useState<File[]>([]);
+	const [facePhotoUrl, setFacePhotoUrl] = useState<string | null>(null);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const linkForm = useForm({
@@ -99,7 +93,7 @@ export function FacialScreeningForm() {
 			onSubmit: directFormSchema,
 		},
 		onSubmit: async () => {
-			if (facePhotoFile.length === 0) {
+			if (!facePhotoUrl) {
 				toast.error("Please upload a face photo");
 				return;
 			}
@@ -116,7 +110,7 @@ export function FacialScreeningForm() {
 	const activeForm = mode === "link" ? linkForm : directForm;
 	const canSubmit =
 		activeForm.state.canSubmit &&
-		(mode === "direct" ? facePhotoFile.length > 0 : true);
+		(mode === "direct" ? Boolean(facePhotoUrl) : true);
 
 	return (
 		<Card>
@@ -292,57 +286,16 @@ export function FacialScreeningForm() {
 								</FieldDescription>
 							</Field>
 
-							<Field className="gap-1.5">
-								<FieldLabel htmlFor="facial-screening-face-photo">
-									Face Photo
-								</FieldLabel>
-								<FileUpload
-									value={facePhotoFile}
-									onValueChange={setFacePhotoFile}
-									accept="image/*"
-									maxFiles={1}
-									maxSize={10 * 1024 * 1024}
-								>
-									<FileUploadDropzone className="flex min-h-36 flex-col items-center justify-center gap-2 border-dashed py-8">
-										<CloudArrowUpIcon className="size-8 text-secondary" />
-										<p className="text-sm text-muted-foreground">
-											Click to upload a face photo
-										</p>
-										<FileUploadTrigger asChild>
-											<Button
-												type="button"
-												variant="link"
-												className="h-auto p-0"
-											>
-												Choose file
-											</Button>
-										</FileUploadTrigger>
-									</FileUploadDropzone>
-									{facePhotoFile.length > 0 && (
-										<FileUploadList>
-											{facePhotoFile.map((file) => (
-												<FileUploadItem
-													key={`${file.name}-${file.lastModified}`}
-													value={file}
-													className="p-2"
-												>
-													<FileUploadItemPreview className="size-8" />
-													<FileUploadItemMetadata size="sm" />
-													<FileUploadItemDelete asChild>
-														<Button
-															type="button"
-															variant="ghost"
-															size="icon-xs"
-														>
-															Remove
-														</Button>
-													</FileUploadItemDelete>
-												</FileUploadItem>
-											))}
-										</FileUploadList>
-									)}
-								</FileUpload>
-							</Field>
+							<ProductProofUpload
+								label="Face Photo"
+								folder={PRODUCT_UPLOAD_FOLDERS.facialScreening}
+								proofUrl={facePhotoUrl}
+								onProofUrlChange={setFacePhotoUrl}
+								accept="image/*"
+								allowedMimeTypes={IMAGE_UPLOAD_MIME_TYPES}
+								emptyStateText="Click to upload a face photo"
+								disabled={isSubmitting}
+							/>
 						</FieldGroup>
 					)}
 

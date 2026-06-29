@@ -1,83 +1,29 @@
 import type { UploadedDocument } from "#/api/http/v1/kyc/kyc.types";
-import { env } from "#/config/env";
-import { isFirebaseConfigured } from "#/lib/firebase";
 import {
-	deleteFileFromFirebase,
-	uploadFileToFirebase,
-} from "#/lib/firebase-storage";
+	deleteUploadedFile,
+	IMAGE_UPLOAD_MIME_TYPES,
+	readFileAsDataUrl,
+	shouldUseFirebaseStorage,
+	UPLOAD_ALLOWED_MIME_TYPES,
+	UPLOAD_MAX_FILE_SIZE,
+	uploadFileToStorage,
+	validateUploadFile,
+} from "#/lib/file-upload-storage";
 
-export const KYC_ALLOWED_MIME_TYPES = [
-	"image/jpeg",
-	"image/png",
-	"image/gif",
-	"application/pdf",
-] as const;
+export const KYC_ALLOWED_MIME_TYPES = UPLOAD_ALLOWED_MIME_TYPES;
+export const KYC_SIGNATURE_MIME_TYPES = IMAGE_UPLOAD_MIME_TYPES;
+export const KYC_MAX_FILE_SIZE = UPLOAD_MAX_FILE_SIZE;
 
-export const KYC_SIGNATURE_MIME_TYPES = [
-	"image/jpeg",
-	"image/png",
-	"image/gif",
-] as const;
-
-export const KYC_MAX_FILE_SIZE = 10 * 1024 * 1024;
+export {
+	readFileAsDataUrl,
+	shouldUseFirebaseStorage,
+};
 
 export function validateKycFile(
 	file: File,
 	allowedTypes: readonly string[] = KYC_ALLOWED_MIME_TYPES,
 ) {
-	if (file.size > KYC_MAX_FILE_SIZE) {
-		return {
-			valid: false as const,
-			error: "File size exceeds 10MB",
-		};
-	}
-
-	if (!allowedTypes.includes(file.type)) {
-		return {
-			valid: false as const,
-			error: "File type is not allowed",
-		};
-	}
-
-	return { valid: true as const };
-}
-
-export function shouldUseFirebaseStorage() {
-	if (!isFirebaseConfigured()) {
-		return false;
-	}
-
-	if (env.isProduction) {
-		return true;
-	}
-
-	const useFirebaseInDev = import.meta.env.VITE_USE_FIREBASE_STORAGE;
-	return useFirebaseInDev === "true" || useFirebaseInDev === true;
-}
-
-export function readFileAsDataUrl(
-	file: File,
-	onProgress?: (progress: number) => void,
-) {
-	return new Promise<string>((resolve, reject) => {
-		const reader = new FileReader();
-
-		reader.onprogress = (event) => {
-			if (!onProgress || !event.lengthComputable) {
-				return;
-			}
-
-			onProgress(
-				Math.min(100, (event.loaded / event.total) * 100),
-			);
-		};
-
-		reader.onload = () => {
-			resolve(String(reader.result ?? ""));
-		};
-		reader.onerror = () => reject(new Error("Failed to read file"));
-		reader.readAsDataURL(file);
-	});
+	return validateUploadFile(file, allowedTypes);
 }
 
 export function createUploadedDocument({
@@ -119,42 +65,23 @@ export async function uploadKycFileToStorage({
 	author?: string;
 	onProgress?: (progress: number) => void;
 }) {
-	if (!shouldUseFirebaseStorage()) {
-		const dataUrl = await readFileAsDataUrl(file, onProgress);
-
-		return createUploadedDocument({
-			file,
-			url: dataUrl,
-			folder,
-			author,
-		});
-	}
-
-	const uploadResult = await uploadFileToFirebase(file, {
+	const uploadedFile = await uploadFileToStorage({
+		file,
 		folder,
-		metadata: {
-			customMetadata: {
-				...(author ? { author } : {}),
-			},
-		},
 		onProgress,
 	});
 
 	return createUploadedDocument({
 		file,
-		url: uploadResult.url,
+		url: uploadedFile.url,
 		folder,
 		author,
-		storagePath: uploadResult.path,
+		storagePath: uploadedFile.storagePath,
 	});
 }
 
 export async function deleteKycFileFromStorage(storagePath: string) {
-	if (!shouldUseFirebaseStorage()) {
-		return;
-	}
-
-	await deleteFileFromFirebase(storagePath);
+	await deleteUploadedFile(storagePath);
 }
 
 export function isDataUrlSignature(value: string) {

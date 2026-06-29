@@ -1,5 +1,4 @@
 import {
-	CloudArrowUpIcon,
 	LinkIcon,
 	MagnifyingGlassIcon,
 	PaperPlaneTiltIcon,
@@ -13,16 +12,6 @@ import { useSupportedCountriesQuery } from "#/api/http/v1/tenants/tenants.hooks"
 import type { SupportedCountry } from "#/api/http/v1/tenants/tenants.types";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
-import {
-	FileUpload,
-	FileUploadDropzone,
-	FileUploadItem,
-	FileUploadItemDelete,
-	FileUploadItemMetadata,
-	FileUploadItemPreview,
-	FileUploadList,
-	FileUploadTrigger,
-} from "#/components/ui/file-upload";
 import { Input } from "#/components/ui/input";
 import {
 	Select,
@@ -41,6 +30,8 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
+import { ProductProofUpload } from "../../-components/product-proof-upload";
+import { PRODUCT_UPLOAD_FOLDERS } from "../../-upload-utils";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
 	VERIFICATION_MODES,
@@ -66,7 +57,9 @@ const directFormSchema = z.object({
 
 export function AddressVerificationForm() {
 	const [mode, setMode] = useState<VerificationMode>("link");
-	const [proofOfAddressFile, setProofOfAddressFile] = useState<File[]>([]);
+	const [proofOfAddressUrl, setProofOfAddressUrl] = useState<string | null>(
+		null,
+	);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const countriesQuery = useSupportedCountriesQuery();
 
@@ -109,7 +102,7 @@ export function AddressVerificationForm() {
 			onSubmit: directFormSchema,
 		},
 		onSubmit: async () => {
-			if (proofOfAddressFile.length === 0) {
+			if (!proofOfAddressUrl) {
 				toast.error("Please upload a proof-of-address document");
 				return;
 			}
@@ -126,7 +119,7 @@ export function AddressVerificationForm() {
 	const activeForm = mode === "link" ? linkForm : directForm;
 	const canSubmit =
 		activeForm.state.canSubmit &&
-		(mode === "direct" ? proofOfAddressFile.length > 0 : true);
+		(mode === "direct" ? Boolean(proofOfAddressUrl) : true);
 
 	return (
 		<Card>
@@ -360,57 +353,14 @@ export function AddressVerificationForm() {
 								</directForm.Field>
 							</FieldGroup>
 
-							<Field className="gap-1.5">
-								<FieldLabel htmlFor="address-verification-proof">
-									Proof of Address
-								</FieldLabel>
-								<FileUpload
-									value={proofOfAddressFile}
-									onValueChange={setProofOfAddressFile}
-									accept="image/*,.pdf"
-									maxFiles={1}
-									maxSize={10 * 1024 * 1024}
-								>
-									<FileUploadDropzone className="flex min-h-36 flex-col items-center justify-center gap-2 border-dashed py-8">
-										<CloudArrowUpIcon className="size-8 text-secondary" />
-										<p className="text-sm text-muted-foreground">
-											Click to upload proof-of-address document (image or PDF)
-										</p>
-										<FileUploadTrigger asChild>
-											<Button
-												type="button"
-												variant="link"
-												className="h-auto p-0"
-											>
-												Choose file
-											</Button>
-										</FileUploadTrigger>
-									</FileUploadDropzone>
-									{proofOfAddressFile.length > 0 && (
-										<FileUploadList>
-											{proofOfAddressFile.map((file) => (
-												<FileUploadItem
-													key={`${file.name}-${file.lastModified}`}
-													value={file}
-													className="p-2"
-												>
-													<FileUploadItemPreview className="size-8" />
-													<FileUploadItemMetadata size="sm" />
-													<FileUploadItemDelete asChild>
-														<Button
-															type="button"
-															variant="ghost"
-															size="icon-xs"
-														>
-															Remove
-														</Button>
-													</FileUploadItemDelete>
-												</FileUploadItem>
-											))}
-										</FileUploadList>
-									)}
-								</FileUpload>
-							</Field>
+							<ProductProofUpload
+								label="Proof of Address"
+								folder={PRODUCT_UPLOAD_FOLDERS.addressVerification}
+								proofUrl={proofOfAddressUrl}
+								onProofUrlChange={setProofOfAddressUrl}
+								emptyStateText="Click to upload proof-of-address document (image or PDF)"
+								disabled={isSubmitting}
+							/>
 						</>
 					)}
 

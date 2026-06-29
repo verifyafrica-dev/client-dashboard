@@ -1,5 +1,4 @@
 import {
-	CloudArrowUpIcon,
 	GlobeHemisphereWestIcon,
 	PaperPlaneTiltIcon,
 } from "@phosphor-icons/react";
@@ -14,16 +13,6 @@ import type { SupportedCountry } from "#/api/http/v1/tenants/tenants.types";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Checkbox } from "#/components/ui/checkbox";
-import {
-	FileUpload,
-	FileUploadDropzone,
-	FileUploadItem,
-	FileUploadItemDelete,
-	FileUploadItemMetadata,
-	FileUploadItemPreview,
-	FileUploadList,
-	FileUploadTrigger,
-} from "#/components/ui/file-upload";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
 import {
@@ -42,6 +31,11 @@ import {
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
 import { verificationConsentSchema } from "../../../-components/VerificationConsentCheckbox/data";
+import { ProductProofUpload } from "../../-components/product-proof-upload";
+import {
+	IMAGE_UPLOAD_MIME_TYPES,
+	PRODUCT_UPLOAD_FOLDERS,
+} from "../../-upload-utils";
 import { getUserTenantMembership } from "../../../team/-data";
 import { KycDatePicker } from "../../../kyc/-components/kyc-form-primitives";
 import {
@@ -144,7 +138,7 @@ const defaultValues = {
 
 export function GovernmentRegistryChecksForm() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const [selfieFiles, setSelfieFiles] = useState<File[]>([]);
+	const [selfieProofUrl, setSelfieProofUrl] = useState<string | null>(null);
 	const [country, setCountry] = useState("");
 	const [verificationType, setVerificationType] = useState("");
 	const [includeValidation, setIncludeValidation] = useState(false);
@@ -184,7 +178,7 @@ export function GovernmentRegistryChecksForm() {
 			onSubmit: governmentRegistryChecksFormSchema,
 		},
 		onSubmit: async () => {
-			if (includeSelfie && selfieFiles.length === 0) {
+			if (includeSelfie && !selfieProofUrl) {
 				toast.error("Selfie image is required for facial matching");
 				return;
 			}
@@ -209,7 +203,7 @@ export function GovernmentRegistryChecksForm() {
 		form.setFieldValue("consent", false);
 		setIncludeValidation(false);
 		setIncludeSelfie(false);
-		setSelfieFiles([]);
+		setSelfieProofUrl(null);
 	};
 
 	const handleReset = () => {
@@ -218,12 +212,12 @@ export function GovernmentRegistryChecksForm() {
 		setVerificationType("");
 		setIncludeValidation(false);
 		setIncludeSelfie(false);
-		setSelfieFiles([]);
+		setSelfieProofUrl(null);
 	};
 
 	const canSubmit =
 		form.state.canSubmit &&
-		(!includeSelfie || selfieFiles.length > 0) &&
+		(!includeSelfie || Boolean(selfieProofUrl)) &&
 		showFullForm;
 
 	return (
@@ -491,7 +485,7 @@ export function GovernmentRegistryChecksForm() {
 											setIncludeSelfie(isChecked);
 
 											if (!isChecked) {
-												setSelfieFiles([]);
+												setSelfieProofUrl(null);
 											}
 										}}
 										disabled={isSubmitting}
@@ -514,47 +508,16 @@ export function GovernmentRegistryChecksForm() {
 					) : null}
 
 					{showFullForm && includeSelfie ? (
-						<Field className="gap-1.5">
-							<FieldLabel>Selfie Image</FieldLabel>
-							<FileUpload
-								value={selfieFiles}
-								onValueChange={setSelfieFiles}
-								accept="image/*"
-								maxFiles={1}
-								maxSize={10 * 1024 * 1024}
-							>
-								<FileUploadDropzone className="flex min-h-36 flex-col items-center justify-center gap-2 border-dashed py-8">
-									<CloudArrowUpIcon className="size-8 text-secondary" />
-									<p className="text-sm text-muted-foreground">
-										Click to upload a selfie image
-									</p>
-									<FileUploadTrigger asChild>
-										<Button type="button" variant="link" className="h-auto p-0">
-											Choose file
-										</Button>
-									</FileUploadTrigger>
-								</FileUploadDropzone>
-								{selfieFiles.length > 0 ? (
-									<FileUploadList>
-										{selfieFiles.map((file) => (
-											<FileUploadItem
-												key={`${file.name}-${file.lastModified}`}
-												value={file}
-												className="p-2"
-											>
-												<FileUploadItemPreview className="size-8" />
-												<FileUploadItemMetadata size="sm" />
-												<FileUploadItemDelete asChild>
-													<Button type="button" variant="ghost" size="icon-xs">
-														Remove
-													</Button>
-												</FileUploadItemDelete>
-											</FileUploadItem>
-										))}
-									</FileUploadList>
-								) : null}
-							</FileUpload>
-						</Field>
+						<ProductProofUpload
+							label="Selfie Image"
+							folder={PRODUCT_UPLOAD_FOLDERS.governmentRegistryChecks}
+							proofUrl={selfieProofUrl}
+							onProofUrlChange={setSelfieProofUrl}
+							accept="image/*"
+							allowedMimeTypes={IMAGE_UPLOAD_MIME_TYPES}
+							emptyStateText="Click to upload a selfie image"
+							disabled={isSubmitting}
+						/>
 					) : null}
 
 					{showFullForm ? (
