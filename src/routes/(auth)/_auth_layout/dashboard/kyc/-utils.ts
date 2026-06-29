@@ -163,21 +163,21 @@ export function getNextIncompleteSectionPath(
 }
 
 export function getKycDisplayStatus({
-	isKycApproved,
-	kycStatus,
+	kyc_verified,
+	kyc_status,
 }: {
-	isKycApproved: boolean;
-	kycStatus: KycStatus;
+	kyc_verified: boolean;
+	kyc_status: KycStatus;
 }) {
-	if (isKycApproved || kycStatus === "verified") {
+	if (kyc_verified || kyc_status === "verified") {
 		return "approved" as const;
 	}
 
-	if (kycStatus === "rejected") {
+	if (kyc_status === "rejected") {
 		return "rejected" as const;
 	}
 
-	if (kycStatus === "submitted") {
+	if (kyc_status === "submitted") {
 		return "submitted" as const;
 	}
 

@@ -20,18 +20,12 @@ import {
 import { useKyc } from "./kyc-provider";
 
 export function KycSubmitPanel() {
-	const {
-		tenantId,
-		allSectionsCompleted,
-		isKycApproved,
-		kycStatus,
-		kycLastSubmissionDate,
-	} = useKyc();
+	const { tenantId, allSectionsCompleted, kyc } = useKyc();
 	const [submitSuccess, setSubmitSuccess] = useState(false);
 	const submitMutation = useSubmitKycForReviewMutation(tenantId ?? "");
-	const isKycSubmitted = kycStatus === "submitted";
+	const isKycSubmitted = kyc.kyc_status === "submitted";
 
-	if (isKycApproved) {
+	if (kyc.kyc_verified) {
 		return (
 			<Alert className="border-emerald-200 bg-emerald-50 text-emerald-950">
 				<CheckCircleIcon className="size-4 text-emerald-600" weight="fill" />
@@ -54,10 +48,10 @@ export function KycSubmitPanel() {
 						Your KYC application has been submitted and is currently under
 						review by our compliance team.
 					</p>
-					{kycLastSubmissionDate && (
+					{kyc.kyc_last_submission_date && (
 						<p className="text-xs text-amber-700">
 							Submitted on:{" "}
-							{new Date(kycLastSubmissionDate).toLocaleString("en-US", {
+							{new Date(kyc.kyc_last_submission_date).toLocaleString("en-US", {
 								year: "numeric",
 								month: "long",
 								day: "numeric",
@@ -122,24 +116,24 @@ export function KycSubmitPanel() {
 
 export function KycRejectedAlert({
 	show,
-	rejectedAt,
-	generalRejectedReason,
-	sectionRejectedReason,
+	rejected_at,
+	general_rejected_reason,
+	section_rejected_reason,
 }: {
 	show: boolean;
-	rejectedAt?: string | null;
-	generalRejectedReason?: string | null;
-	sectionRejectedReason?: SectionRejectedReason;
+	rejected_at?: string | null;
+	general_rejected_reason?: string | null;
+	section_rejected_reason?: SectionRejectedReason;
 }) {
 	if (!show) {
 		return null;
 	}
 
-	const generalReasons = parseRejectedReasons(generalRejectedReason);
-	const sectionReasons = sectionRejectedReason
-		? getSectionRejectionEntries(sectionRejectedReason)
+	const generalReasons = parseRejectedReasons(general_rejected_reason);
+	const sectionReasons = section_rejected_reason
+		? getSectionRejectionEntries(section_rejected_reason)
 		: [];
-	const formattedRejectedAt = formatRejectedAt(rejectedAt);
+	const formattedRejectedAt = formatRejectedAt(rejected_at);
 
 	return (
 		<Alert variant="destructive">

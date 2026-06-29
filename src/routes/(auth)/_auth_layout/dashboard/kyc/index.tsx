@@ -8,11 +8,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { z } from "zod";
 
 import { useKycTenantQuery } from "#/api/http/v1/kyc/kyc.hooks";
-import type { KYBApplication } from "#/api/http/v1/kyc/kyc.types";
-import type {
-	KycStatus,
-	SectionRejectedReason,
-} from "#/api/http/v2/tenants/tenants.types";
+import { normalizeComplianceData } from "#/api/http/v1/kyc/kyc.types";
+import type { TenantDetail } from "#/api/http/v2/tenants/tenants.types";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
@@ -95,24 +92,15 @@ function KycStatusBadge({ status }: { status: keyof typeof STATUS_BADGE }) {
 
 function KycPageInner({
 	activeSection,
-	kycData,
-	isKycApproved,
-	kycStatus,
-	rejectedAt,
-	generalRejectedReason,
-	sectionRejectedReason,
+	tenant,
 }: {
 	activeSection?: (typeof sections)[number];
-	kycData: KYBApplication;
-	isKycApproved: boolean;
-	kycStatus: KycStatus;
-	rejectedAt?: string | null;
-	generalRejectedReason?: string | null;
-	sectionRejectedReason?: SectionRejectedReason;
+	tenant: TenantDetail;
 }) {
+	const kycData = normalizeComplianceData(tenant.compliance_data);
 	const status = getKycDisplayStatus({
-		isKycApproved,
-		kycStatus,
+		kyc_verified: tenant.kyc.kyc_verified,
+		kyc_status: tenant.kyc.kyc_status,
 	});
 
 	const overallProgress = Object.values(getKycCompletionStatus(kycData)).filter(
@@ -123,9 +111,9 @@ function KycPageInner({
 		<div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
 			<KycRejectedAlert
 				show={status === "rejected"}
-				rejectedAt={rejectedAt}
-				generalRejectedReason={generalRejectedReason}
-				sectionRejectedReason={sectionRejectedReason}
+				rejected_at={tenant.kyc.kyc_rejected_at}
+				general_rejected_reason={tenant.general_rejected_reason}
+				section_rejected_reason={tenant.section_rejected_reason}
 			/>
 
 			{activeSection ? (
@@ -203,24 +191,15 @@ function KycPage() {
 		);
 	}
 
+	const tenant = kycQuery.data;
+
 	return (
 		<KycProvider
 			tenantId={tenantId}
-			kycData={kycQuery.data.kycData}
-			isKycApproved={kycQuery.data.isKycApproved}
-			kycStatus={kycQuery.data.kycStatus}
-			kycLastSubmissionDate={kycQuery.data.kycLastSubmissionDate}
+			tenant={tenant}
 			onNavigateToSection={navigateToSection}
 		>
-			<KycPageInner
-				activeSection={activeSection}
-				kycData={kycQuery.data.kycData}
-				isKycApproved={kycQuery.data.isKycApproved}
-				kycStatus={kycQuery.data.kycStatus}
-				rejectedAt={kycQuery.data.rejectedAt}
-				generalRejectedReason={kycQuery.data.generalRejectedReason}
-				sectionRejectedReason={kycQuery.data.sectionRejectedReason}
-			/>
+			<KycPageInner activeSection={activeSection} tenant={tenant} />
 		</KycProvider>
 	);
 }

@@ -10,12 +10,16 @@ import { toast } from "sonner";
 import {
 	useSaveKycSectionMutation,
 } from "#/api/http/v1/kyc/kyc.hooks";
-import type { KYBApplication } from "#/api/http/v1/kyc/kyc.types";
+import {
+	normalizeComplianceData,
+	type KYBApplication,
+} from "#/api/http/v1/kyc/kyc.types";
 import type {
 	KycComplianceSection,
 	KycSectionUpdatePayload,
+	KycSummary,
+	TenantDetail,
 } from "#/api/http/v2/tenants/tenants.types";
-import type { KycStatus } from "#/api/http/v2/tenants/tenants.types";
 import { getUserTenantMembership } from "../../team/-data";
 import { useAuthStore } from "#/stores/auth-store";
 import type { KycSectionPath } from "../-data";
@@ -30,9 +34,7 @@ import {
 type KycContextValue = {
 	tenantId: string;
 	kycData: KYBApplication;
-	isKycApproved: boolean;
-	kycStatus: KycStatus;
-	kycLastSubmissionDate: string | null;
+	kyc: KycSummary;
 	isReadOnly: boolean;
 	isSaving: boolean;
 	completionStatus: KycCompletionStatus;
@@ -50,25 +52,24 @@ const KycContext = createContext<KycContextValue | null>(null);
 export function KycProvider({
 	children,
 	tenantId,
-	kycData,
-	isKycApproved,
-	kycStatus,
-	kycLastSubmissionDate,
+	tenant,
 	onNavigateToSection,
 }: {
 	children: ReactNode;
 	tenantId: string;
-	kycData: KYBApplication;
-	isKycApproved: boolean;
-	kycStatus: KycStatus;
-	kycLastSubmissionDate: string | null;
+	tenant: TenantDetail;
 	onNavigateToSection: (path: KycSectionPath | null) => void;
 }) {
 	const saveMutation = useSaveKycSectionMutation(tenantId);
+	const kyc = tenant.kyc;
+	const kycData = useMemo(
+		() => normalizeComplianceData(tenant.compliance_data),
+		[tenant.compliance_data],
+	);
 	const isReadOnly =
-		isKycApproved ||
-		kycStatus === "submitted" ||
-		kycStatus === "verified";
+		kyc.kyc_verified ||
+		kyc.kyc_status === "submitted" ||
+		kyc.kyc_status === "verified";
 
 	const completionStatus = useMemo(
 		() => getKycCompletionStatus(kycData),
@@ -118,9 +119,7 @@ export function KycProvider({
 		() => ({
 			tenantId,
 			kycData,
-			isKycApproved,
-			kycStatus,
-			kycLastSubmissionDate,
+			kyc,
 			isReadOnly,
 			isSaving: saveMutation.isPending,
 			completionStatus,
@@ -131,9 +130,7 @@ export function KycProvider({
 		[
 			tenantId,
 			kycData,
-			isKycApproved,
-			kycStatus,
-			kycLastSubmissionDate,
+			kyc,
 			isReadOnly,
 			saveMutation.isPending,
 			completionStatus,
