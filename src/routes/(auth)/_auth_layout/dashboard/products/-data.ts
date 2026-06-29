@@ -6,6 +6,7 @@ import {
 	FileTextIcon,
 	MapPinIcon,
 	ShieldCheckIcon,
+	StackIcon,
 	UserFocusIcon,
 	WalletIcon,
 	type IconWeight,
@@ -15,6 +16,7 @@ import type { ComponentType } from "react";
 export const PRODUCT_ICON_WEIGHT = "duotone" as const satisfies IconWeight;
 
 export type ProductSlug =
+	| "mixed-verifications"
 	| "document-verification"
 	| "address-verification"
 	| "facial-screening"
@@ -34,6 +36,14 @@ export type Product = {
 };
 
 export const PRODUCTS: Product[] = [
+	{
+		slug: "mixed-verifications",
+		title: "Mixed Verifications",
+		description:
+			"Launch predefined verification journeys that bundle multiple checks into a single hosted verification flow.",
+		icon: StackIcon,
+		iconWeight: PRODUCT_ICON_WEIGHT,
+	},
 	{
 		slug: "document-verification",
 		title: "Document Verification",

@@ -29,6 +29,7 @@ import { Route as authAuth_layoutDashboardApikeysIndexRouteImport } from './rout
 import { Route as authAuth_layoutDashboardTeamInvitationsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/invitations/index'
 import { Route as authAuth_layoutDashboardTeamActiveUsersIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/active-users/index'
 import { Route as authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/risk-assessment/index'
+import { Route as authAuth_layoutDashboardProductsMixedVerificationsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/mixed-verifications/index'
 import { Route as authAuth_layoutDashboardProductsKybIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/kyb/index'
 import { Route as authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/government-registry-checks/index'
 import { Route as authAuth_layoutDashboardProductsFacialScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/facial-screening/index'
@@ -154,6 +155,12 @@ const authAuth_layoutDashboardProductsRiskAssessmentIndexRoute =
     path: '/dashboard/products/risk-assessment/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
+const authAuth_layoutDashboardProductsMixedVerificationsIndexRoute =
+  authAuth_layoutDashboardProductsMixedVerificationsIndexRouteImport.update({
+    id: '/dashboard/products/mixed-verifications/',
+    path: '/dashboard/products/mixed-verifications/',
+    getParentRoute: () => authAuth_layoutRoute,
+  } as any)
 const authAuth_layoutDashboardProductsKybIndexRoute =
   authAuth_layoutDashboardProductsKybIndexRouteImport.update({
     id: '/dashboard/products/kyb/',
@@ -229,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/products/facial-screening/': typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
   '/dashboard/products/government-registry-checks/': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
   '/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
+  '/dashboard/products/mixed-verifications/': typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
   '/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
   '/dashboard/team/active-users/': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
   '/dashboard/team/invitations/': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
@@ -257,6 +265,7 @@ export interface FileRoutesByTo {
   '/dashboard/products/facial-screening': typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
   '/dashboard/products/government-registry-checks': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
   '/dashboard/products/kyb': typeof authAuth_layoutDashboardProductsKybIndexRoute
+  '/dashboard/products/mixed-verifications': typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
   '/dashboard/products/risk-assessment': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
   '/dashboard/team/active-users': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
   '/dashboard/team/invitations': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
@@ -288,6 +297,7 @@ export interface FileRoutesById {
   '/(auth)/_auth_layout/dashboard/products/facial-screening/': typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
   '/(auth)/_auth_layout/dashboard/products/government-registry-checks/': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
   '/(auth)/_auth_layout/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
+  '/(auth)/_auth_layout/dashboard/products/mixed-verifications/': typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
   '/(auth)/_auth_layout/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
   '/(auth)/_auth_layout/dashboard/team/active-users/': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
   '/(auth)/_auth_layout/dashboard/team/invitations/': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/dashboard/products/facial-screening/'
     | '/dashboard/products/government-registry-checks/'
     | '/dashboard/products/kyb/'
+    | '/dashboard/products/mixed-verifications/'
     | '/dashboard/products/risk-assessment/'
     | '/dashboard/team/active-users/'
     | '/dashboard/team/invitations/'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/dashboard/products/facial-screening'
     | '/dashboard/products/government-registry-checks'
     | '/dashboard/products/kyb'
+    | '/dashboard/products/mixed-verifications'
     | '/dashboard/products/risk-assessment'
     | '/dashboard/team/active-users'
     | '/dashboard/team/invitations'
@@ -376,6 +388,7 @@ export interface FileRouteTypes {
     | '/(auth)/_auth_layout/dashboard/products/facial-screening/'
     | '/(auth)/_auth_layout/dashboard/products/government-registry-checks/'
     | '/(auth)/_auth_layout/dashboard/products/kyb/'
+    | '/(auth)/_auth_layout/dashboard/products/mixed-verifications/'
     | '/(auth)/_auth_layout/dashboard/products/risk-assessment/'
     | '/(auth)/_auth_layout/dashboard/team/active-users/'
     | '/(auth)/_auth_layout/dashboard/team/invitations/'
@@ -529,6 +542,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
+    '/(auth)/_auth_layout/dashboard/products/mixed-verifications/': {
+      id: '/(auth)/_auth_layout/dashboard/products/mixed-verifications/'
+      path: '/dashboard/products/mixed-verifications'
+      fullPath: '/dashboard/products/mixed-verifications/'
+      preLoaderRoute: typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
+    }
     '/(auth)/_auth_layout/dashboard/products/kyb/': {
       id: '/(auth)/_auth_layout/dashboard/products/kyb/'
       path: '/dashboard/products/kyb'
@@ -605,6 +625,7 @@ interface authAuth_layoutRouteChildren {
   authAuth_layoutDashboardProductsFacialScreeningIndexRoute: typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
   authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute: typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
   authAuth_layoutDashboardProductsKybIndexRoute: typeof authAuth_layoutDashboardProductsKybIndexRoute
+  authAuth_layoutDashboardProductsMixedVerificationsIndexRoute: typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
   authAuth_layoutDashboardProductsRiskAssessmentIndexRoute: typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
   authAuth_layoutDashboardTeamActiveUsersIndexRoute: typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
   authAuth_layoutDashboardTeamInvitationsIndexRoute: typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
@@ -641,6 +662,8 @@ const authAuth_layoutRouteChildren: authAuth_layoutRouteChildren = {
     authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute,
   authAuth_layoutDashboardProductsKybIndexRoute:
     authAuth_layoutDashboardProductsKybIndexRoute,
+  authAuth_layoutDashboardProductsMixedVerificationsIndexRoute:
+    authAuth_layoutDashboardProductsMixedVerificationsIndexRoute,
   authAuth_layoutDashboardProductsRiskAssessmentIndexRoute:
     authAuth_layoutDashboardProductsRiskAssessmentIndexRoute,
   authAuth_layoutDashboardTeamActiveUsersIndexRoute:

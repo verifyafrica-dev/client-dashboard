@@ -1,13 +1,24 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTenantMixedVerificationsV2Query } from "#/api/http/v2/verifications/verifications.hooks";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
+import { useCurrentTenant } from "../team/-data";
 import { PRODUCTS } from "./-data";
+import { MIXED_VERIFICATIONS_LIST_PARAMS } from "./mixed-verifications/-data";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/products/")({
 	component: ProductsPage,
 });
 
 function ProductsPage() {
+	const { tenantId } = useCurrentTenant();
+
+	useTenantMixedVerificationsV2Query(
+		tenantId,
+		MIXED_VERIFICATIONS_LIST_PARAMS,
+		Boolean(tenantId),
+	);
+
 	return (
 		<div className="flex flex-col gap-6">
 			<div className="flex flex-col gap-1">

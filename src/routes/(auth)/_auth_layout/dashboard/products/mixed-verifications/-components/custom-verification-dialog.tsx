@@ -1,0 +1,273 @@
+import { useForm } from "@tanstack/react-form";
+import { useEffect } from "react";
+import { toast } from "sonner";
+
+import {
+	useCreateMixedVerificationV2Mutation,
+	useUpdateMixedVerificationV2Mutation,
+} from "#/api/http/v2/verifications/verifications.hooks";
+import type { MixedVerification } from "#/api/http/v2/verifications/verifications.types";
+import { Button } from "#/components/ui/button";
+import { Checkbox } from "#/components/ui/checkbox";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from "#/components/ui/dialog";
+import { Input } from "#/components/ui/input";
+import { Label } from "#/components/ui/label";
+import { Switch } from "#/components/ui/switch";
+import { Textarea } from "#/components/ui/textarea";
+import { cn } from "#/lib/utils.ts";
+import {
+	Field,
+	FieldError,
+	FieldGroup,
+	FieldLabel,
+} from "@/components/ui/field";
+import {
+	CUSTOM_MIXED_VERIFICATION_TYPE_OPTIONS,
+	CustomVerificationFormSchema,
+	formatVerificationTypeLabel,
+	getCustomVerificationFormValues,
+} from "../-data";
+
+const verificationTypePillClassName = cn(
+	"inline-flex cursor-pointer items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors",
+	"border-border bg-muted/30 text-muted-foreground hover:bg-muted/50",
+	"has-[[data-state=checked]]:border-primary has-[[data-state=checked]]:bg-primary/10 has-[[data-state=checked]]:text-primary",
+);
+
+type CustomVerificationDialogProps = {
+	open: boolean;
+	onOpenChange: (open: boolean) => void;
+	tenantId: string;
+	template?: MixedVerification | null;
+};
+
+export function CustomVerificationDialog({
+	open,
+	onOpenChange,
+	tenantId,
+	template,
+}: CustomVerificationDialogProps) {
+	const createMutation = useCreateMixedVerificationV2Mutation();
+	const updateMutation = useUpdateMixedVerificationV2Mutation();
+	const isEditing = Boolean(template);
+
+	const form = useForm({
+		defaultValues: getCustomVerificationFormValues(template),
+		validators: {
+			onSubmit: CustomVerificationFormSchema,
+		},
+		onSubmit: async ({ value }) => {
+			const payload = {
+				name: value.name.trim(),
+				description: value.description.trim(),
+				verifications: value.verifications,
+				is_active: value.is_active,
+				is_custom: true,
+				is_test: false,
+			};
+
+			try {
+				if (isEditing && template) {
+					await updateMutation.mutateAsync({
+						id: template.id,
+						payload,
+						tenantId,
+					});
+					toast.success("Custom verification updated.");
+				} else {
+					await createMutation.mutateAsync({
+						payload,
+						tenantId,
+					});
+					toast.success("Custom verification created.");
+				}
+
+				onOpenChange(false);
+			} catch {
+				toast.error("Failed to save custom verification.");
+			}
+		},
+	});
+
+	useEffect(() => {
+		if (!open) {
+			return;
+		}
+
+		form.reset(getCustomVerificationFormValues(template));
+	}, [open, template, form]);
+
+	const isSaving = createMutation.isPending || updateMutation.isPending;
+
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			<DialogContent className="sm:max-w-lg">
+				<DialogHeader>
+					<DialogTitle className="font-semibold">
+						{isEditing
+							? "Edit Custom Verification"
+							: "Create Custom Verification"}
+					</DialogTitle>
+					<DialogDescription>
+						Build a tenant-specific mixed verification template from supported
+						check types.
+					</DialogDescription>
+				</DialogHeader>
+
+				<form
+					className="flex flex-col gap-4"
+					onSubmit={(event) => {
+						event.preventDefault();
+						form.handleSubmit();
+					}}
+				>
+					<FieldGroup className="flex flex-col gap-4">
+						<form.Field name="name">
+							{(field) => (
+								<Field
+									className="gap-1.5"
+									data-invalid={field.state.meta.errors.length > 0}
+								>
+									<FieldLabel htmlFor="custom-verification-name">
+										Name
+									</FieldLabel>
+									<Input
+										id="custom-verification-name"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(event) =>
+											field.handleChange(event.target.value)
+										}
+										placeholder="Name"
+										disabled={isSaving}
+										aria-invalid={field.state.meta.errors.length > 0}
+									/>
+									<FieldError errors={field.state.meta.errors} />
+								</Field>
+							)}
+						</form.Field>
+
+						<form.Field name="description">
+							{(field) => (
+								<Field className="gap-1.5">
+									<FieldLabel htmlFor="custom-verification-description">
+										Description
+									</FieldLabel>
+									<Textarea
+										id="custom-verification-description"
+										value={field.state.value}
+										onBlur={field.handleBlur}
+										onChange={(event) =>
+											field.handleChange(event.target.value)
+										}
+										placeholder="Description"
+										rows={3}
+										disabled={isSaving}
+									/>
+								</Field>
+							)}
+						</form.Field>
+
+						<form.Field name="verifications">
+							{(field) => (
+								<Field
+									className="gap-3"
+									data-invalid={field.state.meta.errors.length > 0}
+								>
+									<div>
+										<p className="text-sm font-medium">
+											Included Verification Types
+										</p>
+										<p className="mt-1 text-xs text-muted-foreground">
+											Selecting Address Verification will require a full address
+											when this template is started.
+										</p>
+									</div>
+
+									<div className="flex flex-wrap gap-2">
+										{CUSTOM_MIXED_VERIFICATION_TYPE_OPTIONS.map((type) => (
+											<label
+												key={type}
+												htmlFor={`custom-verification-type-${type}`}
+												className={verificationTypePillClassName}
+											>
+												<Checkbox
+													id={`custom-verification-type-${type}`}
+													checked={field.state.value.includes(type)}
+													onCheckedChange={(checked) => {
+														const current = field.state.value;
+
+														field.handleChange(
+															checked === true
+																? current.includes(type)
+																	? current
+																	: [...current, type]
+																: current.filter(
+																		(item) => item !== type,
+																	),
+														);
+													}}
+													disabled={isSaving}
+													className="sr-only size-3.5"
+													hidden
+												/>
+												<span>{formatVerificationTypeLabel(type)}</span>
+											</label>
+										))}
+									</div>
+									<FieldError errors={field.state.meta.errors} />
+								</Field>
+							)}
+						</form.Field>
+
+						<form.Field name="is_active">
+							{(field) => (
+								<Field className="gap-1.5">
+									<div className="flex items-center gap-3">
+										<Switch
+											id="custom-verification-active"
+											checked={field.state.value}
+											onCheckedChange={(checked) =>
+												field.handleChange(checked === true)
+											}
+											disabled={isSaving}
+										/>
+										<Label htmlFor="custom-verification-active">
+											Template is active
+										</Label>
+									</div>
+								</Field>
+							)}
+						</form.Field>
+					</FieldGroup>
+
+					<DialogFooter>
+						<Button
+							type="button"
+							variant="ghost"
+							className="cursor-pointer tracking-wide"
+							disabled={isSaving}
+							onClick={() => onOpenChange(false)}
+						>
+							Cancel
+						</Button>
+						<Button
+							type="submit"
+							className="cursor-pointer tracking-wide"
+							disabled={isSaving}
+						>
+							{isSaving ? "Saving..." : "Save"}
+						</Button>
+					</DialogFooter>
+				</form>
+			</DialogContent>
+		</Dialog>
+	);
+}
