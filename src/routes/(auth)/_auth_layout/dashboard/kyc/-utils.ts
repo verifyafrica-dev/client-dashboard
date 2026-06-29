@@ -1,3 +1,5 @@
+import type { KycStatus } from "#/api/http/v2/tenants/tenants.types";
+import type { SectionRejectedReason } from "#/api/http/v2/tenants/tenants.types";
 import type { KYBApplication } from "#/api/http/v1/kyc/kyc.types";
 import type { KycSectionPath } from "./-data";
 import { SECTION_NAMES } from "./-data";
@@ -9,7 +11,7 @@ export type KycCompletionStatus = {
 	businessActivity: boolean;
 	onboardingQuestionnaire: boolean;
 	documentsUpload: boolean;
-	complianceDocuments: boolean;
+	complianceDeclarations: boolean;
 	authorizedSignature: boolean;
 };
 
@@ -21,12 +23,12 @@ function hasStructuredDirectorAddress(
 	}
 
 	return Boolean(
-		address?.address && address?.postalCode && address?.country,
+		address?.address && address?.postal_code && address?.country,
 	);
 }
 
 export function getKycCompletionStatus(kycData: KYBApplication): KycCompletionStatus {
-	const primaryContact = kycData.company?.primaryContact ?? {
+	const primaryContact = kycData.company?.primary_contact ?? {
 		name: "",
 		email: "",
 		phone: "",
@@ -34,37 +36,37 @@ export function getKycCompletionStatus(kycData: KYBApplication): KycCompletionSt
 	};
 	const directors = kycData.company?.directors ?? [];
 	const ubos = kycData.company?.ubos ?? [];
-	const businessActivity = kycData.company?.businessActivity ?? {
-		natureOfBusiness: "",
-		descriptionOfProductsServices: "",
-		expectedMonthlyVerificationVolume: "",
-		mainGeographiesOfClients: [],
-		regulatoryLicensesHeld: [],
+	const businessActivity = kycData.company?.business_activity ?? {
+		nature_of_business: "",
+		description_of_products_services: "",
+		expected_monthly_verification_volume: "",
+		main_geographies_of_clients: [],
+		regulatory_licenses_held: [],
 	};
 	const documents = kycData.documents ?? {
-		directorsIdentification: [],
-		proofOfBusinessAddress: [],
-		proofOfDirectorsAddress: [],
-		proofOfWebsiteDomainOwnership: [],
-		legalCompanyLicense: [],
+		directors_identification: [],
+		proof_of_business_address: [],
+		proof_of_directors_address: [],
+		proof_of_website_domain_ownership: [],
+		legal_company_license: [],
 	};
-	const complianceDeclarations = kycData.complianceDeclarations ?? {
-		notEngagedInProhibitedActivities: false,
-		noDirectorsUbosOnSanctionsLists: false,
-		informationTrueAndComplete: false,
-		agreeToProvideSupportingDocuments: false,
+	const complianceDeclarations = kycData.compliance_declarations ?? {
+		not_engaged_in_prohibited_activities: false,
+		no_directors_ubos_on_sanctions_lists: false,
+		information_true_and_complete: false,
+		agree_to_provide_supporting_documents: false,
 	};
-	const onboardingQuestionnaire = kycData.onboardingQuestionnaire ?? {
-		purposeOfAccount: "",
-		targetClients: "",
-		averageClientTransactionSizeEur: 0,
-		highRiskJurisdictionsFATFExposure: "",
-		mainBankingPaymentPartners: "",
-		kycKybProcess: "",
+	const onboardingQuestionnaire = kycData.onboarding_questionnaire ?? {
+		purpose_of_account: "",
+		target_clients: "",
+		average_client_transaction_size_eur: 0,
+		high_risk_jurisdictions_fatf_exposure: "",
+		main_banking_payment_partners: "",
+		kyc_kyb_process: "",
 	};
-	const authorizedSignature = kycData.authorizedSignatory ?? {
-		fullName: "",
-		positionTitle: "",
+	const authorizedSignature = kycData.authorized_signature ?? {
+		full_name: "",
+		position_title: "",
 		date: "",
 	};
 
@@ -74,10 +76,10 @@ export function getKycCompletionStatus(kycData: KYBApplication): KycCompletionSt
 
 	return {
 		basicInformation: Boolean(
-			kycData.company?.legalName &&
-				kycData.company?.dateOfIncorporation &&
-				kycData.company?.registrationNumber &&
-				kycData.company?.registeredAddress?.address,
+			kycData.company?.legal_name &&
+				kycData.company?.date_of_incorporation &&
+				kycData.company?.registration_number &&
+				kycData.company?.registered_address?.address,
 		),
 		primaryContact: Boolean(
 			primaryContact.name && primaryContact.email && primaryContact.phone,
@@ -86,31 +88,31 @@ export function getKycCompletionStatus(kycData: KYBApplication): KycCompletionSt
 			directors.length > 0 && ubos.length > 0 && allDirectorsHaveCompleteAddress,
 		),
 		businessActivity: Boolean(
-			businessActivity.natureOfBusiness &&
-				businessActivity.descriptionOfProductsServices &&
-				businessActivity.mainGeographiesOfClients?.length > 0,
+			businessActivity.nature_of_business &&
+				businessActivity.description_of_products_services &&
+				businessActivity.main_geographies_of_clients?.length > 0,
 		),
 		onboardingQuestionnaire: Boolean(
-			onboardingQuestionnaire.purposeOfAccount &&
-				onboardingQuestionnaire.amlCtfOfficer?.name &&
-				onboardingQuestionnaire.amlCtfOfficer?.email,
+			onboardingQuestionnaire.purpose_of_account &&
+				onboardingQuestionnaire.aml_ctf_officer?.name &&
+				onboardingQuestionnaire.aml_ctf_officer?.email,
 		),
 		documentsUpload: Boolean(
-			documents.directorsIdentification?.length > 0 &&
-				documents.proofOfBusinessAddress?.length > 0 &&
-				documents.proofOfDirectorsAddress?.length > 0 &&
-				documents.proofOfWebsiteDomainOwnership?.length > 0 &&
-				documents.legalCompanyLicense?.length > 0,
+			documents.directors_identification?.length > 0 &&
+				documents.proof_of_business_address?.length > 0 &&
+				documents.proof_of_directors_address?.length > 0 &&
+				documents.proof_of_website_domain_ownership?.length > 0 &&
+				documents.legal_company_license?.length > 0,
 		),
-		complianceDocuments: Boolean(
-			complianceDeclarations.notEngagedInProhibitedActivities &&
-				complianceDeclarations.noDirectorsUbosOnSanctionsLists &&
-				complianceDeclarations.informationTrueAndComplete &&
-				complianceDeclarations.agreeToProvideSupportingDocuments,
+		complianceDeclarations: Boolean(
+			complianceDeclarations.not_engaged_in_prohibited_activities &&
+				complianceDeclarations.no_directors_ubos_on_sanctions_lists &&
+				complianceDeclarations.information_true_and_complete &&
+				complianceDeclarations.agree_to_provide_supporting_documents,
 		),
 		authorizedSignature: Boolean(
-			authorizedSignature.fullName &&
-				authorizedSignature.positionTitle &&
+			authorizedSignature.full_name &&
+				authorizedSignature.position_title &&
 				authorizedSignature.signature,
 		),
 	};
@@ -133,8 +135,8 @@ export function isKycSectionCompleted(
 			return completionStatus.onboardingQuestionnaire;
 		case SECTION_NAMES.DOCUMENTS_UPLOAD:
 			return completionStatus.documentsUpload;
-		case SECTION_NAMES.COMPLIANCE_DOCUMENTS:
-			return completionStatus.complianceDocuments;
+		case SECTION_NAMES.COMPLIANCE_DECLARATIONS:
+			return completionStatus.complianceDeclarations;
 		case SECTION_NAMES.AUTHORIZED_SIGNATURE:
 			return completionStatus.authorizedSignature;
 		default:
@@ -162,26 +164,46 @@ export function getNextIncompleteSectionPath(
 
 export function getKycDisplayStatus({
 	isKycApproved,
-	isKycSubmitted,
-	complianceStatus,
+	kycStatus,
 }: {
 	isKycApproved: boolean;
-	isKycSubmitted: boolean;
-	complianceStatus?: string;
+	kycStatus: KycStatus;
 }) {
-	if (isKycApproved) {
+	if (isKycApproved || kycStatus === "verified") {
 		return "approved" as const;
 	}
 
-	if (complianceStatus === "rejected") {
+	if (kycStatus === "rejected") {
 		return "rejected" as const;
 	}
 
-	if (isKycSubmitted) {
+	if (kycStatus === "submitted") {
 		return "submitted" as const;
 	}
 
 	return "pending" as const;
+}
+
+const SECTION_REJECTION_LABELS: Record<keyof SectionRejectedReason, string> = {
+	basic_information: "Basic Information",
+	primary_contact: "Primary Contact",
+	directors_and_shareholders: "Directors and Shareholders",
+	business_activity: "Business Activity",
+	onboarding_questionnaire: "Onboarding Questionnaire",
+	documents_upload: "Documents Upload",
+	compliance_declarations: "Compliance Declarations",
+	authorized_signature: "Authorized Signature",
+};
+
+export function getSectionRejectionEntries(
+	sectionRejectedReason: SectionRejectedReason,
+) {
+	return (Object.entries(sectionRejectedReason) as [keyof SectionRejectedReason, string | null][])
+		.filter(([, reason]) => Boolean(reason?.trim()))
+		.map(([key, reason]) => ({
+			section: SECTION_REJECTION_LABELS[key],
+			reason: reason?.trim() ?? "",
+		}));
 }
 
 export function parseRejectedReasons(reason?: string | null) {

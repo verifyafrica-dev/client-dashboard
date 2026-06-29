@@ -45,7 +45,7 @@ export function KycDocumentPreviewDialog({
 		return null;
 	}
 
-	const previewType = getDocumentPreviewType(document.fileType);
+	const previewType = getDocumentPreviewType(document.file_type);
 	const canGoPrev = currentIndex > 0;
 	const canGoNext = currentIndex < documents.length - 1;
 
@@ -80,7 +80,7 @@ export function KycDocumentPreviewDialog({
 						)}
 						<div className="min-w-0">
 							<DialogTitle className="truncate text-base">
-								{document.fileName}
+								{document.file_name}
 							</DialogTitle>
 							{documents.length > 1 && (
 								<p className="text-xs text-muted-foreground">
@@ -90,7 +90,7 @@ export function KycDocumentPreviewDialog({
 						</div>
 					</div>
 					<Button asChild variant="outline" size="sm">
-						<a href={document.url} download={document.fileName}>
+						<a href={document.url} download={document.file_name}>
 							<DownloadSimpleIcon className="size-4" />
 							Download
 						</a>
@@ -113,7 +113,7 @@ export function KycDocumentPreviewDialog({
 					{previewType === "pdf" ? (
 						<iframe
 							src={document.url}
-							title={document.fileName}
+							title={document.file_name}
 							className="h-[70vh] w-full rounded-md border bg-background"
 							onLoad={() => {
 								setIsLoading(false);
@@ -127,7 +127,7 @@ export function KycDocumentPreviewDialog({
 					) : (
 						<img
 							src={document.url}
-							alt={document.fileName}
+							alt={document.file_name}
 							className="max-h-[70vh] max-w-full rounded-md object-contain"
 							onLoad={() => {
 								setIsLoading(false);

@@ -9,21 +9,27 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import { useSubmitKycForReviewMutation } from "#/api/http/v1/kyc/kyc.hooks";
+import type { SectionRejectedReason } from "#/api/http/v2/tenants/tenants.types";
 import { Alert, AlertDescription, AlertTitle } from "#/components/ui/alert";
 import { Button } from "#/components/ui/button";
-import { formatRejectedAt, parseRejectedReasons } from "../-utils";
+import {
+	formatRejectedAt,
+	getSectionRejectionEntries,
+	parseRejectedReasons,
+} from "../-utils";
 import { useKyc } from "./kyc-provider";
 
 export function KycSubmitPanel() {
 	const {
 		tenantId,
-		kycData,
 		allSectionsCompleted,
 		isKycApproved,
-		isKycSubmitted,
+		kycStatus,
+		kycLastSubmissionDate,
 	} = useKyc();
 	const [submitSuccess, setSubmitSuccess] = useState(false);
 	const submitMutation = useSubmitKycForReviewMutation(tenantId ?? "");
+	const isKycSubmitted = kycStatus === "submitted";
 
 	if (isKycApproved) {
 		return (
@@ -48,10 +54,10 @@ export function KycSubmitPanel() {
 						Your KYC application has been submitted and is currently under
 						review by our compliance team.
 					</p>
-					{kycData.lastSubmissionDate && (
+					{kycLastSubmissionDate && (
 						<p className="text-xs text-amber-700">
 							Submitted on:{" "}
-							{new Date(kycData.lastSubmissionDate).toLocaleString("en-US", {
+							{new Date(kycLastSubmissionDate).toLocaleString("en-US", {
 								year: "numeric",
 								month: "long",
 								day: "numeric",
@@ -80,7 +86,7 @@ export function KycSubmitPanel() {
 		}
 
 		try {
-			await submitMutation.mutateAsync(kycData);
+			await submitMutation.mutateAsync();
 			setSubmitSuccess(true);
 			toast.success(
 				"KYC submitted successfully! We'll review it within 2-3 business days.",
@@ -102,7 +108,7 @@ export function KycSubmitPanel() {
 				</p>
 				<Button
 					type="button"
-					className="cursor-pointer uppercase tracking-wide"
+					className="cursor-pointer tracking-wide"
 					disabled={submitMutation.isPending}
 					onClick={() => void handleSubmit()}
 				>
@@ -117,17 +123,22 @@ export function KycSubmitPanel() {
 export function KycRejectedAlert({
 	show,
 	rejectedAt,
-	rejectedReason,
+	generalRejectedReason,
+	sectionRejectedReason,
 }: {
 	show: boolean;
 	rejectedAt?: string | null;
-	rejectedReason?: string | null;
+	generalRejectedReason?: string | null;
+	sectionRejectedReason?: SectionRejectedReason;
 }) {
 	if (!show) {
 		return null;
 	}
 
-	const reasons = parseRejectedReasons(rejectedReason);
+	const generalReasons = parseRejectedReasons(generalRejectedReason);
+	const sectionReasons = sectionRejectedReason
+		? getSectionRejectionEntries(sectionRejectedReason)
+		: [];
 	const formattedRejectedAt = formatRejectedAt(rejectedAt);
 
 	return (
@@ -142,10 +153,19 @@ export function KycRejectedAlert({
 				{formattedRejectedAt && (
 					<p className="text-xs opacity-90">Rejected on: {formattedRejectedAt}</p>
 				)}
-				{reasons.length > 0 && (
+				{generalReasons.length > 0 && (
 					<ul className="list-disc space-y-1.5 pl-5 text-sm">
-						{reasons.map((reason, index) => (
-							<li key={`${index}-${reason}`}>{reason}</li>
+						{generalReasons.map((reason, index) => (
+							<li key={`general-${index}-${reason}`}>{reason}</li>
+						))}
+					</ul>
+				)}
+				{sectionReasons.length > 0 && (
+					<ul className="list-disc space-y-1.5 pl-5 text-sm">
+						{sectionReasons.map(({ section, reason }) => (
+							<li key={`${section}-${reason}`}>
+								<span className="font-medium">{section}:</span> {reason}
+							</li>
 						))}
 					</ul>
 				)}

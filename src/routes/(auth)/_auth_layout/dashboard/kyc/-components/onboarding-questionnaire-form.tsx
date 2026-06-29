@@ -32,24 +32,24 @@ import { useKyc } from "./kyc-provider";
 function getDefaultValues(
 	kycData: ReturnType<typeof useKyc>["kycData"],
 ): KycOnboardingQuestionnaireFormValues {
-	const questionnaire = kycData.onboardingQuestionnaire;
+	const questionnaire = kycData.onboarding_questionnaire;
 
 	return {
-		purposeOfAccount: questionnaire.purposeOfAccount ?? "",
-		targetClients: questionnaire.targetClients ?? KYC_TARGET_CLIENTS[0],
-		averageClientTransactionSizeEur:
-			questionnaire.averageClientTransactionSizeEur ?? 0,
-		highRiskJurisdictionsFATFExposure:
-			questionnaire.highRiskJurisdictionsFATFExposure ?? "",
-		mainBankingPaymentPartners: questionnaire.mainBankingPaymentPartners ?? "",
-		amlCtfOfficerName: questionnaire.amlCtfOfficer?.name ?? "",
-		amlCtfOfficerEmail: questionnaire.amlCtfOfficer?.email ?? "",
-		kycKybProcess: questionnaire.kycKybProcess ?? "",
+		purpose_of_account: questionnaire.purpose_of_account ?? "",
+		target_clients: questionnaire.target_clients ?? KYC_TARGET_CLIENTS[0],
+		average_client_transaction_size_eur:
+			questionnaire.average_client_transaction_size_eur ?? 0,
+		high_risk_jurisdictions_fatf_exposure:
+			questionnaire.high_risk_jurisdictions_fatf_exposure ?? "",
+		main_banking_payment_partners: questionnaire.main_banking_payment_partners ?? "",
+		amlCtfOfficerName: questionnaire.aml_ctf_officer?.name ?? "",
+		amlCtfOfficerEmail: questionnaire.aml_ctf_officer?.email ?? "",
+		kyc_kyb_process: questionnaire.kyc_kyb_process ?? "",
 	};
 }
 
 export function OnboardingQuestionnaireForm() {
-	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+	const { kycData, isReadOnly, isSaving, saveSection } = useKyc();
 
 	const form = useForm({
 		defaultValues: getDefaultValues(kycData),
@@ -57,24 +57,22 @@ export function OnboardingQuestionnaireForm() {
 			onSubmit: KycOnboardingQuestionnaireFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			await saveCompliance(
-				(current) => ({
-					...current,
-					onboardingQuestionnaire: {
-						purposeOfAccount: value.purposeOfAccount,
-						targetClients: value.targetClients,
-						averageClientTransactionSizeEur:
-							value.averageClientTransactionSizeEur,
-						highRiskJurisdictionsFATFExposure:
-							value.highRiskJurisdictionsFATFExposure,
-						mainBankingPaymentPartners: value.mainBankingPaymentPartners,
-						amlCtfOfficer: {
-							name: value.amlCtfOfficerName,
-							email: value.amlCtfOfficerEmail,
-						},
-						kycKybProcess: value.kycKybProcess,
+			await saveSection(
+				"onboarding-questionnaire",
+				{
+					purpose_of_account: value.purpose_of_account,
+					target_clients: value.target_clients,
+					average_client_transaction_size_eur:
+						value.average_client_transaction_size_eur,
+					high_risk_jurisdictions_fatf_exposure:
+						value.high_risk_jurisdictions_fatf_exposure,
+					main_banking_payment_partners: value.main_banking_payment_partners,
+					aml_ctf_officer: {
+						name: value.amlCtfOfficerName,
+						email: value.amlCtfOfficerEmail,
 					},
-				}),
+					kyc_kyb_process: value.kyc_kyb_process,
+				},
 				{ currentSection: SECTION_NAMES.ONBOARDING_QUESTIONNAIRE },
 			);
 		},
@@ -98,7 +96,7 @@ export function OnboardingQuestionnaireForm() {
 			/>
 
 			<FieldGroup className="flex flex-col gap-4">
-				<form.Field name="purposeOfAccount">
+				<form.Field name="purpose_of_account">
 					{(field) => (
 						<Field
 							className="gap-1.5"
@@ -121,7 +119,7 @@ export function OnboardingQuestionnaireForm() {
 					)}
 				</form.Field>
 
-				<form.Field name="targetClients">
+				<form.Field name="target_clients">
 					{(field) => (
 						<Field
 							className="gap-1.5"
@@ -152,7 +150,7 @@ export function OnboardingQuestionnaireForm() {
 				</form.Field>
 
 				<KycFormGrid>
-					<form.Field name="averageClientTransactionSizeEur">
+					<form.Field name="average_client_transaction_size_eur">
 						{(field) => (
 							<Field
 								className="gap-1.5"
@@ -177,7 +175,7 @@ export function OnboardingQuestionnaireForm() {
 							</Field>
 						)}
 					</form.Field>
-					<form.Field name="highRiskJurisdictionsFATFExposure">
+					<form.Field name="high_risk_jurisdictions_fatf_exposure">
 						{(field) => (
 							<Field
 								className="gap-1.5"
@@ -200,7 +198,7 @@ export function OnboardingQuestionnaireForm() {
 					</form.Field>
 				</KycFormGrid>
 
-				<form.Field name="mainBankingPaymentPartners">
+				<form.Field name="main_banking_payment_partners">
 					{(field) => (
 						<Field
 							className="gap-1.5"
@@ -267,7 +265,7 @@ export function OnboardingQuestionnaireForm() {
 					</KycFormGrid>
 				</div>
 
-				<form.Field name="kycKybProcess">
+				<form.Field name="kyc_kyb_process">
 					{(field) => (
 						<Field
 							className="gap-1.5"

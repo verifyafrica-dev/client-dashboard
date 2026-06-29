@@ -33,15 +33,15 @@ function getDefaultValues(
 	kycData: ReturnType<typeof useKyc>["kycData"],
 ): KycPrimaryContactFormValues {
 	return {
-		name: kycData.company.primaryContact?.name ?? "",
-		position: kycData.company.primaryContact?.position ?? "",
-		email: kycData.company.primaryContact?.email ?? "",
-		phone: kycData.company.primaryContact?.phone ?? "",
+		name: kycData.company.primary_contact?.name ?? "",
+		position: kycData.company.primary_contact?.position ?? "",
+		email: kycData.company.primary_contact?.email ?? "",
+		phone: kycData.company.primary_contact?.phone ?? "",
 	};
 }
 
 export function PrimaryContactForm() {
-	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+	const { kycData, isReadOnly, isSaving, saveSection } = useKyc();
 
 	const form = useForm({
 		defaultValues: getDefaultValues(kycData),
@@ -49,16 +49,9 @@ export function PrimaryContactForm() {
 			onSubmit: KycPrimaryContactFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			await saveCompliance(
-				(current) => ({
-					...current,
-					company: {
-						...current.company,
-						primaryContact: value,
-					},
-				}),
-				{ currentSection: SECTION_NAMES.PRIMARY_CONTACT },
-			);
+			await saveSection("primary-contact", value, {
+				currentSection: SECTION_NAMES.PRIMARY_CONTACT,
+			});
 		},
 	});
 

@@ -210,13 +210,26 @@ export function KycDatePicker({
 export function KycFileUpload({
 	value,
 	onValueChange,
-	accept = "image/*,.pdf",
+	onUpload,
+	onFileReject,
+	onFileValidate,
+	accept = "image/*,application/pdf",
 	maxSize = 10 * 1024 * 1024,
 	multiple = true,
 	disabled,
 }: {
-	value: File[];
-	onValueChange: (files: File[]) => void;
+	value?: File[];
+	onValueChange?: (files: File[]) => void;
+	onUpload?: (
+		files: File[],
+		options: {
+			onProgress: (file: File, progress: number) => void;
+			onSuccess: (file: File) => void;
+			onError: (file: File, error: Error) => void;
+		},
+	) => Promise<void> | void;
+	onFileReject?: (file: File, message: string) => void;
+	onFileValidate?: (file: File) => string | null | undefined;
 	accept?: string;
 	maxSize?: number;
 	multiple?: boolean;
@@ -226,6 +239,9 @@ export function KycFileUpload({
 		<FileUpload
 			value={value}
 			onValueChange={onValueChange}
+			onUpload={onUpload}
+			onFileReject={onFileReject}
+			onFileValidate={onFileValidate}
 			accept={accept}
 			maxSize={maxSize}
 			multiple={multiple}
@@ -242,9 +258,9 @@ export function KycFileUpload({
 					</Button>
 				</FileUploadTrigger>
 			</FileUploadDropzone>
-			{value.length > 0 && (
+			{(value?.length ?? 0) > 0 && (
 				<FileUploadList className="mt-3">
-					{value.map((file) => (
+					{value?.map((file) => (
 						<FileUploadItem
 							key={`${file.name}-${file.lastModified}`}
 							value={file}

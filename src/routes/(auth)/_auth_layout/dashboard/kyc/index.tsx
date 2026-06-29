@@ -9,6 +9,10 @@ import { z } from "zod";
 
 import { useKycTenantQuery } from "#/api/http/v1/kyc/kyc.hooks";
 import type { KYBApplication } from "#/api/http/v1/kyc/kyc.types";
+import type {
+	KycStatus,
+	SectionRejectedReason,
+} from "#/api/http/v2/tenants/tenants.types";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
@@ -93,21 +97,22 @@ function KycPageInner({
 	activeSection,
 	kycData,
 	isKycApproved,
-	complianceStatus,
+	kycStatus,
 	rejectedAt,
-	rejectedReason,
+	generalRejectedReason,
+	sectionRejectedReason,
 }: {
 	activeSection?: (typeof sections)[number];
 	kycData: KYBApplication;
 	isKycApproved: boolean;
-	complianceStatus?: string;
+	kycStatus: KycStatus;
 	rejectedAt?: string | null;
-	rejectedReason?: string | null;
+	generalRejectedReason?: string | null;
+	sectionRejectedReason?: SectionRejectedReason;
 }) {
 	const status = getKycDisplayStatus({
 		isKycApproved,
-		isKycSubmitted: Boolean(kycData.submittedForReview),
-		complianceStatus,
+		kycStatus,
 	});
 
 	const overallProgress = Object.values(getKycCompletionStatus(kycData)).filter(
@@ -119,7 +124,8 @@ function KycPageInner({
 			<KycRejectedAlert
 				show={status === "rejected"}
 				rejectedAt={rejectedAt}
-				rejectedReason={rejectedReason}
+				generalRejectedReason={generalRejectedReason}
+				sectionRejectedReason={sectionRejectedReason}
 			/>
 
 			{activeSection ? (
@@ -202,16 +208,18 @@ function KycPage() {
 			tenantId={tenantId}
 			kycData={kycQuery.data.kycData}
 			isKycApproved={kycQuery.data.isKycApproved}
-			complianceStatus={kycQuery.data.complianceStatus}
+			kycStatus={kycQuery.data.kycStatus}
+			kycLastSubmissionDate={kycQuery.data.kycLastSubmissionDate}
 			onNavigateToSection={navigateToSection}
 		>
 			<KycPageInner
 				activeSection={activeSection}
 				kycData={kycQuery.data.kycData}
 				isKycApproved={kycQuery.data.isKycApproved}
-				complianceStatus={kycQuery.data.complianceStatus}
+				kycStatus={kycQuery.data.kycStatus}
 				rejectedAt={kycQuery.data.rejectedAt}
-				rejectedReason={kycQuery.data.rejectedReason}
+				generalRejectedReason={kycQuery.data.generalRejectedReason}
+				sectionRejectedReason={kycQuery.data.sectionRejectedReason}
 			/>
 		</KycProvider>
 	);

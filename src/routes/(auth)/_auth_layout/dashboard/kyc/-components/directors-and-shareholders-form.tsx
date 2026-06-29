@@ -31,7 +31,7 @@ function normalizeDirectorAddress(
 	address: KycDirectorsAndShareholdersFormValues["directors"][number]["address"],
 ) {
 	if (typeof address === "string") {
-		return { address, postalCode: "", country: "" };
+		return { address, postal_code: "", country: "" };
 	}
 
 	return address;
@@ -44,20 +44,20 @@ function getDefaultValues(
 		kycData.company.directors.length > 0
 			? kycData.company.directors.map((director) => ({
 					name: director.name,
-					dateOfBirth: director.dateOfBirth,
+					date_of_birth: director.date_of_birth,
 					nationality: director.nationality,
 					address: normalizeDirectorAddress(
 						director.address as KycDirectorsAndShareholdersFormValues["directors"][number]["address"],
 					),
-					idNumber: director.idNumber,
+					id_number: director.id_number,
 				}))
 			: [
 					{
 						name: "",
-						dateOfBirth: "",
+						date_of_birth: "",
 						nationality: "",
-						address: { address: "", postalCode: "", country: "" },
-						idNumber: "",
+						address: { address: "", postal_code: "", country: "" },
+						id_number: "",
 					},
 				];
 
@@ -65,16 +65,16 @@ function getDefaultValues(
 		kycData.company.ubos.length > 0
 			? kycData.company.ubos.map((ubo) => ({
 					name: ubo.name,
-					ownershipPercentage: ubo.ownershipPercentage,
-					idNumber: ubo.idNumber,
+					ownership_percentage: ubo.ownership_percentage,
+					id_number: ubo.id_number,
 				}))
-			: [{ name: "", ownershipPercentage: 0, idNumber: "" }];
+			: [{ name: "", ownership_percentage: 0, id_number: "" }];
 
 	return { directors, ubos };
 }
 
 export function DirectorsAndShareholdersForm() {
-	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+	const { kycData, isReadOnly, isSaving, saveSection } = useKyc();
 
 	const form = useForm({
 		defaultValues: getDefaultValues(kycData),
@@ -82,17 +82,9 @@ export function DirectorsAndShareholdersForm() {
 			onSubmit: KycDirectorsAndShareholdersFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			await saveCompliance(
-				(current) => ({
-					...current,
-					company: {
-						...current.company,
-						directors: value.directors,
-						ubos: value.ubos,
-					},
-				}),
-				{ currentSection: SECTION_NAMES.DIRECTORS_AND_SHAREHOLDERS },
-			);
+			await saveSection("directors-and-shareholders", value, {
+				currentSection: SECTION_NAMES.DIRECTORS_AND_SHAREHOLDERS,
+			});
 		},
 	});
 
@@ -151,7 +143,7 @@ export function DirectorsAndShareholdersForm() {
 										)}
 									</form.Field>
 									<KycFormGrid>
-										<form.Field name={`directors[${index}].dateOfBirth`}>
+										<form.Field name={`directors[${index}].date_of_birth`}>
 											{(field) => (
 												<Field
 													className="gap-1.5"
@@ -219,7 +211,7 @@ export function DirectorsAndShareholdersForm() {
 										)}
 									</form.Field>
 									<KycFormGrid>
-										<form.Field name={`directors[${index}].address.postalCode`}>
+										<form.Field name={`directors[${index}].address.postal_code`}>
 											{(field) => (
 												<Field
 													className="gap-1.5"
@@ -261,7 +253,7 @@ export function DirectorsAndShareholdersForm() {
 											)}
 										</form.Field>
 									</KycFormGrid>
-									<form.Field name={`directors[${index}].idNumber`}>
+									<form.Field name={`directors[${index}].id_number`}>
 										{(field) => (
 											<Field
 												className="gap-1.5"
@@ -294,10 +286,10 @@ export function DirectorsAndShareholdersForm() {
 								onClick={() =>
 									directorsField.pushValue({
 										name: "",
-										dateOfBirth: "",
+										date_of_birth: "",
 										nationality: "",
-										address: { address: "", postalCode: "", country: "" },
-										idNumber: "",
+										address: { address: "", postal_code: "", country: "" },
+										id_number: "",
 									})
 								}
 							>
@@ -349,7 +341,7 @@ export function DirectorsAndShareholdersForm() {
 										)}
 									</form.Field>
 									<KycFormGrid>
-										<form.Field name={`ubos[${index}].ownershipPercentage`}>
+										<form.Field name={`ubos[${index}].ownership_percentage`}>
 											{(field) => (
 												<Field
 													className="gap-1.5"
@@ -374,7 +366,7 @@ export function DirectorsAndShareholdersForm() {
 												</Field>
 											)}
 										</form.Field>
-										<form.Field name={`ubos[${index}].idNumber`}>
+										<form.Field name={`ubos[${index}].id_number`}>
 											{(field) => (
 												<Field
 													className="gap-1.5"
@@ -408,8 +400,8 @@ export function DirectorsAndShareholdersForm() {
 								onClick={() =>
 									ubosField.pushValue({
 										name: "",
-										ownershipPercentage: 0,
-										idNumber: "",
+										ownership_percentage: 0,
+										id_number: "",
 									})
 								}
 							>

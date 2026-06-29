@@ -7,8 +7,15 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import { useSaveKycComplianceMutation } from "#/api/http/v1/kyc/kyc.hooks";
+import {
+	useSaveKycSectionMutation,
+} from "#/api/http/v1/kyc/kyc.hooks";
 import type { KYBApplication } from "#/api/http/v1/kyc/kyc.types";
+import type {
+	KycComplianceSection,
+	KycSectionUpdatePayload,
+} from "#/api/http/v2/tenants/tenants.types";
+import type { KycStatus } from "#/api/http/v2/tenants/tenants.types";
 import { getUserTenantMembership } from "../../team/-data";
 import { useAuthStore } from "#/stores/auth-store";
 import type { KycSectionPath } from "../-data";
@@ -17,20 +24,22 @@ import {
 	getKycCompletionStatus,
 	getNextIncompleteSectionPath,
 	isKycSectionCompleted,
+	type KycCompletionStatus,
 } from "../-utils";
 
 type KycContextValue = {
 	tenantId: string;
 	kycData: KYBApplication;
 	isKycApproved: boolean;
-	isKycSubmitted: boolean;
-	complianceStatus?: string;
+	kycStatus: KycStatus;
+	kycLastSubmissionDate: string | null;
 	isReadOnly: boolean;
 	isSaving: boolean;
-	completionStatus: ReturnType<typeof getKycCompletionStatus>;
+	completionStatus: KycCompletionStatus;
 	allSectionsCompleted: boolean;
-	saveCompliance: (
-		buildPayload: (current: KYBApplication) => KYBApplication,
+	saveSection: (
+		section: KycComplianceSection,
+		payload: KycSectionUpdatePayload,
 		options?: { navigateNext?: boolean; currentSection?: KycSectionPath },
 	) => Promise<void>;
 	onNavigateToSection: (path: KycSectionPath | null) => void;
@@ -43,21 +52,23 @@ export function KycProvider({
 	tenantId,
 	kycData,
 	isKycApproved,
-	complianceStatus,
+	kycStatus,
+	kycLastSubmissionDate,
 	onNavigateToSection,
 }: {
 	children: ReactNode;
 	tenantId: string;
 	kycData: KYBApplication;
 	isKycApproved: boolean;
-	complianceStatus?: string;
+	kycStatus: KycStatus;
+	kycLastSubmissionDate: string | null;
 	onNavigateToSection: (path: KycSectionPath | null) => void;
 }) {
-	const saveMutation = useSaveKycComplianceMutation(tenantId);
-	const isKycSubmitted = Boolean(kycData.submittedForReview);
+	const saveMutation = useSaveKycSectionMutation(tenantId);
 	const isReadOnly =
 		isKycApproved ||
-		(isKycSubmitted && complianceStatus !== "rejected");
+		kycStatus === "submitted" ||
+		kycStatus === "verified";
 
 	const completionStatus = useMemo(
 		() => getKycCompletionStatus(kycData),
@@ -69,37 +80,38 @@ export function KycProvider({
 		[completionStatus],
 	);
 
-	const saveCompliance = useCallback(
+	const saveSection = useCallback(
 		async (
-			buildPayload: (current: KYBApplication) => KYBApplication,
+			section: KycComplianceSection,
+			payload: KycSectionUpdatePayload,
 			options?: { navigateNext?: boolean; currentSection?: KycSectionPath },
 		) => {
 			if (isReadOnly) {
 				return;
 			}
 
-			const payload = buildPayload(kycData);
+			await saveMutation.mutateAsync(
+				{ section, payload },
+				{
+					onSuccess: () => {
+						toast.success("Compliance data saved successfully");
 
-			await saveMutation.mutateAsync(payload, {
-				onSuccess: () => {
-					toast.success("Compliance data saved successfully");
-
-					if (options?.navigateNext !== false && options?.currentSection) {
-						const updatedStatus = getKycCompletionStatus(payload);
-						const nextPath = getNextIncompleteSectionPath(
-							options.currentSection,
-							updatedStatus,
-							KYC_SECTION_PATHS,
-						);
-						onNavigateToSection(nextPath);
-					}
+						if (options?.navigateNext !== false && options?.currentSection) {
+							const nextPath = getNextIncompleteSectionPath(
+								options.currentSection,
+								completionStatus,
+								KYC_SECTION_PATHS,
+							);
+							onNavigateToSection(nextPath);
+						}
+					},
+					onError: () => {
+						toast.error("Failed to save compliance data. Please try again.");
+					},
 				},
-				onError: () => {
-					toast.error("Failed to save compliance data. Please try again.");
-				},
-			});
+			);
 		},
-		[kycData, isReadOnly, saveMutation, onNavigateToSection],
+		[isReadOnly, saveMutation, completionStatus, onNavigateToSection],
 	);
 
 	const value = useMemo<KycContextValue>(
@@ -107,26 +119,26 @@ export function KycProvider({
 			tenantId,
 			kycData,
 			isKycApproved,
-			isKycSubmitted,
-			complianceStatus,
+			kycStatus,
+			kycLastSubmissionDate,
 			isReadOnly,
 			isSaving: saveMutation.isPending,
 			completionStatus,
 			allSectionsCompleted,
-			saveCompliance,
+			saveSection,
 			onNavigateToSection,
 		}),
 		[
 			tenantId,
 			kycData,
 			isKycApproved,
-			isKycSubmitted,
-			complianceStatus,
+			kycStatus,
+			kycLastSubmissionDate,
 			isReadOnly,
 			saveMutation.isPending,
 			completionStatus,
 			allSectionsCompleted,
-			saveCompliance,
+			saveSection,
 			onNavigateToSection,
 		],
 	);

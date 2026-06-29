@@ -41,22 +41,22 @@ export type KycSignatureMethod =
 
 export const KYC_DECLARATIONS = [
 	{
-		key: "notEngagedInProhibitedActivities" as const,
+		key: "not_engaged_in_prohibited_activities" as const,
 		label:
 			"We are not engaged in any prohibited activities as defined by applicable laws and regulations",
 	},
 	{
-		key: "noDirectorsUbosOnSanctionsLists" as const,
+		key: "no_directors_ubos_on_sanctions_lists" as const,
 		label:
 			"None of our directors, officers, or UBOs are listed on any sanctions lists",
 	},
 	{
-		key: "informationTrueAndComplete" as const,
+		key: "information_true_and_complete" as const,
 		label:
 			"All information provided is true, complete, and accurate to the best of our knowledge",
 	},
 	{
-		key: "agreeToProvideSupportingDocuments" as const,
+		key: "agree_to_provide_supporting_documents" as const,
 		label:
 			"We agree to provide all supporting documents as requested during the onboarding process",
 	},
@@ -64,28 +64,28 @@ export const KYC_DECLARATIONS = [
 
 export const KYC_DOCUMENT_CATEGORIES = [
 	{
-		key: "directorsIdentification" as const,
+		key: "directors_identification" as const,
 		title: "Directors Identification",
 		description: "Passports and nationally approved IDs for all directors",
 	},
 	{
-		key: "proofOfBusinessAddress" as const,
+		key: "proof_of_business_address" as const,
 		title: "Proof of Business Address",
 		description:
 			"Utility bill, lease agreement, or official government document",
 	},
 	{
-		key: "proofOfDirectorsAddress" as const,
+		key: "proof_of_directors_address" as const,
 		title: "Proof of Directors Address",
 		description: "Utility bills or official documents for each director",
 	},
 	{
-		key: "proofOfWebsiteDomainOwnership" as const,
+		key: "proof_of_website_domain_ownership" as const,
 		title: "Proof of Website/Domain Ownership",
 		description: "Screenshot from domain registrar showing ownership",
 	},
 	{
-		key: "legalCompanyLicense" as const,
+		key: "legal_company_license" as const,
 		title: "Legal Company License",
 		description: "Business registration certificate or operating license",
 	},

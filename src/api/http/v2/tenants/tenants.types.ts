@@ -32,7 +32,7 @@ export const KycComplianceSectionSchema = z.enum([
 	"authorized-signature",
 	"basic-information",
 	"business-activity",
-	"compliance-documents",
+	"compliance-declarations",
 	"directors-and-shareholders",
 	"onboarding-questionnaire",
 	"primary-contact",
@@ -40,11 +40,11 @@ export const KycComplianceSectionSchema = z.enum([
 export type KycComplianceSection = z.infer<typeof KycComplianceSectionSchema>;
 
 export const KycDocumentKeySchema = z.enum([
-	"directorsIdentification",
-	"proofOfBusinessAddress",
-	"proofOfDirectorsAddress",
-	"proofOfWebsiteDomainOwnership",
-	"legalCompanyLicense",
+	"directors_identification",
+	"proof_of_business_address",
+	"proof_of_directors_address",
+	"proof_of_website_domain_ownership",
+	"legal_company_license",
 ]);
 export type KycDocumentKey = z.infer<typeof KycDocumentKeySchema>;
 
@@ -57,32 +57,54 @@ export const TenantListQuerySchema = z.object({
 export type TenantListQuery = z.infer<typeof TenantListQuerySchema>;
 
 export interface SectionRejectedReason {
-	directorsIdentification?: string;
-	proofOfBusinessAddress?: string;
-	proofOfDirectorsAddress?: string;
-	proofOfWebsiteDomainOwnership?: string;
-	legalCompanyLicense?: string;
+	basic_information: string | null;
+	primary_contact: string | null;
+	directors_and_shareholders: string | null;
+	business_activity: string | null;
+	onboarding_questionnaire: string | null;
+	documents_upload: string | null;
+	compliance_declarations: string | null;
+	authorized_signature: string | null;
+}
+
+export interface KycSummary {
+	kyc_verified: boolean;
+	kyc_status: KycStatus;
+	kyc_submitted_at: string | null;
+	kyc_last_submission_date: string | null;
+	kyc_rejected_at: string | null;
+}
+
+export interface ComplianceData {
+	basic_information: Record<string, unknown>;
+	primary_contact: Record<string, unknown>;
+	directors_and_shareholders: Record<string, unknown>;
+	business_activity: Record<string, unknown>;
+	onboarding_questionnaire: Record<string, unknown>;
+	documents_upload: Record<string, unknown[]>;
+	compliance_declarations: boolean;
+	authorized_signature: Record<string, unknown>;
 }
 
 export interface KycCompletionStatus {
-	basicInformation: boolean;
-	primaryContact: boolean;
-	directorsAndShareholders: boolean;
-	businessActivity: boolean;
-	onboardingQuestionnaire: boolean;
-	documentsUpload: boolean;
-	complianceDocuments: boolean;
-	authorizedSignature: boolean;
+	basic_information: boolean;
+	primary_contact: boolean;
+	directors_and_shareholders: boolean;
+	business_activity: boolean;
+	onboarding_questionnaire: boolean;
+	documents_upload: boolean;
+	compliance_declarations: boolean;
+	authorized_signature: boolean;
 }
 
 export interface KycUploadedDocument {
 	id: string;
-	fileName: string;
-	fileSize: number;
-	fileType: string;
-	uploadedAt: string;
+	file_name: string;
+	file_size: number;
+	file_type: string;
+	uploaded_at: string;
 	url: string;
-	storagePath: string;
+	storage_path: string;
 	author?: string;
 }
 
@@ -90,15 +112,11 @@ export interface TenantDetail {
 	id: string;
 	name: string;
 	created_at: string;
-	compliance_data: Record<string, unknown>;
+	compliance_data: ComplianceData | Record<string, unknown>;
 	enabled_countries: string[] | Record<string, unknown>;
-	kyc_verified: boolean;
-	kyc_status: KycStatus;
-	kyc_submitted_at: string | null;
-	kyc_last_submission_date: string | null;
-	kyc_rejected_at: string | null;
-	general_rejected_reason: string;
-	section_rejected_reason: SectionRejectedReason | Record<string, unknown>;
+	kyc: KycSummary;
+	general_rejected_reason: string | null;
+	section_rejected_reason: SectionRejectedReason;
 	stripe_customer_id?: string;
 	email: string;
 	tenant_id: string;
@@ -209,9 +227,9 @@ export interface TenantVerificationConfigListData {
 }
 
 export interface TenantComplianceDataPayload {
-	compliance_data: Record<string, unknown>;
+	compliance_data: ComplianceData | Record<string, unknown>;
 	completion_status: KycCompletionStatus;
-	kyc_status: KycStatus;
+	kyc: KycSummary;
 }
 
 export interface TenantComplianceDocumentRegisterData {
@@ -254,11 +272,14 @@ export const TenantUpdateSchema = z.object({
 	general_rejected_reason: z.string().optional(),
 	section_rejected_reason: z
 		.object({
-			directorsIdentification: z.string().optional(),
-			proofOfBusinessAddress: z.string().optional(),
-			proofOfDirectorsAddress: z.string().optional(),
-			proofOfWebsiteDomainOwnership: z.string().optional(),
-			legalCompanyLicense: z.string().optional(),
+			basic_information: z.string().nullable().optional(),
+			primary_contact: z.string().nullable().optional(),
+			directors_and_shareholders: z.string().nullable().optional(),
+			business_activity: z.string().nullable().optional(),
+			onboarding_questionnaire: z.string().nullable().optional(),
+			documents_upload: z.string().nullable().optional(),
+			compliance_declarations: z.string().nullable().optional(),
+			authorized_signature: z.string().nullable().optional(),
 		})
 		.optional(),
 	reject_reason: z.string().optional(),
@@ -358,18 +379,48 @@ export type TenantUserMembershipUpdatePayload = z.infer<
 	typeof TenantUserMembershipUpdateSchema
 >;
 
+const KYC_DATA_URL_PATTERN =
+	/^data:(image\/(?:jpeg|png|gif)|application\/pdf);base64,.+/i;
+
+function isValidKycDocumentUrl(value: string) {
+	if (KYC_DATA_URL_PATTERN.test(value)) {
+		return import.meta.env.DEV;
+	}
+
+	return z.url().safeParse(value).success;
+}
+
 export const TenantComplianceDocumentRegisterSchema = z.object({
 	document_key: KycDocumentKeySchema,
-	url: z.url({ message: "Invalid document URL" }),
-	storagePath: z.string().min(1),
-	fileName: z.string().min(1),
-	fileSize: z.number().int().positive(),
-	fileType: z.string().min(1),
+	url: z
+		.string()
+		.min(1)
+		.refine(isValidKycDocumentUrl, { message: "Invalid document URL" }),
+	storage_path: z.string().min(1),
+	file_name: z.string().min(1),
+	file_size: z.number().int().positive(),
+	file_type: z.string().min(1),
 });
 
 export type TenantComplianceDocumentRegisterPayload = z.infer<
 	typeof TenantComplianceDocumentRegisterSchema
 >;
+
+export const TenantComplianceDocumentDeleteSchema = z.object({
+	document_key: KycDocumentKeySchema,
+	document_id: z.string().min(1),
+});
+
+export type TenantComplianceDocumentDeletePayload = z.infer<
+	typeof TenantComplianceDocumentDeleteSchema
+>;
+
+export interface TenantComplianceDocumentDeleteData {
+	document: KycUploadedDocument;
+	compliance_data: ComplianceData | Record<string, unknown>;
+	completion_status: KycCompletionStatus;
+	kyc: KycSummary;
+}
 
 export const TenantVerificationConfigUpsertSchema = z.object({
 	verification_type: z.string().min(1),
@@ -403,6 +454,8 @@ export type TenantComplianceDataResponse =
 	V2SuccessResponse<TenantComplianceDataPayload>;
 export type TenantComplianceDocumentRegisterResponse =
 	V2SuccessResponse<TenantComplianceDocumentRegisterData>;
+export type TenantComplianceDocumentDeleteResponse =
+	V2SuccessResponse<TenantComplianceDocumentDeleteData>;
 export type TenantInvitationVerifyResponse =
 	V2SuccessResponse<TenantInvitationVerifyData>;
 export type TenantInvitationAcceptResponse =

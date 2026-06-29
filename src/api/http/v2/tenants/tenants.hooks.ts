@@ -15,6 +15,7 @@ import type {
 	TenantAPIKeyPutUpdatePayload,
 	TenantAPIKeyUpdatePayload,
 	TenantComplianceDocumentRegisterPayload,
+	TenantComplianceDocumentDeletePayload,
 	TenantCreatePayload,
 	TenantInvitationAcceptPayload,
 	TenantInvitationCreatePayload,
@@ -251,6 +252,22 @@ export const useRegisterTenantComplianceDocumentV2Mutation = (
 	return useMutation({
 		mutationFn: (payload: TenantComplianceDocumentRegisterPayload) =>
 			TENANTS_V2_API.REGISTER_COMPLIANCE_DOCUMENT(tenantId, payload),
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: TENANTS_V2_QUERY_KEYS.detail(tenantId),
+			});
+		},
+	});
+};
+
+export const useDeleteTenantComplianceDocumentV2Mutation = (
+	tenantId: string,
+) => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: (payload: TenantComplianceDocumentDeletePayload) =>
+			TENANTS_V2_API.DELETE_COMPLIANCE_DOCUMENT(tenantId, payload),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: TENANTS_V2_QUERY_KEYS.detail(tenantId),

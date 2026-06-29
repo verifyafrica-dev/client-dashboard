@@ -39,22 +39,22 @@ import { useKyc } from "./kyc-provider";
 function getDefaultValues(
 	kycData: ReturnType<typeof useKyc>["kycData"],
 ): KycBusinessActivityFormValues {
-	const activity = kycData.company.businessActivity;
+	const activity = kycData.company.business_activity;
 
 	return {
-		natureOfBusiness: activity.natureOfBusiness ?? "",
-		descriptionOfProductsServices: activity.descriptionOfProductsServices ?? "",
-		expectedMonthlyVerificationVolume:
-			activity.expectedMonthlyVerificationVolume ?? "",
-		mainGeographiesOfClients: activity.mainGeographiesOfClients?.length
-			? activity.mainGeographiesOfClients
+		nature_of_business: activity.nature_of_business ?? "",
+		description_of_products_services: activity.description_of_products_services ?? "",
+		expected_monthly_verification_volume:
+			activity.expected_monthly_verification_volume ?? "",
+		main_geographies_of_clients: activity.main_geographies_of_clients?.length
+			? activity.main_geographies_of_clients
 			: [],
-		regulatoryLicensesHeld: activity.regulatoryLicensesHeld ?? [],
+		regulatory_licenses_held: activity.regulatory_licenses_held ?? [],
 	};
 }
 
 export function BusinessActivityForm() {
-	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+	const { kycData, isReadOnly, isSaving, saveSection } = useKyc();
 
 	const form = useForm({
 		defaultValues: getDefaultValues(kycData),
@@ -62,24 +62,9 @@ export function BusinessActivityForm() {
 			onSubmit: KycBusinessActivityFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			await saveCompliance(
-				(current) => ({
-					...current,
-					company: {
-						...current.company,
-						businessActivity: {
-							natureOfBusiness: value.natureOfBusiness,
-							descriptionOfProductsServices:
-								value.descriptionOfProductsServices,
-							expectedMonthlyVerificationVolume:
-								value.expectedMonthlyVerificationVolume,
-							mainGeographiesOfClients: value.mainGeographiesOfClients,
-							regulatoryLicensesHeld: value.regulatoryLicensesHeld,
-						},
-					},
-				}),
-				{ currentSection: SECTION_NAMES.BUSINESS_ACTIVITY },
-			);
+			await saveSection("business-activity", value, {
+				currentSection: SECTION_NAMES.BUSINESS_ACTIVITY,
+			});
 		},
 	});
 
@@ -87,7 +72,7 @@ export function BusinessActivityForm() {
 		form.reset(getDefaultValues(kycData));
 	}, [form, kycData]);
 
-	const selectedGeography = form.state.values.mainGeographiesOfClients[0] ?? "";
+	const selectedGeography = form.state.values.main_geographies_of_clients[0] ?? "";
 
 	return (
 		<form
@@ -103,7 +88,7 @@ export function BusinessActivityForm() {
 			/>
 
 			<FieldGroup className="flex flex-col gap-4">
-				<form.Field name="natureOfBusiness">
+				<form.Field name="nature_of_business">
 					{(field) => (
 						<Field
 							className="gap-1.5"
@@ -124,7 +109,7 @@ export function BusinessActivityForm() {
 					)}
 				</form.Field>
 
-				<form.Field name="descriptionOfProductsServices">
+				<form.Field name="description_of_products_services">
 					{(field) => (
 						<Field
 							className="gap-1.5"
@@ -148,7 +133,7 @@ export function BusinessActivityForm() {
 				</form.Field>
 
 				<KycFormGrid>
-					<form.Field name="expectedMonthlyVerificationVolume">
+					<form.Field name="expected_monthly_verification_volume">
 						{(field) => (
 							<Field
 								className="gap-1.5"
@@ -179,7 +164,7 @@ export function BusinessActivityForm() {
 						)}
 					</form.Field>
 
-					<form.Field name="mainGeographiesOfClients">
+					<form.Field name="main_geographies_of_clients">
 						{(field) => (
 							<Field
 								className="gap-1.5"
@@ -212,7 +197,7 @@ export function BusinessActivityForm() {
 				</KycFormGrid>
 			</FieldGroup>
 
-			<form.Field name="regulatoryLicensesHeld" mode="array">
+			<form.Field name="regulatory_licenses_held" mode="array">
 				{(licensesField) => (
 					<section className="space-y-4">
 						<div className="flex flex-wrap items-center justify-between gap-3">
@@ -251,7 +236,7 @@ export function BusinessActivityForm() {
 							>
 								<div className="space-y-4">
 									<form.Field
-										name={`regulatoryLicensesHeld[${index}].license_name`}
+										name={`regulatory_licenses_held[${index}].license_name`}
 									>
 										{(field) => (
 											<Field
@@ -273,7 +258,7 @@ export function BusinessActivityForm() {
 									</form.Field>
 									<KycFormGrid>
 										<form.Field
-											name={`regulatoryLicensesHeld[${index}].license_number`}
+											name={`regulatory_licenses_held[${index}].license_number`}
 										>
 											{(field) => (
 												<Field
@@ -294,7 +279,7 @@ export function BusinessActivityForm() {
 											)}
 										</form.Field>
 										<form.Field
-											name={`regulatoryLicensesHeld[${index}].country`}
+											name={`regulatory_licenses_held[${index}].country`}
 										>
 											{(field) => (
 												<Field

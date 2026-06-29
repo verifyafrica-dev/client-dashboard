@@ -16,22 +16,22 @@ import { KycSaveButton, KycSectionHeader } from "./kyc-form-primitives";
 function getDefaultValues(
 	kycData: ReturnType<typeof useKyc>["kycData"],
 ): KycComplianceDeclarationsFormValues {
-	const declarations = kycData.complianceDeclarations;
+	const declarations = kycData.compliance_declarations;
 
 	return {
-		notEngagedInProhibitedActivities:
-			declarations.notEngagedInProhibitedActivities ?? false,
-		noDirectorsUbosOnSanctionsLists:
-			declarations.noDirectorsUbosOnSanctionsLists ?? false,
-		informationTrueAndComplete:
-			declarations.informationTrueAndComplete ?? false,
-		agreeToProvideSupportingDocuments:
-			declarations.agreeToProvideSupportingDocuments ?? false,
+		not_engaged_in_prohibited_activities:
+			declarations.not_engaged_in_prohibited_activities ?? false,
+		no_directors_ubos_on_sanctions_lists:
+			declarations.no_directors_ubos_on_sanctions_lists ?? false,
+		information_true_and_complete:
+			declarations.information_true_and_complete ?? false,
+		agree_to_provide_supporting_documents:
+			declarations.agree_to_provide_supporting_documents ?? false,
 	};
 }
 
 export function ComplianceDeclarationsForm() {
-	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+	const { kycData, isReadOnly, isSaving, saveSection } = useKyc();
 
 	const form = useForm({
 		defaultValues: getDefaultValues(kycData),
@@ -39,13 +39,9 @@ export function ComplianceDeclarationsForm() {
 			onSubmit: KycComplianceDeclarationsFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			await saveCompliance(
-				(current) => ({
-					...current,
-					complianceDeclarations: value,
-				}),
-				{ currentSection: SECTION_NAMES.COMPLIANCE_DOCUMENTS },
-			);
+			await saveSection("compliance-declarations", value, {
+				currentSection: SECTION_NAMES.COMPLIANCE_DECLARATIONS,
+			});
 		},
 	});
 

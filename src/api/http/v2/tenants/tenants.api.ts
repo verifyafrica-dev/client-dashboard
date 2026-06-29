@@ -18,6 +18,8 @@ import type {
 	TenantComplianceDataPayload,
 	TenantComplianceDocumentRegisterData,
 	TenantComplianceDocumentRegisterPayload,
+	TenantComplianceDocumentDeleteData,
+	TenantComplianceDocumentDeletePayload,
 	TenantCreatePayload,
 	TenantDetail,
 	TenantInvitation,
@@ -140,6 +142,17 @@ export const TENANTS_V2_API = {
 				withTenantHeader(tenantId),
 			)
 			.then((res) => unwrapV2Data<TenantComplianceDocumentRegisterData>(res)),
+
+	DELETE_COMPLIANCE_DOCUMENT: async (
+		tenantId: string,
+		data: TenantComplianceDocumentDeletePayload,
+	): Promise<TenantComplianceDocumentDeleteData> =>
+		await $http
+			.delete(TENANTS_V2_ENDPOINTS.complianceDocuments, {
+				data,
+				...withTenantHeader(tenantId),
+			})
+			.then((res) => unwrapV2Data<TenantComplianceDocumentDeleteData>(res)),
 
 	SUBMIT_COMPLIANCE: async (tenantId: string): Promise<TenantDetail> =>
 		await $http

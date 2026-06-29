@@ -5,7 +5,7 @@ export const SECTION_NAMES = {
 	BUSINESS_ACTIVITY: "business-activity",
 	ONBOARDING_QUESTIONNAIRE: "onboarding-questionnaire",
 	DOCUMENTS_UPLOAD: "documents-upload",
-	COMPLIANCE_DOCUMENTS: "compliance-documents",
+	COMPLIANCE_DECLARATIONS: "compliance-declarations",
 	AUTHORIZED_SIGNATURE: "authorized-signature",
 } as const;
 
@@ -16,7 +16,7 @@ export const KYC_SECTION_PATHS = [
 	SECTION_NAMES.BUSINESS_ACTIVITY,
 	SECTION_NAMES.ONBOARDING_QUESTIONNAIRE,
 	SECTION_NAMES.DOCUMENTS_UPLOAD,
-	SECTION_NAMES.COMPLIANCE_DOCUMENTS,
+	SECTION_NAMES.COMPLIANCE_DECLARATIONS,
 	SECTION_NAMES.AUTHORIZED_SIGNATURE,
 ] as const;
 
@@ -63,7 +63,7 @@ export const sections: KycSection[] = [
 		title: "Compliance Declarations",
 		description:
 			"Please confirm the following declarations by checking the boxes below:",
-		path: SECTION_NAMES.COMPLIANCE_DOCUMENTS,
+		path: SECTION_NAMES.COMPLIANCE_DECLARATIONS,
 	},
 	{
 		title: "Authorized Signature",

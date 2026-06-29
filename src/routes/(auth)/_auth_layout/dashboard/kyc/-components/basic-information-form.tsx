@@ -31,24 +31,24 @@ function getDefaultValues(
 	kycData: ReturnType<typeof useKyc>["kycData"],
 ): KycBasicInformationFormValues {
 	return {
-		legalName: kycData.company.legalName ?? "",
-		tradingName: kycData.company.tradingName ?? "",
-		countryOfIncorporation: kycData.company.countryOfIncorporation ?? "",
-		registrationNumber: kycData.company.registrationNumber ?? "",
-		dateOfIncorporation: kycData.company.dateOfIncorporation ?? "",
-		registeredAddress: kycData.company.registeredAddress?.address ?? "",
-		registeredPostalCode: kycData.company.registeredAddress?.postalCode ?? "",
-		registeredCountry: kycData.company.registeredAddress?.country ?? "",
-		businessAddress: kycData.company.businessAddress?.address ?? "",
-		businessPostalCode: kycData.company.businessAddress?.postalCode ?? "",
-		businessCountry: kycData.company.businessAddress?.country ?? "",
+		legalName: kycData.company.legal_name ?? "",
+		tradingName: kycData.company.trading_name ?? "",
+		countryOfIncorporation: kycData.company.country_of_incorporation ?? "",
+		registrationNumber: kycData.company.registration_number ?? "",
+		dateOfIncorporation: kycData.company.date_of_incorporation ?? "",
+		registeredAddress: kycData.company.registered_address?.address ?? "",
+		registeredPostalCode: kycData.company.registered_address?.postal_code ?? "",
+		registeredCountry: kycData.company.registered_address?.country ?? "",
+		businessAddress: kycData.company.business_address?.address ?? "",
+		businessPostalCode: kycData.company.business_address?.postal_code ?? "",
+		businessCountry: kycData.company.business_address?.country ?? "",
 		website: kycData.company.website ?? "",
-		taxIdVatNumber: kycData.company.taxIdVatNumber ?? "",
+		taxIdVatNumber: kycData.company.tax_id_vat_number ?? "",
 	};
 }
 
 export function BasicInformationForm() {
-	const { kycData, isReadOnly, isSaving, saveCompliance } = useKyc();
+	const { kycData, isReadOnly, isSaving, saveSection } = useKyc();
 
 	const form = useForm({
 		defaultValues: getDefaultValues(kycData),
@@ -56,35 +56,27 @@ export function BasicInformationForm() {
 			onSubmit: KycBasicInformationFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			await saveCompliance(
-				(current) => ({
-					...current,
-					company: {
-						...current.company,
-						legalName: value.legalName,
-						tradingName: value.tradingName,
-						countryOfIncorporation: value.countryOfIncorporation,
-						registrationNumber: value.registrationNumber,
-						dateOfIncorporation: value.dateOfIncorporation,
-						registeredAddress: {
-							address: value.registeredAddress,
-							postalCode: value.registeredPostalCode,
-							country: value.registeredCountry,
-						},
-						businessAddress:
-							value.businessAddress ||
-							value.businessPostalCode ||
-							value.businessCountry
-								? {
-										address: value.businessAddress ?? "",
-										postalCode: value.businessPostalCode ?? "",
-										country: value.businessCountry ?? "",
-									}
-								: undefined,
-						website: normalizeWebsiteUrl(value.website),
-						taxIdVatNumber: value.taxIdVatNumber,
+			await saveSection(
+				"basic-information",
+				{
+					legal_name: value.legalName,
+					trading_name: value.tradingName,
+					country_of_incorporation: value.countryOfIncorporation,
+					registration_number: value.registrationNumber,
+					date_of_incorporation: value.dateOfIncorporation,
+					registered_address: {
+						address: value.registeredAddress,
+						postal_code: value.registeredPostalCode,
+						country: value.registeredCountry,
 					},
-				}),
+					business_address: {
+						address: value.businessAddress,
+						postal_code: value.businessPostalCode,
+						country: value.businessCountry,
+					},
+					website: normalizeWebsiteUrl(value.website),
+					tax_id_vat_number: value.taxIdVatNumber,
+				},
 				{ currentSection: SECTION_NAMES.BASIC_INFORMATION },
 			);
 		},

@@ -76,7 +76,7 @@ function DashboardPage() {
 	const [timeRange, setTimeRange] = useState<TimeRange>("all");
 	const { tenantId } = useCurrentTenant();
 	const tenantQuery = useTenantV2DetailQuery(tenantId, Boolean(tenantId));
-	const isKycVerified = tenantQuery.data?.kyc_verified ?? false;
+	const isKycVerified = tenantQuery.data?.kyc.kyc_verified ?? false;
 	const isKycLoading = tenantQuery.isPending || tenantQuery.isFetching;
 	const showOnboarding =
 		!tenantQuery.isError &&

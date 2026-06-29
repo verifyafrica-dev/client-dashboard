@@ -15,7 +15,7 @@ const SECTION_FORMS = {
 	[SECTION_NAMES.BUSINESS_ACTIVITY]: BusinessActivityForm,
 	[SECTION_NAMES.ONBOARDING_QUESTIONNAIRE]: OnboardingQuestionnaireForm,
 	[SECTION_NAMES.DOCUMENTS_UPLOAD]: DocumentsUploadForm,
-	[SECTION_NAMES.COMPLIANCE_DOCUMENTS]: ComplianceDeclarationsForm,
+	[SECTION_NAMES.COMPLIANCE_DECLARATIONS]: ComplianceDeclarationsForm,
 	[SECTION_NAMES.AUTHORIZED_SIGNATURE]: AuthorizedSignatureForm,
 } as const;
 

@@ -26,7 +26,7 @@ function SectionStatusIcon({ completed }: { completed: boolean }) {
 }
 
 export function KycSectionList({ sections }: { sections: KycSection[] }) {
-	const { completionStatus, isKycApproved, isKycSubmitted } = useKyc();
+	const { completionStatus, isReadOnly } = useKyc();
 
 	return (
 		<ul className="space-y-3">
@@ -50,7 +50,7 @@ export function KycSectionList({ sections }: { sections: KycSection[] }) {
 							</p>
 						</div>
 
-						{!isKycApproved && (
+						{!isReadOnly && (
 							<Button
 								variant="outline"
 								size="sm"
