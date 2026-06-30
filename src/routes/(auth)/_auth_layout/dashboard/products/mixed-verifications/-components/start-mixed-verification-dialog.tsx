@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useStartMixedVerificationV2Mutation } from "#/api/http/v2/verifications/verifications.hooks";
 import type { MixedVerification } from "#/api/http/v2/verifications/verifications.types";
+import type { V2AxiosError } from "#/api/http/shared";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -33,9 +34,7 @@ export function StartMixedVerificationDialog({
 	const startMutation = useStartMixedVerificationV2Mutation();
 	const [email, setEmail] = useState("");
 	const [fullAddress, setFullAddress] = useState("");
-	const requiresAddress = template
-		? mixedVerificationRequiresAddress(template)
-		: false;
+	const [requiresAddress, setRequiresAddress] = useState(false);
 
 	useEffect(() => {
 		if (!open) {
@@ -43,6 +42,12 @@ export function StartMixedVerificationDialog({
 			setFullAddress("");
 		}
 	}, [open]);
+
+	useLayoutEffect(() => {
+		if (template) {
+			setRequiresAddress(mixedVerificationRequiresAddress(template));
+		}
+	}, [template]);
 
 	async function handleStart() {
 		if (!template) {
@@ -72,8 +77,9 @@ export function StartMixedVerificationDialog({
 			});
 			toast.success("Mixed verification started successfully.");
 			onOpenChange(false);
-		} catch {
-			toast.error("Failed to start mixed verification.");
+		} catch (error) {
+			const message = (error as V2AxiosError).response?.data?.message;
+			toast.error(message ?? "Failed to start mixed verification.");
 		}
 	}
 
@@ -83,7 +89,7 @@ export function StartMixedVerificationDialog({
 				<DialogHeader>
 					<DialogTitle className="font-semibold">Start Mixed Verification</DialogTitle>
 					<DialogDescription>
-						{template?.name ?? "Launch a hosted verification flow for a recipient."}
+						{template?.name}
 					</DialogDescription>
 				</DialogHeader>
 

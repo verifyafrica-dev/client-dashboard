@@ -6,7 +6,7 @@ import type {
 	VerificationRequest,
 	VerificationRequestCreatePayload,
 } from "#/api/http/v2/verifications/verifications.types";
-import { getV2ErrorMessage } from "#/lib/api-errors";
+import type { V2AxiosError } from "#/api/http/shared";
 import {
 	buildLinkResult,
 	type HostedLinkResult,
@@ -72,11 +72,9 @@ export function useProductVerificationSubmit(
 			setIsResultDialogOpen(true);
 			return true;
 		} catch (error) {
+			const message = (error as V2AxiosError).response?.data?.message;
 			toast.error(
-				getV2ErrorMessage(
-					error,
-					options?.errorMessage ?? "Failed to submit verification.",
-				),
+				message ?? options?.errorMessage ?? "Failed to submit verification.",
 			);
 			return false;
 		}

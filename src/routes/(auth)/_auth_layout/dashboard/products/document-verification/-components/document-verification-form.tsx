@@ -10,7 +10,7 @@ import { z } from "zod";
 
 import { useCreateVerificationRequestV2Mutation } from "#/api/http/v2/verifications/verifications.hooks";
 import type { VerificationRequest } from "#/api/http/v2/verifications/verifications.types";
-import { getV2ErrorMessage } from "#/lib/api-errors";
+import type { V2AxiosError } from "#/api/http/shared";
 import type { HostedLinkResult } from "#/lib/verification-links";
 import { buildLinkResult } from "#/lib/verification-links";
 import { Button } from "#/components/ui/button";
@@ -117,9 +117,8 @@ export function DocumentVerificationForm() {
 			setIsResultDialogOpen(true);
 			resetForms();
 		} catch (error) {
-			toast.error(
-				getV2ErrorMessage(error, "Failed to submit document verification."),
-			);
+			const message = (error as V2AxiosError).response?.data?.message;
+			toast.error(message ?? "Failed to submit document verification.");
 		}
 	}
 
