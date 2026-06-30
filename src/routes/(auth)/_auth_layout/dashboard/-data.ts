@@ -61,6 +61,7 @@ export type TrendPoint = {
 export type VerificationTypePoint = {
 	type: string;
 	count: number;
+	fill: string;
 };
 
 export type DashboardStats = {
@@ -129,6 +130,7 @@ function mapTypeDistribution(
 	return Array.from(grouped.entries()).map(([type, count]) => ({
 		type,
 		count,
+		fill: `var(--color-${type})`,
 	}));
 }
 

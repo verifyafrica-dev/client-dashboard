@@ -16,8 +16,6 @@ import {
 	CartesianGrid,
 	Pie,
 	PieChart,
-	type PieSectorShapeProps,
-	Sector,
 	XAxis,
 } from "recharts";
 import { useTenantAnalyticsV2Query } from "#/api/http/v2/analytics/analytics.hooks";
@@ -179,16 +177,6 @@ function DashboardPage() {
 
 function DashboardKycLoadingState() {
 	return <Skeleton className="h-48 w-full rounded-2xl" />;
-}
-
-function VerificationTypeSector(props: PieSectorShapeProps) {
-	const type = String(props.payload?.type ?? "");
-	return (
-		<Sector
-			{...props}
-			fill={`var(--color-${type})`}
-		/>
-	);
 }
 
 function formatCurrency(value: number) {
@@ -451,7 +439,14 @@ function DashboardContent({
 							className="mx-auto aspect-square h-[280px] w-full max-w-[320px]"
 						>
 							<PieChart>
-								<ChartTooltip content={<ChartTooltipContent hideLabel />} />
+								<ChartTooltip
+									content={
+										<ChartTooltipContent
+											hideLabel
+											nameKey="type"
+										/>
+									}
+								/>
 								<Pie
 									data={typeData}
 									dataKey="count"
@@ -459,7 +454,6 @@ function DashboardContent({
 									innerRadius={60}
 									outerRadius={100}
 									paddingAngle={2}
-									shape={VerificationTypeSector}
 								/>
 							</PieChart>
 						</ChartContainer>
@@ -472,9 +466,7 @@ function DashboardContent({
 									<span className="flex items-center gap-2 text-muted-foreground">
 										<span
 											className="size-2 shrink-0 rounded-full"
-											style={{
-												backgroundColor: `var(--color-${entry.type})`,
-											}}
+											style={{ backgroundColor: entry.fill }}
 										/>
 										{typeChartConfig[entry.type as keyof typeof typeChartConfig]
 											?.label ?? entry.type}
