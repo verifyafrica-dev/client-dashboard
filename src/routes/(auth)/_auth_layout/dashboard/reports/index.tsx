@@ -1,6 +1,6 @@
 import { ArrowsClockwiseIcon, EyeIcon, StackIcon } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 
 import { VERIFICATIONS_V2_QUERY_KEYS } from "#/api/http/v2/verifications/verifications.hooks";
@@ -122,8 +122,10 @@ function ReportsPage() {
 						/>
 						Refresh
 					</Button>
-					<Button className="cursor-pointer tracking-wide">
-						New Verification
+					<Button className="cursor-pointer tracking-wide" asChild>
+						<Link to="/dashboard/products">
+							New Verification
+						</Link>
 					</Button>
 				</div>
 			</div>
