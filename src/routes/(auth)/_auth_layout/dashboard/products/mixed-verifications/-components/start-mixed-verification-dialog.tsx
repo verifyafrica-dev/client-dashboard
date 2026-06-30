@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useStartMixedVerificationV2Mutation } from "#/api/http/v2/verifications/verifications.hooks";
@@ -34,7 +34,9 @@ export function StartMixedVerificationDialog({
 	const startMutation = useStartMixedVerificationV2Mutation();
 	const [email, setEmail] = useState("");
 	const [fullAddress, setFullAddress] = useState("");
-	const [requiresAddress, setRequiresAddress] = useState(false);
+	const requiresAddress = template
+		? mixedVerificationRequiresAddress(template)
+		: false;
 
 	useEffect(() => {
 		if (!open) {
@@ -42,12 +44,6 @@ export function StartMixedVerificationDialog({
 			setFullAddress("");
 		}
 	}, [open]);
-
-	useLayoutEffect(() => {
-		if (template) {
-			setRequiresAddress(mixedVerificationRequiresAddress(template));
-		}
-	}, [template]);
 
 	async function handleStart() {
 		if (!template) {

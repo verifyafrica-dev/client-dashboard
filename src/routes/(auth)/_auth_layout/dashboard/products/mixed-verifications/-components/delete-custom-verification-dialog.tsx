@@ -14,11 +14,13 @@ import {
 import { Button } from "#/components/ui/button";
 
 type DeleteCustomVerificationDialogProps = {
+	open: boolean;
 	template: MixedVerification | null;
 	onOpenChange: (open: boolean) => void;
 };
 
 export function DeleteCustomVerificationDialog({
+	open,
 	template,
 	onOpenChange,
 }: DeleteCustomVerificationDialogProps) {
@@ -39,7 +41,7 @@ export function DeleteCustomVerificationDialog({
 	}
 
 	return (
-		<AlertDialog open={Boolean(template)} onOpenChange={onOpenChange}>
+		<AlertDialog open={open} onOpenChange={onOpenChange}>
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle className="font-semibold">Delete Custom Verification</AlertDialogTitle>

@@ -93,6 +93,8 @@ function MixedVerificationsPage() {
 	);
 
 	const [customDialogOpen, setCustomDialogOpen] = useState(false);
+	const [startDialogOpen, setStartDialogOpen] = useState(false);
+	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [editingTemplate, setEditingTemplate] =
 		useState<MixedVerification | null>(null);
 	const [startingTemplate, setStartingTemplate] =
@@ -117,6 +119,16 @@ function MixedVerificationsPage() {
 	function openEditDialog(template: MixedVerification) {
 		setEditingTemplate(template);
 		setCustomDialogOpen(true);
+	}
+
+	function openStartDialog(template: MixedVerification) {
+		setStartingTemplate(template);
+		setStartDialogOpen(true);
+	}
+
+	function openDeleteDialog(template: MixedVerification) {
+		setDeletingTemplate(template);
+		setDeleteDialogOpen(true);
 	}
 
 	return (
@@ -167,9 +179,9 @@ function MixedVerificationsPage() {
 						templates={groupedTemplates.platform}
 						isLoading={mixedVerificationsQuery.isPending}
 						canManageCustom={isTenantAdmin}
-						onStart={setStartingTemplate}
+						onStart={openStartDialog}
 						onEdit={openEditDialog}
-						onDelete={setDeletingTemplate}
+						onDelete={openDeleteDialog}
 					/>
 
 					<MixedVerificationSection
@@ -182,9 +194,9 @@ function MixedVerificationsPage() {
 						templates={groupedTemplates.custom}
 						isLoading={mixedVerificationsQuery.isPending}
 						canManageCustom={isTenantAdmin}
-						onStart={setStartingTemplate}
+						onStart={openStartDialog}
 						onEdit={openEditDialog}
-						onDelete={setDeletingTemplate}
+						onDelete={openDeleteDialog}
 					/>
 				</div>
 			)}
@@ -198,22 +210,15 @@ function MixedVerificationsPage() {
 						template={editingTemplate}
 					/>
 					<StartMixedVerificationDialog
-						open={Boolean(startingTemplate)}
-						onOpenChange={(open) => {
-							if (!open) {
-								setStartingTemplate(null);
-							}
-						}}
+						open={startDialogOpen}
+						onOpenChange={setStartDialogOpen}
 						template={startingTemplate}
 						tenantId={tenantId}
 					/>
 					<DeleteCustomVerificationDialog
+						open={deleteDialogOpen}
 						template={deletingTemplate}
-						onOpenChange={(open) => {
-							if (!open) {
-								setDeletingTemplate(null);
-							}
-						}}
+						onOpenChange={setDeleteDialogOpen}
 					/>
 				</>
 			)}
