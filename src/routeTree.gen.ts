@@ -30,6 +30,7 @@ import { Route as authAuth_layoutDashboardBillingIndexRouteImport } from './rout
 import { Route as authAuth_layoutDashboardApikeysIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/apikeys/index'
 import { Route as authAuth_layoutDashboardTeamInvitationsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/invitations/index'
 import { Route as authAuth_layoutDashboardTeamActiveUsersIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/active-users/index'
+import { Route as authAuth_layoutDashboardReportsIdIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/reports/$id/index'
 import { Route as authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/risk-assessment/index'
 import { Route as authAuth_layoutDashboardProductsMixedVerificationsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/mixed-verifications/index'
 import { Route as authAuth_layoutDashboardProductsKybIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/kyb/index'
@@ -40,6 +41,7 @@ import { Route as authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRout
 import { Route as authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/business-aml-screening/index'
 import { Route as authAuth_layoutDashboardProductsAmlScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/aml-screening/index'
 import { Route as authAuth_layoutDashboardProductsAddressVerificationIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/address-verification/index'
+import { Route as authAuth_layoutDashboardReportsBatchBatchIdIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/reports/batch/$batchId/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -163,6 +165,12 @@ const authAuth_layoutDashboardTeamActiveUsersIndexRoute =
     path: '/dashboard/team/active-users/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
+const authAuth_layoutDashboardReportsIdIndexRoute =
+  authAuth_layoutDashboardReportsIdIndexRouteImport.update({
+    id: '/dashboard/reports/$id/',
+    path: '/dashboard/reports/$id/',
+    getParentRoute: () => authAuth_layoutRoute,
+  } as any)
 const authAuth_layoutDashboardProductsRiskAssessmentIndexRoute =
   authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport.update({
     id: '/dashboard/products/risk-assessment/',
@@ -225,6 +233,12 @@ const authAuth_layoutDashboardProductsAddressVerificationIndexRoute =
     path: '/dashboard/products/address-verification/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
+const authAuth_layoutDashboardReportsBatchBatchIdIndexRoute =
+  authAuth_layoutDashboardReportsBatchBatchIdIndexRouteImport.update({
+    id: '/dashboard/reports/batch/$batchId/',
+    path: '/dashboard/reports/batch/$batchId/',
+    getParentRoute: () => authAuth_layoutRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -254,8 +268,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
   '/dashboard/products/mixed-verifications/': typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
   '/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
+  '/dashboard/reports/$id/': typeof authAuth_layoutDashboardReportsIdIndexRoute
   '/dashboard/team/active-users/': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
   '/dashboard/team/invitations/': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
+  '/dashboard/reports/batch/$batchId/': typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -285,8 +301,10 @@ export interface FileRoutesByTo {
   '/dashboard/products/kyb': typeof authAuth_layoutDashboardProductsKybIndexRoute
   '/dashboard/products/mixed-verifications': typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
   '/dashboard/products/risk-assessment': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
+  '/dashboard/reports/$id': typeof authAuth_layoutDashboardReportsIdIndexRoute
   '/dashboard/team/active-users': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
   '/dashboard/team/invitations': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
+  '/dashboard/reports/batch/$batchId': typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -319,8 +337,10 @@ export interface FileRoutesById {
   '/(auth)/_auth_layout/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
   '/(auth)/_auth_layout/dashboard/products/mixed-verifications/': typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
   '/(auth)/_auth_layout/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
+  '/(auth)/_auth_layout/dashboard/reports/$id/': typeof authAuth_layoutDashboardReportsIdIndexRoute
   '/(auth)/_auth_layout/dashboard/team/active-users/': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
   '/(auth)/_auth_layout/dashboard/team/invitations/': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
+  '/(auth)/_auth_layout/dashboard/reports/batch/$batchId/': typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -352,8 +372,10 @@ export interface FileRouteTypes {
     | '/dashboard/products/kyb/'
     | '/dashboard/products/mixed-verifications/'
     | '/dashboard/products/risk-assessment/'
+    | '/dashboard/reports/$id/'
     | '/dashboard/team/active-users/'
     | '/dashboard/team/invitations/'
+    | '/dashboard/reports/batch/$batchId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -383,8 +405,10 @@ export interface FileRouteTypes {
     | '/dashboard/products/kyb'
     | '/dashboard/products/mixed-verifications'
     | '/dashboard/products/risk-assessment'
+    | '/dashboard/reports/$id'
     | '/dashboard/team/active-users'
     | '/dashboard/team/invitations'
+    | '/dashboard/reports/batch/$batchId'
   id:
     | '__root__'
     | '/'
@@ -416,8 +440,10 @@ export interface FileRouteTypes {
     | '/(auth)/_auth_layout/dashboard/products/kyb/'
     | '/(auth)/_auth_layout/dashboard/products/mixed-verifications/'
     | '/(auth)/_auth_layout/dashboard/products/risk-assessment/'
+    | '/(auth)/_auth_layout/dashboard/reports/$id/'
     | '/(auth)/_auth_layout/dashboard/team/active-users/'
     | '/(auth)/_auth_layout/dashboard/team/invitations/'
+    | '/(auth)/_auth_layout/dashboard/reports/batch/$batchId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -575,6 +601,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authAuth_layoutDashboardTeamActiveUsersIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
+    '/(auth)/_auth_layout/dashboard/reports/$id/': {
+      id: '/(auth)/_auth_layout/dashboard/reports/$id/'
+      path: '/dashboard/reports/$id'
+      fullPath: '/dashboard/reports/$id/'
+      preLoaderRoute: typeof authAuth_layoutDashboardReportsIdIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
+    }
     '/(auth)/_auth_layout/dashboard/products/risk-assessment/': {
       id: '/(auth)/_auth_layout/dashboard/products/risk-assessment/'
       path: '/dashboard/products/risk-assessment'
@@ -645,6 +678,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof authAuth_layoutDashboardProductsAddressVerificationIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
+    '/(auth)/_auth_layout/dashboard/reports/batch/$batchId/': {
+      id: '/(auth)/_auth_layout/dashboard/reports/batch/$batchId/'
+      path: '/dashboard/reports/batch/$batchId'
+      fullPath: '/dashboard/reports/batch/$batchId/'
+      preLoaderRoute: typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRouteImport
+      parentRoute: typeof authAuth_layoutRoute
+    }
   }
 }
 
@@ -667,8 +707,10 @@ interface authAuth_layoutRouteChildren {
   authAuth_layoutDashboardProductsKybIndexRoute: typeof authAuth_layoutDashboardProductsKybIndexRoute
   authAuth_layoutDashboardProductsMixedVerificationsIndexRoute: typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
   authAuth_layoutDashboardProductsRiskAssessmentIndexRoute: typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
+  authAuth_layoutDashboardReportsIdIndexRoute: typeof authAuth_layoutDashboardReportsIdIndexRoute
   authAuth_layoutDashboardTeamActiveUsersIndexRoute: typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
   authAuth_layoutDashboardTeamInvitationsIndexRoute: typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
+  authAuth_layoutDashboardReportsBatchBatchIdIndexRoute: typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRoute
 }
 
 const authAuth_layoutRouteChildren: authAuth_layoutRouteChildren = {
@@ -706,10 +748,14 @@ const authAuth_layoutRouteChildren: authAuth_layoutRouteChildren = {
     authAuth_layoutDashboardProductsMixedVerificationsIndexRoute,
   authAuth_layoutDashboardProductsRiskAssessmentIndexRoute:
     authAuth_layoutDashboardProductsRiskAssessmentIndexRoute,
+  authAuth_layoutDashboardReportsIdIndexRoute:
+    authAuth_layoutDashboardReportsIdIndexRoute,
   authAuth_layoutDashboardTeamActiveUsersIndexRoute:
     authAuth_layoutDashboardTeamActiveUsersIndexRoute,
   authAuth_layoutDashboardTeamInvitationsIndexRoute:
     authAuth_layoutDashboardTeamInvitationsIndexRoute,
+  authAuth_layoutDashboardReportsBatchBatchIdIndexRoute:
+    authAuth_layoutDashboardReportsBatchBatchIdIndexRoute,
 }
 
 const authAuth_layoutRouteWithChildren = authAuth_layoutRoute._addFileChildren(

@@ -1,4 +1,5 @@
 import { EyeIcon } from "@phosphor-icons/react";
+import { Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTenantVerificationRequestsV2Query } from "#/api/http/v2/verifications/verifications.hooks";
@@ -229,9 +230,15 @@ function IndividualVerificationRow({
 	verification: VerificationReport;
 }) {
 	return (
-		<TableRow>
+		<TableRow className="cursor-pointer">
 			<TableCell className="pl-4 font-mono text-xs sm:pl-6">
-				<p className="truncate max-w-[15ch]">{verification.id}</p>
+				<Link
+					to="/dashboard/reports/$id"
+					params={{ id: verification.id }}
+					className="block truncate max-w-[15ch] hover:underline"
+				>
+					{verification.id}
+				</Link>
 			</TableCell>
 			<TableCell className="font-mono text-xs">
 				<p className="truncate max-w-[15ch]">
@@ -260,9 +267,15 @@ function IndividualVerificationRow({
 					variant="outline"
 					size="sm"
 					className="cursor-pointer uppercase tracking-wide"
+					asChild
 				>
-					<EyeIcon className="size-4" />
-					View
+					<Link
+						to="/dashboard/reports/$id"
+						params={{ id: verification.id }}
+					>
+						<EyeIcon className="size-4" />
+						View
+					</Link>
 				</Button>
 			</TableCell>
 		</TableRow>

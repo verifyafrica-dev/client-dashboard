@@ -64,7 +64,12 @@ export function VerificationResultDialog({
 					</Button>
 					{verificationId ? (
 						<Button type="button" className="cursor-pointer" asChild>
-							<Link to="/dashboard/reports">View Reports</Link>
+							<Link
+								to="/dashboard/reports/$id"
+								params={{ id: verificationId }}
+							>
+								View Report
+							</Link>
 						</Button>
 					) : null}
 				</DialogFooter>

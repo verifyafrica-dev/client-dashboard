@@ -1,4 +1,5 @@
 import { EyeIcon } from "@phosphor-icons/react";
+import { Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTenantVerificationBatchesV2Query } from "#/api/http/v2/verifications/verifications.hooks";
@@ -225,9 +226,15 @@ function BatchVerificationRow({ batch }: { batch: BatchVerificationReport }) {
 			: "0";
 
 	return (
-		<TableRow>
+		<TableRow className="cursor-pointer">
 			<TableCell className="pl-4 font-mono text-xs sm:pl-6">
-				<p className="truncate max-w-[15ch]">{batch.id}</p>
+				<Link
+					to="/dashboard/reports/batch/$batchId"
+					params={{ batchId: batch.id }}
+					className="block truncate max-w-[15ch] hover:underline"
+				>
+					{batch.id}
+				</Link>
 			</TableCell>
 			<TableCell>
 				<VerificationStatusBadge status={batch.status} />
@@ -270,9 +277,15 @@ function BatchVerificationRow({ batch }: { batch: BatchVerificationReport }) {
 					variant="outline"
 					size="sm"
 					className="cursor-pointer uppercase tracking-wide"
+					asChild
 				>
-					<EyeIcon className="size-4" />
-					View
+					<Link
+						to="/dashboard/reports/batch/$batchId"
+						params={{ batchId: batch.id }}
+					>
+						<EyeIcon className="size-4" />
+						View
+					</Link>
 				</Button>
 			</TableCell>
 		</TableRow>
