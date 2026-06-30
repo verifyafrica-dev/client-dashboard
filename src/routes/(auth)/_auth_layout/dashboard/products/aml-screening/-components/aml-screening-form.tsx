@@ -28,7 +28,9 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
+import { VerificationResultDialog } from "../../-components/verification-result-dialog";
 import { useTenantSupportedCountries } from "../../-countries";
+import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
 	VERIFICATION_MODES,
@@ -41,6 +43,8 @@ import {
 	DEFAULT_AML_SCREENING_FILTERS,
 	DEFAULT_MATCH_SCORE,
 	type AmlScreeningFilterKey,
+	buildAmlScreeningDirectPayload,
+	buildAmlScreeningLinkPayload,
 } from "../-data";
 
 const linkFormSchema = z.object({
@@ -71,7 +75,17 @@ export function AmlScreeningForm() {
 	const [mode, setMode] = useState<VerificationMode>("link");
 	const [filters, setFilters] = useState(DEFAULT_AML_SCREENING_FILTERS);
 	const [matchScore, setMatchScore] = useState(DEFAULT_MATCH_SCORE);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const {
+		submitVerification,
+		linkResult,
+		verificationResult,
+		isResultDialogOpen,
+		setIsResultDialogOpen,
+		isSubmitting,
+		handleStartNewVerification,
+	} = useProductVerificationSubmit({
+		errorMessage: "Failed to submit AML screening verification.",
+	});
 	const { countries, isPending: isCountriesPending } =
 		useTenantSupportedCountries();
 
@@ -91,17 +105,23 @@ export function AmlScreeningForm() {
 			onChange: linkFormSchema,
 			onSubmit: linkFormSchema,
 		},
-		onSubmit: async () => {
+		onSubmit: async ({ value }) => {
 			if (!hasSelectedFilters) {
 				toast.error("Select at least one filter");
 				return;
 			}
 
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+			const submitted = await submitVerification(
+				buildAmlScreeningLinkPayload(value, { filters, matchScore }),
+				{
+					mode: "link",
+					email: value.email,
+					urlLimit: value.urlLimit,
+				},
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
@@ -118,20 +138,29 @@ export function AmlScreeningForm() {
 			onChange: directFormSchema,
 			onSubmit: directFormSchema,
 		},
-		onSubmit: async () => {
+		onSubmit: async ({ value }) => {
 			if (!hasSelectedFilters) {
 				toast.error("Select at least one filter");
 				return;
 			}
 
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+			const submitted = await submitVerification(
+				buildAmlScreeningDirectPayload(value, { filters, matchScore }),
+				{ mode: "direct" },
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
+
+	function resetForms() {
+		linkForm.reset();
+		directForm.reset();
+		setFilters(DEFAULT_AML_SCREENING_FILTERS);
+		setMatchScore(DEFAULT_MATCH_SCORE);
+	}
 
 	const activeForm = mode === "link" ? linkForm : directForm;
 
@@ -478,6 +507,15 @@ export function AmlScreeningForm() {
 					)}
 				</form>
 			</CardContent>
+
+			<VerificationResultDialog
+				open={isResultDialogOpen}
+				onOpenChange={setIsResultDialogOpen}
+				linkResult={linkResult}
+				verification={verificationResult}
+				onStartNew={() => handleStartNewVerification(resetForms)}
+				description="Your AML screening verification request was created successfully."
+			/>
 		</Card>
 	);
 }

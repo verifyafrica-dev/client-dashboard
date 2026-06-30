@@ -39,7 +39,9 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
+import { VerificationResultDialog } from "../../-components/verification-result-dialog";
 import { useTenantSupportedCountries } from "../../-countries";
+import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import type { SupportedCountry } from "#/api/http/v2/tenants/tenants.types";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
@@ -54,6 +56,10 @@ import {
 	DEFAULT_MATCH_SCORE,
 	type AmlScreeningFilterKey,
 } from "../../aml-screening/-data";
+import {
+	buildBusinessAmlScreeningDirectPayload,
+	buildBusinessAmlScreeningLinkPayload,
+} from "../-data";
 
 const businessFieldsSchema = {
 	screeningCountry: z.string(),
@@ -87,7 +93,17 @@ export function BusinessAmlScreeningForm() {
 	const [mode, setMode] = useState<VerificationMode>("link");
 	const [filters, setFilters] = useState(DEFAULT_AML_SCREENING_FILTERS);
 	const [matchScore, setMatchScore] = useState(DEFAULT_MATCH_SCORE);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const {
+		submitVerification,
+		linkResult,
+		verificationResult,
+		isResultDialogOpen,
+		setIsResultDialogOpen,
+		isSubmitting,
+		handleStartNewVerification,
+	} = useProductVerificationSubmit({
+		errorMessage: "Failed to submit business AML screening verification.",
+	});
 	const { countries, isPending: isCountriesPending } =
 		useTenantSupportedCountries();
 
@@ -109,17 +125,23 @@ export function BusinessAmlScreeningForm() {
 			onChange: linkFormSchema,
 			onSubmit: linkFormSchema,
 		},
-		onSubmit: async () => {
+		onSubmit: async ({ value }) => {
 			if (!hasSelectedFilters) {
 				toast.error("Select at least one filter");
 				return;
 			}
 
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+			const submitted = await submitVerification(
+				buildBusinessAmlScreeningLinkPayload(value, { filters, matchScore }),
+				{
+					mode: "link",
+					email: value.email,
+					urlLimit: value.urlLimit,
+				},
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
@@ -136,20 +158,29 @@ export function BusinessAmlScreeningForm() {
 			onChange: directFormSchema,
 			onSubmit: directFormSchema,
 		},
-		onSubmit: async () => {
+		onSubmit: async ({ value }) => {
 			if (!hasSelectedFilters) {
 				toast.error("Select at least one filter");
 				return;
 			}
 
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+			const submitted = await submitVerification(
+				buildBusinessAmlScreeningDirectPayload(value, { filters, matchScore }),
+				{ mode: "direct" },
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
+
+	function resetForms() {
+		linkForm.reset();
+		directForm.reset();
+		setFilters(DEFAULT_AML_SCREENING_FILTERS);
+		setMatchScore(DEFAULT_MATCH_SCORE);
+	}
 
 	const activeForm = mode === "link" ? linkForm : directForm;
 
@@ -509,6 +540,15 @@ export function BusinessAmlScreeningForm() {
 					)}
 				</form>
 			</CardContent>
+
+			<VerificationResultDialog
+				open={isResultDialogOpen}
+				onOpenChange={setIsResultDialogOpen}
+				linkResult={linkResult}
+				verification={verificationResult}
+				onStartNew={() => handleStartNewVerification(resetForms)}
+				description="Your business AML screening verification request was created successfully."
+			/>
 		</Card>
 	);
 }

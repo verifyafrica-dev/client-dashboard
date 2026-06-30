@@ -37,7 +37,12 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
-import { verificationConsentSchema } from "../../../-components/VerificationConsentCheckbox/data";
+import {
+	DEFAULT_VERIFICATION_URL_LIMIT,
+	verificationConsentSchema,
+} from "../../../-components/VerificationConsentCheckbox/data";
+import { VerificationResultDialog } from "../../-components/verification-result-dialog";
+import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import {
 	AML_SCREENING_FILTERS,
 	DEFAULT_AML_SCREENING_FILTERS,
@@ -47,6 +52,7 @@ import {
 	DEFAULT_RISK_RANGES,
 	RISK_ASSESSMENT_CHECKS,
 	RISK_LEVELS,
+	buildRiskAssessmentPayload,
 	type RiskLevelKey,
 	type RiskRange,
 } from "../-data";
@@ -66,7 +72,17 @@ export function RiskAssessmentForm() {
 	const [filters, setFilters] = useState(DEFAULT_AML_SCREENING_FILTERS);
 	const [riskRanges, setRiskRanges] = useState(DEFAULT_RISK_RANGES);
 	const [isCheckDialogOpen, setIsCheckDialogOpen] = useState(false);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const {
+		submitVerification,
+		linkResult,
+		verificationResult,
+		isResultDialogOpen,
+		setIsResultDialogOpen,
+		isSubmitting,
+		handleStartNewVerification,
+	} = useProductVerificationSubmit({
+		errorMessage: "Failed to submit risk assessment verification.",
+	});
 
 	const hasSelectedFilters = useMemo(
 		() => Object.values(filters).some(Boolean),
@@ -84,24 +100,36 @@ export function RiskAssessmentForm() {
 			onChange: riskAssessmentFormSchema,
 			onSubmit: riskAssessmentFormSchema,
 		},
-		onSubmit: async () => {
+		onSubmit: async ({ value }) => {
 			if (!hasSelectedFilters) {
 				toast.error("Select at least one filter");
 				return;
 			}
 
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+			const submitted = await submitVerification(
+				buildRiskAssessmentPayload(value),
+				{
+					mode: "link",
+					email: value.email,
+					urlLimit: DEFAULT_VERIFICATION_URL_LIMIT,
+				},
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
 
-	const selectedCheckLabel = RISK_ASSESSMENT_CHECKS.find(
-		(check) => check.id === form.state.values.selectedCheck,
-	)?.label;
+	function resetForms() {
+		form.reset();
+		setFilters(DEFAULT_AML_SCREENING_FILTERS);
+		setRiskRanges(DEFAULT_RISK_RANGES);
+	}
+
+	const selectedCheckTitle = RISK_ASSESSMENT_CHECKS.find(
+		(check) => check.risk_reference === form.state.values.selectedCheck,
+	)?.title;
 
 	function toggleFilter(key: AmlScreeningFilterKey, checked: boolean) {
 		setFilters((current) => ({ ...current, [key]: checked }));
@@ -181,7 +209,7 @@ export function RiskAssessmentForm() {
 									onClick={() => setIsCheckDialogOpen(true)}
 								>
 									<ChartBarIcon className="size-4" />
-									{selectedCheckLabel ?? "Select check"}
+									{selectedCheckTitle ?? "Select check"}
 									<CaretRightIcon className="size-4" />
 								</Button>
 
@@ -199,18 +227,18 @@ export function RiskAssessmentForm() {
 													key={check.id}
 													type="button"
 													variant={
-														field.state.value === check.id
+														field.state.value === check.risk_reference
 															? "secondary"
 															: "outline"
 													}
 													className="h-auto justify-start px-4 py-3"
 													onClick={() => {
-														field.handleChange(check.id);
+														field.handleChange(check.risk_reference);
 														setIsCheckDialogOpen(false);
 													}}
 												>
 													<ChartBarIcon className="size-4" />
-													{check.label}
+													{check.title}
 												</Button>
 											))}
 										</div>
@@ -312,6 +340,15 @@ export function RiskAssessmentForm() {
 					</form.Subscribe>
 				</form>
 			</CardContent>
+
+			<VerificationResultDialog
+				open={isResultDialogOpen}
+				onOpenChange={setIsResultDialogOpen}
+				linkResult={linkResult}
+				verification={verificationResult}
+				onStartNew={() => handleStartNewVerification(resetForms)}
+				description="Your risk assessment verification request was created successfully."
+			/>
 		</Card>
 	);
 }

@@ -30,6 +30,8 @@ import { VerificationConsentCheckbox } from "../../../-components/VerificationCo
 import { verificationConsentSchema } from "../../../-components/VerificationConsentCheckbox/data";
 import { useTenantSupportedCountries } from "../../-countries";
 import { ProductProofUpload } from "../../-components/product-proof-upload";
+import { VerificationResultDialog } from "../../-components/verification-result-dialog";
+import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import {
 	IMAGE_UPLOAD_MIME_TYPES,
 	PRODUCT_UPLOAD_FOLDERS,
@@ -37,6 +39,7 @@ import {
 import { KycDatePicker } from "../../../kyc/-components/kyc-form-primitives";
 import {
 	allowsCustomerDataValidation,
+	buildGovernmentRegistryPayload,
 	filterToRegistryCountries,
 	getPrimaryInputLabel,
 	getRegistryVerificationTypes,
@@ -134,12 +137,23 @@ const defaultValues = {
 };
 
 export function GovernmentRegistryChecksForm() {
-	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [selfieProofUrl, setSelfieProofUrl] = useState<string | null>(null);
+	const [isProofUploading, setIsProofUploading] = useState(false);
 	const [country, setCountry] = useState("");
 	const [verificationType, setVerificationType] = useState("");
 	const [includeValidation, setIncludeValidation] = useState(false);
 	const [includeSelfie, setIncludeSelfie] = useState(false);
+	const {
+		submitVerification,
+		linkResult,
+		verificationResult,
+		isResultDialogOpen,
+		setIsResultDialogOpen,
+		isSubmitting,
+		handleStartNewVerification,
+	} = useProductVerificationSubmit({
+		errorMessage: "Failed to submit government registry verification.",
+	});
 	const { countries, isPending: isCountriesPending } =
 		useTenantSupportedCountries({ filter: filterToRegistryCountries });
 
@@ -161,17 +175,19 @@ export function GovernmentRegistryChecksForm() {
 			onChange: governmentRegistryChecksFormSchema,
 			onSubmit: governmentRegistryChecksFormSchema,
 		},
-		onSubmit: async () => {
+		onSubmit: async ({ value }) => {
 			if (includeSelfie && !selfieProofUrl) {
 				toast.error("Selfie image is required for facial matching");
 				return;
 			}
 
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+			const submitted = await submitVerification(
+				buildGovernmentRegistryPayload(value, { selfieProofUrl }),
+				{ mode: "direct" },
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
@@ -190,13 +206,18 @@ export function GovernmentRegistryChecksForm() {
 		setSelfieProofUrl(null);
 	};
 
-	const handleReset = () => {
+	function resetForms() {
 		form.reset();
 		setCountry("");
 		setVerificationType("");
 		setIncludeValidation(false);
 		setIncludeSelfie(false);
 		setSelfieProofUrl(null);
+		setIsProofUploading(false);
+	}
+
+	const handleReset = () => {
+		resetForms();
 	};
 
 	return (
@@ -492,6 +513,7 @@ export function GovernmentRegistryChecksForm() {
 							folder={PRODUCT_UPLOAD_FOLDERS.governmentRegistryChecks}
 							proofUrl={selfieProofUrl}
 							onProofUrlChange={setSelfieProofUrl}
+							onUploadingChange={setIsProofUploading}
 							accept="image/*"
 							allowedMimeTypes={IMAGE_UPLOAD_MIME_TYPES}
 							emptyStateText="Click to upload a selfie image"
@@ -530,6 +552,7 @@ export function GovernmentRegistryChecksForm() {
 										disabled={
 											!canSubmit ||
 											(includeSelfie && !selfieProofUrl) ||
+											isProofUploading ||
 											isSubmitting
 										}
 									>
@@ -542,6 +565,15 @@ export function GovernmentRegistryChecksForm() {
 					) : null}
 				</form>
 			</CardContent>
+
+			<VerificationResultDialog
+				open={isResultDialogOpen}
+				onOpenChange={setIsResultDialogOpen}
+				linkResult={linkResult}
+				verification={verificationResult}
+				onStartNew={() => handleStartNewVerification(resetForms)}
+				description="Your government registry verification request was created successfully."
+			/>
 		</Card>
 	);
 }

@@ -1,6 +1,5 @@
 import { PaperPlaneTiltIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -14,7 +13,16 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
-import { verificationConsentSchema } from "../../../-components/VerificationConsentCheckbox/data";
+import {
+	DEFAULT_VERIFICATION_URL_LIMIT,
+	verificationConsentSchema,
+} from "../../../-components/VerificationConsentCheckbox/data";
+import { VerificationResultDialog } from "../../-components/verification-result-dialog";
+import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
+import {
+	buildCryptoWalletScreeningPayload,
+	isValidWalletAddress,
+} from "../-data";
 
 const cryptoWalletScreeningFormSchema = z.object({
 	email: z.email("Enter a valid email address"),
@@ -23,7 +31,17 @@ const cryptoWalletScreeningFormSchema = z.object({
 });
 
 export function CryptoWalletScreeningForm() {
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const {
+		submitVerification,
+		linkResult,
+		verificationResult,
+		isResultDialogOpen,
+		setIsResultDialogOpen,
+		isSubmitting,
+		handleStartNewVerification,
+	} = useProductVerificationSubmit({
+		errorMessage: "Failed to submit crypto wallet screening verification.",
+	});
 
 	const form = useForm({
 		defaultValues: {
@@ -35,15 +53,30 @@ export function CryptoWalletScreeningForm() {
 			onChange: cryptoWalletScreeningFormSchema,
 			onSubmit: cryptoWalletScreeningFormSchema,
 		},
-		onSubmit: async () => {
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+		onSubmit: async ({ value }) => {
+			if (!isValidWalletAddress(value.walletAddress)) {
+				toast.error("Enter a valid wallet address");
+				return;
+			}
+
+			const submitted = await submitVerification(
+				buildCryptoWalletScreeningPayload(value),
+				{
+					mode: "link",
+					email: value.email,
+					urlLimit: DEFAULT_VERIFICATION_URL_LIMIT,
+				},
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
+
+	function resetForms() {
+		form.reset();
+	}
 
 	return (
 		<Card>
@@ -122,6 +155,15 @@ export function CryptoWalletScreeningForm() {
 					</form.Subscribe>
 				</form>
 			</CardContent>
+
+			<VerificationResultDialog
+				open={isResultDialogOpen}
+				onOpenChange={setIsResultDialogOpen}
+				linkResult={linkResult}
+				verification={verificationResult}
+				onStartNew={() => handleStartNewVerification(resetForms)}
+				description="Your crypto wallet screening verification request was created successfully."
+			/>
 		</Card>
 	);
 }

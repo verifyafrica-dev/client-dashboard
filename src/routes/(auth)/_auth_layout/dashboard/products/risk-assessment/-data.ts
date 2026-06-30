@@ -1,3 +1,12 @@
+import type {
+	VerificationRequestCreatePayload,
+	VerificationType,
+} from "#/api/http/v2/verifications/verifications.types";
+
+const RISK_ASSESSMENT_TYPE = "risk_assessment" satisfies VerificationType;
+
+import riskAssessmentChecksJson from "./risk_assessment.json";
+
 export type RiskLevelKey = "low" | "medium" | "high" | "prohibited";
 
 export type RiskRange = {
@@ -40,10 +49,40 @@ export const DEFAULT_RISK_RANGES: Record<RiskLevelKey, RiskRange> = {
 	prohibited: { min: 100, max: 100, enabled: true },
 };
 
-export const RISK_ASSESSMENT_CHECKS = [
-	{ id: "standard", label: "Standard Risk Check" },
-	{ id: "enhanced", label: "Enhanced Compliance Check" },
-] as const;
+export const RISK_ASSESSMENT_CHECKS = (
+	riskAssessmentChecksJson as RiskAssessmentCheck[]
+).filter((check) => check.mode === "live");
 
-export type RiskAssessmentCheckId =
-	(typeof RISK_ASSESSMENT_CHECKS)[number]["id"];
+export type RiskAssessmentCheck = {
+	id: string;
+	name: string;
+	title: string;
+	description: string;
+	risk_reference: string;
+	mode: "live" | "test";
+};
+
+type RiskAssessmentFormValues = {
+	email: string;
+	phone: string;
+	selectedCheck: string;
+};
+
+export function buildRiskAssessmentPayload(
+	values: RiskAssessmentFormValues,
+	isTest = false,
+): VerificationRequestCreatePayload {
+	return {
+		verification_type: RISK_ASSESSMENT_TYPE,
+		method_type: "onsite",
+		is_test: isTest,
+		input_data: {
+			email: values.email.trim(),
+			language: "EN",
+			risk_assessment: {
+				phone_number: values.phone.trim(),
+				risk_reference: values.selectedCheck,
+			},
+		},
+	};
+}

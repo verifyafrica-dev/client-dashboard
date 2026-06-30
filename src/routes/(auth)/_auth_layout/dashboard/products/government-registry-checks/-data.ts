@@ -1,3 +1,7 @@
+import type {
+	VerificationRequestCreatePayload,
+	VerificationType,
+} from "#/api/http/v2/verifications/verifications.types";
 import { VERIFICATION_TYPES } from "#/lib/constants";
 
 export const REGISTRY_COUNTRY_CODES = ["ng", "za", "gh", "ke"] as const;
@@ -253,4 +257,50 @@ export function filterToRegistryCountries<
 	T extends { code: string; name: string },
 >(countries: T[]) {
 	return filterRegistryCountries(countries, undefined);
+}
+
+type GovernmentRegistryFormValues = {
+	verificationType: string;
+	input: string;
+	lastName: string;
+	includeValidation: boolean;
+	validationFirstName: string;
+	validationLastName: string;
+	validationDateOfBirth: string;
+};
+
+export function buildGovernmentRegistryPayload(
+	values: GovernmentRegistryFormValues,
+	options?: { selfieProofUrl?: string | null },
+	isTest = false,
+): VerificationRequestCreatePayload {
+	const inputField = getPrimaryInputParameter(values.verificationType);
+	if (!inputField) {
+		throw new Error("Unsupported verification type");
+	}
+
+	const inputData: Record<string, unknown> = {
+		[inputField]: values.input.trim(),
+	};
+
+	if (requiresLastNameField(values.verificationType) && values.lastName.trim()) {
+		inputData.last_name = values.lastName.trim();
+	}
+
+	if (values.includeValidation) {
+		inputData.first_name = values.validationFirstName.trim();
+		inputData.last_name = values.validationLastName.trim();
+		inputData.date_of_birth = values.validationDateOfBirth.trim();
+	}
+
+	if (options?.selfieProofUrl) {
+		inputData.selfie = options.selfieProofUrl;
+	}
+
+	return {
+		verification_type: values.verificationType as VerificationType,
+		method_type: "offsite",
+		is_test: isTest,
+		input_data: inputData,
+	};
 }

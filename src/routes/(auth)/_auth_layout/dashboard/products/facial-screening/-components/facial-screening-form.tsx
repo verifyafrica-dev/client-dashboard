@@ -28,6 +28,8 @@ import {
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
 import { ProductProofUpload } from "../../-components/product-proof-upload";
+import { VerificationResultDialog } from "../../-components/verification-result-dialog";
+import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import {
 	IMAGE_UPLOAD_MIME_TYPES,
 	PRODUCT_UPLOAD_FOLDERS,
@@ -44,6 +46,10 @@ import {
 	FACE_VERIFICATION_MODES,
 	type FaceVerificationMode,
 } from "../-data";
+import {
+	buildFacialScreeningDirectPayload,
+	buildFacialScreeningLinkPayload,
+} from "../-payload";
 
 const linkFormSchema = z.object({
 	email: z.email("Enter a valid email address"),
@@ -60,7 +66,18 @@ const directFormSchema = z.object({
 export function FacialScreeningForm() {
 	const [mode, setMode] = useState<VerificationMode>("link");
 	const [facePhotoUrl, setFacePhotoUrl] = useState<string | null>(null);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isProofUploading, setIsProofUploading] = useState(false);
+	const {
+		submitVerification,
+		linkResult,
+		verificationResult,
+		isResultDialogOpen,
+		setIsResultDialogOpen,
+		isSubmitting,
+		handleStartNewVerification,
+	} = useProductVerificationSubmit({
+		errorMessage: "Failed to submit facial screening verification.",
+	});
 
 	const linkForm = useForm({
 		defaultValues: {
@@ -73,12 +90,18 @@ export function FacialScreeningForm() {
 			onChange: linkFormSchema,
 			onSubmit: linkFormSchema,
 		},
-		onSubmit: async () => {
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+		onSubmit: async ({ value }) => {
+			const submitted = await submitVerification(
+				buildFacialScreeningLinkPayload(value),
+				{
+					mode: "link",
+					email: value.email,
+					urlLimit: value.urlLimit,
+				},
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
@@ -92,20 +115,29 @@ export function FacialScreeningForm() {
 			onChange: directFormSchema,
 			onSubmit: directFormSchema,
 		},
-		onSubmit: async () => {
+		onSubmit: async ({ value }) => {
 			if (!facePhotoUrl) {
 				toast.error("Please upload a face photo");
 				return;
 			}
 
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+			const submitted = await submitVerification(
+				buildFacialScreeningDirectPayload(value, facePhotoUrl),
+				{ mode: "direct" },
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
+
+	function resetForms() {
+		linkForm.reset();
+		directForm.reset();
+		setFacePhotoUrl(null);
+		setIsProofUploading(false);
+	}
 
 	const activeForm = mode === "link" ? linkForm : directForm;
 
@@ -288,6 +320,7 @@ export function FacialScreeningForm() {
 								folder={PRODUCT_UPLOAD_FOLDERS.facialScreening}
 								proofUrl={facePhotoUrl}
 								onProofUrlChange={setFacePhotoUrl}
+								onUploadingChange={setIsProofUploading}
 								accept="image/*"
 								allowedMimeTypes={IMAGE_UPLOAD_MIME_TYPES}
 								emptyStateText="Click to upload a face photo"
@@ -337,7 +370,12 @@ export function FacialScreeningForm() {
 								<Button
 									type="submit"
 									className="w-full cursor-pointer"
-									disabled={!canSubmit || !facePhotoUrl || isSubmitting}
+									disabled={
+										!canSubmit ||
+										!facePhotoUrl ||
+										isProofUploading ||
+										isSubmitting
+									}
 								>
 									<PaperPlaneTiltIcon className="size-4" />
 									{isSubmitting ? "Submitting..." : "Submit Verification"}
@@ -347,6 +385,15 @@ export function FacialScreeningForm() {
 					)}
 				</form>
 			</CardContent>
+
+			<VerificationResultDialog
+				open={isResultDialogOpen}
+				onOpenChange={setIsResultDialogOpen}
+				linkResult={linkResult}
+				verification={verificationResult}
+				onStartNew={() => handleStartNewVerification(resetForms)}
+				description="Your facial screening verification request was created successfully."
+			/>
 		</Card>
 	);
 }

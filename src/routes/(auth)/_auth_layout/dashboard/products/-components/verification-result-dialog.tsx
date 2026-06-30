@@ -20,6 +20,7 @@ type VerificationResultDialogProps = {
 	linkResult: HostedLinkResult | null;
 	verification: VerificationRequest | null;
 	onStartNew: () => void;
+	description?: string;
 };
 
 export function VerificationResultDialog({
@@ -28,6 +29,7 @@ export function VerificationResultDialog({
 	linkResult,
 	verification,
 	onStartNew,
+	description = "Your verification request was created successfully.",
 }: VerificationResultDialogProps) {
 	const verificationId =
 		verification?.id ?? linkResult?.hostedLink?.verification_id ?? null;
@@ -39,9 +41,7 @@ export function VerificationResultDialog({
 					<DialogTitle className="font-semibold">
 						Verification Request Submitted
 					</DialogTitle>
-					<DialogDescription>
-						Your document verification request was created successfully.
-					</DialogDescription>
+					<DialogDescription>{description}</DialogDescription>
 				</DialogHeader>
 
 				{linkResult ? <HostedVerificationLinkCard linkResult={linkResult} /> : null}

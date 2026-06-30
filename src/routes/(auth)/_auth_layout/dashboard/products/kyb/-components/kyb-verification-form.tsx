@@ -1,7 +1,5 @@
 import { PaperPlaneTiltIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "#/components/ui/button";
@@ -21,8 +19,11 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
+import { VerificationResultDialog } from "../../-components/verification-result-dialog";
 import { verificationConsentSchema } from "../../../-components/VerificationConsentCheckbox/data";
 import { useTenantSupportedCountries } from "../../-countries";
+import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
+import { buildKybVerificationPayload } from "../-data";
 
 const kybFormSchema = z.object({
 	email: z.email("Enter a valid email address"),
@@ -36,7 +37,17 @@ const kybFormSchema = z.object({
 });
 
 export function KybVerificationForm() {
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const {
+		submitVerification,
+		linkResult,
+		verificationResult,
+		isResultDialogOpen,
+		setIsResultDialogOpen,
+		isSubmitting,
+		handleStartNewVerification,
+	} = useProductVerificationSubmit({
+		errorMessage: "Failed to submit KYB verification.",
+	});
 	const { countries, isPending: isCountriesPending } =
 		useTenantSupportedCountries();
 
@@ -52,15 +63,21 @@ export function KybVerificationForm() {
 			onChange: kybFormSchema,
 			onSubmit: kybFormSchema,
 		},
-		onSubmit: async () => {
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+		onSubmit: async ({ value }) => {
+			const submitted = await submitVerification(
+				buildKybVerificationPayload(value),
+				{ mode: "direct" },
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
+
+	function resetForms() {
+		form.reset();
+	}
 
 	return (
 		<Card>
@@ -193,6 +210,15 @@ export function KybVerificationForm() {
 					</form.Subscribe>
 				</form>
 			</CardContent>
+
+			<VerificationResultDialog
+				open={isResultDialogOpen}
+				onOpenChange={setIsResultDialogOpen}
+				linkResult={linkResult}
+				verification={verificationResult}
+				onStartNew={() => handleStartNewVerification(resetForms)}
+				description="Your KYB verification request was created successfully."
+			/>
 		</Card>
 	);
 }

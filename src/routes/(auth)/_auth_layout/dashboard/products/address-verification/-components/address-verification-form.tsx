@@ -30,7 +30,13 @@ import {
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
 import { useTenantSupportedCountries } from "../../-countries";
 import { ProductProofUpload } from "../../-components/product-proof-upload";
+import { VerificationResultDialog } from "../../-components/verification-result-dialog";
+import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import { PRODUCT_UPLOAD_FOLDERS } from "../../-upload-utils";
+import {
+	buildAddressVerificationDirectPayload,
+	buildAddressVerificationLinkPayload,
+} from "../-data";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
 	VERIFICATION_MODES,
@@ -59,7 +65,18 @@ export function AddressVerificationForm() {
 	const [proofOfAddressUrl, setProofOfAddressUrl] = useState<string | null>(
 		null,
 	);
-	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [isProofUploading, setIsProofUploading] = useState(false);
+	const {
+		submitVerification,
+		linkResult,
+		verificationResult,
+		isResultDialogOpen,
+		setIsResultDialogOpen,
+		isSubmitting,
+		handleStartNewVerification,
+	} = useProductVerificationSubmit({
+		errorMessage: "Failed to submit address verification.",
+	});
 	const { countries, isPending: isCountriesPending } =
 		useTenantSupportedCountries();
 
@@ -75,12 +92,18 @@ export function AddressVerificationForm() {
 			onChange: linkFormSchema,
 			onSubmit: linkFormSchema,
 		},
-		onSubmit: async () => {
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+		onSubmit: async ({ value }) => {
+			const submitted = await submitVerification(
+				buildAddressVerificationLinkPayload(value),
+				{
+					mode: "link",
+					email: value.email,
+					urlLimit: value.urlLimit,
+				},
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
@@ -96,20 +119,29 @@ export function AddressVerificationForm() {
 			onChange: directFormSchema,
 			onSubmit: directFormSchema,
 		},
-		onSubmit: async () => {
+		onSubmit: async ({ value }) => {
 			if (!proofOfAddressUrl) {
 				toast.error("Please upload a proof-of-address document");
 				return;
 			}
 
-			setIsSubmitting(true);
-			try {
-				toast.success("Verification request submitted");
-			} finally {
-				setIsSubmitting(false);
+			const submitted = await submitVerification(
+				buildAddressVerificationDirectPayload(value, proofOfAddressUrl),
+				{ mode: "direct" },
+			);
+
+			if (submitted) {
+				resetForms();
 			}
 		},
 	});
+
+	function resetForms() {
+		linkForm.reset();
+		directForm.reset();
+		setProofOfAddressUrl(null);
+		setIsProofUploading(false);
+	}
 
 	const activeForm = mode === "link" ? linkForm : directForm;
 
@@ -350,6 +382,7 @@ export function AddressVerificationForm() {
 								folder={PRODUCT_UPLOAD_FOLDERS.addressVerification}
 								proofUrl={proofOfAddressUrl}
 								onProofUrlChange={setProofOfAddressUrl}
+								onUploadingChange={setIsProofUploading}
 								emptyStateText="Click to upload proof-of-address document (image or PDF)"
 								disabled={isSubmitting}
 							/>
@@ -398,7 +431,10 @@ export function AddressVerificationForm() {
 									type="submit"
 									className="w-full cursor-pointer"
 									disabled={
-										!canSubmit || !proofOfAddressUrl || isSubmitting
+										!canSubmit ||
+										!proofOfAddressUrl ||
+										isProofUploading ||
+										isSubmitting
 									}
 								>
 									<PaperPlaneTiltIcon className="size-4" />
@@ -409,6 +445,15 @@ export function AddressVerificationForm() {
 					)}
 				</form>
 			</CardContent>
+
+			<VerificationResultDialog
+				open={isResultDialogOpen}
+				onOpenChange={setIsResultDialogOpen}
+				linkResult={linkResult}
+				verification={verificationResult}
+				onStartNew={() => handleStartNewVerification(resetForms)}
+				description="Your address verification request was created successfully."
+			/>
 		</Card>
 	);
 }
