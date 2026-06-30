@@ -29,7 +29,9 @@ export function BillingInformationSection() {
 		Boolean(tenantId),
 	);
 	const billingInfo = billingInformationQuery.data;
-	const isBillingNotFound = isBillingNotFoundError(billingInformationQuery.error);
+	const isBillingNotFound = isBillingNotFoundError(
+		billingInformationQuery.error,
+	);
 
 	const [form, setForm] = useState<BillingFormState>(EMPTY_BILLING_FORM);
 	const createMutation = useCreateBillingInformationV2Mutation();

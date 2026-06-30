@@ -4,12 +4,10 @@ import {
 	PaperPlaneTiltIcon,
 } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { useSupportedCountriesQuery } from "#/api/http/v1/tenants/tenants.hooks";
-import type { SupportedCountry } from "#/api/http/v1/tenants/tenants.types";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
@@ -30,6 +28,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
+import { useTenantSupportedCountries } from "../../-countries";
 import { ProductProofUpload } from "../../-components/product-proof-upload";
 import { PRODUCT_UPLOAD_FOLDERS } from "../../-upload-utils";
 import {
@@ -61,12 +60,8 @@ export function AddressVerificationForm() {
 		null,
 	);
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const countriesQuery = useSupportedCountriesQuery();
-
-	const countries = useMemo(
-		() => (countriesQuery.data as SupportedCountry[]) ?? [],
-		[countriesQuery.data],
-	);
+	const { countries, isPending: isCountriesPending } =
+		useTenantSupportedCountries();
 
 	const linkForm = useForm({
 		defaultValues: {
@@ -117,9 +112,6 @@ export function AddressVerificationForm() {
 	});
 
 	const activeForm = mode === "link" ? linkForm : directForm;
-	const canSubmit =
-		activeForm.state.canSubmit &&
-		(mode === "direct" ? Boolean(proofOfAddressUrl) : true);
 
 	return (
 		<Card>
@@ -196,7 +188,7 @@ export function AddressVerificationForm() {
 										<Select
 											value={field.state.value}
 											onValueChange={field.handleChange}
-											disabled={countriesQuery.isPending}
+											disabled={isCountriesPending}
 										>
 											<SelectTrigger
 												id="address-verification-link-country"
@@ -204,7 +196,7 @@ export function AddressVerificationForm() {
 											>
 												<SelectValue
 													placeholder={
-														countriesQuery.isPending
+														isCountriesPending
 															? "Loading countries..."
 															: "Select a country"
 													}
@@ -306,7 +298,7 @@ export function AddressVerificationForm() {
 											<Select
 												value={field.state.value}
 												onValueChange={field.handleChange}
-												disabled={countriesQuery.isPending}
+												disabled={isCountriesPending}
 											>
 												<SelectTrigger
 													id="address-verification-direct-country"
@@ -314,7 +306,7 @@ export function AddressVerificationForm() {
 												>
 													<SelectValue
 														placeholder={
-															countriesQuery.isPending
+															isCountriesPending
 																? "Loading countries..."
 																: "Select a country"
 														}
@@ -386,14 +378,35 @@ export function AddressVerificationForm() {
 						</directForm.Field>
 					)}
 
-					<Button
-						type="submit"
-						className="w-full cursor-pointer"
-						disabled={!canSubmit || isSubmitting}
-					>
-						<PaperPlaneTiltIcon className="size-4" />
-						{isSubmitting ? "Submitting..." : "Submit Verification"}
-					</Button>
+					{mode === "link" ? (
+						<linkForm.Subscribe selector={(state) => state.canSubmit}>
+							{(canSubmit) => (
+								<Button
+									type="submit"
+									className="w-full cursor-pointer"
+									disabled={!canSubmit || isSubmitting}
+								>
+									<PaperPlaneTiltIcon className="size-4" />
+									{isSubmitting ? "Submitting..." : "Submit Verification"}
+								</Button>
+							)}
+						</linkForm.Subscribe>
+					) : (
+						<directForm.Subscribe selector={(state) => state.canSubmit}>
+							{(canSubmit) => (
+								<Button
+									type="submit"
+									className="w-full cursor-pointer"
+									disabled={
+										!canSubmit || !proofOfAddressUrl || isSubmitting
+									}
+								>
+									<PaperPlaneTiltIcon className="size-4" />
+									{isSubmitting ? "Submitting..." : "Submit Verification"}
+								</Button>
+							)}
+						</directForm.Subscribe>
+					)}
 				</form>
 			</CardContent>
 		</Card>

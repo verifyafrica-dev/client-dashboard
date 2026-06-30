@@ -248,3 +248,9 @@ export function filterRegistryCountries<
 		enabledCodes.has(normalizeCountryCode(country.code)),
 	);
 }
+
+export function filterToRegistryCountries<
+	T extends { code: string; name: string },
+>(countries: T[]) {
+	return filterRegistryCountries(countries, undefined);
+}

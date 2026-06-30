@@ -8,8 +8,6 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { useSupportedCountriesQuery } from "#/api/http/v1/tenants/tenants.hooks";
-import type { SupportedCountry } from "#/api/http/v1/tenants/tenants.types";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Checkbox } from "#/components/ui/checkbox";
@@ -22,7 +20,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "#/components/ui/select";
-import { useAuthStore } from "#/stores/auth-store";
 import {
 	Field,
 	FieldDescription,
@@ -31,16 +28,16 @@ import {
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
 import { verificationConsentSchema } from "../../../-components/VerificationConsentCheckbox/data";
+import { useTenantSupportedCountries } from "../../-countries";
 import { ProductProofUpload } from "../../-components/product-proof-upload";
 import {
 	IMAGE_UPLOAD_MIME_TYPES,
 	PRODUCT_UPLOAD_FOLDERS,
 } from "../../-upload-utils";
-import { getUserTenantMembership } from "../../../team/-data";
 import { KycDatePicker } from "../../../kyc/-components/kyc-form-primitives";
 import {
 	allowsCustomerDataValidation,
-	filterRegistryCountries,
+	filterToRegistryCountries,
 	getPrimaryInputLabel,
 	getRegistryVerificationTypes,
 	requiresLastNameField,
@@ -143,21 +140,8 @@ export function GovernmentRegistryChecksForm() {
 	const [verificationType, setVerificationType] = useState("");
 	const [includeValidation, setIncludeValidation] = useState(false);
 	const [includeSelfie, setIncludeSelfie] = useState(false);
-	const user = useAuthStore((state) => state.user);
-	const countriesQuery = useSupportedCountriesQuery();
-
-	const tenant = user ? getUserTenantMembership(user) : undefined;
-	const enabledCountryCodes =
-		tenant?.enabled_countries && tenant.enabled_countries.length > 0
-			? tenant.enabled_countries
-			: undefined;
-
-	const countries = useMemo(() => {
-		const supportedCountries =
-			(countriesQuery.data as SupportedCountry[] | undefined) ?? [];
-
-		return filterRegistryCountries(supportedCountries, enabledCountryCodes);
-	}, [countriesQuery.data, enabledCountryCodes]);
+	const { countries, isPending: isCountriesPending } =
+		useTenantSupportedCountries({ filter: filterToRegistryCountries });
 
 	const verificationTypes = useMemo(
 		() => (country ? getRegistryVerificationTypes(country) : []),
@@ -215,11 +199,6 @@ export function GovernmentRegistryChecksForm() {
 		setSelfieProofUrl(null);
 	};
 
-	const canSubmit =
-		form.state.canSubmit &&
-		(!includeSelfie || Boolean(selfieProofUrl)) &&
-		showFullForm;
-
 	return (
 		<Card>
 			<CardContent className="pt-0">
@@ -248,7 +227,7 @@ export function GovernmentRegistryChecksForm() {
 											form.setFieldValue("verificationType", "");
 											resetDependentFields();
 										}}
-										disabled={countriesQuery.isPending || isSubmitting}
+										disabled={isCountriesPending || isSubmitting}
 									>
 										<SelectTrigger
 											id="government-registry-checks-country"
@@ -258,7 +237,7 @@ export function GovernmentRegistryChecksForm() {
 												<GlobeHemisphereWestIcon className="size-4 text-muted-foreground" />
 												<SelectValue
 													placeholder={
-														countriesQuery.isPending
+														isCountriesPending
 															? "Loading countries..."
 															: "Select a country"
 													}
@@ -543,14 +522,22 @@ export function GovernmentRegistryChecksForm() {
 								Reset
 							</Button>
 
-							<Button
-								type="submit"
-								className="cursor-pointer sm:min-w-48"
-								disabled={!canSubmit || isSubmitting}
-							>
-								<PaperPlaneTiltIcon className="size-4" />
-								{isSubmitting ? "Submitting..." : "Submit Verification"}
-							</Button>
+							<form.Subscribe selector={(state) => state.canSubmit}>
+								{(canSubmit) => (
+									<Button
+										type="submit"
+										className="cursor-pointer sm:min-w-48"
+										disabled={
+											!canSubmit ||
+											(includeSelfie && !selfieProofUrl) ||
+											isSubmitting
+										}
+									>
+										<PaperPlaneTiltIcon className="size-4" />
+										{isSubmitting ? "Submitting..." : "Submit Verification"}
+									</Button>
+								)}
+							</form.Subscribe>
 						</div>
 					) : null}
 				</form>

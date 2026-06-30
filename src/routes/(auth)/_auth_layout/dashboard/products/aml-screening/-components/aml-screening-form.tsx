@@ -5,8 +5,6 @@ import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { useSupportedCountriesQuery } from "#/api/http/v1/tenants/tenants.hooks";
-import type { SupportedCountry } from "#/api/http/v1/tenants/tenants.types";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Checkbox } from "#/components/ui/checkbox";
@@ -30,6 +28,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
+import { useTenantSupportedCountries } from "../../-countries";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
 	VERIFICATION_MODES,
@@ -73,12 +72,8 @@ export function AmlScreeningForm() {
 	const [filters, setFilters] = useState(DEFAULT_AML_SCREENING_FILTERS);
 	const [matchScore, setMatchScore] = useState(DEFAULT_MATCH_SCORE);
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const countriesQuery = useSupportedCountriesQuery();
-
-	const countries = useMemo(
-		() => (countriesQuery.data as SupportedCountry[]) ?? [],
-		[countriesQuery.data],
-	);
+	const { countries, isPending: isCountriesPending } =
+		useTenantSupportedCountries();
 
 	const hasSelectedFilters = useMemo(
 		() => Object.values(filters).some(Boolean),
@@ -139,7 +134,6 @@ export function AmlScreeningForm() {
 	});
 
 	const activeForm = mode === "link" ? linkForm : directForm;
-	const canSubmit = activeForm.state.canSubmit && hasSelectedFilters;
 
 	function toggleFilter(key: AmlScreeningFilterKey, checked: boolean) {
 		setFilters((current) => ({ ...current, [key]: checked }));
@@ -222,7 +216,7 @@ export function AmlScreeningForm() {
 										<Select
 											value={field.state.value || undefined}
 											onValueChange={field.handleChange}
-											disabled={countriesQuery.isPending}
+											disabled={isCountriesPending}
 										>
 											<SelectTrigger
 												id="aml-screening-link-country"
@@ -230,7 +224,7 @@ export function AmlScreeningForm() {
 											>
 												<SelectValue
 													placeholder={
-														countriesQuery.isPending
+														isCountriesPending
 															? "Loading countries..."
 															: "Select a country"
 													}
@@ -314,7 +308,7 @@ export function AmlScreeningForm() {
 										<Select
 											value={field.state.value || undefined}
 											onValueChange={field.handleChange}
-											disabled={countriesQuery.isPending}
+											disabled={isCountriesPending}
 										>
 											<SelectTrigger
 												id="aml-screening-direct-country"
@@ -322,7 +316,7 @@ export function AmlScreeningForm() {
 											>
 												<SelectValue
 													placeholder={
-														countriesQuery.isPending
+														isCountriesPending
 															? "Loading countries..."
 															: "Select a country"
 													}
@@ -451,14 +445,37 @@ export function AmlScreeningForm() {
 						</directForm.Field>
 					)}
 
-					<Button
-						type="submit"
-						className="w-full cursor-pointer"
-						disabled={!canSubmit || isSubmitting}
-					>
-						<PaperPlaneTiltIcon className="size-4" />
-						{isSubmitting ? "Submitting..." : "Submit Verification"}
-					</Button>
+					{mode === "link" ? (
+						<linkForm.Subscribe selector={(state) => state.canSubmit}>
+							{(canSubmit) => (
+								<Button
+									type="submit"
+									className="w-full cursor-pointer"
+									disabled={
+										!canSubmit || !hasSelectedFilters || isSubmitting
+									}
+								>
+									<PaperPlaneTiltIcon className="size-4" />
+									{isSubmitting ? "Submitting..." : "Submit Verification"}
+								</Button>
+							)}
+						</linkForm.Subscribe>
+					) : (
+						<directForm.Subscribe selector={(state) => state.canSubmit}>
+							{(canSubmit) => (
+								<Button
+									type="submit"
+									className="w-full cursor-pointer"
+									disabled={
+										!canSubmit || !hasSelectedFilters || isSubmitting
+									}
+								>
+									<PaperPlaneTiltIcon className="size-4" />
+									{isSubmitting ? "Submitting..." : "Submit Verification"}
+								</Button>
+							)}
+						</directForm.Subscribe>
+					)}
 				</form>
 			</CardContent>
 		</Card>

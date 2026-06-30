@@ -4,14 +4,12 @@ import {
 	PaperPlaneTiltIcon,
 } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 import { useCreateVerificationRequestV2Mutation } from "#/api/http/v2/verifications/verifications.hooks";
 import type { VerificationRequest } from "#/api/http/v2/verifications/verifications.types";
-import { useSupportedCountriesV2Query } from "#/api/http/v2/tenants/tenants.hooks";
-import type { SupportedCountry } from "#/api/http/v2/tenants/tenants.types";
 import { getV2ErrorMessage } from "#/lib/api-errors";
 import type { HostedLinkResult } from "#/lib/verification-links";
 import { buildLinkResult } from "#/lib/verification-links";
@@ -34,6 +32,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
+import { useTenantSupportedCountries } from "../../-countries";
 import { ProductProofUpload } from "../../-components/product-proof-upload";
 import { VerificationResultDialog } from "../../-components/verification-result-dialog";
 import { PRODUCT_UPLOAD_FOLDERS } from "../../-upload-utils";
@@ -49,25 +48,6 @@ import {
 	type VerificationMode,
 	verificationConsentSchema,
 } from "../../../-components/VerificationConsentCheckbox/data";
-
-function filterCountriesByTenant(
-	countries: SupportedCountry[],
-	enabledCountries: string[] | undefined,
-) {
-	if (enabledCountries === undefined) {
-		return countries;
-	}
-
-	const enabledCodes = new Set(
-		enabledCountries
-			.map((code) => code.trim().toLowerCase())
-			.filter(Boolean),
-	);
-
-	return countries.filter((country) =>
-		enabledCodes.has(country.code.trim().toLowerCase()),
-	);
-}
 
 const linkFormSchema = z.object({
 	email: z.email("Enter a valid email address"),
@@ -91,23 +71,11 @@ export function DocumentVerificationForm() {
 	const [verificationResult, setVerificationResult] =
 		useState<VerificationRequest | null>(null);
 	const [isResultDialogOpen, setIsResultDialogOpen] = useState(false);
-	const { tenantId, tenant } = useCurrentTenant();
+	const { tenantId } = useCurrentTenant();
 	const createVerificationMutation = useCreateVerificationRequestV2Mutation();
-	const countriesQuery = useSupportedCountriesV2Query();
+	const { countries, isPending: isCountriesPending } =
+		useTenantSupportedCountries();
 	const isSubmitting = createVerificationMutation.isPending;
-
-	const enabledCountries =
-		tenant?.enabled_countries && tenant.enabled_countries.length > 0
-			? tenant.enabled_countries
-			: undefined;
-
-	const countries = useMemo(() => {
-		const supportedCountries = countriesQuery.data ?? [];
-
-		return filterCountriesByTenant(supportedCountries, enabledCountries).sort(
-			(left, right) => left.name.localeCompare(right.name),
-		);
-	}, [countriesQuery.data, enabledCountries]);
 
 	async function submitVerification(
 		payload: ReturnType<typeof buildDocumentVerificationLinkPayload>,
@@ -375,7 +343,7 @@ export function DocumentVerificationForm() {
 										<Select
 											value={field.state.value}
 											onValueChange={field.handleChange}
-											disabled={countriesQuery.isPending}
+											disabled={isCountriesPending}
 										>
 											<SelectTrigger
 												id="document-verification-country"
@@ -383,7 +351,7 @@ export function DocumentVerificationForm() {
 											>
 												<SelectValue
 													placeholder={
-														countriesQuery.isPending
+														isCountriesPending
 															? "Loading countries..."
 															: "Select a country"
 													}

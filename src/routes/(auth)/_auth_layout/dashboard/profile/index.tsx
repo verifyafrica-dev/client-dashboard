@@ -8,23 +8,22 @@ import {
 	UserIcon,
 } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-
+import type { V2AxiosError } from "#/api/http/shared";
 import {
 	useMeV2Query,
 	useUpdateMeV2Mutation,
 	useUserV2ChangePasswordMutation,
 } from "#/api/http/v2/users/users.hooks";
 import {
-	type UserSession,
 	UserChangePasswordFormSchema,
 	type UserChangePasswordFormValues,
 	UserProfileUpdateFormSchema,
 	type UserProfileUpdateFormValues,
+	type UserSession,
 } from "#/api/http/v2/users/users.types";
-import type { V2AxiosError } from "#/api/http/shared";
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
 import { Button } from "#/components/ui/button";
 import {
@@ -46,18 +45,37 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import { BillingInformationSection } from "./-components/billing-information-section";
-import { getProfileInitials } from "./-data";
+import {
+	getProfileInitials,
+	mergeProfileSearchParams,
+	type ProfileSearchParams,
+	profileSearchSchema,
+} from "./-data";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/dashboard/profile/")(
 	{
+		validateSearch: profileSearchSchema,
 		component: ProfilePage,
 	},
 );
 
 function ProfilePage() {
+	const navigate = useNavigate({ from: Route.fullPath });
+	const urlSearch = Route.useSearch();
 	const meQuery = useMeV2Query();
 	const user = meQuery.data;
 	const isLoading = meQuery.isPending || meQuery.isFetching;
+	const activeTab = urlSearch.tab ?? "profile";
+
+	function handleTabChange(value: string) {
+		void navigate({
+			search: (current) =>
+				mergeProfileSearchParams(current, {
+					tab: value as ProfileSearchParams["tab"],
+				}),
+			replace: true,
+		});
+	}
 
 	if (meQuery.isError) {
 		return (
@@ -83,7 +101,11 @@ function ProfilePage() {
 				{isLoading || !user ? (
 					<ProfilePageSkeleton />
 				) : (
-					<Tabs defaultValue="profile" className="flex w-full flex-col gap-6">
+					<Tabs
+						value={activeTab}
+						onValueChange={handleTabChange}
+						className="flex w-full flex-col gap-6"
+					>
 						<TabsList>
 							<TabsTrigger value="profile">
 								<UserIcon />

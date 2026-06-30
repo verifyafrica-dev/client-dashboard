@@ -1,11 +1,9 @@
 import { PaperPlaneTiltIcon } from "@phosphor-icons/react";
 import { useForm } from "@tanstack/react-form";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import { useSupportedCountriesQuery } from "#/api/http/v1/tenants/tenants.hooks";
-import type { SupportedCountry } from "#/api/http/v1/tenants/tenants.types";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
@@ -24,6 +22,7 @@ import {
 } from "@/components/ui/field";
 import { VerificationConsentCheckbox } from "../../../-components/VerificationConsentCheckbox";
 import { verificationConsentSchema } from "../../../-components/VerificationConsentCheckbox/data";
+import { useTenantSupportedCountries } from "../../-countries";
 
 const kybFormSchema = z.object({
 	email: z.email("Enter a valid email address"),
@@ -38,12 +37,8 @@ const kybFormSchema = z.object({
 
 export function KybVerificationForm() {
 	const [isSubmitting, setIsSubmitting] = useState(false);
-	const countriesQuery = useSupportedCountriesQuery();
-
-	const countries = useMemo(
-		() => (countriesQuery.data as SupportedCountry[]) ?? [],
-		[countriesQuery.data],
-	);
+	const { countries, isPending: isCountriesPending } =
+		useTenantSupportedCountries();
 
 	const form = useForm({
 		defaultValues: {
@@ -108,7 +103,7 @@ export function KybVerificationForm() {
 									<Select
 										value={field.state.value || undefined}
 										onValueChange={field.handleChange}
-										disabled={countriesQuery.isPending}
+										disabled={isCountriesPending}
 									>
 										<SelectTrigger
 											id="kyb-verification-jurisdiction"
@@ -116,7 +111,7 @@ export function KybVerificationForm() {
 										>
 											<SelectValue
 												placeholder={
-													countriesQuery.isPending
+													isCountriesPending
 														? "Loading jurisdictions..."
 														: "Select a jurisdiction"
 												}
@@ -184,14 +179,18 @@ export function KybVerificationForm() {
 						)}
 					</form.Field>
 
-					<Button
-						type="submit"
-						className="w-full cursor-pointer"
-						disabled={!form.state.canSubmit || isSubmitting}
-					>
-						<PaperPlaneTiltIcon className="size-4" />
-						{isSubmitting ? "Submitting..." : "Submit Verification"}
-					</Button>
+					<form.Subscribe selector={(state) => state.canSubmit}>
+						{(canSubmit) => (
+							<Button
+								type="submit"
+								className="w-full cursor-pointer"
+								disabled={!canSubmit || isSubmitting}
+							>
+								<PaperPlaneTiltIcon className="size-4" />
+								{isSubmitting ? "Submitting..." : "Submit Verification"}
+							</Button>
+						)}
+					</form.Subscribe>
 				</form>
 			</CardContent>
 		</Card>

@@ -108,9 +108,6 @@ export function FacialScreeningForm() {
 	});
 
 	const activeForm = mode === "link" ? linkForm : directForm;
-	const canSubmit =
-		activeForm.state.canSubmit &&
-		(mode === "direct" ? Boolean(facePhotoUrl) : true);
 
 	return (
 		<Card>
@@ -321,14 +318,33 @@ export function FacialScreeningForm() {
 						</directForm.Field>
 					)}
 
-					<Button
-						type="submit"
-						className="w-full cursor-pointer"
-						disabled={!canSubmit || isSubmitting}
-					>
-						<PaperPlaneTiltIcon className="size-4" />
-						{isSubmitting ? "Submitting..." : "Submit Verification"}
-					</Button>
+					{mode === "link" ? (
+						<linkForm.Subscribe selector={(state) => state.canSubmit}>
+							{(canSubmit) => (
+								<Button
+									type="submit"
+									className="w-full cursor-pointer"
+									disabled={!canSubmit || isSubmitting}
+								>
+									<PaperPlaneTiltIcon className="size-4" />
+									{isSubmitting ? "Submitting..." : "Submit Verification"}
+								</Button>
+							)}
+						</linkForm.Subscribe>
+					) : (
+						<directForm.Subscribe selector={(state) => state.canSubmit}>
+							{(canSubmit) => (
+								<Button
+									type="submit"
+									className="w-full cursor-pointer"
+									disabled={!canSubmit || !facePhotoUrl || isSubmitting}
+								>
+									<PaperPlaneTiltIcon className="size-4" />
+									{isSubmitting ? "Submitting..." : "Submit Verification"}
+								</Button>
+							)}
+						</directForm.Subscribe>
+					)}
 				</form>
 			</CardContent>
 		</Card>

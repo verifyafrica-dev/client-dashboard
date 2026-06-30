@@ -108,14 +108,18 @@ export function CryptoWalletScreeningForm() {
 						)}
 					</form.Field>
 
-					<Button
-						type="submit"
-						className="w-full cursor-pointer"
-						disabled={!form.state.canSubmit || isSubmitting}
-					>
-						<PaperPlaneTiltIcon className="size-4" />
-						{isSubmitting ? "Submitting..." : "Submit Verification"}
-					</Button>
+					<form.Subscribe selector={(state) => state.canSubmit}>
+						{(canSubmit) => (
+							<Button
+								type="submit"
+								className="w-full cursor-pointer"
+								disabled={!canSubmit || isSubmitting}
+							>
+								<PaperPlaneTiltIcon className="size-4" />
+								{isSubmitting ? "Submitting..." : "Submit Verification"}
+							</Button>
+						)}
+					</form.Subscribe>
 				</form>
 			</CardContent>
 		</Card>
