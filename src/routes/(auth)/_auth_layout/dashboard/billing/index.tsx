@@ -79,7 +79,10 @@ function BillingPage() {
 	const [selectedTransaction, setSelectedTransaction] =
 		useState<Transaction | null>(null);
 
-	const walletBalanceQuery = useWalletBalanceV2Query(tenantId, Boolean(tenantId));
+	const walletBalanceQuery = useWalletBalanceV2Query(
+		tenantId,
+		Boolean(tenantId),
+	);
 	const billingInformationQuery = useTenantBillingInformationV2Query(
 		tenantId,
 		Boolean(tenantId),
@@ -103,7 +106,9 @@ function BillingPage() {
 
 	const wallet = walletBalanceQuery.data;
 	const billingInfo = billingInformationQuery.data;
-	const isBillingNotFound = isBillingNotFoundError(billingInformationQuery.error);
+	const isBillingNotFound = isBillingNotFoundError(
+		billingInformationQuery.error,
+	);
 	const currency = wallet?.currency ?? "USD";
 	const balanceAmount = Number.parseFloat(wallet?.balance ?? "0");
 
@@ -198,7 +203,7 @@ function BillingPage() {
 									<p className="text-sm text-muted-foreground">Balance</p>
 									<div>
 										<p className="text-4xl font-semibold tracking-tight">
-											{formatMoney(balanceAmount)}
+											${formatMoney(balanceAmount)}
 										</p>
 										<p className="text-sm font-medium text-muted-foreground">
 											{currency}
@@ -258,7 +263,10 @@ function BillingPage() {
 							<TabsTrigger value="invoices">Invoices</TabsTrigger>
 						</TabsList>
 
-						<TabsContent value="transactions" className="flex flex-col gap-4">
+						<TabsContent
+							value="transactions"
+							className="flex flex-col gap-4"
+						>
 							<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 								<h2 className="text-lg font-semibold">Transaction History</h2>
 								<div className="flex flex-wrap items-center gap-2">
@@ -423,7 +431,10 @@ function BillingPage() {
 							)}
 						</TabsContent>
 
-						<TabsContent value="invoices" className="flex flex-col gap-4">
+						<TabsContent
+							value="invoices"
+							className="flex flex-col gap-4"
+						>
 							<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 								<h2 className="text-lg font-semibold">Invoices</h2>
 								<Button
@@ -500,7 +511,10 @@ function BillingPage() {
 															)}
 														</TableCell>
 														<TableCell>
-															<Badge variant="outline" className="capitalize">
+															<Badge
+																variant="outline"
+																className="capitalize"
+															>
 																{invoice.payment_status ?? "unknown"}
 															</Badge>
 														</TableCell>

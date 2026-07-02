@@ -6,12 +6,16 @@ import {
 	UserIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import {
 	useResendTenantInvitationV2Mutation,
 	useTenantInvitationsV2Query,
 } from "#/api/http/v2/tenants/tenants.hooks";
+import {
+	TablePagination,
+	TablePaginationSkeleton,
+} from "#/components/table-pagination";
 import { Avatar, AvatarFallback } from "#/components/ui/avatar";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -32,11 +36,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "#/components/ui/table";
-import {
-	paginateItems,
-	TablePagination,
-	TablePaginationSkeleton,
-} from "#/components/table-pagination";
+import { useDebouncedValue } from "#/hooks/use-debounced-value";
 import { cn } from "#/lib/utils.ts";
 import {
 	DeleteUserDialog,
@@ -44,13 +44,13 @@ import {
 } from "../-components/delete-user-dialog";
 import { TeamIconActionButton } from "../-components/team-icon-action-button";
 import {
-	TeamMemberDetailsDialog,
 	type TeamMemberDetails,
+	TeamMemberDetailsDialog,
 } from "../-components/team-member-details-dialog";
-import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { TeamTableShell } from "../-components/team-table-shell";
-import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
+import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import type { TenantUserRole } from "../-data";
+import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
 import {
 	InvitationRoleBadge,
 	InvitationStatusBadge,
@@ -64,7 +64,6 @@ import {
 	mapInvitationsToUserInvitations,
 	ROLE_LABELS,
 	STATUS_LABELS,
-	TEAM_PAGE_SIZE,
 	type UserInvitation,
 } from "./-data";
 
@@ -98,45 +97,48 @@ function InvitationsPage() {
 		string | null
 	>(null);
 	const [detailsOpen, setDetailsOpen] = useState(false);
-	const [selectedMember, setSelectedMember] = useState<TeamMemberDetails | null>(
-		null,
+	const [selectedMember, setSelectedMember] =
+		useState<TeamMemberDetails | null>(null);
+	const debouncedSearch = useDebouncedValue(search, 300);
+
+	const invitationListQuery = useMemo(
+		() => ({
+			page,
+			per_page: TEAM_LIST_PAGE_SIZE,
+			...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+			...(statusFilter !== "all" ? { status: statusFilter } : {}),
+			...(roleFilter !== "all" ? { role: roleFilter } : {}),
+		}),
+		[page, debouncedSearch, statusFilter, roleFilter],
 	);
 
 	const invitationsQuery = useTenantInvitationsV2Query(
 		tenantId,
-		{ per_page: TEAM_LIST_PAGE_SIZE },
+		invitationListQuery,
 		Boolean(tenantId),
 	);
 	const resendInvitationMutation = useResendTenantInvitationV2Mutation(
 		tenantId ?? "",
 	);
 
+	useEffect(() => {
+		setPage(1);
+	}, [debouncedSearch, statusFilter, roleFilter]);
+
 	const invitations = useMemo(
 		() => mapInvitationsToUserInvitations(invitationsQuery.data?.items ?? []),
 		[invitationsQuery.data?.items],
 	);
 
-	const isLoading = invitationsQuery.isPending || invitationsQuery.isFetching;
+	const totalInvitations = invitationsQuery.data?.meta.pagination.total ?? 0;
+	const hasActiveFilters =
+		debouncedSearch.trim().length > 0 ||
+		statusFilter !== "all" ||
+		roleFilter !== "all";
 
-	const filteredInvitations = useMemo(() => {
-		const query = search.trim().toLowerCase();
-
-		return invitations.filter((invitation) => {
-			const matchesSearch =
-				query.length === 0 || invitation.email.toLowerCase().includes(query);
-			const matchesStatus =
-				statusFilter === "all" || invitation.status === statusFilter;
-			const matchesRole =
-				roleFilter === "all" || invitation.role === roleFilter;
-
-			return matchesSearch && matchesStatus && matchesRole;
-		});
-	}, [invitations, search, statusFilter, roleFilter]);
-
-	const { items: paginatedInvitations, safePage } = useMemo(
-		() => paginateItems(filteredInvitations, page, TEAM_PAGE_SIZE),
-		[filteredInvitations, page],
-	);
+	const isLoading =
+		invitationsQuery.isPending ||
+		(invitationsQuery.isFetching && !invitationsQuery.data);
 
 	function openDeleteDialog(invitation: UserInvitation) {
 		setInvitationToDelete(invitation);
@@ -204,7 +206,6 @@ function InvitationsPage() {
 									value={search}
 									onChange={(event) => {
 										setSearch(event.target.value);
-										setPage(1);
 									}}
 									className="pl-9"
 									disabled={isLoading}
@@ -218,7 +219,6 @@ function InvitationsPage() {
 									value={statusFilter}
 									onValueChange={(value) => {
 										setStatusFilter(value as InvitationStatus | "all");
-										setPage(1);
 									}}
 									disabled={isLoading}
 								>
@@ -243,7 +243,6 @@ function InvitationsPage() {
 									value={roleFilter}
 									onValueChange={(value) => {
 										setRoleFilter(value as TenantUserRole | "all");
-										setPage(1);
 									}}
 									disabled={isLoading}
 								>
@@ -276,9 +275,7 @@ function InvitationsPage() {
 					) : (
 						<TeamTableShell>
 							<Table
-								className={cn(
-									paginatedInvitations.length === 0 && "h-full flex-1",
-								)}
+								className={cn(invitations.length === 0 && "h-full flex-1")}
 							>
 								<TableHeader>
 									<TableRow className="hover:bg-transparent">
@@ -299,19 +296,19 @@ function InvitationsPage() {
 									</TableRow>
 								</TableHeader>
 								<TableBody>
-									{paginatedInvitations.length === 0 ? (
+									{invitations.length === 0 ? (
 										<TableRow>
 											<TableCell
 												colSpan={INVITATION_TABLE_COLUMNS.length}
 												className="h-24 text-center text-sm text-muted-foreground"
 											>
-												{invitations.length === 0
-													? 'No invitations yet. Click "Invite User" to send one.'
-													: "No invitations match your search or filters."}
+												{hasActiveFilters
+													? "No invitations match your search or filters."
+													: 'No invitations yet. Click "Invite User" to send one.'}
 											</TableCell>
 										</TableRow>
 									) : (
-										paginatedInvitations.map((invitation) => (
+										invitations.map((invitation) => (
 											<TableRow
 												key={invitation.id}
 												className="cursor-pointer"
@@ -376,9 +373,9 @@ function InvitationsPage() {
 								</TableBody>
 							</Table>
 							<TablePagination
-								page={safePage}
-								pageSize={TEAM_PAGE_SIZE}
-								total={filteredInvitations.length}
+								page={page}
+								pageSize={TEAM_LIST_PAGE_SIZE}
+								total={totalInvitations}
 								onPageChange={setPage}
 							/>
 						</TeamTableShell>

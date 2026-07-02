@@ -20,7 +20,7 @@ export function VerificationMetadataCard({
 
 	return (
 		<Card className="bg-muted/20">
-			<CardContent className="grid gap-4 pt-6 sm:grid-cols-2">
+			<CardContent className="grid gap-4 pt-0 sm:grid-cols-2">
 				<ReportDetailField
 					label="Verification ID"
 					value={verification.id}

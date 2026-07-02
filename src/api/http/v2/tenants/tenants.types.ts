@@ -1,6 +1,11 @@
 import { z } from "zod";
 
 import type {
+	BillingInformationStatus,
+	BillingPlan,
+} from "#/api/http/v2/billing/billing.types";
+
+import type {
 	V2AxiosError,
 	V2MessageSuccessResponse,
 	V2PaginatedSuccessResponse,
@@ -55,6 +60,58 @@ export const TenantListQuerySchema = z.object({
 });
 
 export type TenantListQuery = z.infer<typeof TenantListQuerySchema>;
+
+export const TenantUserListStatusFilterSchema = z.enum(["active", "inactive"]);
+export type TenantUserListStatusFilter = z.infer<
+	typeof TenantUserListStatusFilterSchema
+>;
+
+export const TenantUserListQuerySchema = TenantListQuerySchema.extend({
+	search: z.string().optional(),
+	role: TenantRoleSchema.optional(),
+	status: TenantUserListStatusFilterSchema.optional(),
+});
+
+export type TenantUserListQuery = z.infer<typeof TenantUserListQuerySchema>;
+
+export const TenantInvitationListStatusFilterSchema = z.enum([
+	"pending",
+	"accepted",
+	"expired",
+	"canceled",
+	"cancelled",
+]);
+
+export type TenantInvitationListStatusFilter = z.infer<
+	typeof TenantInvitationListStatusFilterSchema
+>;
+
+export const TenantInvitationListQuerySchema = TenantListQuerySchema.extend({
+	search: z.string().optional(),
+	role: TenantRoleSchema.optional(),
+	status: TenantInvitationListStatusFilterSchema.optional(),
+});
+
+export type TenantInvitationListQuery = z.infer<
+	typeof TenantInvitationListQuerySchema
+>;
+
+export const TenantAllListKycStatusFilterSchema = z.enum([
+	"verified",
+	"pending",
+	"not_started",
+]);
+export type TenantAllListKycStatusFilter = z.infer<
+	typeof TenantAllListKycStatusFilterSchema
+>;
+
+export const TenantAllListQuerySchema = TenantListQuerySchema.extend({
+	search: z.string().optional(),
+	billing_plan: z.enum(["payg", "enterprise"]).optional(),
+	kyc_status: TenantAllListKycStatusFilterSchema.optional(),
+});
+
+export type TenantAllListQuery = z.infer<typeof TenantAllListQuerySchema>;
 
 export interface SectionRejectedReason {
 	basic_information: string | null;
@@ -136,6 +193,21 @@ export interface TenantListItem {
 	joined_at: string;
 }
 
+export interface TenantAllListBilling {
+	id: string;
+	billing_name?: string;
+	billing_email?: string;
+	billing_address?: string;
+	billing_city?: string;
+	billing_state?: string;
+	billing_postal_code?: string;
+	billing_country?: string;
+	billing_plan: BillingPlan;
+	status?: BillingInformationStatus;
+	created_at: string;
+	updated_at: string;
+}
+
 export interface TenantAllListItem {
 	id: string;
 	name: string;
@@ -146,6 +218,7 @@ export interface TenantAllListItem {
 	stripe_customer_id?: string;
 	tenant_id: string;
 	created_at: string;
+	billing: TenantAllListBilling | null;
 }
 
 export interface TenantAPIKey {

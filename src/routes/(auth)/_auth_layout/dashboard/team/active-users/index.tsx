@@ -6,10 +6,9 @@ import {
 	UserMinusIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTenantUsersV2Query } from "#/api/http/v2/tenants/tenants.hooks";
 import {
-	paginateItems,
 	TablePagination,
 	TablePaginationSkeleton,
 } from "#/components/table-pagination";
@@ -33,6 +32,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "#/components/ui/table";
+import { useDebouncedValue } from "#/hooks/use-debounced-value";
 import { cn } from "#/lib/utils.ts";
 import {
 	DeleteUserDialog,
@@ -40,13 +40,13 @@ import {
 } from "../-components/delete-user-dialog";
 import { TeamIconActionButton } from "../-components/team-icon-action-button";
 import {
-	TeamMembershipDialog,
-	type TeamMembershipAction,
-} from "../-components/team-membership-dialog";
-import {
-	TeamMemberDetailsDialog,
 	type TeamMemberDetails,
+	TeamMemberDetailsDialog,
 } from "../-components/team-member-details-dialog";
+import {
+	type TeamMembershipAction,
+	TeamMembershipDialog,
+} from "../-components/team-membership-dialog";
 import { TeamTableShell } from "../-components/team-table-shell";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { UserRoleBadge } from "../-components/user-role-badge";
@@ -63,7 +63,6 @@ import {
 	getUserInitials,
 	mapTenantUsersToActiveUsers,
 	ROLE_LABELS,
-	TEAM_PAGE_SIZE,
 	TEAM_ROLES,
 } from "./-data";
 
@@ -94,54 +93,50 @@ function ActiveUsersPage() {
 	const [roleFilter, setRoleFilter] = useState<TenantUserRole | "all">("all");
 	const [page, setPage] = useState(1);
 	const [detailsOpen, setDetailsOpen] = useState(false);
-	const [selectedMember, setSelectedMember] = useState<TeamMemberDetails | null>(
-		null,
-	);
+	const [selectedMember, setSelectedMember] =
+		useState<TeamMemberDetails | null>(null);
 	const [membershipDialogOpen, setMembershipDialogOpen] = useState(false);
 	const [membershipAction, setMembershipAction] =
 		useState<TeamMembershipAction | null>(null);
 	const [userForMembership, setUserForMembership] = useState<ActiveUser | null>(
 		null,
 	);
+	const debouncedSearch = useDebouncedValue(search, 300);
+
+	const userListQuery = useMemo(
+		() => ({
+			page,
+			per_page: TEAM_LIST_PAGE_SIZE,
+			...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
+			...(statusFilter !== "all" ? { status: statusFilter } : {}),
+			...(roleFilter !== "all" ? { role: roleFilter } : {}),
+		}),
+		[page, debouncedSearch, statusFilter, roleFilter],
+	);
 
 	const usersQuery = useTenantUsersV2Query(
 		tenantId,
-		{ per_page: TEAM_LIST_PAGE_SIZE },
+		userListQuery,
 		Boolean(tenantId),
 	);
 
+	useEffect(() => {
+		setPage(1);
+	}, [debouncedSearch, statusFilter, roleFilter]);
+
 	const users = useMemo(
-		() =>
-			mapTenantUsersToActiveUsers(
-				usersQuery.data?.items ?? [],
-				user?.id,
-			),
+		() => mapTenantUsersToActiveUsers(usersQuery.data?.items ?? [], user?.id),
 		[usersQuery.data?.items, user?.id],
 	);
 
-	const isLoading = usersQuery.isPending || usersQuery.isFetching;
+	const totalUsers = usersQuery.data?.meta.pagination.total ?? 0;
+	const hasActiveFilters =
+		debouncedSearch.trim().length > 0 ||
+		statusFilter !== "all" ||
+		roleFilter !== "all";
 
-	const filteredUsers = useMemo(() => {
-		const query = search.trim().toLowerCase();
-
-		return users.filter((activeUser) => {
-			const matchesSearch =
-				query.length === 0 ||
-				activeUser.name.toLowerCase().includes(query) ||
-				activeUser.email.toLowerCase().includes(query);
-			const matchesStatus =
-				statusFilter === "all" || activeUser.status === statusFilter;
-			const matchesRole =
-				roleFilter === "all" || activeUser.role === roleFilter;
-
-			return matchesSearch && matchesStatus && matchesRole;
-		});
-	}, [users, search, statusFilter, roleFilter]);
-
-	const { items: paginatedUsers, safePage } = useMemo(
-		() => paginateItems(filteredUsers, page, TEAM_PAGE_SIZE),
-		[filteredUsers, page],
-	);
+	const isLoading =
+		usersQuery.isPending || (usersQuery.isFetching && !usersQuery.data);
 
 	function openDeleteDialog(activeUser: ActiveUser) {
 		setUserToDelete(activeUser);
@@ -203,7 +198,6 @@ function ActiveUsersPage() {
 									value={search}
 									onChange={(event) => {
 										setSearch(event.target.value);
-										setPage(1);
 									}}
 									className="pl-9"
 									disabled={isLoading}
@@ -217,7 +211,6 @@ function ActiveUsersPage() {
 									value={statusFilter}
 									onValueChange={(value) => {
 										setStatusFilter(value as ActiveUserStatus | "all");
-										setPage(1);
 									}}
 									disabled={isLoading}
 								>
@@ -240,7 +233,6 @@ function ActiveUsersPage() {
 									value={roleFilter}
 									onValueChange={(value) => {
 										setRoleFilter(value as TenantUserRole | "all");
-										setPage(1);
 									}}
 									disabled={isLoading}
 								>
@@ -272,9 +264,7 @@ function ActiveUsersPage() {
 						</div>
 					) : (
 						<TeamTableShell>
-							<Table
-								className={cn(paginatedUsers.length === 0 && "h-full flex-1")}
-							>
+							<Table className={cn(users.length === 0 && "h-full flex-1")}>
 								<TableHeader>
 									<TableRow className="hover:bg-transparent">
 										{ACTIVE_USER_TABLE_COLUMNS.map((column, index) => (
@@ -294,19 +284,19 @@ function ActiveUsersPage() {
 									</TableRow>
 								</TableHeader>
 								<TableBody>
-									{paginatedUsers.length === 0 ? (
+									{users.length === 0 ? (
 										<TableRow>
 											<TableCell
 												colSpan={ACTIVE_USER_TABLE_COLUMNS.length}
 												className="h-24 text-center text-sm text-muted-foreground"
 											>
-												{users.length === 0
-													? "No active users yet."
-													: "No users match your search or filters."}
+												{hasActiveFilters
+													? "No users match your search or filters."
+													: "No active users yet."}
 											</TableCell>
 										</TableRow>
 									) : (
-										paginatedUsers.map((activeUser) => (
+										users.map((activeUser) => (
 											<TableRow
 												key={activeUser.id}
 												className="cursor-pointer"
@@ -369,10 +359,7 @@ function ActiveUsersPage() {
 																	label="Reactivate user"
 																	icon={UserCheckIcon}
 																	onClick={() =>
-																		openMembershipDialog(
-																			activeUser,
-																			"activate",
-																		)
+																		openMembershipDialog(activeUser, "activate")
 																	}
 																/>
 															)}
@@ -381,9 +368,7 @@ function ActiveUsersPage() {
 																icon={TrashIcon}
 																variant="destructive"
 																disabled={activeUser.isCurrentUser}
-																onClick={() =>
-																	openDeleteDialog(activeUser)
-																}
+																onClick={() => openDeleteDialog(activeUser)}
 															/>
 														</div>
 													)}
@@ -394,9 +379,9 @@ function ActiveUsersPage() {
 								</TableBody>
 							</Table>
 							<TablePagination
-								page={safePage}
-								pageSize={TEAM_PAGE_SIZE}
-								total={filteredUsers.length}
+								page={page}
+								pageSize={TEAM_LIST_PAGE_SIZE}
+								total={totalUsers}
 								onPageChange={setPage}
 							/>
 						</TeamTableShell>

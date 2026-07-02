@@ -22,7 +22,10 @@ import type {
 	TenantInvitationCreatePayload,
 	TenantInvitationCreateUserPayload,
 	TenantInvitationVerifyPayload,
+	TenantAllListQuery,
+	TenantInvitationListQuery,
 	TenantListQuery,
+	TenantUserListQuery,
 	TenantUpdatePayload,
 	TenantUserMembershipUpdatePayload,
 	TenantUserRoleUpdatePayload,
@@ -41,16 +44,16 @@ const TENANTS_V2_STALE_TIME = 60_000;
 export const TENANTS_V2_QUERY_KEYS = {
 	all: ["tenants-v2"] as const,
 	detail: (tenantId: string) => ["tenants-v2", "detail", tenantId] as const,
-	allList: (params?: TenantListQuery) =>
+	allList: (params?: TenantAllListQuery) =>
 		["tenants-v2", "all", params ?? {}] as const,
 	list: (params?: TenantListQuery) =>
 		["tenants-v2", "list", params ?? {}] as const,
 	countries: ["tenants-v2", "countries"] as const,
 	apiKey: (tenantId: string) => ["tenants-v2", "api-key", tenantId] as const,
 	webhook: (tenantId: string) => ["tenants-v2", "webhook", tenantId] as const,
-	invitations: (tenantId: string, params?: TenantListQuery) =>
+	invitations: (tenantId: string, params?: TenantInvitationListQuery) =>
 		["tenants-v2", "invitations", tenantId, params ?? {}] as const,
-	users: (tenantId: string, params?: TenantListQuery) =>
+	users: (tenantId: string, params?: TenantUserListQuery) =>
 		["tenants-v2", "users", tenantId, params ?? {}] as const,
 	verificationConfigs: (tenantId: string) =>
 		["tenants-v2", "verification-configs", tenantId] as const,
@@ -74,7 +77,7 @@ export const useTenantV2DetailQuery = (
 	});
 
 export const useTenantsAllV2Query = (
-	params?: TenantListQuery,
+	params?: TenantAllListQuery,
 	enabled = true,
 ): UseQueryResult<PaginatedTenantAllListResult> =>
 	useQuery<PaginatedTenantAllListResult>({
@@ -141,7 +144,7 @@ export const useTenantWebhookV2Query = (
 
 export const useTenantInvitationsV2Query = (
 	tenantId: string | undefined,
-	params?: TenantListQuery,
+	params?: TenantInvitationListQuery,
 	enabled = true,
 ): UseQueryResult<PaginatedTenantInvitationListResult> =>
 	useQuery<PaginatedTenantInvitationListResult>({
@@ -159,7 +162,7 @@ export const useTenantInvitationsV2Query = (
 
 export const useTenantUsersV2Query = (
 	tenantId: string | undefined,
-	params?: TenantListQuery,
+	params?: TenantUserListQuery,
 	enabled = true,
 ): UseQueryResult<PaginatedTenantUserListResult> =>
 	useQuery<PaginatedTenantUserListResult>({

@@ -10,14 +10,7 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import type { ComponentType } from "react";
 import { useMemo, useState } from "react";
-import {
-	Area,
-	AreaChart,
-	CartesianGrid,
-	Pie,
-	PieChart,
-	XAxis,
-} from "recharts";
+import { Area, AreaChart, CartesianGrid, Pie, PieChart, XAxis } from "recharts";
 import { useTenantAnalyticsV2Query } from "#/api/http/v2/analytics/analytics.hooks";
 import { useTenantV2DetailQuery } from "#/api/http/v2/tenants/tenants.hooks";
 import { Button } from "#/components/ui/button";
@@ -180,9 +173,9 @@ function DashboardKycLoadingState() {
 }
 
 function formatCurrency(value: number) {
-	return new Intl.NumberFormat("en-NG", {
+	return new Intl.NumberFormat("en-US", {
 		style: "currency",
-		currency: "NGN",
+		currency: "USD",
 		maximumFractionDigits: 0,
 	}).format(value);
 }

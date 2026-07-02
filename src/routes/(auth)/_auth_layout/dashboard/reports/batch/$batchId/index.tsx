@@ -33,7 +33,14 @@ import {
 	REPORTS_PAGE_SIZE,
 } from "../../-data";
 
-const VERIFICATION_COLUMNS = ["ID", "Type", "Status", "Name", "Date", "Actions"];
+const VERIFICATION_COLUMNS = [
+	"ID",
+	"Type",
+	"Status",
+	"Name",
+	"Date",
+	"Actions",
+];
 
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/dashboard/reports/batch/$batchId/",
@@ -46,7 +53,10 @@ function BatchVerificationReportDetailPage() {
 	const { tenantId } = useCurrentTenant();
 	const [page, setPage] = useState(1);
 
-	const batchQuery = useVerificationBatchDetailV2Query(batchId, Boolean(batchId));
+	const batchQuery = useVerificationBatchDetailV2Query(
+		batchId,
+		Boolean(batchId),
+	);
 	const batch = batchQuery.data;
 
 	const requestsQuery = useTenantVerificationRequestsV2Query(
@@ -61,10 +71,7 @@ function BatchVerificationReportDetailPage() {
 
 	const verifications = useMemo(
 		() =>
-			mapVerificationRequestsToReports(
-				requestsQuery.data?.items ?? [],
-				"live",
-			),
+			mapVerificationRequestsToReports(requestsQuery.data?.items ?? [], "live"),
 		[requestsQuery.data?.items],
 	);
 
@@ -77,7 +84,11 @@ function BatchVerificationReportDetailPage() {
 	return (
 		<div className="flex min-w-0 flex-col gap-6">
 			<div className="flex flex-col gap-3">
-				<Button variant="ghost" className="w-fit px-4" asChild>
+				<Button
+					variant="ghost"
+					className="w-fit px-4"
+					asChild
+				>
 					<Link
 						to="/dashboard/reports"
 						search={{ tab: "batch" }}
@@ -99,7 +110,10 @@ function BatchVerificationReportDetailPage() {
 			{batchQuery.isPending ? (
 				<div className="grid gap-4 md:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, index) => (
-						<Skeleton key={index} className="h-28 w-full rounded-xl" />
+						<Skeleton
+							key={index}
+							className="h-28 w-full rounded-xl"
+						/>
 					))}
 				</div>
 			) : batchQuery.isError || !batch ? (
@@ -116,7 +130,10 @@ function BatchVerificationReportDetailPage() {
 						</StatCard>
 						<StatCard label="Total Count">{batch.total_count}</StatCard>
 						<StatCard label="Successful">
-							<BatchCountBadge count={batch.success_count} variant="success" />
+							<BatchCountBadge
+								count={batch.success_count}
+								variant="success"
+							/>
 						</StatCard>
 						<StatCard label="Success Rate">
 							<div className="flex items-center gap-2">
@@ -247,16 +264,10 @@ function BatchVerificationReportDetailPage() {
 	);
 }
 
-function StatCard({
-	label,
-	children,
-}: {
-	label: string;
-	children: ReactNode;
-}) {
+function StatCard({ label, children }: { label: string; children: ReactNode }) {
 	return (
 		<Card>
-			<CardContent className="flex flex-col gap-2 pt-6">
+			<CardContent className="flex flex-col gap-2 pt-0">
 				<p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
 					{label}
 				</p>

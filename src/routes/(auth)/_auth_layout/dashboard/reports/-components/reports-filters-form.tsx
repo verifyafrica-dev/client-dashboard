@@ -92,7 +92,6 @@ export function ReportsFiltersForm({
 							</div>
 						)}
 					</form.Field>
-
 					{scope === "requests" ? (
 						<form.Field name="verificationType">
 							{(field) => (
@@ -114,7 +113,10 @@ export function ReportsFiltersForm({
 										<SelectContent>
 											<SelectItem value="all">All Types</SelectItem>
 											{verificationTypes.map((type) => (
-												<SelectItem key={type} value={type}>
+												<SelectItem
+													key={type}
+													value={type}
+												>
 													{formatVerificationTypeLabel(type)}
 												</SelectItem>
 											))}
@@ -124,7 +126,6 @@ export function ReportsFiltersForm({
 							)}
 						</form.Field>
 					) : null}
-
 					<form.Field name="status">
 						{(field) => (
 							<div className="space-y-1.5">
@@ -143,7 +144,10 @@ export function ReportsFiltersForm({
 									<SelectContent>
 										<SelectItem value="all">All Statuses</SelectItem>
 										{statuses.map((status) => (
-											<SelectItem key={status} value={status}>
+											<SelectItem
+												key={status}
+												value={status}
+											>
 												{status}
 											</SelectItem>
 										))}
@@ -163,13 +167,19 @@ export function ReportsFiltersForm({
 										onValueChange={field.handleChange}
 										disabled={disabled}
 									>
-										<SelectTrigger id="country-filter" className="w-full">
+										<SelectTrigger
+											id="country-filter"
+											className="w-full"
+										>
 											<SelectValue placeholder="All Countries" />
 										</SelectTrigger>
 										<SelectContent>
 											<SelectItem value="all">All Countries</SelectItem>
 											{countries.map((country) => (
-												<SelectItem key={country} value={country}>
+												<SelectItem
+													key={country}
+													value={country}
+												>
 													{country}
 												</SelectItem>
 											))}
@@ -180,10 +190,6 @@ export function ReportsFiltersForm({
 						</form.Field>
 					) : null}
 				</div>
-
-				<p className="text-sm text-muted-foreground">
-					Showing {filteredCount} of {totalCount} results
-				</p>
 			</CardContent>
 		</Card>
 	);
