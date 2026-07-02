@@ -2,6 +2,7 @@ import {
 	useMutation,
 	useQuery,
 	useQueryClient,
+	type UseQueryResult,
 } from "@tanstack/react-query";
 
 import { BILLING_V2_API } from "./billing.api";
@@ -45,7 +46,7 @@ export const BILLING_V2_QUERY_KEYS = {
 export const useTenantBillingInformationV2Query = (
 	tenantId: string | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<BillingInformation> =>
 	useQuery<BillingInformation>({
 		queryKey: BILLING_V2_QUERY_KEYS.billingInformation(tenantId ?? ""),
 		queryFn: () => {
