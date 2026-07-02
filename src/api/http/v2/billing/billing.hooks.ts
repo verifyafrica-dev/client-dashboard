@@ -63,7 +63,7 @@ export const useTenantBillingInformationV2Query = (
 export const useAllBillingInformationV2Query = (
 	params?: BillingListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedBillingInformationListResult> =>
 	useQuery<PaginatedBillingInformationListResult>({
 		queryKey: BILLING_V2_QUERY_KEYS.allBillingInformation(params),
 		queryFn: () => BILLING_V2_API.ALL_BILLING_INFORMATION(params),
@@ -74,7 +74,7 @@ export const useAllBillingInformationV2Query = (
 export const useBillingPricingListV2Query = (
 	params?: BillingPricingListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedBillingPricingListResult> =>
 	useQuery<PaginatedBillingPricingListResult>({
 		queryKey: BILLING_V2_QUERY_KEYS.billingPricingList(params),
 		queryFn: () => BILLING_V2_API.BILLING_PRICING_LIST(params),
@@ -85,7 +85,7 @@ export const useBillingPricingListV2Query = (
 export const useBillingPricingDetailV2Query = (
 	id: string | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<BillingPricing> =>
 	useQuery<BillingPricing>({
 		queryKey: BILLING_V2_QUERY_KEYS.billingPricingDetail(id ?? ""),
 		queryFn: () => BILLING_V2_API.BILLING_PRICING_DETAIL(id ?? ""),
@@ -97,7 +97,7 @@ export const useTenantInvoicesV2Query = (
 	tenantId: string | undefined,
 	params?: BillingListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedTenantInvoiceListResult> =>
 	useQuery<PaginatedTenantInvoiceListResult>({
 		queryKey: BILLING_V2_QUERY_KEYS.tenantInvoices(tenantId ?? "", params),
 		queryFn: () => {
@@ -114,7 +114,7 @@ export const useTenantInvoicesV2Query = (
 export const useAllInvoicesV2Query = (
 	params?: AllInvoicesListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedAllInvoiceListResult> =>
 	useQuery<PaginatedAllInvoiceListResult>({
 		queryKey: BILLING_V2_QUERY_KEYS.allInvoicesList(params),
 		queryFn: () => BILLING_V2_API.ALL_INVOICES_LIST(params),
@@ -125,7 +125,7 @@ export const useAllInvoicesV2Query = (
 export const useAllInvoiceDetailV2Query = (
 	id: string | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<Invoice> =>
 	useQuery<Invoice>({
 		queryKey: BILLING_V2_QUERY_KEYS.allInvoiceDetail(id ?? ""),
 		queryFn: () => BILLING_V2_API.ALL_INVOICE_DETAIL(id ?? ""),

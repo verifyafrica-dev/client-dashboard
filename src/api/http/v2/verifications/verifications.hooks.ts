@@ -2,6 +2,7 @@ import {
 	useMutation,
 	useQuery,
 	useQueryClient,
+	type UseQueryResult,
 } from "@tanstack/react-query";
 
 import { VERIFICATIONS_V2_API } from "./verifications.api";
@@ -46,7 +47,8 @@ export const VERIFICATIONS_V2_QUERY_KEYS = {
 	tenantMixedVerifications: (
 		tenantId: string | undefined,
 		params?: MixedVerificationListQuery,
-	) => ["verifications-v2", "mixed", tenantId ?? "global", params ?? {}] as const,
+	) =>
+		["verifications-v2", "mixed", tenantId ?? "global", params ?? {}] as const,
 	mixedVerificationDetail: (id: string) =>
 		["verifications-v2", "mixed", "detail", id] as const,
 	allBatches: (params?: VerificationBatchListQuery) =>
@@ -61,15 +63,14 @@ export const VERIFICATIONS_V2_QUERY_KEYS = {
 		["verifications-v2", "prices", tenantId, params ?? {}] as const,
 	priceDetail: (id: number) =>
 		["verifications-v2", "prices", "detail", id] as const,
-	linkDetail: (link: string) =>
-		["verifications-v2", "links", link] as const,
+	linkDetail: (link: string) => ["verifications-v2", "links", link] as const,
 } as const;
 
 export const useVerificationTypesV2Query = (
 	tenantId?: string,
 	params?: Pick<VerificationListQuery, "is_test">,
 	enabled = true,
-) =>
+): UseQueryResult<VerificationTypeDefinition[]> =>
 	useQuery<VerificationTypeDefinition[]>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.types(tenantId, params),
 		queryFn: () => VERIFICATIONS_V2_API.TYPES(tenantId, params),
@@ -80,7 +81,7 @@ export const useVerificationTypesV2Query = (
 export const useAllVerificationRequestsV2Query = (
 	params?: VerificationListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedVerificationRequestListResult> =>
 	useQuery<PaginatedVerificationRequestListResult>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.allRequests(params),
 		queryFn: () => VERIFICATIONS_V2_API.ALL_REQUESTS(params),
@@ -92,7 +93,7 @@ export const useTenantVerificationRequestsV2Query = (
 	tenantId: string | undefined,
 	params?: VerificationListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedVerificationRequestListResult> =>
 	useQuery<PaginatedVerificationRequestListResult>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.tenantRequests(
 			tenantId ?? "",
@@ -112,7 +113,7 @@ export const useTenantVerificationRequestsV2Query = (
 export const useVerificationRequestDetailV2Query = (
 	verificationId: string | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<VerificationRequestDetail> =>
 	useQuery<VerificationRequestDetail>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.requestDetail(verificationId ?? ""),
 		queryFn: () => VERIFICATIONS_V2_API.REQUEST_DETAIL(verificationId ?? ""),
@@ -123,7 +124,7 @@ export const useVerificationRequestDetailV2Query = (
 export const useAllMixedVerificationsV2Query = (
 	params?: MixedVerificationListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedMixedVerificationListResult> =>
 	useQuery<PaginatedMixedVerificationListResult>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.allMixedVerifications(params),
 		queryFn: () => VERIFICATIONS_V2_API.ALL_MIXED_VERIFICATIONS(params),
@@ -135,13 +136,14 @@ export const useTenantMixedVerificationsV2Query = (
 	tenantId: string | undefined,
 	params?: MixedVerificationListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedMixedVerificationListResult> =>
 	useQuery<PaginatedMixedVerificationListResult>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.tenantMixedVerifications(
 			tenantId,
 			params,
 		),
-		queryFn: () => VERIFICATIONS_V2_API.TENANT_MIXED_VERIFICATIONS(tenantId, params),
+		queryFn: () =>
+			VERIFICATIONS_V2_API.TENANT_MIXED_VERIFICATIONS(tenantId, params),
 		enabled,
 		staleTime: VERIFICATIONS_V2_STALE_TIME,
 	});
@@ -149,7 +151,7 @@ export const useTenantMixedVerificationsV2Query = (
 export const useMixedVerificationDetailV2Query = (
 	id: string | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<MixedVerification> =>
 	useQuery<MixedVerification>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.mixedVerificationDetail(id ?? ""),
 		queryFn: () => VERIFICATIONS_V2_API.MIXED_VERIFICATION_DETAIL(id ?? ""),
@@ -160,7 +162,7 @@ export const useMixedVerificationDetailV2Query = (
 export const useAllVerificationBatchesV2Query = (
 	params?: VerificationBatchListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedVerificationBatchListResult> =>
 	useQuery<PaginatedVerificationBatchListResult>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.allBatches(params),
 		queryFn: () => VERIFICATIONS_V2_API.ALL_BATCHES(params),
@@ -172,7 +174,7 @@ export const useTenantVerificationBatchesV2Query = (
 	tenantId: string | undefined,
 	params?: VerificationBatchListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedVerificationBatchListResult> =>
 	useQuery<PaginatedVerificationBatchListResult>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.tenantBatches(tenantId ?? "", params),
 		queryFn: () => {
@@ -189,7 +191,7 @@ export const useTenantVerificationBatchesV2Query = (
 export const useVerificationBatchDetailV2Query = (
 	batchId: string | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<VerificationBatch> =>
 	useQuery<VerificationBatch>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.batchDetail(batchId ?? ""),
 		queryFn: () => VERIFICATIONS_V2_API.BATCH_DETAIL(batchId ?? ""),
@@ -200,7 +202,7 @@ export const useVerificationBatchDetailV2Query = (
 export const useAllVerificationPricesV2Query = (
 	params?: VerificationBatchListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedVerificationPriceListResult> =>
 	useQuery<PaginatedVerificationPriceListResult>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.allPrices(params),
 		queryFn: () => VERIFICATIONS_V2_API.ALL_PRICES(params),
@@ -212,7 +214,7 @@ export const useTenantVerificationPricesV2Query = (
 	tenantId: string | undefined,
 	params?: VerificationBatchListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedVerificationTypePriceListResult> =>
 	useQuery<PaginatedVerificationTypePriceListResult>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.tenantPrices(tenantId ?? "", params),
 		queryFn: () => {
@@ -229,7 +231,7 @@ export const useTenantVerificationPricesV2Query = (
 export const useVerificationPriceDetailV2Query = (
 	id: number | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<VerificationPrice> =>
 	useQuery<VerificationPrice>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.priceDetail(id ?? 0),
 		queryFn: () => VERIFICATIONS_V2_API.PRICE_DETAIL(id ?? 0),
@@ -240,7 +242,7 @@ export const useVerificationPriceDetailV2Query = (
 export const useVerificationLinkDetailV2Query = (
 	link: string | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<VerificationLink> =>
 	useQuery<VerificationLink>({
 		queryKey: VERIFICATIONS_V2_QUERY_KEYS.linkDetail(link ?? ""),
 		queryFn: () => VERIFICATIONS_V2_API.LINK_DETAIL(link ?? ""),
@@ -273,10 +275,7 @@ export const useSendVerificationEmailV2Mutation = () => {
 	return useMutation({
 		mutationFn: (verificationId: string) =>
 			VERIFICATIONS_V2_API.REQUEST_SEND_EMAIL(verificationId),
-		onSuccess: (
-			_data: VerificationSendEmailData,
-			verificationId: string,
-		) => {
+		onSuccess: (_data: VerificationSendEmailData, verificationId: string) => {
 			queryClient.invalidateQueries({
 				queryKey: VERIFICATIONS_V2_QUERY_KEYS.requestDetail(verificationId),
 			});
@@ -294,7 +293,9 @@ export const useRefreshVerificationStatusV2Mutation = () => {
 			queryClient.invalidateQueries({
 				queryKey: VERIFICATIONS_V2_QUERY_KEYS.requestDetail(data.id),
 			});
-			queryClient.invalidateQueries({ queryKey: VERIFICATIONS_V2_QUERY_KEYS.all });
+			queryClient.invalidateQueries({
+				queryKey: VERIFICATIONS_V2_QUERY_KEYS.all,
+			});
 		},
 	});
 };
@@ -357,7 +358,8 @@ export const useDeleteMixedVerificationV2Mutation = () => {
 	const queryClient = useQueryClient();
 
 	return useMutation({
-		mutationFn: (id: string) => VERIFICATIONS_V2_API.DELETE_MIXED_VERIFICATION(id),
+		mutationFn: (id: string) =>
+			VERIFICATIONS_V2_API.DELETE_MIXED_VERIFICATION(id),
 		onSuccess: () => {
 			queryClient.invalidateQueries({
 				queryKey: VERIFICATIONS_V2_QUERY_KEYS.all,

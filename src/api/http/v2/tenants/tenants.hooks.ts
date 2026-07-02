@@ -2,6 +2,7 @@ import {
 	useMutation,
 	useQuery,
 	useQueryClient,
+	type UseQueryResult,
 } from "@tanstack/react-query";
 
 import { TENANTS_V2_API } from "./tenants.api";
@@ -28,6 +29,11 @@ import type {
 	TenantVerificationConfigUpdatePayload,
 	TenantWebhookCreatePayload,
 	TenantWebhookUpdatePayload,
+	TenantVerificationConfigListData,
+	TenantWebhook,
+	TenantAPIKey,
+	SupportedCountry,
+	TenantDetail,
 } from "./tenants.types";
 
 const TENANTS_V2_STALE_TIME = 60_000;
@@ -53,8 +59,8 @@ export const TENANTS_V2_QUERY_KEYS = {
 export const useTenantV2DetailQuery = (
 	tenantId: string | undefined,
 	enabled = true,
-) =>
-	useQuery({
+): UseQueryResult<TenantDetail> =>
+	useQuery<TenantDetail>({
 		queryKey: TENANTS_V2_QUERY_KEYS.detail(tenantId ?? ""),
 		queryFn: () => {
 			if (!tenantId) {
@@ -70,7 +76,7 @@ export const useTenantV2DetailQuery = (
 export const useTenantsAllV2Query = (
 	params?: TenantListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedTenantAllListResult> =>
 	useQuery<PaginatedTenantAllListResult>({
 		queryKey: TENANTS_V2_QUERY_KEYS.allList(params),
 		queryFn: () => TENANTS_V2_API.ALL_LIST(params),
@@ -81,7 +87,7 @@ export const useTenantsAllV2Query = (
 export const useTenantsListV2Query = (
 	params?: TenantListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedTenantListResult> =>
 	useQuery<PaginatedTenantListResult>({
 		queryKey: TENANTS_V2_QUERY_KEYS.list(params),
 		queryFn: () => TENANTS_V2_API.LIST(params),
@@ -89,8 +95,10 @@ export const useTenantsListV2Query = (
 		staleTime: TENANTS_V2_STALE_TIME,
 	});
 
-export const useSupportedCountriesV2Query = (enabled = true) =>
-	useQuery({
+export const useSupportedCountriesV2Query = (
+	enabled = true,
+): UseQueryResult<SupportedCountry[]> =>
+	useQuery<SupportedCountry[]>({
 		queryKey: TENANTS_V2_QUERY_KEYS.countries,
 		queryFn: TENANTS_V2_API.COUNTRIES,
 		enabled,
@@ -100,8 +108,8 @@ export const useSupportedCountriesV2Query = (enabled = true) =>
 export const useTenantApiKeyV2Query = (
 	tenantId: string | undefined,
 	enabled = true,
-) =>
-	useQuery({
+): UseQueryResult<TenantAPIKey> =>
+	useQuery<TenantAPIKey>({
 		queryKey: TENANTS_V2_QUERY_KEYS.apiKey(tenantId ?? ""),
 		queryFn: () => {
 			if (!tenantId) {
@@ -117,8 +125,8 @@ export const useTenantApiKeyV2Query = (
 export const useTenantWebhookV2Query = (
 	tenantId: string | undefined,
 	enabled = true,
-) =>
-	useQuery({
+): UseQueryResult<TenantWebhook> =>
+	useQuery<TenantWebhook>({
 		queryKey: TENANTS_V2_QUERY_KEYS.webhook(tenantId ?? ""),
 		queryFn: () => {
 			if (!tenantId) {
@@ -135,7 +143,7 @@ export const useTenantInvitationsV2Query = (
 	tenantId: string | undefined,
 	params?: TenantListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedTenantInvitationListResult> =>
 	useQuery<PaginatedTenantInvitationListResult>({
 		queryKey: TENANTS_V2_QUERY_KEYS.invitations(tenantId ?? "", params),
 		queryFn: () => {
@@ -153,7 +161,7 @@ export const useTenantUsersV2Query = (
 	tenantId: string | undefined,
 	params?: TenantListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedTenantUserListResult> =>
 	useQuery<PaginatedTenantUserListResult>({
 		queryKey: TENANTS_V2_QUERY_KEYS.users(tenantId ?? "", params),
 		queryFn: () => {
@@ -170,8 +178,8 @@ export const useTenantUsersV2Query = (
 export const useTenantVerificationConfigsV2Query = (
 	tenantId: string | undefined,
 	enabled = true,
-) =>
-	useQuery({
+): UseQueryResult<TenantVerificationConfigListData> =>
+	useQuery<TenantVerificationConfigListData>({
 		queryKey: TENANTS_V2_QUERY_KEYS.verificationConfigs(tenantId ?? ""),
 		queryFn: () => {
 			if (!tenantId) {

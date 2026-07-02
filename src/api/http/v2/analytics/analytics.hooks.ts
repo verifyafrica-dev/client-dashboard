@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
 import { ANALYTICS_V2_API } from "./analytics.api";
 import type {
@@ -18,10 +18,7 @@ export const ANALYTICS_V2_QUERY_KEYS = {
 			params?.from_date ?? null,
 			params?.to_date ?? null,
 		] as const,
-	tenant: (
-		tenantId: string,
-		params?: AnalyticsDateRangeQuery,
-	) =>
+	tenant: (tenantId: string, params?: AnalyticsDateRangeQuery) =>
 		[
 			"analytics-v2",
 			"tenant",
@@ -30,10 +27,7 @@ export const ANALYTICS_V2_QUERY_KEYS = {
 			params?.to_date ?? null,
 			params?.is_test ?? null,
 		] as const,
-	statements: (
-		params?: AnalyticsStatementsListQuery,
-		tenantId?: string,
-	) =>
+	statements: (params?: AnalyticsStatementsListQuery, tenantId?: string) =>
 		[
 			"analytics-v2",
 			"statements",
@@ -46,7 +40,7 @@ export const ANALYTICS_V2_QUERY_KEYS = {
 export const usePlatformAnalyticsV2Query = (
 	params?: AnalyticsDateRangeQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PlatformAnalyticsPayload> =>
 	useQuery<PlatformAnalyticsPayload>({
 		queryKey: ANALYTICS_V2_QUERY_KEYS.root(params),
 		queryFn: () => ANALYTICS_V2_API.ROOT(params),
@@ -57,7 +51,7 @@ export const useTenantAnalyticsV2Query = (
 	tenantId: string | undefined,
 	params?: AnalyticsDateRangeQuery,
 	enabled = true,
-) =>
+): UseQueryResult<AnalyticsPayload> =>
 	useQuery<AnalyticsPayload>({
 		queryKey: ANALYTICS_V2_QUERY_KEYS.tenant(tenantId ?? "", params),
 		queryFn: () => {
@@ -74,11 +68,15 @@ export const useTenantStatementsV2Query = (
 	params?: AnalyticsStatementsListQuery,
 	tenantId?: string,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedStatementsListResult> =>
 	useQuery<PaginatedStatementsListResult>({
 		queryKey: ANALYTICS_V2_QUERY_KEYS.statements(params, tenantId),
 		queryFn: () => ANALYTICS_V2_API.STATEMENTS(params, tenantId),
 		enabled,
 	});
 
-export type { AnalyticsPayload, PaginatedStatementsListResult, PlatformAnalyticsPayload };
+export type {
+	AnalyticsPayload,
+	PaginatedStatementsListResult,
+	PlatformAnalyticsPayload,
+};

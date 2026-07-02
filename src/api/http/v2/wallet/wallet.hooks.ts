@@ -2,6 +2,7 @@ import {
 	useMutation,
 	useQuery,
 	useQueryClient,
+	type UseQueryResult,
 } from "@tanstack/react-query";
 
 import { WALLET_V2_API } from "./wallet.api";
@@ -42,7 +43,7 @@ export const WALLET_V2_QUERY_KEYS = {
 export const useWalletBalanceV2Query = (
 	tenantId: string | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<Wallet> =>
 	useQuery<Wallet>({
 		queryKey: WALLET_V2_QUERY_KEYS.balance(tenantId ?? ""),
 		queryFn: () => {
@@ -59,7 +60,7 @@ export const useWalletBalanceV2Query = (
 export const useAllWalletBalancesV2Query = (
 	params?: WalletListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedWalletBalanceListResult> =>
 	useQuery<PaginatedWalletBalanceListResult>({
 		queryKey: WALLET_V2_QUERY_KEYS.allBalances(params),
 		queryFn: () => WALLET_V2_API.ALL_BALANCES(params),
@@ -71,7 +72,7 @@ export const useTenantFundingRequestsV2Query = (
 	tenantId: string | undefined,
 	params?: WalletListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedWalletFundingRequestListResult> =>
 	useQuery<PaginatedWalletFundingRequestListResult>({
 		queryKey: WALLET_V2_QUERY_KEYS.tenantFundingRequests(
 			tenantId ?? "",
@@ -91,7 +92,7 @@ export const useTenantFundingRequestsV2Query = (
 export const useAllFundingRequestsV2Query = (
 	params?: WalletListQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedWalletFundingRequestListResult> =>
 	useQuery<PaginatedWalletFundingRequestListResult>({
 		queryKey: WALLET_V2_QUERY_KEYS.allFundingRequests(params),
 		queryFn: () => WALLET_V2_API.ALL_FUNDING_REQUESTS(params),
@@ -103,7 +104,7 @@ export const useTenantTransactionsV2Query = (
 	tenantId: string | undefined,
 	params?: WalletTransactionsQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedWalletTransactionListResult> =>
 	useQuery<PaginatedWalletTransactionListResult>({
 		queryKey: WALLET_V2_QUERY_KEYS.tenantTransactions(tenantId ?? "", params),
 		queryFn: () => {
@@ -120,7 +121,7 @@ export const useTenantTransactionsV2Query = (
 export const useAllTransactionsV2Query = (
 	params?: WalletTransactionsQuery,
 	enabled = true,
-) =>
+): UseQueryResult<PaginatedWalletTransactionListResult> =>
 	useQuery<PaginatedWalletTransactionListResult>({
 		queryKey: WALLET_V2_QUERY_KEYS.allTransactions(params),
 		queryFn: () => WALLET_V2_API.ALL_TRANSACTIONS(params),
@@ -132,12 +133,9 @@ export const useTopUpVerifyV2Query = (
 	tenantId: string | undefined,
 	sessionId: string | undefined,
 	enabled = true,
-) =>
+): UseQueryResult<TopUpVerifyData> =>
 	useQuery<TopUpVerifyData>({
-		queryKey: WALLET_V2_QUERY_KEYS.topUpVerify(
-			tenantId ?? "",
-			sessionId ?? "",
-		),
+		queryKey: WALLET_V2_QUERY_KEYS.topUpVerify(tenantId ?? "", sessionId ?? ""),
 		queryFn: () => {
 			if (!tenantId || !sessionId) {
 				throw new Error("Tenant ID and session ID are required");

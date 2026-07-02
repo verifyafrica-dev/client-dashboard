@@ -58,14 +58,16 @@ const toAuthStoreUser = (user: UserSession): UserDetail => ({
 	created_at: "",
 });
 
-export const useUsersV2ListQuery = (params?: UserListQuery) =>
-	useQuery({
+export const useUsersV2ListQuery = (
+	params?: UserListQuery,
+): UseQueryResult<PaginatedAdminUserListResult> =>
+	useQuery<PaginatedAdminUserListResult>({
 		queryKey: USER_V2_QUERY_KEYS.list(params),
 		queryFn: () => USERS_V2_API.LIST(params),
 	});
 
-export const useUserV2DetailQuery = (id: string) =>
-	useQuery({
+export const useUserV2DetailQuery = (id: string): UseQueryResult<AdminUser> =>
+	useQuery<AdminUser>({
 		queryKey: USER_V2_QUERY_KEYS.detail(id),
 		queryFn: () => USERS_V2_API.DETAIL(id),
 		enabled: Boolean(id),
@@ -92,8 +94,11 @@ export const useMeV2Query = (
 	return query;
 };
 
-export const useUserV2LookupQuery = (query: UserLookupQuery, enabled = true) =>
-	useQuery({
+export const useUserV2LookupQuery = (
+	query: UserLookupQuery,
+	enabled = true,
+): UseQueryResult<LookupResponseData> =>
+	useQuery<LookupResponseData>({
 		queryKey: USER_V2_QUERY_KEYS.lookup(query),
 		queryFn: () => USERS_V2_API.LOOKUP(query),
 		enabled,
@@ -102,7 +107,10 @@ export const useUserV2LookupQuery = (query: UserLookupQuery, enabled = true) =>
 export const useVerifyForgotPasswordTokenV2Query = (
 	token: string,
 	enabled = true,
-): UseQueryResult<VerifyForgotPasswordTokenResponseData, UserApiErrorResponse> =>
+): UseQueryResult<
+	VerifyForgotPasswordTokenResponseData,
+	UserApiErrorResponse
+> =>
 	useQuery({
 		queryKey: USER_V2_QUERY_KEYS.verifyForgotPasswordToken(token),
 		queryFn: () => USERS_V2_API.VERIFY_FORGOT_PASSWORD_TOKEN({ token }),
