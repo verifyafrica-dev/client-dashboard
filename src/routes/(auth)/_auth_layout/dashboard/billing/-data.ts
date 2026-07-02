@@ -10,6 +10,7 @@ import type {
 } from "#/api/http/v2/billing/billing.types";
 import type { WalletTransaction } from "#/api/http/v2/wallet/wallet.types";
 import { normalizeCountryName } from "#/lib/country-state-city";
+import { pickChangedFields } from "#/lib/pick-changed-fields";
 
 export type BillingFormState = {
 	billing_name: string;
@@ -49,11 +50,19 @@ export function getBillingFormState(
 	};
 }
 
+export function getBillingFormUpdateValues(form: BillingFormState) {
+	const { billing_email: _billingEmail, ...updateValues } = form;
+	return updateValues;
+}
+
 export function getBillingInformationUpdatePayload(
+	original: BillingFormState,
 	form: BillingFormState,
 ): BillingInformationUpdatePayload {
-	const { billing_email: _billingEmail, ...updatePayload } = form;
-	return updatePayload;
+	return pickChangedFields(
+		getBillingFormUpdateValues(original),
+		getBillingFormUpdateValues(form),
+	);
 }
 
 export function getBillingInformationCreatePayload(

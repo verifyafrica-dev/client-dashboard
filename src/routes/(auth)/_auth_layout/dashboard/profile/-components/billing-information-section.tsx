@@ -1,5 +1,5 @@
 import { FloppyDiskIcon } from "@phosphor-icons/react";
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -10,6 +10,7 @@ import {
 import { Button } from "#/components/ui/button";
 import { Separator } from "#/components/ui/separator";
 import { Skeleton } from "#/components/ui/skeleton";
+import { hasChangedFields } from "#/lib/pick-changed-fields";
 import { cn } from "#/lib/utils.ts";
 import { BillingInformationFormFields } from "../../billing/-components/billing-information-form-fields";
 import {
@@ -34,6 +35,12 @@ export function BillingInformationSection() {
 	);
 
 	const [form, setForm] = useState<BillingFormState>(EMPTY_BILLING_FORM);
+	const originalForm = useMemo(
+		() => getBillingFormState(billingInfo),
+		[billingInfo],
+	);
+	const isEditing = Boolean(billingInfo);
+	const hasChanges = isEditing ? hasChangedFields(originalForm, form) : true;
 	const createMutation = useCreateBillingInformationV2Mutation();
 	const updateMutation = useUpdateTenantBillingInformationV2Mutation(
 		tenantId ?? "",
@@ -54,11 +61,17 @@ export function BillingInformationSection() {
 		setForm((current) => ({ ...current, [field]: value }));
 	}
 
-	function handleSubmit(event: FormEvent<HTMLFormElement>) {
+	function handleSubmit(event: React.SubmitEvent<HTMLFormElement>) {
 		event.preventDefault();
 
 		if (billingInfo) {
-			updateMutation.mutate(getBillingInformationUpdatePayload(form), {
+			const payload = getBillingInformationUpdatePayload(originalForm, form);
+
+			if (Object.keys(payload).length === 0) {
+				return;
+			}
+
+			updateMutation.mutate(payload, {
 				onSuccess: () => {
 					toast.success("Billing information updated");
 				},
@@ -112,14 +125,21 @@ export function BillingInformationSection() {
 				</p>
 			</div>
 
-			<form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+			<form
+				className="flex flex-col gap-6"
+				onSubmit={handleSubmit}
+			>
 				<BillingInformationFormFields
 					form={form}
 					onFieldChange={updateField}
 					isEmailDisabled={Boolean(billingInfo)}
 				/>
 
-				<Button type="submit" className="w-full" disabled={isSaving}>
+				<Button
+					type="submit"
+					className="w-full"
+					disabled={isSaving || !hasChanges}
+				>
 					<FloppyDiskIcon
 						className={cn("size-4", isSaving && "animate-pulse")}
 						weight="fill"
@@ -141,7 +161,10 @@ function BillingInformationSectionSkeleton() {
 			</div>
 			<div className="grid gap-4">
 				{["name", "email", "address", "city", "country"].map((field) => (
-					<div key={field} className="flex flex-col gap-2">
+					<div
+						key={field}
+						className="flex flex-col gap-2"
+					>
 						<Skeleton className="h-4 w-24" />
 						<Skeleton className="h-10 w-full" />
 					</div>

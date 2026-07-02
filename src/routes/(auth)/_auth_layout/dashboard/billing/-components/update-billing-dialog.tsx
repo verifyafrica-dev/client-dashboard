@@ -1,5 +1,5 @@
 import { BuildingsIcon } from "@phosphor-icons/react";
-import { type ComponentProps, useEffect, useState } from "react";
+import { type ComponentProps, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -15,6 +15,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "#/components/ui/dialog";
+import { hasChangedFields } from "#/lib/pick-changed-fields";
 import {
 	type BillingFormState,
 	EMPTY_BILLING_FORM,
@@ -38,6 +39,14 @@ export function UpdateBillingDialog({
 	const updateMutation = useUpdateTenantBillingInformationV2Mutation(
 		tenantId ?? "",
 	);
+	const originalForm = useMemo(
+		() => getBillingFormState(billingInfo),
+		[billingInfo],
+	);
+	const isEditing = Boolean(billingInfo);
+	const hasChanges = isEditing
+		? hasChangedFields(originalForm, form)
+		: true;
 
 	const isSaving = createMutation.isPending || updateMutation.isPending;
 
@@ -56,7 +65,13 @@ export function UpdateBillingDialog({
 
 	function handleSubmit() {
 		if (billingInfo) {
-			updateMutation.mutate(getBillingInformationUpdatePayload(form), {
+			const payload = getBillingInformationUpdatePayload(originalForm, form);
+
+			if (Object.keys(payload).length === 0) {
+				return;
+			}
+
+			updateMutation.mutate(payload, {
 				onSuccess: () => {
 					toast.success("Billing information updated");
 					onOpenChange?.(false);
@@ -112,7 +127,7 @@ export function UpdateBillingDialog({
 					<Button
 						type="button"
 						className="cursor-pointer"
-						disabled={isSaving}
+						disabled={isSaving || !hasChanges}
 						onClick={handleSubmit}
 					>
 						{isSaving ? "Saving..." : "Update Billing Info"}

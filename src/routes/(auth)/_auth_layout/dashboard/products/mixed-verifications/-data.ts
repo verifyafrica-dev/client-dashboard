@@ -59,6 +59,17 @@ export function getCustomVerificationFormValues(
 	};
 }
 
+export function buildCustomVerificationPayload(
+	values: CustomVerificationFormValues,
+) {
+	return {
+		name: values.name.trim(),
+		description: values.description.trim(),
+		verifications: values.verifications,
+		is_active: values.is_active,
+	};
+}
+
 export function formatVerificationTypeLabel(value: string) {
 	return value
 		.split("_")

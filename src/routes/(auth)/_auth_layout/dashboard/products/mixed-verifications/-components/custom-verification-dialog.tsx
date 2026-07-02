@@ -20,6 +20,7 @@ import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
 import { Switch } from "#/components/ui/switch";
 import { Textarea } from "#/components/ui/textarea";
+import { hasChangedFields, pickChangedFields } from "#/lib/pick-changed-fields";
 import { cn } from "#/lib/utils.ts";
 import {
 	Field,
@@ -28,6 +29,7 @@ import {
 	FieldLabel,
 } from "@/components/ui/field";
 import {
+	buildCustomVerificationPayload,
 	CUSTOM_MIXED_VERIFICATION_TYPE_OPTIONS,
 	CustomVerificationFormSchema,
 	formatVerificationTypeLabel,
@@ -64,17 +66,19 @@ export function CustomVerificationDialog({
 			onSubmit: CustomVerificationFormSchema,
 		},
 		onSubmit: async ({ value }) => {
-			const payload = {
-				name: value.name.trim(),
-				description: value.description.trim(),
-				verifications: value.verifications,
-				is_active: value.is_active,
-				is_custom: true,
-				is_test: false,
-			};
-
 			try {
 				if (isEditing && template) {
+					const payload = pickChangedFields(
+						buildCustomVerificationPayload(
+							getCustomVerificationFormValues(template),
+						),
+						buildCustomVerificationPayload(value),
+					);
+
+					if (Object.keys(payload).length === 0) {
+						return;
+					}
+
 					await updateMutation.mutateAsync({
 						id: template.id,
 						payload,
@@ -83,7 +87,11 @@ export function CustomVerificationDialog({
 					toast.success("Custom verification updated.");
 				} else {
 					await createMutation.mutateAsync({
-						payload,
+						payload: {
+							...buildCustomVerificationPayload(value),
+							is_custom: true,
+							is_test: false,
+						},
 						tenantId,
 					});
 					toast.success("Custom verification created.");
@@ -257,13 +265,17 @@ export function CustomVerificationDialog({
 						>
 							Cancel
 						</Button>
-						<Button
-							type="submit"
-							className="cursor-pointer tracking-wide"
-							disabled={isSaving}
-						>
-							{isSaving ? "Saving..." : "Save"}
-						</Button>
+						<form.Subscribe selector={(state) => !state.isDefaultValue}>
+							{(isDirty) => (
+								<Button
+									type="submit"
+									className="cursor-pointer tracking-wide"
+									disabled={isSaving || (isEditing && !isDirty)}
+								>
+									{isSaving ? "Saving..." : "Save"}
+								</Button>
+							)}
+						</form.Subscribe>
 					</DialogFooter>
 				</form>
 			</DialogContent>
