@@ -49,8 +49,7 @@ import {
 } from "../-components/team-member-details-dialog";
 import { TeamTableShell } from "../-components/team-table-shell";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
-import type { TenantUserRole } from "../-data";
-import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
+import { TEAM_PAGE_SIZE, useCurrentTenant, type TenantUserRole } from "../-data";
 import {
 	InvitationRoleBadge,
 	InvitationStatusBadge,
@@ -104,7 +103,7 @@ function InvitationsPage() {
 	const invitationListQuery = useMemo(
 		() => ({
 			page,
-			per_page: TEAM_LIST_PAGE_SIZE,
+			per_page: TEAM_PAGE_SIZE,
 			...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
 			...(statusFilter !== "all" ? { status: statusFilter } : {}),
 			...(roleFilter !== "all" ? { role: roleFilter } : {}),
@@ -374,7 +373,7 @@ function InvitationsPage() {
 							</Table>
 							<TablePagination
 								page={page}
-								pageSize={TEAM_LIST_PAGE_SIZE}
+								pageSize={TEAM_PAGE_SIZE}
 								total={totalInvitations}
 								onPageChange={setPage}
 							/>

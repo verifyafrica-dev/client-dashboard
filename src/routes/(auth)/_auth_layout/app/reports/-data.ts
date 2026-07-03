@@ -27,7 +27,7 @@ export type BatchVerificationReport = {
 	created_at: string;
 };
 
-export const REPORTS_PAGE_SIZE = 5;
+export const REPORTS_PAGE_SIZE = 10;
 
 export const COUNTRY_CODE_MAP: Record<string, string> = {
 	ng: "Nigeria",

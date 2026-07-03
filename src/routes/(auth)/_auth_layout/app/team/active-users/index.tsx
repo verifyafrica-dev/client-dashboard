@@ -50,8 +50,7 @@ import {
 import { TeamTableShell } from "../-components/team-table-shell";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { UserRoleBadge } from "../-components/user-role-badge";
-import type { TenantUserRole } from "../-data";
-import { TEAM_LIST_PAGE_SIZE, useCurrentTenant } from "../-data";
+import { TEAM_PAGE_SIZE, useCurrentTenant, type TenantUserRole } from "../-data";
 import { InviteUserDialog } from "../invitations/-components/invite-user-dialog";
 import { ActiveUserStatusBadge } from "./-components/user-status-badge";
 import {
@@ -106,7 +105,7 @@ function ActiveUsersPage() {
 	const userListQuery = useMemo(
 		() => ({
 			page,
-			per_page: TEAM_LIST_PAGE_SIZE,
+			per_page: TEAM_PAGE_SIZE,
 			...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
 			...(statusFilter !== "all" ? { status: statusFilter } : {}),
 			...(roleFilter !== "all" ? { role: roleFilter } : {}),
@@ -380,7 +379,7 @@ function ActiveUsersPage() {
 							</Table>
 							<TablePagination
 								page={page}
-								pageSize={TEAM_LIST_PAGE_SIZE}
+								pageSize={TEAM_PAGE_SIZE}
 								total={totalUsers}
 								onPageChange={setPage}
 							/>

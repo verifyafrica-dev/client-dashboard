@@ -12,9 +12,7 @@ export const ROLE_LABELS: Record<TenantUserRole, string> = {
 
 export const TEAM_ROLES: TenantUserRole[] = ["admin", "member"];
 
-export const TEAM_PAGE_SIZE = 5;
-
-export const TEAM_LIST_PAGE_SIZE = 10;
+export const TEAM_PAGE_SIZE = 10;
 
 export function formatTeamDate(date: Date) {
 	return new Intl.DateTimeFormat("en-US", {
