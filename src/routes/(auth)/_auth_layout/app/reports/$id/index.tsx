@@ -18,6 +18,7 @@ import { generatePDFWithColorSupport } from "#/lib/pdfHelpers";
 import { isPlainObject } from "#/lib/validators";
 import { cn } from "#/lib/utils.ts";
 import { VerificationMetadataCard } from "../-components/verification-metadata-card";
+import { VerificationProofsSection } from "../-components/verification-proofs-section";
 import { VerificationResultPanel } from "../-components/verification-result-panel";
 
 export const Route = createFileRoute(
@@ -176,6 +177,9 @@ function VerificationReportDetailPage() {
 			) : (
 				<div ref={reportRef} className="flex flex-col gap-6">
 					<VerificationMetadataCard verification={verification} />
+					{verification.proofs_available ? (
+						<VerificationProofsSection proofs={verification.proofs} />
+					) : null}
 					<VerificationResultPanel data={resultData} />
 				</div>
 			)}

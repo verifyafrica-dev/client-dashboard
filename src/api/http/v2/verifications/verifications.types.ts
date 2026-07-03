@@ -145,9 +145,22 @@ export interface VerificationRequest {
 	email_sent_at?: string | null;
 }
 
+export interface VerificationProofUrlObject {
+	proof?: string;
+}
+
+export interface VerificationProofs {
+	access_token?: string;
+	address?: VerificationProofUrlObject;
+	document?: VerificationProofUrlObject;
+	face?: VerificationProofUrlObject;
+	verification_video?: string;
+	verification_report?: string;
+}
+
 export interface VerificationRequestDetail extends VerificationRequest {
 	proofs_available: boolean;
-	proofs: Record<string, unknown>;
+	proofs: VerificationProofs;
 }
 
 export interface VerificationBatch {

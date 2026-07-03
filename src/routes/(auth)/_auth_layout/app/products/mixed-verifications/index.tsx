@@ -3,9 +3,17 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 
 import { useTenantMixedVerificationsV2Query } from "#/api/http/v2/verifications/verifications.hooks";
-import type { MixedVerification } from "#/api/http/v2/verifications/verifications.types";
+import type {
+	MixedVerification,
+	VerificationRequest,
+} from "#/api/http/v2/verifications/verifications.types";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
+import {
+	buildLinkResult,
+	type HostedLinkResult,
+} from "#/lib/verification-links";
+import { VerificationResultDialog } from "../-components/verification-result-dialog";
 import { useCurrentTenant } from "../../team/-data";
 import { getProduct } from "../-data";
 import {
@@ -101,6 +109,8 @@ function MixedVerificationsPage() {
 		useState<MixedVerification | null>(null);
 	const [deletingTemplate, setDeletingTemplate] =
 		useState<MixedVerification | null>(null);
+	const [linkResult, setLinkResult] = useState<HostedLinkResult | null>(null);
+	const [isResultDialogOpen, setIsResultDialogOpen] = useState(false);
 
 	const groupedTemplates = useMemo(
 		() => groupMixedVerifications(mixedVerificationsQuery.data?.items ?? []),
@@ -129,6 +139,19 @@ function MixedVerificationsPage() {
 	function openDeleteDialog(template: MixedVerification) {
 		setDeletingTemplate(template);
 		setDeleteDialogOpen(true);
+	}
+
+	function handleMixedVerificationStarted(
+		verification: VerificationRequest,
+		email: string,
+	) {
+		setLinkResult(buildLinkResult(verification, email));
+		setIsResultDialogOpen(true);
+	}
+
+	function handleStartNewMixedVerification() {
+		setIsResultDialogOpen(false);
+		setLinkResult(null);
 	}
 
 	return (
@@ -214,6 +237,15 @@ function MixedVerificationsPage() {
 						onOpenChange={setStartDialogOpen}
 						template={startingTemplate}
 						tenantId={tenantId}
+						onStarted={handleMixedVerificationStarted}
+					/>
+					<VerificationResultDialog
+						open={isResultDialogOpen}
+						onOpenChange={setIsResultDialogOpen}
+						linkResult={linkResult}
+						verification={null}
+						onStartNew={handleStartNewMixedVerification}
+						description="Your mixed verification request was created successfully."
 					/>
 					<DeleteCustomVerificationDialog
 						open={deleteDialogOpen}

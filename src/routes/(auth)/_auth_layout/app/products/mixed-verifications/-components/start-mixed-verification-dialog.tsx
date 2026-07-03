@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useStartMixedVerificationV2Mutation } from "#/api/http/v2/verifications/verifications.hooks";
-import type { MixedVerification } from "#/api/http/v2/verifications/verifications.types";
+import type {
+	MixedVerification,
+	VerificationRequest,
+} from "#/api/http/v2/verifications/verifications.types";
 import type { V2AxiosError } from "#/api/http/shared";
 import { Button } from "#/components/ui/button";
 import {
@@ -23,6 +26,7 @@ type StartMixedVerificationDialogProps = {
 	onOpenChange: (open: boolean) => void;
 	template: MixedVerification | null;
 	tenantId: string;
+	onStarted: (verification: VerificationRequest, email: string) => void;
 };
 
 export function StartMixedVerificationDialog({
@@ -30,6 +34,7 @@ export function StartMixedVerificationDialog({
 	onOpenChange,
 	template,
 	tenantId,
+	onStarted,
 }: StartMixedVerificationDialogProps) {
 	const startMutation = useStartMixedVerificationV2Mutation();
 	const [email, setEmail] = useState("");
@@ -61,7 +66,7 @@ export function StartMixedVerificationDialog({
 		}
 
 		try {
-			await startMutation.mutateAsync({
+			const verification = await startMutation.mutateAsync({
 				tenantId,
 				payload: {
 					email: email.trim(),
@@ -71,7 +76,7 @@ export function StartMixedVerificationDialog({
 					full_address: requiresAddress ? fullAddress.trim() : undefined,
 				},
 			});
-			toast.success("Mixed verification started successfully.");
+			onStarted(verification, email.trim());
 			onOpenChange(false);
 		} catch (error) {
 			const message = (error as V2AxiosError).response?.data?.message;
@@ -80,13 +85,16 @@ export function StartMixedVerificationDialog({
 	}
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog
+			open={open}
+			onOpenChange={onOpenChange}
+		>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle className="font-semibold">Start Mixed Verification</DialogTitle>
-					<DialogDescription>
-						{template?.name}
-					</DialogDescription>
+					<DialogTitle className="font-semibold">
+						Start Mixed Verification
+					</DialogTitle>
+					<DialogDescription>{template?.name}</DialogDescription>
 				</DialogHeader>
 
 				<div className="space-y-4">
@@ -122,7 +130,7 @@ export function StartMixedVerificationDialog({
 					<Button
 						type="button"
 						variant="ghost"
-						className="cursor-pointer uppercase tracking-wide"
+						className="cursor-pointer tracking-wide"
 						disabled={startMutation.isPending}
 						onClick={() => onOpenChange(false)}
 					>
@@ -130,7 +138,7 @@ export function StartMixedVerificationDialog({
 					</Button>
 					<Button
 						type="button"
-						className="cursor-pointer uppercase tracking-wide"
+						className="cursor-pointer tracking-wide"
 						disabled={startMutation.isPending}
 						onClick={() => void handleStart()}
 					>

@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import {
 	unwrapV2Data,
 	unwrapV2Message,
@@ -69,6 +71,24 @@ const withTenantHeader = (tenantId: string) => ({
 const withOptionalTenantHeader = (tenantId?: string) =>
 	tenantId ? withTenantHeader(tenantId) : undefined;
 
+/** POST directly to a Shufti proof URL with the access token from the detail response. */
+export const fetchShuftiProofAsset = async (
+	proofUrl: string,
+	accessToken: string,
+): Promise<Blob> => {
+	const response = await axios.post<Blob>(
+		proofUrl,
+		{ access_token: accessToken },
+		{
+			headers: { "Content-Type": "application/json" },
+			responseType: "blob",
+			timeout: 120_000,
+		},
+	);
+
+	return response.data;
+};
+
 export const VERIFICATIONS_V2_API = {
 	TYPES: async (
 		tenantId?: string,
@@ -113,6 +133,8 @@ export const VERIFICATIONS_V2_API = {
 		await $http
 			.get(VERIFICATIONS_V2_ENDPOINTS.requestDetail(verificationId))
 			.then((res) => unwrapV2Data<VerificationRequestDetail>(res)),
+
+	FETCH_SHUFTI_PROOF_ASSET: fetchShuftiProofAsset,
 
 	REQUEST_PROOF: async (
 		verificationId: string,

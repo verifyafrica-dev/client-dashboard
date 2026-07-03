@@ -22,7 +22,6 @@ import type {
 	VerificationLink,
 	VerificationListQuery,
 	VerificationPrice,
-	VerificationProofKey,
 	VerificationRequest,
 	VerificationRequestCreatePayload,
 	VerificationRequestDetail,
@@ -303,12 +302,12 @@ export const useRefreshVerificationStatusV2Mutation = () => {
 export const useFetchVerificationProofV2Mutation = () =>
 	useMutation({
 		mutationFn: ({
-			verificationId,
-			proofKey,
+			proofUrl,
+			accessToken,
 		}: {
-			verificationId: string;
-			proofKey: VerificationProofKey;
-		}) => VERIFICATIONS_V2_API.REQUEST_PROOF(verificationId, proofKey),
+			proofUrl: string;
+			accessToken: string;
+		}) => VERIFICATIONS_V2_API.FETCH_SHUFTI_PROOF_ASSET(proofUrl, accessToken),
 	});
 
 export const useCreateMixedVerificationV2Mutation = () => {
