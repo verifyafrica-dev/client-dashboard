@@ -9,6 +9,7 @@ import type {
 } from "#/api/http/v2/verifications/verifications.types";
 import { Button } from "#/components/ui/button";
 import { Skeleton } from "#/components/ui/skeleton";
+import { createSkeletonKeys } from "#/lib/skeleton-keys";
 import {
 	buildLinkResult,
 	type HostedLinkResult,
@@ -38,8 +39,8 @@ function MixedVerificationSectionCardsSkeleton({
 }) {
 	return (
 		<div className="grid gap-4 md:grid-cols-2">
-			{Array.from({ length: count }).map((_, index) => (
-				<Skeleton key={index} className="h-56 w-full rounded-xl" />
+			{createSkeletonKeys(count, "mixed-verification-card").map((key) => (
+				<Skeleton key={key} className="h-56 w-full rounded-xl" />
 			))}
 		</div>
 	);

@@ -341,10 +341,7 @@ function InvitationsPage() {
 												</TableCell>
 												<TableCell className="pr-4 sm:pr-6">
 													{isTenantAdmin && (
-														<div
-															className="flex items-center gap-1"
-															onClick={(event) => event.stopPropagation()}
-														>
+														<div className="flex items-center gap-1">
 															{canResendInvitation(invitation.status) && (
 																<TeamIconActionButton
 																	label={
@@ -356,16 +353,20 @@ function InvitationsPage() {
 																	disabled={
 																		resendingInvitationId === invitation.id
 																	}
-																	onClick={() =>
-																		void handleResendInvitation(invitation)
-																	}
+																	onClick={(event) => {
+																		event.stopPropagation();
+																		void handleResendInvitation(invitation);
+																	}}
 																/>
 															)}
 															<TeamIconActionButton
 																label="Delete invitation"
 																icon={TrashIcon}
 																variant="destructive"
-																onClick={() => openDeleteDialog(invitation)}
+																onClick={(event) => {
+																	event.stopPropagation();
+																	openDeleteDialog(invitation);
+																}}
 															/>
 														</div>
 													)}

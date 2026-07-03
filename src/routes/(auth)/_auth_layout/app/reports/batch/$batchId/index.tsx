@@ -19,6 +19,7 @@ import {
 	TableRow,
 } from "#/components/ui/table";
 import { cn } from "#/lib/utils.ts";
+import { createSkeletonKeys } from "#/lib/skeleton-keys";
 import { useCurrentTenant } from "../../../team/-data";
 import { ReportsTableShell } from "../../-components/reports-table-shell";
 import {
@@ -102,8 +103,8 @@ function BatchVerificationReportDetailPage() {
 
 			{batchQuery.isPending ? (
 				<div className="grid gap-4 md:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, index) => (
-						<Skeleton key={index} className="h-28 w-full rounded-xl" />
+					{createSkeletonKeys(4, "batch-stat").map((key) => (
+						<Skeleton key={key} className="h-28 w-full rounded-xl" />
 					))}
 				</div>
 			) : batchQuery.isError || !batch ? (

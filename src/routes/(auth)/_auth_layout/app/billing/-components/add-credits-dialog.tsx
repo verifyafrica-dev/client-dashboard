@@ -1,7 +1,7 @@
 import { CurrencyDollarIcon, WalletIcon } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
-import { type ComponentProps, useEffect, useRef, useState } from "react";
+import { type ComponentProps, useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -104,7 +104,7 @@ export function AddCreditsDialog({
 	const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-	const clearVerificationTimers = () => {
+	const clearVerificationTimers = useCallback(() => {
 		if (pollIntervalRef.current) {
 			clearInterval(pollIntervalRef.current);
 			pollIntervalRef.current = null;
@@ -114,16 +114,16 @@ export function AddCreditsDialog({
 			clearTimeout(pollTimeoutRef.current);
 			pollTimeoutRef.current = null;
 		}
-	};
+	}, []);
 
-	const resetPaymentState = () => {
+	const resetPaymentState = useCallback(() => {
 		clearVerificationTimers();
 		setSubmitError(null);
 		setIsSubmitting(false);
 		setShowStripeCheckout(false);
 		setClientSecret(null);
 		createSessionMutation.reset();
-	};
+	}, [clearVerificationTimers, createSessionMutation]);
 
 	useEffect(() => {
 		return () => {

@@ -149,8 +149,8 @@ export function KycRejectedAlert({
 				)}
 				{generalReasons.length > 0 && (
 					<ul className="list-disc space-y-1.5 pl-5 text-sm">
-						{generalReasons.map((reason, index) => (
-							<li key={`general-${index}-${reason}`}>{reason}</li>
+						{generalReasons.map((reason) => (
+							<li key={reason}>{reason}</li>
 						))}
 					</ul>
 				)}

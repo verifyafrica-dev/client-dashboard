@@ -36,8 +36,8 @@ export function ReportsFiltersForm({
 	verificationTypes,
 	statuses,
 	countries,
-	totalCount,
-	filteredCount,
+	totalCount: _totalCount,
+	filteredCount: _filteredCount,
 	disabled = false,
 	onChange,
 }: ReportsFiltersFormProps) {

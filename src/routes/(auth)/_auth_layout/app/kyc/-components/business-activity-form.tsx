@@ -224,9 +224,13 @@ export function BusinessActivityForm() {
 							)}
 						</div>
 
-						{licensesField.state.value.map((_, index) => (
+						{licensesField.state.value.map((license, index) => (
 							<KycEntryCard
-								key={`license-${index}`}
+								key={[
+									license.license_name,
+									license.license_number,
+									license.country,
+								].join("|")}
 								title={`License ${index + 1}`}
 								onRemove={
 									!isReadOnly

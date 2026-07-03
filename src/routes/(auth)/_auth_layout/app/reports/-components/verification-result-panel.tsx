@@ -8,6 +8,14 @@ type VerificationResultPanelProps = {
 	emptyMessage?: string;
 };
 
+function getResultItemKey(parentKey: string, item: unknown) {
+	if (isPlainObject(item)) {
+		return `${parentKey}-${JSON.stringify(item)}`;
+	}
+
+	return `${parentKey}-${String(item)}`;
+}
+
 function formatFieldLabel(key: string) {
 	return key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
@@ -98,20 +106,20 @@ function ResultFieldGrid({ data }: { data: Record<string, unknown> }) {
 									{value.length === 0 ? (
 										<p className="text-sm text-muted-foreground">No items.</p>
 									) : (
-										value.map((item, index) => {
+										value.map((item) => {
 											if (isPlainObject(item)) {
 												const nestedItem = item as Record<string, unknown>;
 
 												return (
 													<ResultFieldGrid
-														key={`${key}-${index}`}
+														key={getResultItemKey(key, nestedItem)}
 														data={nestedItem}
 													/>
 												);
 											}
 
 											return (
-												<p key={`${key}-${index}`} className="text-sm">
+												<p key={getResultItemKey(key, item)} className="text-sm">
 													{renderPrimitiveValue(item)}
 												</p>
 											);

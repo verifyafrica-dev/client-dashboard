@@ -2,10 +2,12 @@ export const setCookie = (name: string, value: string, expiresDays: number) => {
 	const date = new Date();
 	date.setTime(date.getTime() + expiresDays * 24 * 60 * 60 * 1000);
 	const expires = `expires=${date.toUTCString()}`;
+	// biome-ignore lint/suspicious/noDocumentCookie: legacy cookie helpers until Cookie Store API is adopted
 	document.cookie = `${name}=${value};${expires};path=/`;
 };
 
 export const setCookieWithoutExpiry = (name: string, value: string) => {
+	// biome-ignore lint/suspicious/noDocumentCookie: legacy cookie helpers until Cookie Store API is adopted
 	document.cookie = `${name}=${value}; path=/`;
 };
 
@@ -20,7 +22,9 @@ export const deleteExpiredCookie = (name: string) => {
 	const expiryDate = new Date(expires);
 
 	if (expiryDate <= new Date()) {
+		// biome-ignore lint/suspicious/noDocumentCookie: legacy cookie helpers until Cookie Store API is adopted
 		document.cookie = `${value}`;
+		// biome-ignore lint/suspicious/noDocumentCookie: legacy cookie helpers until Cookie Store API is adopted
 		document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/`;
 	}
 };
@@ -37,12 +41,14 @@ export const getCookie = (name: string): string | null => {
 };
 
 export const deleteCookie = (name: string) => {
+	// biome-ignore lint/suspicious/noDocumentCookie: legacy cookie helpers until Cookie Store API is adopted
 	document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 };
 
 export const deleteAllCookies = (): void => {
 	const cookies = document.cookie.split(";");
 	for (let i = 0; i < cookies.length; i++) {
+		// biome-ignore lint/suspicious/noDocumentCookie: legacy cookie helpers until Cookie Store API is adopted
 		document.cookie = `${cookies[i]}=; expires=${new Date(0).toUTCString()}`;
 	}
 };

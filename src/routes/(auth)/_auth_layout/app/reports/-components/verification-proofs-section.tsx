@@ -4,6 +4,7 @@ import { VERIFICATIONS_V2_API } from "#/api/http/v2/verifications/verifications.
 import type { VerificationProofs } from "#/api/http/v2/verifications/verifications.types";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Skeleton } from "#/components/ui/skeleton";
+import { createSkeletonKeys } from "#/lib/skeleton-keys";
 import { cn } from "#/lib/utils.ts";
 import {
 	getVisibleProofEntries,
@@ -24,13 +25,9 @@ type LoadedProofAsset = {
 
 function VerificationProofsSkeleton({ count }: { count: number }) {
 	return (
-		<div
-			className="grid gap-4 sm:grid-cols-2"
-			aria-busy="true"
-			aria-label="Loading verification proofs"
-		>
-			{Array.from({ length: count }).map((_, index) => (
-				<div key={index} className="flex flex-col gap-2 sm:col-span-2">
+		<div className="grid gap-4 sm:grid-cols-2">
+			{createSkeletonKeys(count, "verification-proof").map((key) => (
+				<div key={key} className="flex flex-col gap-2 sm:col-span-2">
 					<Skeleton className="h-3 w-32" />
 					<Skeleton className="h-40 w-full max-w-xs rounded-md" />
 				</div>
@@ -102,7 +99,9 @@ export function VerificationProofsSection({
 
 		return () => {
 			isCancelled = true;
-			createdUrls.forEach((url) => window.URL.revokeObjectURL(url));
+			for (const url of createdUrls) {
+				window.URL.revokeObjectURL(url);
+			}
 		};
 	}, [proofEntries, proofs?.access_token]);
 
@@ -139,7 +138,9 @@ export function VerificationProofsSection({
 												src={asset.url}
 												controls
 												className="max-w-full rounded-md border bg-black sm:max-w-xs"
-											/>
+											>
+												<track kind="captions" />
+											</video>
 										) : (
 											<img
 												src={asset.url}

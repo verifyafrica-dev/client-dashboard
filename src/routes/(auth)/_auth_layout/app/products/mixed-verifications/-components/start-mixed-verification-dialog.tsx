@@ -95,11 +95,7 @@ export function StartMixedVerificationDialog({
 				</DialogHeader>
 
 				{startMutation.isPending ? (
-					<div
-						className="space-y-4"
-						aria-busy="true"
-						aria-label="Starting mixed verification"
-					>
+					<div className="space-y-4">
 						<div className="space-y-2">
 							<Skeleton className="h-4 w-28" />
 							<Skeleton className="h-10 w-full" />

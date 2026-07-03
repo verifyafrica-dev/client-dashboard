@@ -40,11 +40,18 @@ export const unwrapV2Data = <T>(response: AxiosResponse<V2SuccessResponse<T>>) =
 
 export const unwrapV2Paginated = <T>(
 	response: AxiosResponse<V2PaginatedSuccessResponse<T>>,
-) => ({
-	items: response.data.data,
-	meta: response.data.meta!,
-	message: response.data.message,
-});
+) => {
+	const meta = response.data.meta;
+	if (!meta) {
+		throw new Error("Paginated API response is missing meta.");
+	}
+
+	return {
+		items: response.data.data,
+		meta,
+		message: response.data.message,
+	};
+};
 
 export const unwrapV2Message = (
 	response: AxiosResponse<V2MessageSuccessResponse>,

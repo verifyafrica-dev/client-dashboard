@@ -358,30 +358,29 @@ function ActiveUsersPage() {
 												</TableCell>
 												<TableCell className="pr-4 sm:pr-6">
 													{isTenantAdmin && (
-														<div
-															className="flex items-center gap-1"
-															onClick={(event) => event.stopPropagation()}
-														>
+														<div className="flex items-center gap-1">
 															{activeUser.status === "active" ? (
 																<TeamIconActionButton
 																	label="Deactivate user"
 																	icon={UserMinusIcon}
 																	variant="outline"
 																	disabled={activeUser.isCurrentUser}
-																	onClick={() =>
+																	onClick={(event) => {
+																		event.stopPropagation();
 																		openMembershipDialog(
 																			activeUser,
 																			"deactivate",
-																		)
-																	}
+																		);
+																	}}
 																/>
 															) : (
 																<TeamIconActionButton
 																	label="Reactivate user"
 																	icon={UserCheckIcon}
-																	onClick={() =>
-																		openMembershipDialog(activeUser, "activate")
-																	}
+																	onClick={(event) => {
+																		event.stopPropagation();
+																		openMembershipDialog(activeUser, "activate");
+																	}}
 																/>
 															)}
 															<TeamIconActionButton
@@ -389,7 +388,10 @@ function ActiveUsersPage() {
 																icon={TrashIcon}
 																variant="destructive"
 																disabled={activeUser.isCurrentUser}
-																onClick={() => openDeleteDialog(activeUser)}
+																onClick={(event) => {
+																	event.stopPropagation();
+																	openDeleteDialog(activeUser);
+																}}
 															/>
 														</div>
 													)}

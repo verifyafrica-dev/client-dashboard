@@ -195,11 +195,10 @@ export function CustomVerificationDialog({
 										</p>
 									</div>
 
-									<div
-										className="flex flex-wrap gap-2"
-										role="group"
-										aria-label="Included verification types"
-									>
+									<fieldset className="m-0 flex flex-wrap gap-2 border-0 p-0">
+										<legend className="sr-only">
+											Included verification types
+										</legend>
 										{CUSTOM_MIXED_VERIFICATION_TYPE_OPTIONS.map((type) => {
 											const isSelected = field.state.value.includes(type);
 
@@ -224,7 +223,7 @@ export function CustomVerificationDialog({
 												</button>
 											);
 										})}
-									</div>
+									</fieldset>
 									<FieldError errors={field.state.meta.errors} />
 								</Field>
 							)}

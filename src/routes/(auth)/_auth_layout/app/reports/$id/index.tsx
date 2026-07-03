@@ -15,6 +15,7 @@ import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Skeleton } from "#/components/ui/skeleton";
 import { generatePDFWithColorSupport } from "#/lib/pdfHelpers";
+import { createSkeletonKeys } from "#/lib/skeleton-keys";
 import { cn } from "#/lib/utils.ts";
 import { isPlainObject } from "#/lib/validators";
 import { VerificationMetadataCard } from "../-components/verification-metadata-card";
@@ -158,8 +159,8 @@ function VerificationReportDetailPage() {
 						<CardContent className="space-y-4 pt-6">
 							<Skeleton className="h-6 w-48" />
 							<div className="grid gap-4 sm:grid-cols-2">
-								{Array.from({ length: 6 }).map((_, index) => (
-									<Skeleton key={index} className="h-14 w-full" />
+								{createSkeletonKeys(6, "report-metadata-field").map((key) => (
+									<Skeleton key={key} className="h-14 w-full" />
 								))}
 							</div>
 						</CardContent>
@@ -174,9 +175,9 @@ function VerificationReportDetailPage() {
 						<CardContent className="space-y-4 pt-6">
 							<Skeleton className="h-5 w-24" />
 							<div className="grid gap-4 sm:grid-cols-2">
-								{Array.from({ length: 2 }).map((_, index) => (
+								{createSkeletonKeys(2, "report-proof-field").map((key) => (
 									<div
-										key={index}
+										key={key}
 										className="flex flex-col gap-2 sm:col-span-2"
 									>
 										<Skeleton className="h-3 w-32" />

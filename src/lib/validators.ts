@@ -110,12 +110,12 @@ export const isCreditCard = (value: string): boolean => {
 	return sum % 10 === 0;
 };
 
-export const isPlainObject = (value: any): boolean => {
+export const isPlainObject = (value: unknown): boolean => {
 	return (
 		value !== null && typeof value === "object" && value.constructor === Object
 	);
 };
 
-export const isString = (value: any): boolean => {
+export const isString = (value: unknown): boolean => {
 	return typeof value === "string" || value instanceof String;
 };
