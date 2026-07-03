@@ -42,14 +42,20 @@ function VerificationReportDetailPage() {
 		}
 
 		const responseData = verification.response_data;
+		let data: Record<string, unknown> | null = null;
 
 		if (isPlainObject(responseData.data)) {
-			return responseData.data as Record<string, unknown>;
+			data = responseData.data as Record<string, unknown>;
+		} else if (isPlainObject(responseData)) {
+			data = responseData as Record<string, unknown>;
 		}
 
-		return isPlainObject(responseData)
-			? (responseData as Record<string, unknown>)
-			: null;
+		if (!data) {
+			return null;
+		}
+
+		const { proofs: _proofs, ...rest } = data;
+		return rest;
 	}, [verification?.response_data]);
 
 	const isRefreshEligible = useMemo(() => {
@@ -159,6 +165,12 @@ function VerificationReportDetailPage() {
 					</Card>
 					<Card>
 						<CardContent className="space-y-4 pt-6">
+							<Skeleton className="h-5 w-40" />
+							<Skeleton className="h-64 w-full" />
+						</CardContent>
+					</Card>
+					<Card>
+						<CardContent className="space-y-4 pt-6">
 							<Skeleton className="h-5 w-24" />
 							<div className="grid gap-4 sm:grid-cols-2">
 								{Array.from({ length: 2 }).map((_, index) => (
@@ -168,12 +180,6 @@ function VerificationReportDetailPage() {
 									</div>
 								))}
 							</div>
-						</CardContent>
-					</Card>
-					<Card>
-						<CardContent className="space-y-4 pt-6">
-							<Skeleton className="h-5 w-40" />
-							<Skeleton className="h-64 w-full" />
 						</CardContent>
 					</Card>
 				</div>
@@ -197,10 +203,10 @@ function VerificationReportDetailPage() {
 			) : (
 				<div ref={reportRef} className="flex flex-col gap-6">
 					<VerificationMetadataCard verification={verification} />
+					<VerificationResultPanel data={resultData} />
 					{verification.proofs_available ? (
 						<VerificationProofsSection proofs={verification.proofs} />
 					) : null}
-					<VerificationResultPanel data={resultData} />
 				</div>
 			)}
 		</div>
