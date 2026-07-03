@@ -18,6 +18,7 @@ import {
 } from "#/components/ui/dialog";
 import { Input } from "#/components/ui/input";
 import { Label } from "#/components/ui/label";
+import { Skeleton } from "#/components/ui/skeleton";
 import { Textarea } from "#/components/ui/textarea";
 import { mixedVerificationRequiresAddress } from "../-data";
 
@@ -97,34 +98,50 @@ export function StartMixedVerificationDialog({
 					<DialogDescription>{template?.name}</DialogDescription>
 				</DialogHeader>
 
-				<div className="space-y-4">
-					<div className="space-y-2">
-						<Label htmlFor="mixed-verification-email">Recipient Email</Label>
-						<Input
-							id="mixed-verification-email"
-							type="email"
-							value={email}
-							onChange={(event) => setEmail(event.target.value)}
-							placeholder="recipient@example.com"
-						/>
-						<p className="text-xs text-muted-foreground">
-							The hosted verification link will be issued for this recipient.
-						</p>
-					</div>
-
-					{requiresAddress && (
+				{startMutation.isPending ? (
+					<div className="space-y-4" aria-busy="true" aria-label="Starting mixed verification">
 						<div className="space-y-2">
-							<Label htmlFor="mixed-verification-address">Full Address</Label>
-							<Textarea
-								id="mixed-verification-address"
-								value={fullAddress}
-								onChange={(event) => setFullAddress(event.target.value)}
-								placeholder="Enter the recipient's full address"
-								rows={3}
-							/>
+							<Skeleton className="h-4 w-28" />
+							<Skeleton className="h-10 w-full" />
+							<Skeleton className="h-3 w-4/5" />
 						</div>
-					)}
-				</div>
+						{requiresAddress ? (
+							<div className="space-y-2">
+								<Skeleton className="h-4 w-24" />
+								<Skeleton className="h-24 w-full" />
+							</div>
+						) : null}
+					</div>
+				) : (
+					<div className="space-y-4">
+						<div className="space-y-2">
+							<Label htmlFor="mixed-verification-email">Recipient Email</Label>
+							<Input
+								id="mixed-verification-email"
+								type="email"
+								value={email}
+								onChange={(event) => setEmail(event.target.value)}
+								placeholder="recipient@example.com"
+							/>
+							<p className="text-xs text-muted-foreground">
+								The hosted verification link will be issued for this recipient.
+							</p>
+						</div>
+
+						{requiresAddress && (
+							<div className="space-y-2">
+								<Label htmlFor="mixed-verification-address">Full Address</Label>
+								<Textarea
+									id="mixed-verification-address"
+									value={fullAddress}
+									onChange={(event) => setFullAddress(event.target.value)}
+									placeholder="Enter the recipient's full address"
+									rows={3}
+								/>
+							</div>
+						)}
+					</div>
+				)}
 
 				<DialogFooter>
 					<Button

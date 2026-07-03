@@ -145,18 +145,38 @@ function VerificationReportDetailPage() {
 				</div>
 			</div>
 
-			{verificationQuery.isPending ? (
-				<Card>
-					<CardContent className="space-y-4 pt-6">
-						<Skeleton className="h-6 w-48" />
-						<div className="grid gap-4 sm:grid-cols-2">
-							{Array.from({ length: 6 }).map((_, index) => (
-								<Skeleton key={index} className="h-14 w-full" />
-							))}
-						</div>
-						<Skeleton className="h-64 w-full" />
-					</CardContent>
-				</Card>
+			{verificationQuery.isPending || refreshMutation.isPending ? (
+				<div className="flex flex-col gap-6">
+					<Card>
+						<CardContent className="space-y-4 pt-6">
+							<Skeleton className="h-6 w-48" />
+							<div className="grid gap-4 sm:grid-cols-2">
+								{Array.from({ length: 6 }).map((_, index) => (
+									<Skeleton key={index} className="h-14 w-full" />
+								))}
+							</div>
+						</CardContent>
+					</Card>
+					<Card>
+						<CardContent className="space-y-4 pt-6">
+							<Skeleton className="h-5 w-24" />
+							<div className="grid gap-4 sm:grid-cols-2">
+								{Array.from({ length: 2 }).map((_, index) => (
+									<div key={index} className="flex flex-col gap-2 sm:col-span-2">
+										<Skeleton className="h-3 w-32" />
+										<Skeleton className="h-40 w-full max-w-xs rounded-md" />
+									</div>
+								))}
+							</div>
+						</CardContent>
+					</Card>
+					<Card>
+						<CardContent className="space-y-4 pt-6">
+							<Skeleton className="h-5 w-40" />
+							<Skeleton className="h-64 w-full" />
+						</CardContent>
+					</Card>
+				</div>
 			) : verificationQuery.isError || !verification ? (
 				<Card>
 					<CardContent className="flex min-h-[320px] flex-col items-center justify-center gap-4 pt-6 text-center">
