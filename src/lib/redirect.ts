@@ -1,4 +1,4 @@
-const DEFAULT_POST_LOGIN_PATH = "/dashboard";
+const DEFAULT_POST_LOGIN_PATH = "/app";
 const LOGIN_PATH = "/login";
 
 const AUTH_PATHS_WITHOUT_REDIRECT = new Set([

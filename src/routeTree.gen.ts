@@ -18,30 +18,30 @@ import { Route as unguardedUnguarded_layoutLoginIndexRouteImport } from './route
 import { Route as unguardedUnguarded_layoutInviteIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/invite/index'
 import { Route as unguardedUnguarded_layoutForgotPasswordIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/forgot-password/index'
 import { Route as unguardedUnguarded_layoutActivateAccountIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/activate-account/index'
-import { Route as authAuth_layoutDashboardIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/index'
+import { Route as authAuth_layoutAppIndexRouteImport } from './routes/(auth)/_auth_layout/app/index'
 import { Route as unguardedUnguarded_layoutVerifyResultRouteImport } from './routes/(unguarded)/_unguarded_layout/verify/result'
 import { Route as unguardedUnguarded_layoutVerifyLinkIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/verify/$link/index'
-import { Route as authAuth_layoutDashboardTeamIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/index'
-import { Route as authAuth_layoutDashboardReportsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/reports/index'
-import { Route as authAuth_layoutDashboardProfileIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/profile/index'
-import { Route as authAuth_layoutDashboardProductsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/index'
-import { Route as authAuth_layoutDashboardKycIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/kyc/index'
-import { Route as authAuth_layoutDashboardBillingIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/billing/index'
-import { Route as authAuth_layoutDashboardApikeysIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/apikeys/index'
-import { Route as authAuth_layoutDashboardTeamInvitationsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/invitations/index'
-import { Route as authAuth_layoutDashboardTeamActiveUsersIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/team/active-users/index'
-import { Route as authAuth_layoutDashboardReportsIdIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/reports/$id/index'
-import { Route as authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/risk-assessment/index'
-import { Route as authAuth_layoutDashboardProductsMixedVerificationsIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/mixed-verifications/index'
-import { Route as authAuth_layoutDashboardProductsKybIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/kyb/index'
-import { Route as authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/government-registry-checks/index'
-import { Route as authAuth_layoutDashboardProductsFacialScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/facial-screening/index'
-import { Route as authAuth_layoutDashboardProductsDocumentVerificationIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/document-verification/index'
-import { Route as authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/index'
-import { Route as authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/business-aml-screening/index'
-import { Route as authAuth_layoutDashboardProductsAmlScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/aml-screening/index'
-import { Route as authAuth_layoutDashboardProductsAddressVerificationIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/products/address-verification/index'
-import { Route as authAuth_layoutDashboardReportsBatchBatchIdIndexRouteImport } from './routes/(auth)/_auth_layout/dashboard/reports/batch/$batchId/index'
+import { Route as authAuth_layoutAppTeamIndexRouteImport } from './routes/(auth)/_auth_layout/app/team/index'
+import { Route as authAuth_layoutAppReportsIndexRouteImport } from './routes/(auth)/_auth_layout/app/reports/index'
+import { Route as authAuth_layoutAppProfileIndexRouteImport } from './routes/(auth)/_auth_layout/app/profile/index'
+import { Route as authAuth_layoutAppProductsIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/index'
+import { Route as authAuth_layoutAppKycIndexRouteImport } from './routes/(auth)/_auth_layout/app/kyc/index'
+import { Route as authAuth_layoutAppBillingIndexRouteImport } from './routes/(auth)/_auth_layout/app/billing/index'
+import { Route as authAuth_layoutAppApikeysIndexRouteImport } from './routes/(auth)/_auth_layout/app/apikeys/index'
+import { Route as authAuth_layoutAppTeamInvitationsIndexRouteImport } from './routes/(auth)/_auth_layout/app/team/invitations/index'
+import { Route as authAuth_layoutAppTeamActiveUsersIndexRouteImport } from './routes/(auth)/_auth_layout/app/team/active-users/index'
+import { Route as authAuth_layoutAppReportsIdIndexRouteImport } from './routes/(auth)/_auth_layout/app/reports/$id/index'
+import { Route as authAuth_layoutAppProductsRiskAssessmentIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/risk-assessment/index'
+import { Route as authAuth_layoutAppProductsMixedVerificationsIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/mixed-verifications/index'
+import { Route as authAuth_layoutAppProductsKybIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/kyb/index'
+import { Route as authAuth_layoutAppProductsGovernmentRegistryChecksIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/government-registry-checks/index'
+import { Route as authAuth_layoutAppProductsFacialScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/facial-screening/index'
+import { Route as authAuth_layoutAppProductsDocumentVerificationIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/document-verification/index'
+import { Route as authAuth_layoutAppProductsCryptoWalletScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/crypto-wallet-screening/index'
+import { Route as authAuth_layoutAppProductsBusinessAmlScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/business-aml-screening/index'
+import { Route as authAuth_layoutAppProductsAmlScreeningIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/aml-screening/index'
+import { Route as authAuth_layoutAppProductsAddressVerificationIndexRouteImport } from './routes/(auth)/_auth_layout/app/products/address-verification/index'
+import { Route as authAuth_layoutAppReportsBatchBatchIdIndexRouteImport } from './routes/(auth)/_auth_layout/app/reports/batch/$batchId/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -93,12 +93,11 @@ const unguardedUnguarded_layoutActivateAccountIndexRoute =
     path: '/activate-account/',
     getParentRoute: () => unguardedUnguarded_layoutRoute,
   } as any)
-const authAuth_layoutDashboardIndexRoute =
-  authAuth_layoutDashboardIndexRouteImport.update({
-    id: '/dashboard/',
-    path: '/dashboard/',
-    getParentRoute: () => authAuth_layoutRoute,
-  } as any)
+const authAuth_layoutAppIndexRoute = authAuth_layoutAppIndexRouteImport.update({
+  id: '/app/',
+  path: '/app/',
+  getParentRoute: () => authAuth_layoutRoute,
+} as any)
 const unguardedUnguarded_layoutVerifyResultRoute =
   unguardedUnguarded_layoutVerifyResultRouteImport.update({
     id: '/verify/result',
@@ -111,200 +110,198 @@ const unguardedUnguarded_layoutVerifyLinkIndexRoute =
     path: '/verify/$link/',
     getParentRoute: () => unguardedUnguarded_layoutRoute,
   } as any)
-const authAuth_layoutDashboardTeamIndexRoute =
-  authAuth_layoutDashboardTeamIndexRouteImport.update({
-    id: '/dashboard/team/',
-    path: '/dashboard/team/',
+const authAuth_layoutAppTeamIndexRoute =
+  authAuth_layoutAppTeamIndexRouteImport.update({
+    id: '/app/team/',
+    path: '/app/team/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardReportsIndexRoute =
-  authAuth_layoutDashboardReportsIndexRouteImport.update({
-    id: '/dashboard/reports/',
-    path: '/dashboard/reports/',
+const authAuth_layoutAppReportsIndexRoute =
+  authAuth_layoutAppReportsIndexRouteImport.update({
+    id: '/app/reports/',
+    path: '/app/reports/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProfileIndexRoute =
-  authAuth_layoutDashboardProfileIndexRouteImport.update({
-    id: '/dashboard/profile/',
-    path: '/dashboard/profile/',
+const authAuth_layoutAppProfileIndexRoute =
+  authAuth_layoutAppProfileIndexRouteImport.update({
+    id: '/app/profile/',
+    path: '/app/profile/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsIndexRoute =
-  authAuth_layoutDashboardProductsIndexRouteImport.update({
-    id: '/dashboard/products/',
-    path: '/dashboard/products/',
+const authAuth_layoutAppProductsIndexRoute =
+  authAuth_layoutAppProductsIndexRouteImport.update({
+    id: '/app/products/',
+    path: '/app/products/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardKycIndexRoute =
-  authAuth_layoutDashboardKycIndexRouteImport.update({
-    id: '/dashboard/kyc/',
-    path: '/dashboard/kyc/',
+const authAuth_layoutAppKycIndexRoute =
+  authAuth_layoutAppKycIndexRouteImport.update({
+    id: '/app/kyc/',
+    path: '/app/kyc/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardBillingIndexRoute =
-  authAuth_layoutDashboardBillingIndexRouteImport.update({
-    id: '/dashboard/billing/',
-    path: '/dashboard/billing/',
+const authAuth_layoutAppBillingIndexRoute =
+  authAuth_layoutAppBillingIndexRouteImport.update({
+    id: '/app/billing/',
+    path: '/app/billing/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardApikeysIndexRoute =
-  authAuth_layoutDashboardApikeysIndexRouteImport.update({
-    id: '/dashboard/apikeys/',
-    path: '/dashboard/apikeys/',
+const authAuth_layoutAppApikeysIndexRoute =
+  authAuth_layoutAppApikeysIndexRouteImport.update({
+    id: '/app/apikeys/',
+    path: '/app/apikeys/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardTeamInvitationsIndexRoute =
-  authAuth_layoutDashboardTeamInvitationsIndexRouteImport.update({
-    id: '/dashboard/team/invitations/',
-    path: '/dashboard/team/invitations/',
+const authAuth_layoutAppTeamInvitationsIndexRoute =
+  authAuth_layoutAppTeamInvitationsIndexRouteImport.update({
+    id: '/app/team/invitations/',
+    path: '/app/team/invitations/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardTeamActiveUsersIndexRoute =
-  authAuth_layoutDashboardTeamActiveUsersIndexRouteImport.update({
-    id: '/dashboard/team/active-users/',
-    path: '/dashboard/team/active-users/',
+const authAuth_layoutAppTeamActiveUsersIndexRoute =
+  authAuth_layoutAppTeamActiveUsersIndexRouteImport.update({
+    id: '/app/team/active-users/',
+    path: '/app/team/active-users/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardReportsIdIndexRoute =
-  authAuth_layoutDashboardReportsIdIndexRouteImport.update({
-    id: '/dashboard/reports/$id/',
-    path: '/dashboard/reports/$id/',
+const authAuth_layoutAppReportsIdIndexRoute =
+  authAuth_layoutAppReportsIdIndexRouteImport.update({
+    id: '/app/reports/$id/',
+    path: '/app/reports/$id/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsRiskAssessmentIndexRoute =
-  authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport.update({
-    id: '/dashboard/products/risk-assessment/',
-    path: '/dashboard/products/risk-assessment/',
+const authAuth_layoutAppProductsRiskAssessmentIndexRoute =
+  authAuth_layoutAppProductsRiskAssessmentIndexRouteImport.update({
+    id: '/app/products/risk-assessment/',
+    path: '/app/products/risk-assessment/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsMixedVerificationsIndexRoute =
-  authAuth_layoutDashboardProductsMixedVerificationsIndexRouteImport.update({
-    id: '/dashboard/products/mixed-verifications/',
-    path: '/dashboard/products/mixed-verifications/',
+const authAuth_layoutAppProductsMixedVerificationsIndexRoute =
+  authAuth_layoutAppProductsMixedVerificationsIndexRouteImport.update({
+    id: '/app/products/mixed-verifications/',
+    path: '/app/products/mixed-verifications/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsKybIndexRoute =
-  authAuth_layoutDashboardProductsKybIndexRouteImport.update({
-    id: '/dashboard/products/kyb/',
-    path: '/dashboard/products/kyb/',
+const authAuth_layoutAppProductsKybIndexRoute =
+  authAuth_layoutAppProductsKybIndexRouteImport.update({
+    id: '/app/products/kyb/',
+    path: '/app/products/kyb/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute =
-  authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRouteImport.update(
-    {
-      id: '/dashboard/products/government-registry-checks/',
-      path: '/dashboard/products/government-registry-checks/',
-      getParentRoute: () => authAuth_layoutRoute,
-    } as any,
-  )
-const authAuth_layoutDashboardProductsFacialScreeningIndexRoute =
-  authAuth_layoutDashboardProductsFacialScreeningIndexRouteImport.update({
-    id: '/dashboard/products/facial-screening/',
-    path: '/dashboard/products/facial-screening/',
+const authAuth_layoutAppProductsGovernmentRegistryChecksIndexRoute =
+  authAuth_layoutAppProductsGovernmentRegistryChecksIndexRouteImport.update({
+    id: '/app/products/government-registry-checks/',
+    path: '/app/products/government-registry-checks/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsDocumentVerificationIndexRoute =
-  authAuth_layoutDashboardProductsDocumentVerificationIndexRouteImport.update({
-    id: '/dashboard/products/document-verification/',
-    path: '/dashboard/products/document-verification/',
+const authAuth_layoutAppProductsFacialScreeningIndexRoute =
+  authAuth_layoutAppProductsFacialScreeningIndexRouteImport.update({
+    id: '/app/products/facial-screening/',
+    path: '/app/products/facial-screening/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute =
-  authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRouteImport.update({
-    id: '/dashboard/products/crypto-wallet-screening/',
-    path: '/dashboard/products/crypto-wallet-screening/',
+const authAuth_layoutAppProductsDocumentVerificationIndexRoute =
+  authAuth_layoutAppProductsDocumentVerificationIndexRouteImport.update({
+    id: '/app/products/document-verification/',
+    path: '/app/products/document-verification/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute =
-  authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRouteImport.update({
-    id: '/dashboard/products/business-aml-screening/',
-    path: '/dashboard/products/business-aml-screening/',
+const authAuth_layoutAppProductsCryptoWalletScreeningIndexRoute =
+  authAuth_layoutAppProductsCryptoWalletScreeningIndexRouteImport.update({
+    id: '/app/products/crypto-wallet-screening/',
+    path: '/app/products/crypto-wallet-screening/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsAmlScreeningIndexRoute =
-  authAuth_layoutDashboardProductsAmlScreeningIndexRouteImport.update({
-    id: '/dashboard/products/aml-screening/',
-    path: '/dashboard/products/aml-screening/',
+const authAuth_layoutAppProductsBusinessAmlScreeningIndexRoute =
+  authAuth_layoutAppProductsBusinessAmlScreeningIndexRouteImport.update({
+    id: '/app/products/business-aml-screening/',
+    path: '/app/products/business-aml-screening/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardProductsAddressVerificationIndexRoute =
-  authAuth_layoutDashboardProductsAddressVerificationIndexRouteImport.update({
-    id: '/dashboard/products/address-verification/',
-    path: '/dashboard/products/address-verification/',
+const authAuth_layoutAppProductsAmlScreeningIndexRoute =
+  authAuth_layoutAppProductsAmlScreeningIndexRouteImport.update({
+    id: '/app/products/aml-screening/',
+    path: '/app/products/aml-screening/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
-const authAuth_layoutDashboardReportsBatchBatchIdIndexRoute =
-  authAuth_layoutDashboardReportsBatchBatchIdIndexRouteImport.update({
-    id: '/dashboard/reports/batch/$batchId/',
-    path: '/dashboard/reports/batch/$batchId/',
+const authAuth_layoutAppProductsAddressVerificationIndexRoute =
+  authAuth_layoutAppProductsAddressVerificationIndexRouteImport.update({
+    id: '/app/products/address-verification/',
+    path: '/app/products/address-verification/',
+    getParentRoute: () => authAuth_layoutRoute,
+  } as any)
+const authAuth_layoutAppReportsBatchBatchIdIndexRoute =
+  authAuth_layoutAppReportsBatchBatchIdIndexRouteImport.update({
+    id: '/app/reports/batch/$batchId/',
+    path: '/app/reports/batch/$batchId/',
     getParentRoute: () => authAuth_layoutRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/verify/result': typeof unguardedUnguarded_layoutVerifyResultRoute
-  '/dashboard/': typeof authAuth_layoutDashboardIndexRoute
+  '/app/': typeof authAuth_layoutAppIndexRoute
   '/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   '/forgot-password/': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
   '/invite/': typeof unguardedUnguarded_layoutInviteIndexRoute
   '/login/': typeof unguardedUnguarded_layoutLoginIndexRoute
   '/register/': typeof unguardedUnguarded_layoutRegisterIndexRoute
   '/reset-password/': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
-  '/dashboard/apikeys/': typeof authAuth_layoutDashboardApikeysIndexRoute
-  '/dashboard/billing/': typeof authAuth_layoutDashboardBillingIndexRoute
-  '/dashboard/kyc/': typeof authAuth_layoutDashboardKycIndexRoute
-  '/dashboard/products/': typeof authAuth_layoutDashboardProductsIndexRoute
-  '/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
-  '/dashboard/reports/': typeof authAuth_layoutDashboardReportsIndexRoute
-  '/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
+  '/app/apikeys/': typeof authAuth_layoutAppApikeysIndexRoute
+  '/app/billing/': typeof authAuth_layoutAppBillingIndexRoute
+  '/app/kyc/': typeof authAuth_layoutAppKycIndexRoute
+  '/app/products/': typeof authAuth_layoutAppProductsIndexRoute
+  '/app/profile/': typeof authAuth_layoutAppProfileIndexRoute
+  '/app/reports/': typeof authAuth_layoutAppReportsIndexRoute
+  '/app/team/': typeof authAuth_layoutAppTeamIndexRoute
   '/verify/$link/': typeof unguardedUnguarded_layoutVerifyLinkIndexRoute
-  '/dashboard/products/address-verification/': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
-  '/dashboard/products/aml-screening/': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
-  '/dashboard/products/business-aml-screening/': typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
-  '/dashboard/products/crypto-wallet-screening/': typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute
-  '/dashboard/products/document-verification/': typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRoute
-  '/dashboard/products/facial-screening/': typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
-  '/dashboard/products/government-registry-checks/': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
-  '/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
-  '/dashboard/products/mixed-verifications/': typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
-  '/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
-  '/dashboard/reports/$id/': typeof authAuth_layoutDashboardReportsIdIndexRoute
-  '/dashboard/team/active-users/': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
-  '/dashboard/team/invitations/': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
-  '/dashboard/reports/batch/$batchId/': typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRoute
+  '/app/products/address-verification/': typeof authAuth_layoutAppProductsAddressVerificationIndexRoute
+  '/app/products/aml-screening/': typeof authAuth_layoutAppProductsAmlScreeningIndexRoute
+  '/app/products/business-aml-screening/': typeof authAuth_layoutAppProductsBusinessAmlScreeningIndexRoute
+  '/app/products/crypto-wallet-screening/': typeof authAuth_layoutAppProductsCryptoWalletScreeningIndexRoute
+  '/app/products/document-verification/': typeof authAuth_layoutAppProductsDocumentVerificationIndexRoute
+  '/app/products/facial-screening/': typeof authAuth_layoutAppProductsFacialScreeningIndexRoute
+  '/app/products/government-registry-checks/': typeof authAuth_layoutAppProductsGovernmentRegistryChecksIndexRoute
+  '/app/products/kyb/': typeof authAuth_layoutAppProductsKybIndexRoute
+  '/app/products/mixed-verifications/': typeof authAuth_layoutAppProductsMixedVerificationsIndexRoute
+  '/app/products/risk-assessment/': typeof authAuth_layoutAppProductsRiskAssessmentIndexRoute
+  '/app/reports/$id/': typeof authAuth_layoutAppReportsIdIndexRoute
+  '/app/team/active-users/': typeof authAuth_layoutAppTeamActiveUsersIndexRoute
+  '/app/team/invitations/': typeof authAuth_layoutAppTeamInvitationsIndexRoute
+  '/app/reports/batch/$batchId/': typeof authAuth_layoutAppReportsBatchBatchIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/verify/result': typeof unguardedUnguarded_layoutVerifyResultRoute
-  '/dashboard': typeof authAuth_layoutDashboardIndexRoute
+  '/app': typeof authAuth_layoutAppIndexRoute
   '/activate-account': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   '/forgot-password': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
   '/invite': typeof unguardedUnguarded_layoutInviteIndexRoute
   '/login': typeof unguardedUnguarded_layoutLoginIndexRoute
   '/register': typeof unguardedUnguarded_layoutRegisterIndexRoute
   '/reset-password': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
-  '/dashboard/apikeys': typeof authAuth_layoutDashboardApikeysIndexRoute
-  '/dashboard/billing': typeof authAuth_layoutDashboardBillingIndexRoute
-  '/dashboard/kyc': typeof authAuth_layoutDashboardKycIndexRoute
-  '/dashboard/products': typeof authAuth_layoutDashboardProductsIndexRoute
-  '/dashboard/profile': typeof authAuth_layoutDashboardProfileIndexRoute
-  '/dashboard/reports': typeof authAuth_layoutDashboardReportsIndexRoute
-  '/dashboard/team': typeof authAuth_layoutDashboardTeamIndexRoute
+  '/app/apikeys': typeof authAuth_layoutAppApikeysIndexRoute
+  '/app/billing': typeof authAuth_layoutAppBillingIndexRoute
+  '/app/kyc': typeof authAuth_layoutAppKycIndexRoute
+  '/app/products': typeof authAuth_layoutAppProductsIndexRoute
+  '/app/profile': typeof authAuth_layoutAppProfileIndexRoute
+  '/app/reports': typeof authAuth_layoutAppReportsIndexRoute
+  '/app/team': typeof authAuth_layoutAppTeamIndexRoute
   '/verify/$link': typeof unguardedUnguarded_layoutVerifyLinkIndexRoute
-  '/dashboard/products/address-verification': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
-  '/dashboard/products/aml-screening': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
-  '/dashboard/products/business-aml-screening': typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
-  '/dashboard/products/crypto-wallet-screening': typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute
-  '/dashboard/products/document-verification': typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRoute
-  '/dashboard/products/facial-screening': typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
-  '/dashboard/products/government-registry-checks': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
-  '/dashboard/products/kyb': typeof authAuth_layoutDashboardProductsKybIndexRoute
-  '/dashboard/products/mixed-verifications': typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
-  '/dashboard/products/risk-assessment': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
-  '/dashboard/reports/$id': typeof authAuth_layoutDashboardReportsIdIndexRoute
-  '/dashboard/team/active-users': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
-  '/dashboard/team/invitations': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
-  '/dashboard/reports/batch/$batchId': typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRoute
+  '/app/products/address-verification': typeof authAuth_layoutAppProductsAddressVerificationIndexRoute
+  '/app/products/aml-screening': typeof authAuth_layoutAppProductsAmlScreeningIndexRoute
+  '/app/products/business-aml-screening': typeof authAuth_layoutAppProductsBusinessAmlScreeningIndexRoute
+  '/app/products/crypto-wallet-screening': typeof authAuth_layoutAppProductsCryptoWalletScreeningIndexRoute
+  '/app/products/document-verification': typeof authAuth_layoutAppProductsDocumentVerificationIndexRoute
+  '/app/products/facial-screening': typeof authAuth_layoutAppProductsFacialScreeningIndexRoute
+  '/app/products/government-registry-checks': typeof authAuth_layoutAppProductsGovernmentRegistryChecksIndexRoute
+  '/app/products/kyb': typeof authAuth_layoutAppProductsKybIndexRoute
+  '/app/products/mixed-verifications': typeof authAuth_layoutAppProductsMixedVerificationsIndexRoute
+  '/app/products/risk-assessment': typeof authAuth_layoutAppProductsRiskAssessmentIndexRoute
+  '/app/reports/$id': typeof authAuth_layoutAppReportsIdIndexRoute
+  '/app/team/active-users': typeof authAuth_layoutAppTeamActiveUsersIndexRoute
+  '/app/team/invitations': typeof authAuth_layoutAppTeamInvitationsIndexRoute
+  '/app/reports/batch/$batchId': typeof authAuth_layoutAppReportsBatchBatchIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -312,138 +309,138 @@ export interface FileRoutesById {
   '/(auth)/_auth_layout': typeof authAuth_layoutRouteWithChildren
   '/(unguarded)/_unguarded_layout': typeof unguardedUnguarded_layoutRouteWithChildren
   '/(unguarded)/_unguarded_layout/verify/result': typeof unguardedUnguarded_layoutVerifyResultRoute
-  '/(auth)/_auth_layout/dashboard/': typeof authAuth_layoutDashboardIndexRoute
+  '/(auth)/_auth_layout/app/': typeof authAuth_layoutAppIndexRoute
   '/(unguarded)/_unguarded_layout/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   '/(unguarded)/_unguarded_layout/forgot-password/': typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
   '/(unguarded)/_unguarded_layout/invite/': typeof unguardedUnguarded_layoutInviteIndexRoute
   '/(unguarded)/_unguarded_layout/login/': typeof unguardedUnguarded_layoutLoginIndexRoute
   '/(unguarded)/_unguarded_layout/register/': typeof unguardedUnguarded_layoutRegisterIndexRoute
   '/(unguarded)/_unguarded_layout/reset-password/': typeof unguardedUnguarded_layoutResetPasswordIndexRoute
-  '/(auth)/_auth_layout/dashboard/apikeys/': typeof authAuth_layoutDashboardApikeysIndexRoute
-  '/(auth)/_auth_layout/dashboard/billing/': typeof authAuth_layoutDashboardBillingIndexRoute
-  '/(auth)/_auth_layout/dashboard/kyc/': typeof authAuth_layoutDashboardKycIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/': typeof authAuth_layoutDashboardProductsIndexRoute
-  '/(auth)/_auth_layout/dashboard/profile/': typeof authAuth_layoutDashboardProfileIndexRoute
-  '/(auth)/_auth_layout/dashboard/reports/': typeof authAuth_layoutDashboardReportsIndexRoute
-  '/(auth)/_auth_layout/dashboard/team/': typeof authAuth_layoutDashboardTeamIndexRoute
+  '/(auth)/_auth_layout/app/apikeys/': typeof authAuth_layoutAppApikeysIndexRoute
+  '/(auth)/_auth_layout/app/billing/': typeof authAuth_layoutAppBillingIndexRoute
+  '/(auth)/_auth_layout/app/kyc/': typeof authAuth_layoutAppKycIndexRoute
+  '/(auth)/_auth_layout/app/products/': typeof authAuth_layoutAppProductsIndexRoute
+  '/(auth)/_auth_layout/app/profile/': typeof authAuth_layoutAppProfileIndexRoute
+  '/(auth)/_auth_layout/app/reports/': typeof authAuth_layoutAppReportsIndexRoute
+  '/(auth)/_auth_layout/app/team/': typeof authAuth_layoutAppTeamIndexRoute
   '/(unguarded)/_unguarded_layout/verify/$link/': typeof unguardedUnguarded_layoutVerifyLinkIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/address-verification/': typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/aml-screening/': typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/business-aml-screening/': typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/': typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/document-verification/': typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/facial-screening/': typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/government-registry-checks/': typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/kyb/': typeof authAuth_layoutDashboardProductsKybIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/mixed-verifications/': typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
-  '/(auth)/_auth_layout/dashboard/products/risk-assessment/': typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
-  '/(auth)/_auth_layout/dashboard/reports/$id/': typeof authAuth_layoutDashboardReportsIdIndexRoute
-  '/(auth)/_auth_layout/dashboard/team/active-users/': typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
-  '/(auth)/_auth_layout/dashboard/team/invitations/': typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
-  '/(auth)/_auth_layout/dashboard/reports/batch/$batchId/': typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRoute
+  '/(auth)/_auth_layout/app/products/address-verification/': typeof authAuth_layoutAppProductsAddressVerificationIndexRoute
+  '/(auth)/_auth_layout/app/products/aml-screening/': typeof authAuth_layoutAppProductsAmlScreeningIndexRoute
+  '/(auth)/_auth_layout/app/products/business-aml-screening/': typeof authAuth_layoutAppProductsBusinessAmlScreeningIndexRoute
+  '/(auth)/_auth_layout/app/products/crypto-wallet-screening/': typeof authAuth_layoutAppProductsCryptoWalletScreeningIndexRoute
+  '/(auth)/_auth_layout/app/products/document-verification/': typeof authAuth_layoutAppProductsDocumentVerificationIndexRoute
+  '/(auth)/_auth_layout/app/products/facial-screening/': typeof authAuth_layoutAppProductsFacialScreeningIndexRoute
+  '/(auth)/_auth_layout/app/products/government-registry-checks/': typeof authAuth_layoutAppProductsGovernmentRegistryChecksIndexRoute
+  '/(auth)/_auth_layout/app/products/kyb/': typeof authAuth_layoutAppProductsKybIndexRoute
+  '/(auth)/_auth_layout/app/products/mixed-verifications/': typeof authAuth_layoutAppProductsMixedVerificationsIndexRoute
+  '/(auth)/_auth_layout/app/products/risk-assessment/': typeof authAuth_layoutAppProductsRiskAssessmentIndexRoute
+  '/(auth)/_auth_layout/app/reports/$id/': typeof authAuth_layoutAppReportsIdIndexRoute
+  '/(auth)/_auth_layout/app/team/active-users/': typeof authAuth_layoutAppTeamActiveUsersIndexRoute
+  '/(auth)/_auth_layout/app/team/invitations/': typeof authAuth_layoutAppTeamInvitationsIndexRoute
+  '/(auth)/_auth_layout/app/reports/batch/$batchId/': typeof authAuth_layoutAppReportsBatchBatchIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/verify/result'
-    | '/dashboard/'
+    | '/app/'
     | '/activate-account/'
     | '/forgot-password/'
     | '/invite/'
     | '/login/'
     | '/register/'
     | '/reset-password/'
-    | '/dashboard/apikeys/'
-    | '/dashboard/billing/'
-    | '/dashboard/kyc/'
-    | '/dashboard/products/'
-    | '/dashboard/profile/'
-    | '/dashboard/reports/'
-    | '/dashboard/team/'
+    | '/app/apikeys/'
+    | '/app/billing/'
+    | '/app/kyc/'
+    | '/app/products/'
+    | '/app/profile/'
+    | '/app/reports/'
+    | '/app/team/'
     | '/verify/$link/'
-    | '/dashboard/products/address-verification/'
-    | '/dashboard/products/aml-screening/'
-    | '/dashboard/products/business-aml-screening/'
-    | '/dashboard/products/crypto-wallet-screening/'
-    | '/dashboard/products/document-verification/'
-    | '/dashboard/products/facial-screening/'
-    | '/dashboard/products/government-registry-checks/'
-    | '/dashboard/products/kyb/'
-    | '/dashboard/products/mixed-verifications/'
-    | '/dashboard/products/risk-assessment/'
-    | '/dashboard/reports/$id/'
-    | '/dashboard/team/active-users/'
-    | '/dashboard/team/invitations/'
-    | '/dashboard/reports/batch/$batchId/'
+    | '/app/products/address-verification/'
+    | '/app/products/aml-screening/'
+    | '/app/products/business-aml-screening/'
+    | '/app/products/crypto-wallet-screening/'
+    | '/app/products/document-verification/'
+    | '/app/products/facial-screening/'
+    | '/app/products/government-registry-checks/'
+    | '/app/products/kyb/'
+    | '/app/products/mixed-verifications/'
+    | '/app/products/risk-assessment/'
+    | '/app/reports/$id/'
+    | '/app/team/active-users/'
+    | '/app/team/invitations/'
+    | '/app/reports/batch/$batchId/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/verify/result'
-    | '/dashboard'
+    | '/app'
     | '/activate-account'
     | '/forgot-password'
     | '/invite'
     | '/login'
     | '/register'
     | '/reset-password'
-    | '/dashboard/apikeys'
-    | '/dashboard/billing'
-    | '/dashboard/kyc'
-    | '/dashboard/products'
-    | '/dashboard/profile'
-    | '/dashboard/reports'
-    | '/dashboard/team'
+    | '/app/apikeys'
+    | '/app/billing'
+    | '/app/kyc'
+    | '/app/products'
+    | '/app/profile'
+    | '/app/reports'
+    | '/app/team'
     | '/verify/$link'
-    | '/dashboard/products/address-verification'
-    | '/dashboard/products/aml-screening'
-    | '/dashboard/products/business-aml-screening'
-    | '/dashboard/products/crypto-wallet-screening'
-    | '/dashboard/products/document-verification'
-    | '/dashboard/products/facial-screening'
-    | '/dashboard/products/government-registry-checks'
-    | '/dashboard/products/kyb'
-    | '/dashboard/products/mixed-verifications'
-    | '/dashboard/products/risk-assessment'
-    | '/dashboard/reports/$id'
-    | '/dashboard/team/active-users'
-    | '/dashboard/team/invitations'
-    | '/dashboard/reports/batch/$batchId'
+    | '/app/products/address-verification'
+    | '/app/products/aml-screening'
+    | '/app/products/business-aml-screening'
+    | '/app/products/crypto-wallet-screening'
+    | '/app/products/document-verification'
+    | '/app/products/facial-screening'
+    | '/app/products/government-registry-checks'
+    | '/app/products/kyb'
+    | '/app/products/mixed-verifications'
+    | '/app/products/risk-assessment'
+    | '/app/reports/$id'
+    | '/app/team/active-users'
+    | '/app/team/invitations'
+    | '/app/reports/batch/$batchId'
   id:
     | '__root__'
     | '/'
     | '/(auth)/_auth_layout'
     | '/(unguarded)/_unguarded_layout'
     | '/(unguarded)/_unguarded_layout/verify/result'
-    | '/(auth)/_auth_layout/dashboard/'
+    | '/(auth)/_auth_layout/app/'
     | '/(unguarded)/_unguarded_layout/activate-account/'
     | '/(unguarded)/_unguarded_layout/forgot-password/'
     | '/(unguarded)/_unguarded_layout/invite/'
     | '/(unguarded)/_unguarded_layout/login/'
     | '/(unguarded)/_unguarded_layout/register/'
     | '/(unguarded)/_unguarded_layout/reset-password/'
-    | '/(auth)/_auth_layout/dashboard/apikeys/'
-    | '/(auth)/_auth_layout/dashboard/billing/'
-    | '/(auth)/_auth_layout/dashboard/kyc/'
-    | '/(auth)/_auth_layout/dashboard/products/'
-    | '/(auth)/_auth_layout/dashboard/profile/'
-    | '/(auth)/_auth_layout/dashboard/reports/'
-    | '/(auth)/_auth_layout/dashboard/team/'
+    | '/(auth)/_auth_layout/app/apikeys/'
+    | '/(auth)/_auth_layout/app/billing/'
+    | '/(auth)/_auth_layout/app/kyc/'
+    | '/(auth)/_auth_layout/app/products/'
+    | '/(auth)/_auth_layout/app/profile/'
+    | '/(auth)/_auth_layout/app/reports/'
+    | '/(auth)/_auth_layout/app/team/'
     | '/(unguarded)/_unguarded_layout/verify/$link/'
-    | '/(auth)/_auth_layout/dashboard/products/address-verification/'
-    | '/(auth)/_auth_layout/dashboard/products/aml-screening/'
-    | '/(auth)/_auth_layout/dashboard/products/business-aml-screening/'
-    | '/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/'
-    | '/(auth)/_auth_layout/dashboard/products/document-verification/'
-    | '/(auth)/_auth_layout/dashboard/products/facial-screening/'
-    | '/(auth)/_auth_layout/dashboard/products/government-registry-checks/'
-    | '/(auth)/_auth_layout/dashboard/products/kyb/'
-    | '/(auth)/_auth_layout/dashboard/products/mixed-verifications/'
-    | '/(auth)/_auth_layout/dashboard/products/risk-assessment/'
-    | '/(auth)/_auth_layout/dashboard/reports/$id/'
-    | '/(auth)/_auth_layout/dashboard/team/active-users/'
-    | '/(auth)/_auth_layout/dashboard/team/invitations/'
-    | '/(auth)/_auth_layout/dashboard/reports/batch/$batchId/'
+    | '/(auth)/_auth_layout/app/products/address-verification/'
+    | '/(auth)/_auth_layout/app/products/aml-screening/'
+    | '/(auth)/_auth_layout/app/products/business-aml-screening/'
+    | '/(auth)/_auth_layout/app/products/crypto-wallet-screening/'
+    | '/(auth)/_auth_layout/app/products/document-verification/'
+    | '/(auth)/_auth_layout/app/products/facial-screening/'
+    | '/(auth)/_auth_layout/app/products/government-registry-checks/'
+    | '/(auth)/_auth_layout/app/products/kyb/'
+    | '/(auth)/_auth_layout/app/products/mixed-verifications/'
+    | '/(auth)/_auth_layout/app/products/risk-assessment/'
+    | '/(auth)/_auth_layout/app/reports/$id/'
+    | '/(auth)/_auth_layout/app/team/active-users/'
+    | '/(auth)/_auth_layout/app/team/invitations/'
+    | '/(auth)/_auth_layout/app/reports/batch/$batchId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -517,11 +514,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof unguardedUnguarded_layoutActivateAccountIndexRouteImport
       parentRoute: typeof unguardedUnguarded_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/': {
-      id: '/(auth)/_auth_layout/dashboard/'
-      path: '/dashboard'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof authAuth_layoutDashboardIndexRouteImport
+    '/(auth)/_auth_layout/app/': {
+      id: '/(auth)/_auth_layout/app/'
+      path: '/app'
+      fullPath: '/app/'
+      preLoaderRoute: typeof authAuth_layoutAppIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
     '/(unguarded)/_unguarded_layout/verify/result': {
@@ -538,224 +535,217 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof unguardedUnguarded_layoutVerifyLinkIndexRouteImport
       parentRoute: typeof unguardedUnguarded_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/team/': {
-      id: '/(auth)/_auth_layout/dashboard/team/'
-      path: '/dashboard/team'
-      fullPath: '/dashboard/team/'
-      preLoaderRoute: typeof authAuth_layoutDashboardTeamIndexRouteImport
+    '/(auth)/_auth_layout/app/team/': {
+      id: '/(auth)/_auth_layout/app/team/'
+      path: '/app/team'
+      fullPath: '/app/team/'
+      preLoaderRoute: typeof authAuth_layoutAppTeamIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/reports/': {
-      id: '/(auth)/_auth_layout/dashboard/reports/'
-      path: '/dashboard/reports'
-      fullPath: '/dashboard/reports/'
-      preLoaderRoute: typeof authAuth_layoutDashboardReportsIndexRouteImport
+    '/(auth)/_auth_layout/app/reports/': {
+      id: '/(auth)/_auth_layout/app/reports/'
+      path: '/app/reports'
+      fullPath: '/app/reports/'
+      preLoaderRoute: typeof authAuth_layoutAppReportsIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/profile/': {
-      id: '/(auth)/_auth_layout/dashboard/profile/'
-      path: '/dashboard/profile'
-      fullPath: '/dashboard/profile/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProfileIndexRouteImport
+    '/(auth)/_auth_layout/app/profile/': {
+      id: '/(auth)/_auth_layout/app/profile/'
+      path: '/app/profile'
+      fullPath: '/app/profile/'
+      preLoaderRoute: typeof authAuth_layoutAppProfileIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/': {
-      id: '/(auth)/_auth_layout/dashboard/products/'
-      path: '/dashboard/products'
-      fullPath: '/dashboard/products/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsIndexRouteImport
+    '/(auth)/_auth_layout/app/products/': {
+      id: '/(auth)/_auth_layout/app/products/'
+      path: '/app/products'
+      fullPath: '/app/products/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/kyc/': {
-      id: '/(auth)/_auth_layout/dashboard/kyc/'
-      path: '/dashboard/kyc'
-      fullPath: '/dashboard/kyc/'
-      preLoaderRoute: typeof authAuth_layoutDashboardKycIndexRouteImport
+    '/(auth)/_auth_layout/app/kyc/': {
+      id: '/(auth)/_auth_layout/app/kyc/'
+      path: '/app/kyc'
+      fullPath: '/app/kyc/'
+      preLoaderRoute: typeof authAuth_layoutAppKycIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/billing/': {
-      id: '/(auth)/_auth_layout/dashboard/billing/'
-      path: '/dashboard/billing'
-      fullPath: '/dashboard/billing/'
-      preLoaderRoute: typeof authAuth_layoutDashboardBillingIndexRouteImport
+    '/(auth)/_auth_layout/app/billing/': {
+      id: '/(auth)/_auth_layout/app/billing/'
+      path: '/app/billing'
+      fullPath: '/app/billing/'
+      preLoaderRoute: typeof authAuth_layoutAppBillingIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/apikeys/': {
-      id: '/(auth)/_auth_layout/dashboard/apikeys/'
-      path: '/dashboard/apikeys'
-      fullPath: '/dashboard/apikeys/'
-      preLoaderRoute: typeof authAuth_layoutDashboardApikeysIndexRouteImport
+    '/(auth)/_auth_layout/app/apikeys/': {
+      id: '/(auth)/_auth_layout/app/apikeys/'
+      path: '/app/apikeys'
+      fullPath: '/app/apikeys/'
+      preLoaderRoute: typeof authAuth_layoutAppApikeysIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/team/invitations/': {
-      id: '/(auth)/_auth_layout/dashboard/team/invitations/'
-      path: '/dashboard/team/invitations'
-      fullPath: '/dashboard/team/invitations/'
-      preLoaderRoute: typeof authAuth_layoutDashboardTeamInvitationsIndexRouteImport
+    '/(auth)/_auth_layout/app/team/invitations/': {
+      id: '/(auth)/_auth_layout/app/team/invitations/'
+      path: '/app/team/invitations'
+      fullPath: '/app/team/invitations/'
+      preLoaderRoute: typeof authAuth_layoutAppTeamInvitationsIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/team/active-users/': {
-      id: '/(auth)/_auth_layout/dashboard/team/active-users/'
-      path: '/dashboard/team/active-users'
-      fullPath: '/dashboard/team/active-users/'
-      preLoaderRoute: typeof authAuth_layoutDashboardTeamActiveUsersIndexRouteImport
+    '/(auth)/_auth_layout/app/team/active-users/': {
+      id: '/(auth)/_auth_layout/app/team/active-users/'
+      path: '/app/team/active-users'
+      fullPath: '/app/team/active-users/'
+      preLoaderRoute: typeof authAuth_layoutAppTeamActiveUsersIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/reports/$id/': {
-      id: '/(auth)/_auth_layout/dashboard/reports/$id/'
-      path: '/dashboard/reports/$id'
-      fullPath: '/dashboard/reports/$id/'
-      preLoaderRoute: typeof authAuth_layoutDashboardReportsIdIndexRouteImport
+    '/(auth)/_auth_layout/app/reports/$id/': {
+      id: '/(auth)/_auth_layout/app/reports/$id/'
+      path: '/app/reports/$id'
+      fullPath: '/app/reports/$id/'
+      preLoaderRoute: typeof authAuth_layoutAppReportsIdIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/risk-assessment/': {
-      id: '/(auth)/_auth_layout/dashboard/products/risk-assessment/'
-      path: '/dashboard/products/risk-assessment'
-      fullPath: '/dashboard/products/risk-assessment/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRouteImport
+    '/(auth)/_auth_layout/app/products/risk-assessment/': {
+      id: '/(auth)/_auth_layout/app/products/risk-assessment/'
+      path: '/app/products/risk-assessment'
+      fullPath: '/app/products/risk-assessment/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsRiskAssessmentIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/mixed-verifications/': {
-      id: '/(auth)/_auth_layout/dashboard/products/mixed-verifications/'
-      path: '/dashboard/products/mixed-verifications'
-      fullPath: '/dashboard/products/mixed-verifications/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRouteImport
+    '/(auth)/_auth_layout/app/products/mixed-verifications/': {
+      id: '/(auth)/_auth_layout/app/products/mixed-verifications/'
+      path: '/app/products/mixed-verifications'
+      fullPath: '/app/products/mixed-verifications/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsMixedVerificationsIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/kyb/': {
-      id: '/(auth)/_auth_layout/dashboard/products/kyb/'
-      path: '/dashboard/products/kyb'
-      fullPath: '/dashboard/products/kyb/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsKybIndexRouteImport
+    '/(auth)/_auth_layout/app/products/kyb/': {
+      id: '/(auth)/_auth_layout/app/products/kyb/'
+      path: '/app/products/kyb'
+      fullPath: '/app/products/kyb/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsKybIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/government-registry-checks/': {
-      id: '/(auth)/_auth_layout/dashboard/products/government-registry-checks/'
-      path: '/dashboard/products/government-registry-checks'
-      fullPath: '/dashboard/products/government-registry-checks/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRouteImport
+    '/(auth)/_auth_layout/app/products/government-registry-checks/': {
+      id: '/(auth)/_auth_layout/app/products/government-registry-checks/'
+      path: '/app/products/government-registry-checks'
+      fullPath: '/app/products/government-registry-checks/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsGovernmentRegistryChecksIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/facial-screening/': {
-      id: '/(auth)/_auth_layout/dashboard/products/facial-screening/'
-      path: '/dashboard/products/facial-screening'
-      fullPath: '/dashboard/products/facial-screening/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsFacialScreeningIndexRouteImport
+    '/(auth)/_auth_layout/app/products/facial-screening/': {
+      id: '/(auth)/_auth_layout/app/products/facial-screening/'
+      path: '/app/products/facial-screening'
+      fullPath: '/app/products/facial-screening/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsFacialScreeningIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/document-verification/': {
-      id: '/(auth)/_auth_layout/dashboard/products/document-verification/'
-      path: '/dashboard/products/document-verification'
-      fullPath: '/dashboard/products/document-verification/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRouteImport
+    '/(auth)/_auth_layout/app/products/document-verification/': {
+      id: '/(auth)/_auth_layout/app/products/document-verification/'
+      path: '/app/products/document-verification'
+      fullPath: '/app/products/document-verification/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsDocumentVerificationIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/': {
-      id: '/(auth)/_auth_layout/dashboard/products/crypto-wallet-screening/'
-      path: '/dashboard/products/crypto-wallet-screening'
-      fullPath: '/dashboard/products/crypto-wallet-screening/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRouteImport
+    '/(auth)/_auth_layout/app/products/crypto-wallet-screening/': {
+      id: '/(auth)/_auth_layout/app/products/crypto-wallet-screening/'
+      path: '/app/products/crypto-wallet-screening'
+      fullPath: '/app/products/crypto-wallet-screening/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsCryptoWalletScreeningIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/business-aml-screening/': {
-      id: '/(auth)/_auth_layout/dashboard/products/business-aml-screening/'
-      path: '/dashboard/products/business-aml-screening'
-      fullPath: '/dashboard/products/business-aml-screening/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRouteImport
+    '/(auth)/_auth_layout/app/products/business-aml-screening/': {
+      id: '/(auth)/_auth_layout/app/products/business-aml-screening/'
+      path: '/app/products/business-aml-screening'
+      fullPath: '/app/products/business-aml-screening/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsBusinessAmlScreeningIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/aml-screening/': {
-      id: '/(auth)/_auth_layout/dashboard/products/aml-screening/'
-      path: '/dashboard/products/aml-screening'
-      fullPath: '/dashboard/products/aml-screening/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsAmlScreeningIndexRouteImport
+    '/(auth)/_auth_layout/app/products/aml-screening/': {
+      id: '/(auth)/_auth_layout/app/products/aml-screening/'
+      path: '/app/products/aml-screening'
+      fullPath: '/app/products/aml-screening/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsAmlScreeningIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/products/address-verification/': {
-      id: '/(auth)/_auth_layout/dashboard/products/address-verification/'
-      path: '/dashboard/products/address-verification'
-      fullPath: '/dashboard/products/address-verification/'
-      preLoaderRoute: typeof authAuth_layoutDashboardProductsAddressVerificationIndexRouteImport
+    '/(auth)/_auth_layout/app/products/address-verification/': {
+      id: '/(auth)/_auth_layout/app/products/address-verification/'
+      path: '/app/products/address-verification'
+      fullPath: '/app/products/address-verification/'
+      preLoaderRoute: typeof authAuth_layoutAppProductsAddressVerificationIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
-    '/(auth)/_auth_layout/dashboard/reports/batch/$batchId/': {
-      id: '/(auth)/_auth_layout/dashboard/reports/batch/$batchId/'
-      path: '/dashboard/reports/batch/$batchId'
-      fullPath: '/dashboard/reports/batch/$batchId/'
-      preLoaderRoute: typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRouteImport
+    '/(auth)/_auth_layout/app/reports/batch/$batchId/': {
+      id: '/(auth)/_auth_layout/app/reports/batch/$batchId/'
+      path: '/app/reports/batch/$batchId'
+      fullPath: '/app/reports/batch/$batchId/'
+      preLoaderRoute: typeof authAuth_layoutAppReportsBatchBatchIdIndexRouteImport
       parentRoute: typeof authAuth_layoutRoute
     }
   }
 }
 
 interface authAuth_layoutRouteChildren {
-  authAuth_layoutDashboardIndexRoute: typeof authAuth_layoutDashboardIndexRoute
-  authAuth_layoutDashboardApikeysIndexRoute: typeof authAuth_layoutDashboardApikeysIndexRoute
-  authAuth_layoutDashboardBillingIndexRoute: typeof authAuth_layoutDashboardBillingIndexRoute
-  authAuth_layoutDashboardKycIndexRoute: typeof authAuth_layoutDashboardKycIndexRoute
-  authAuth_layoutDashboardProductsIndexRoute: typeof authAuth_layoutDashboardProductsIndexRoute
-  authAuth_layoutDashboardProfileIndexRoute: typeof authAuth_layoutDashboardProfileIndexRoute
-  authAuth_layoutDashboardReportsIndexRoute: typeof authAuth_layoutDashboardReportsIndexRoute
-  authAuth_layoutDashboardTeamIndexRoute: typeof authAuth_layoutDashboardTeamIndexRoute
-  authAuth_layoutDashboardProductsAddressVerificationIndexRoute: typeof authAuth_layoutDashboardProductsAddressVerificationIndexRoute
-  authAuth_layoutDashboardProductsAmlScreeningIndexRoute: typeof authAuth_layoutDashboardProductsAmlScreeningIndexRoute
-  authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute: typeof authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute
-  authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute: typeof authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute
-  authAuth_layoutDashboardProductsDocumentVerificationIndexRoute: typeof authAuth_layoutDashboardProductsDocumentVerificationIndexRoute
-  authAuth_layoutDashboardProductsFacialScreeningIndexRoute: typeof authAuth_layoutDashboardProductsFacialScreeningIndexRoute
-  authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute: typeof authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute
-  authAuth_layoutDashboardProductsKybIndexRoute: typeof authAuth_layoutDashboardProductsKybIndexRoute
-  authAuth_layoutDashboardProductsMixedVerificationsIndexRoute: typeof authAuth_layoutDashboardProductsMixedVerificationsIndexRoute
-  authAuth_layoutDashboardProductsRiskAssessmentIndexRoute: typeof authAuth_layoutDashboardProductsRiskAssessmentIndexRoute
-  authAuth_layoutDashboardReportsIdIndexRoute: typeof authAuth_layoutDashboardReportsIdIndexRoute
-  authAuth_layoutDashboardTeamActiveUsersIndexRoute: typeof authAuth_layoutDashboardTeamActiveUsersIndexRoute
-  authAuth_layoutDashboardTeamInvitationsIndexRoute: typeof authAuth_layoutDashboardTeamInvitationsIndexRoute
-  authAuth_layoutDashboardReportsBatchBatchIdIndexRoute: typeof authAuth_layoutDashboardReportsBatchBatchIdIndexRoute
+  authAuth_layoutAppIndexRoute: typeof authAuth_layoutAppIndexRoute
+  authAuth_layoutAppApikeysIndexRoute: typeof authAuth_layoutAppApikeysIndexRoute
+  authAuth_layoutAppBillingIndexRoute: typeof authAuth_layoutAppBillingIndexRoute
+  authAuth_layoutAppKycIndexRoute: typeof authAuth_layoutAppKycIndexRoute
+  authAuth_layoutAppProductsIndexRoute: typeof authAuth_layoutAppProductsIndexRoute
+  authAuth_layoutAppProfileIndexRoute: typeof authAuth_layoutAppProfileIndexRoute
+  authAuth_layoutAppReportsIndexRoute: typeof authAuth_layoutAppReportsIndexRoute
+  authAuth_layoutAppTeamIndexRoute: typeof authAuth_layoutAppTeamIndexRoute
+  authAuth_layoutAppProductsAddressVerificationIndexRoute: typeof authAuth_layoutAppProductsAddressVerificationIndexRoute
+  authAuth_layoutAppProductsAmlScreeningIndexRoute: typeof authAuth_layoutAppProductsAmlScreeningIndexRoute
+  authAuth_layoutAppProductsBusinessAmlScreeningIndexRoute: typeof authAuth_layoutAppProductsBusinessAmlScreeningIndexRoute
+  authAuth_layoutAppProductsCryptoWalletScreeningIndexRoute: typeof authAuth_layoutAppProductsCryptoWalletScreeningIndexRoute
+  authAuth_layoutAppProductsDocumentVerificationIndexRoute: typeof authAuth_layoutAppProductsDocumentVerificationIndexRoute
+  authAuth_layoutAppProductsFacialScreeningIndexRoute: typeof authAuth_layoutAppProductsFacialScreeningIndexRoute
+  authAuth_layoutAppProductsGovernmentRegistryChecksIndexRoute: typeof authAuth_layoutAppProductsGovernmentRegistryChecksIndexRoute
+  authAuth_layoutAppProductsKybIndexRoute: typeof authAuth_layoutAppProductsKybIndexRoute
+  authAuth_layoutAppProductsMixedVerificationsIndexRoute: typeof authAuth_layoutAppProductsMixedVerificationsIndexRoute
+  authAuth_layoutAppProductsRiskAssessmentIndexRoute: typeof authAuth_layoutAppProductsRiskAssessmentIndexRoute
+  authAuth_layoutAppReportsIdIndexRoute: typeof authAuth_layoutAppReportsIdIndexRoute
+  authAuth_layoutAppTeamActiveUsersIndexRoute: typeof authAuth_layoutAppTeamActiveUsersIndexRoute
+  authAuth_layoutAppTeamInvitationsIndexRoute: typeof authAuth_layoutAppTeamInvitationsIndexRoute
+  authAuth_layoutAppReportsBatchBatchIdIndexRoute: typeof authAuth_layoutAppReportsBatchBatchIdIndexRoute
 }
 
 const authAuth_layoutRouteChildren: authAuth_layoutRouteChildren = {
-  authAuth_layoutDashboardIndexRoute: authAuth_layoutDashboardIndexRoute,
-  authAuth_layoutDashboardApikeysIndexRoute:
-    authAuth_layoutDashboardApikeysIndexRoute,
-  authAuth_layoutDashboardBillingIndexRoute:
-    authAuth_layoutDashboardBillingIndexRoute,
-  authAuth_layoutDashboardKycIndexRoute: authAuth_layoutDashboardKycIndexRoute,
-  authAuth_layoutDashboardProductsIndexRoute:
-    authAuth_layoutDashboardProductsIndexRoute,
-  authAuth_layoutDashboardProfileIndexRoute:
-    authAuth_layoutDashboardProfileIndexRoute,
-  authAuth_layoutDashboardReportsIndexRoute:
-    authAuth_layoutDashboardReportsIndexRoute,
-  authAuth_layoutDashboardTeamIndexRoute:
-    authAuth_layoutDashboardTeamIndexRoute,
-  authAuth_layoutDashboardProductsAddressVerificationIndexRoute:
-    authAuth_layoutDashboardProductsAddressVerificationIndexRoute,
-  authAuth_layoutDashboardProductsAmlScreeningIndexRoute:
-    authAuth_layoutDashboardProductsAmlScreeningIndexRoute,
-  authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute:
-    authAuth_layoutDashboardProductsBusinessAmlScreeningIndexRoute,
-  authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute:
-    authAuth_layoutDashboardProductsCryptoWalletScreeningIndexRoute,
-  authAuth_layoutDashboardProductsDocumentVerificationIndexRoute:
-    authAuth_layoutDashboardProductsDocumentVerificationIndexRoute,
-  authAuth_layoutDashboardProductsFacialScreeningIndexRoute:
-    authAuth_layoutDashboardProductsFacialScreeningIndexRoute,
-  authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute:
-    authAuth_layoutDashboardProductsGovernmentRegistryChecksIndexRoute,
-  authAuth_layoutDashboardProductsKybIndexRoute:
-    authAuth_layoutDashboardProductsKybIndexRoute,
-  authAuth_layoutDashboardProductsMixedVerificationsIndexRoute:
-    authAuth_layoutDashboardProductsMixedVerificationsIndexRoute,
-  authAuth_layoutDashboardProductsRiskAssessmentIndexRoute:
-    authAuth_layoutDashboardProductsRiskAssessmentIndexRoute,
-  authAuth_layoutDashboardReportsIdIndexRoute:
-    authAuth_layoutDashboardReportsIdIndexRoute,
-  authAuth_layoutDashboardTeamActiveUsersIndexRoute:
-    authAuth_layoutDashboardTeamActiveUsersIndexRoute,
-  authAuth_layoutDashboardTeamInvitationsIndexRoute:
-    authAuth_layoutDashboardTeamInvitationsIndexRoute,
-  authAuth_layoutDashboardReportsBatchBatchIdIndexRoute:
-    authAuth_layoutDashboardReportsBatchBatchIdIndexRoute,
+  authAuth_layoutAppIndexRoute: authAuth_layoutAppIndexRoute,
+  authAuth_layoutAppApikeysIndexRoute: authAuth_layoutAppApikeysIndexRoute,
+  authAuth_layoutAppBillingIndexRoute: authAuth_layoutAppBillingIndexRoute,
+  authAuth_layoutAppKycIndexRoute: authAuth_layoutAppKycIndexRoute,
+  authAuth_layoutAppProductsIndexRoute: authAuth_layoutAppProductsIndexRoute,
+  authAuth_layoutAppProfileIndexRoute: authAuth_layoutAppProfileIndexRoute,
+  authAuth_layoutAppReportsIndexRoute: authAuth_layoutAppReportsIndexRoute,
+  authAuth_layoutAppTeamIndexRoute: authAuth_layoutAppTeamIndexRoute,
+  authAuth_layoutAppProductsAddressVerificationIndexRoute:
+    authAuth_layoutAppProductsAddressVerificationIndexRoute,
+  authAuth_layoutAppProductsAmlScreeningIndexRoute:
+    authAuth_layoutAppProductsAmlScreeningIndexRoute,
+  authAuth_layoutAppProductsBusinessAmlScreeningIndexRoute:
+    authAuth_layoutAppProductsBusinessAmlScreeningIndexRoute,
+  authAuth_layoutAppProductsCryptoWalletScreeningIndexRoute:
+    authAuth_layoutAppProductsCryptoWalletScreeningIndexRoute,
+  authAuth_layoutAppProductsDocumentVerificationIndexRoute:
+    authAuth_layoutAppProductsDocumentVerificationIndexRoute,
+  authAuth_layoutAppProductsFacialScreeningIndexRoute:
+    authAuth_layoutAppProductsFacialScreeningIndexRoute,
+  authAuth_layoutAppProductsGovernmentRegistryChecksIndexRoute:
+    authAuth_layoutAppProductsGovernmentRegistryChecksIndexRoute,
+  authAuth_layoutAppProductsKybIndexRoute:
+    authAuth_layoutAppProductsKybIndexRoute,
+  authAuth_layoutAppProductsMixedVerificationsIndexRoute:
+    authAuth_layoutAppProductsMixedVerificationsIndexRoute,
+  authAuth_layoutAppProductsRiskAssessmentIndexRoute:
+    authAuth_layoutAppProductsRiskAssessmentIndexRoute,
+  authAuth_layoutAppReportsIdIndexRoute: authAuth_layoutAppReportsIdIndexRoute,
+  authAuth_layoutAppTeamActiveUsersIndexRoute:
+    authAuth_layoutAppTeamActiveUsersIndexRoute,
+  authAuth_layoutAppTeamInvitationsIndexRoute:
+    authAuth_layoutAppTeamInvitationsIndexRoute,
+  authAuth_layoutAppReportsBatchBatchIdIndexRoute:
+    authAuth_layoutAppReportsBatchBatchIdIndexRoute,
 }
 
 const authAuth_layoutRouteWithChildren = authAuth_layoutRoute._addFileChildren(

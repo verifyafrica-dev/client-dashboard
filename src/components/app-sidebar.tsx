@@ -35,45 +35,45 @@ import {
 import { cn } from "#/lib/utils.ts";
 
 const teamSubItems = [
-	{ title: "Active Users", to: "/dashboard/team/active-users" },
-	{ title: "Invitations", to: "/dashboard/team/invitations" },
+	{ title: "Active Users", to: "/app/team/active-users" },
+	{ title: "Invitations", to: "/app/team/invitations" },
 ] as const;
 
 const navItems = [
 	{
 		title: "Dashboard",
-		to: "/dashboard",
+		to: "/app",
 		icon: HouseIcon,
 		isExact: true,
 	},
 	{
 		title: "Products",
-		to: "/dashboard/products",
+		to: "/app/products",
 		icon: SquaresFourIcon,
 	},
 	{
 		title: "Reports",
-		to: "/dashboard/reports",
+		to: "/app/reports",
 		icon: ClipboardTextIcon,
 	},
 	{
 		title: "Profile",
-		to: "/dashboard/profile",
+		to: "/app/profile",
 		icon: UserCircleIcon,
 	},
 	{
 		title: "KYC",
-		to: "/dashboard/kyc",
+		to: "/app/kyc",
 		icon: ShieldCheckIcon,
 	},
 	{
 		title: "API Keys",
-		to: "/dashboard/apikeys",
+		to: "/app/apikeys",
 		icon: KeyIcon,
 	},
 	{
 		title: "Billing",
-		to: "/dashboard/billing",
+		to: "/app/billing",
 		icon: CreditCardIcon,
 	},
 ] as const;
@@ -117,7 +117,7 @@ function SidebarTeamNav() {
 	const pathname = useRouterState({
 		select: (state) => state.location.pathname,
 	});
-	const isTeamActive = pathname.startsWith("/dashboard/team");
+	const isTeamActive = pathname.startsWith("/app/team");
 	const [isOpen, setIsOpen] = React.useState(isTeamActive);
 
 	React.useEffect(() => {
@@ -174,7 +174,7 @@ function SidebarTeamNav() {
 export function AppSidebar() {
 	return (
 		<Sidebar collapsible="icon">
-			<Link to="/dashboard">
+			<Link to="/app">
 				<SidebarHeader className="flex min-h-14 max-h-14 items-center border-b border-sidebar-border px-4 py-1 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-2">
 					<picture className="group-data-[collapsible=icon]:hidden">
 						<img

@@ -18,11 +18,11 @@ import { deleteAllCookies } from "#/lib/cookies";
 import { buildLoginRedirectUrl } from "#/lib/redirect";
 import { useAuthStore } from "#/stores/auth-store";
 import { cn } from "#/lib/utils.ts";
-import { getUserInitials } from "#/routes/(auth)/_auth_layout/dashboard/team/-data";
+import { getUserInitials } from "#/routes/(auth)/_auth_layout/app/team/-data";
 
 const userMenuLinks = [
-	{ label: "Profile", to: "/dashboard/profile" },
-	{ label: "My Team", to: "/dashboard/team" },
+	{ label: "Profile", to: "/app/profile" },
+	{ label: "My Team", to: "/app/team" },
 ] as const;
 
 export const Route = createFileRoute("/(auth)/_auth_layout")({

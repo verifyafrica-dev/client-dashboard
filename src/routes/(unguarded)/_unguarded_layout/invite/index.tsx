@@ -343,7 +343,7 @@ function ExistingUserInvitationPrompt({
 			{
 				onSuccess: () => {
 					toast.success("Invitation accepted successfully");
-					navigate({ to: "/dashboard" });
+					navigate({ to: "/app" });
 				},
 				onError: (error) => {
 					const axiosError = error as V2AxiosError;
