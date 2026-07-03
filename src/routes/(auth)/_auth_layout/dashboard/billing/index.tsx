@@ -8,6 +8,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import {
 	BILLING_V2_QUERY_KEYS,
 	useTenantBillingInformationV2Query,
@@ -213,7 +214,15 @@ function BillingPage() {
 								<Button
 									type="button"
 									className="cursor-pointer"
-									onClick={() => setTopUpOpen(true)}
+									onClick={() => {
+										if (!billingInfo) {
+											toast.warning("Please add billing information first");
+											setBillingOpen(true);
+											return;
+										}
+
+										setTopUpOpen(true);
+									}}
 								>
 									Top Up Balance
 								</Button>
@@ -547,6 +556,10 @@ function BillingPage() {
 				open={topUpOpen}
 				onOpenChange={setTopUpOpen}
 				userEmail={user?.email}
+				tenantId={tenantId}
+				onSuccess={() => {
+					void handleRefresh();
+				}}
 			/>
 			<UpdateBillingDialog
 				open={billingOpen}

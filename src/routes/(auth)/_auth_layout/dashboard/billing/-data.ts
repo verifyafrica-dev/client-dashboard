@@ -408,7 +408,7 @@ export function getInvoiceFilename(invoice: Invoice) {
 	return invoice.invoice_id ?? invoice.id;
 }
 
-export const TOP_UP_DEFAULT_MIN_AMOUNT = 300;
+export const TOP_UP_DEFAULT_MIN_AMOUNT = 1;
 export const TOP_UP_EXCLUDED_USER_MIN_AMOUNT = 30;
 export const TOP_UP_MAX_AMOUNT = 50_000;
 
