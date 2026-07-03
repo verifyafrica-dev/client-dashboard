@@ -129,7 +129,7 @@ export function AddCreditsDialog({
 		return () => {
 			clearVerificationTimers();
 		};
-	}, []);
+	}, [clearVerificationTimers]);
 
 	const form = useForm({
 		defaultValues: {
@@ -183,7 +183,7 @@ export function AddCreditsDialog({
 		}
 
 		resetPaymentState();
-	}, [open, form]);
+	}, [open, form, resetPaymentState]);
 
 	const startPaymentVerification = (sessionId: string, requestedAmount: number) => {
 		if (!tenantId) {

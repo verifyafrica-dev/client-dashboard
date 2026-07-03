@@ -126,7 +126,7 @@ function InvitationsPage() {
 
 	useEffect(() => {
 		setPage(1);
-	}, [debouncedSearch, statusFilter, roleFilter]);
+	}, []);
 
 	const invitations = useMemo(
 		() => mapInvitationsToUserInvitations(invitationsQuery.data?.items ?? []),

@@ -125,7 +125,7 @@ function ActiveUsersPage() {
 
 	useEffect(() => {
 		setPage(1);
-	}, [debouncedSearch, statusFilter, roleFilter]);
+	}, []);
 
 	const users = useMemo(
 		() => mapTenantUsersToActiveUsers(usersQuery.data?.items ?? [], user?.id),

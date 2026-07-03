@@ -57,11 +57,11 @@ export function TeamMemberDetailsDialog({
 	const invitation = !isUser ? member.data : null;
 
 	const displayName = isUser
-		? user!.name
-		: invitation!.name?.trim() || invitation!.email;
+		? user?.name
+		: invitation?.name?.trim() || invitation?.email;
 
 	const subtitle = isUser
-		? user!.isCurrentUser
+		? user?.isCurrentUser
 			? "Active team member (You)"
 			: "Active team member"
 		: "Pending invitation";
@@ -80,7 +80,7 @@ export function TeamMemberDetailsDialog({
 								}
 							>
 								{isUser ? (
-									getUserInitials(user!.name)
+									getUserInitials(user?.name)
 								) : (
 									<UserIcon className="size-5" />
 								)}
@@ -96,49 +96,49 @@ export function TeamMemberDetailsDialog({
 				<dl className="mt-2">
 					{isUser ? (
 						<>
-							<DetailRow label="Email" value={user!.email} />
+							<DetailRow label="Email" value={user?.email} />
 							<DetailRow
 								label="Role"
-								value={<UserRoleBadge role={user!.role} />}
+								value={<UserRoleBadge role={user?.role} />}
 							/>
 							<DetailRow
 								label="Membership"
-								value={<ActiveUserStatusBadge status={user!.status} />}
+								value={<ActiveUserStatusBadge status={user?.status} />}
 							/>
 							<DetailRow
 								label="Joined"
-								value={formatTeamDate(user!.joinedAt)}
+								value={formatTeamDate(user?.joinedAt)}
 							/>
 							<DetailRow
 								label="Phone"
-								value={user!.phoneNumber?.trim() || "—"}
+								value={user?.phoneNumber?.trim() || "—"}
 							/>
 							<DetailRow
 								label="Last login"
-								value={formatOptionalDate(user!.lastLogin)}
+								value={formatOptionalDate(user?.lastLogin)}
 							/>
 							<DetailRow
 								label="Account status"
-								value={user!.accountActive ? "Active" : "Inactive"}
+								value={user?.accountActive ? "Active" : "Inactive"}
 							/>
 						</>
 					) : (
 						<>
-							<DetailRow label="Email" value={invitation!.email} />
-							{invitation!.name?.trim() ? (
-								<DetailRow label="Name" value={invitation!.name} />
+							<DetailRow label="Email" value={invitation?.email} />
+							{invitation?.name?.trim() ? (
+								<DetailRow label="Name" value={invitation?.name} />
 							) : null}
 							<DetailRow
 								label="Role"
-								value={<UserRoleBadge role={invitation!.role} />}
+								value={<UserRoleBadge role={invitation?.role} />}
 							/>
 							<DetailRow
 								label="Invitation status"
-								value={<InvitationStatusBadge status={invitation!.status} />}
+								value={<InvitationStatusBadge status={invitation?.status} />}
 							/>
 							<DetailRow
 								label="Expires"
-								value={formatTeamDate(invitation!.expiresAt)}
+								value={formatTeamDate(invitation?.expiresAt)}
 							/>
 						</>
 					)}

@@ -88,7 +88,7 @@ export const isISODate = (value: string): boolean => {
 	const isoDateRegex = /^\d{4}-\d{2}-\d{2}$/;
 	if (!isoDateRegex.test(value)) return false;
 	const date = new Date(value);
-	return date instanceof Date && !isNaN(date.getTime());
+	return date instanceof Date && !Number.isNaN(date.getTime());
 };
 
 // ✅ Checks if a credit card number passes Luhn algorithm

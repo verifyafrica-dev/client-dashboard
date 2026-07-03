@@ -43,6 +43,6 @@ export const deleteCookie = (name: string) => {
 export const deleteAllCookies = (): void => {
 	const cookies = document.cookie.split(";");
 	for (let i = 0; i < cookies.length; i++) {
-		document.cookie = cookies[i] + "=; expires=" + new Date(0).toUTCString();
+		document.cookie = `${cookies[i]}=; expires=${new Date(0).toUTCString()}`;
 	}
 };

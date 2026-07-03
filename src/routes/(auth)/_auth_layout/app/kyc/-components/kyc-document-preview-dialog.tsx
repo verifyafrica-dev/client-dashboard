@@ -39,7 +39,7 @@ export function KycDocumentPreviewDialog({
 			setIsLoading(true);
 			setHasError(false);
 		}
-	}, [open, currentIndex]);
+	}, [open]);
 
 	if (!document) {
 		return null;

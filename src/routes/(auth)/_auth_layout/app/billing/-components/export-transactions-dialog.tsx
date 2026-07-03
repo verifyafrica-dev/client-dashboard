@@ -56,7 +56,7 @@ export function ExportTransactionsDialog({
 
 		setPreset("custom");
 		setDateRange(getDefaultExportDateRange(accountCreatedAt, today));
-	}, [open, accountCreatedAt]);
+	}, [open, accountCreatedAt, today]);
 
 	function handlePresetChange(nextPreset: ExportDurationPreset) {
 		setPreset(nextPreset);
