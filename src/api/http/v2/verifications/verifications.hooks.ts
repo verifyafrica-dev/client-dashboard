@@ -1,8 +1,8 @@
 import {
+	type UseQueryResult,
 	useMutation,
 	useQuery,
 	useQueryClient,
-	type UseQueryResult,
 } from "@tanstack/react-query";
 
 import { VERIFICATIONS_V2_API } from "./verifications.api";

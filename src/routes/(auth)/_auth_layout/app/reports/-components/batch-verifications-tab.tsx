@@ -51,8 +51,6 @@ const COLUMNS = [
 	"Actions",
 ];
 
-
-
 type BatchVerificationsTabProps = {
 	tenantId: string;
 	searchParams: ReportsSearchParams;
@@ -279,10 +277,7 @@ function BatchVerificationRow({ batch }: { batch: BatchVerificationReport }) {
 					className="cursor-pointer uppercase tracking-wide"
 					asChild
 				>
-					<Link
-						to="/app/reports/batch/$batchId"
-						params={{ batchId: batch.id }}
-					>
+					<Link to="/app/reports/batch/$batchId" params={{ batchId: batch.id }}>
 						<EyeIcon className="size-4" />
 						View
 					</Link>

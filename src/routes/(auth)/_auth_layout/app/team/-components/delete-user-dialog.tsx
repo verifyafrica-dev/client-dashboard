@@ -1,7 +1,6 @@
 import { toast } from "sonner";
-
-import { useRemoveTenantUserV2Mutation } from "#/api/http/v2/tenants/tenants.hooks";
 import { useDeleteTenantInvitationMutation } from "#/api/http/v1/tenants/tenants.hooks";
+import { useRemoveTenantUserV2Mutation } from "#/api/http/v2/tenants/tenants.hooks";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -96,8 +95,8 @@ export function DeleteUserDialog({
 							</>
 						) : (
 							<>
-								Removing a user will also remove their access to the tenant.
-								Are you sure you want to remove{" "}
+								Removing a user will also remove their access to the tenant. Are
+								you sure you want to remove{" "}
 								<span className="font-medium text-foreground">
 									{displayName}
 								</span>

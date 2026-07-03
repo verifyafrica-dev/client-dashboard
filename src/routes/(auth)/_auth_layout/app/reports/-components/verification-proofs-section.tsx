@@ -22,11 +22,7 @@ type LoadedProofAsset = {
 	mimeType: string;
 };
 
-function VerificationProofsSkeleton({
-	count,
-}: {
-	count: number;
-}) {
+function VerificationProofsSkeleton({ count }: { count: number }) {
 	return (
 		<div
 			className="grid gap-4 sm:grid-cols-2"
@@ -46,13 +42,10 @@ function VerificationProofsSkeleton({
 export function VerificationProofsSection({
 	proofs,
 }: VerificationProofsSectionProps) {
-	const proofEntries = useMemo(
-		() => getVisibleProofEntries(proofs),
-		[proofs],
-	);
-	const [assets, setAssets] = useState<Partial<Record<ProofDisplayKey, LoadedProofAsset>>>(
-		{},
-	);
+	const proofEntries = useMemo(() => getVisibleProofEntries(proofs), [proofs]);
+	const [assets, setAssets] = useState<
+		Partial<Record<ProofDisplayKey, LoadedProofAsset>>
+	>({});
 	const [errorKeys, setErrorKeys] = useState<ProofDisplayKey[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 

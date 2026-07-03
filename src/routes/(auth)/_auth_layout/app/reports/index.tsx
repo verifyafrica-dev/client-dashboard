@@ -1,6 +1,6 @@
 import { ArrowsClockwiseIcon, EyeIcon, StackIcon } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 
 import { VERIFICATIONS_V2_QUERY_KEYS } from "#/api/http/v2/verifications/verifications.hooks";
@@ -20,12 +20,10 @@ import {
 
 const REPORTS_COUNTRIES = Object.values(COUNTRY_CODE_MAP).sort();
 
-export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/")(
-	{
-		validateSearch: reportsSearchSchema,
-		component: ReportsPage,
-	},
-);
+export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/")({
+	validateSearch: reportsSearchSchema,
+	component: ReportsPage,
+});
 
 function ReportsPage() {
 	const queryClient = useQueryClient();
@@ -123,9 +121,7 @@ function ReportsPage() {
 						Refresh
 					</Button>
 					<Button className="cursor-pointer tracking-wide" asChild>
-						<Link to="/app/products">
-							New Verification
-						</Link>
+						<Link to="/app/products">New Verification</Link>
 					</Button>
 				</div>
 			</div>

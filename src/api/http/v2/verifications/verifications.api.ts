@@ -124,7 +124,11 @@ export const VERIFICATIONS_V2_API = {
 		data: VerificationRequestCreatePayload,
 	): Promise<VerificationRequest> =>
 		await $http
-			.post(VERIFICATIONS_V2_ENDPOINTS.requests, data, withTenantHeader(tenantId))
+			.post(
+				VERIFICATIONS_V2_ENDPOINTS.requests,
+				data,
+				withTenantHeader(tenantId),
+			)
 			.then((res) => unwrapV2Data<VerificationRequest>(res)),
 
 	REQUEST_DETAIL: async (
@@ -204,9 +208,7 @@ export const VERIFICATIONS_V2_API = {
 			})
 			.then((res) => unwrapV2Data<MixedVerification>(res)),
 
-	DELETE_MIXED_VERIFICATION: async (
-		id: string,
-	): Promise<string> =>
+	DELETE_MIXED_VERIFICATION: async (id: string): Promise<string> =>
 		await $http
 			.delete(VERIFICATIONS_V2_ENDPOINTS.mixedVerificationDetail(id))
 			.then((res) => unwrapV2Message(res)),

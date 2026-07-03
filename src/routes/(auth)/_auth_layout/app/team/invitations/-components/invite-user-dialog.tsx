@@ -98,15 +98,14 @@ export function InviteUserDialog({
 			const payload = TenantInvitationCreateSchema.parse(value);
 
 			await inviteMutation.mutateAsync(payload, {
-					onSuccess: () => {
-						toast.success("User invitation sent successfully");
-						onOpenChange?.(false);
-					},
-					onError: () => {
-						toast.error("Failed to send invitation. Please try again.");
-					},
+				onSuccess: () => {
+					toast.success("User invitation sent successfully");
+					onOpenChange?.(false);
 				},
-			);
+				onError: () => {
+					toast.error("Failed to send invitation. Please try again.");
+				},
+			});
 		},
 	});
 

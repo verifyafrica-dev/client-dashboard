@@ -150,9 +150,7 @@ export function CustomVerificationDialog({
 										id="custom-verification-name"
 										value={field.state.value}
 										onBlur={field.handleBlur}
-										onChange={(event) =>
-											field.handleChange(event.target.value)
-										}
+										onChange={(event) => field.handleChange(event.target.value)}
 										placeholder="Name"
 										disabled={isSaving}
 										aria-invalid={field.state.meta.errors.length > 0}
@@ -172,9 +170,7 @@ export function CustomVerificationDialog({
 										id="custom-verification-description"
 										value={field.state.value}
 										onBlur={field.handleBlur}
-										onChange={(event) =>
-											field.handleChange(event.target.value)
-										}
+										onChange={(event) => field.handleChange(event.target.value)}
 										placeholder="Description"
 										rows={3}
 										disabled={isSaving}

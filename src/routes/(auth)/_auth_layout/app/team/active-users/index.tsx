@@ -50,7 +50,11 @@ import {
 import { TeamTableShell } from "../-components/team-table-shell";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
 import { UserRoleBadge } from "../-components/user-role-badge";
-import { TEAM_PAGE_SIZE, useCurrentTenant, type TenantUserRole } from "../-data";
+import {
+	TEAM_PAGE_SIZE,
+	type TenantUserRole,
+	useCurrentTenant,
+} from "../-data";
 import { InviteUserDialog } from "../invitations/-components/invite-user-dialog";
 import { ActiveUserStatusBadge } from "./-components/user-status-badge";
 import {
@@ -203,7 +207,10 @@ function ActiveUsersPage() {
 								/>
 							</div>
 							<div className="flex flex-wrap items-center gap-2">
-								<Label htmlFor="user-status-filter" className="sr-only">
+								<Label
+									htmlFor="user-status-filter"
+									className="sr-only"
+								>
 									Status
 								</Label>
 								<Select
@@ -213,19 +220,28 @@ function ActiveUsersPage() {
 									}}
 									disabled={isLoading}
 								>
-									<SelectTrigger id="user-status-filter" className="w-[150px]">
+									<SelectTrigger
+										id="user-status-filter"
+										className="w-[150px]"
+									>
 										<SelectValue placeholder="Status: All" />
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value="all">Status: All</SelectItem>
 										{ACTIVE_USER_STATUSES.map((status) => (
-											<SelectItem key={status} value={status}>
+											<SelectItem
+												key={status}
+												value={status}
+											>
 												{ACTIVE_USER_STATUS_LABELS[status]}
 											</SelectItem>
 										))}
 									</SelectContent>
 								</Select>
-								<Label htmlFor="user-role-filter" className="sr-only">
+								<Label
+									htmlFor="user-role-filter"
+									className="sr-only"
+								>
 									Role
 								</Label>
 								<Select
@@ -235,13 +251,19 @@ function ActiveUsersPage() {
 									}}
 									disabled={isLoading}
 								>
-									<SelectTrigger id="user-role-filter" className="w-[150px]">
+									<SelectTrigger
+										id="user-role-filter"
+										className="w-[150px]"
+									>
 										<SelectValue placeholder="Role: All" />
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value="all">Role: All</SelectItem>
 										{TEAM_ROLES.map((role) => (
-											<SelectItem key={role} value={role}>
+											<SelectItem
+												key={role}
+												value={role}
+											>
 												{ROLE_LABELS[role]}
 											</SelectItem>
 										))}

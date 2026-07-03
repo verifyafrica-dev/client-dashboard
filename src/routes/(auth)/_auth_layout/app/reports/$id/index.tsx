@@ -15,15 +15,13 @@ import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Skeleton } from "#/components/ui/skeleton";
 import { generatePDFWithColorSupport } from "#/lib/pdfHelpers";
-import { isPlainObject } from "#/lib/validators";
 import { cn } from "#/lib/utils.ts";
+import { isPlainObject } from "#/lib/validators";
 import { VerificationMetadataCard } from "../-components/verification-metadata-card";
 import { VerificationProofsSection } from "../-components/verification-proofs-section";
 import { VerificationResultPanel } from "../-components/verification-result-panel";
 
-export const Route = createFileRoute(
-	"/(auth)/_auth_layout/app/reports/$id/",
-)({
+export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/$id/")({
 	component: VerificationReportDetailPage,
 });
 
@@ -32,7 +30,10 @@ function VerificationReportDetailPage() {
 	const reportRef = useRef<HTMLDivElement>(null);
 	const [isDownloading, setIsDownloading] = useState(false);
 
-	const verificationQuery = useVerificationRequestDetailV2Query(id, Boolean(id));
+	const verificationQuery = useVerificationRequestDetailV2Query(
+		id,
+		Boolean(id),
+	);
 	const refreshMutation = useRefreshVerificationStatusV2Mutation();
 	const verification = verificationQuery.data;
 
@@ -174,7 +175,10 @@ function VerificationReportDetailPage() {
 							<Skeleton className="h-5 w-24" />
 							<div className="grid gap-4 sm:grid-cols-2">
 								{Array.from({ length: 2 }).map((_, index) => (
-									<div key={index} className="flex flex-col gap-2 sm:col-span-2">
+									<div
+										key={index}
+										className="flex flex-col gap-2 sm:col-span-2"
+									>
 										<Skeleton className="h-3 w-32" />
 										<Skeleton className="h-40 w-full max-w-xs rounded-md" />
 									</div>
@@ -187,8 +191,8 @@ function VerificationReportDetailPage() {
 				<Card>
 					<CardContent className="flex min-h-[320px] flex-col items-center justify-center gap-4 pt-6 text-center">
 						<p className="text-sm text-muted-foreground">
-							Failed to load verification report. It may not exist or you may not
-							have access.
+							Failed to load verification report. It may not exist or you may
+							not have access.
 						</p>
 						<Button
 							type="button"

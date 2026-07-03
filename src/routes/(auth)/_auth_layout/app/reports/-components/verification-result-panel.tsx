@@ -9,9 +9,7 @@ type VerificationResultPanelProps = {
 };
 
 function formatFieldLabel(key: string) {
-	return key
-		.replace(/_/g, " ")
-		.replace(/\b\w/g, (char) => char.toUpperCase());
+	return key.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
 function isImageValue(value: string) {

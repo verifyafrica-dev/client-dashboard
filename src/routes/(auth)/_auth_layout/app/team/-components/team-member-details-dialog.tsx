@@ -9,9 +9,9 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "#/components/ui/dialog";
-import type { ActiveUser } from "../active-users/-data";
-import { ActiveUserStatusBadge } from "../active-users/-components/user-status-badge";
 import { formatTeamDate, getUserInitials } from "../-data";
+import { ActiveUserStatusBadge } from "../active-users/-components/user-status-badge";
+import type { ActiveUser } from "../active-users/-data";
 import { InvitationStatusBadge } from "../invitations/-components/invitation-badges";
 import type { UserInvitation } from "../invitations/-data";
 import { UserRoleBadge } from "./user-role-badge";
@@ -67,10 +67,7 @@ export function TeamMemberDetailsDialog({
 		: "Pending invitation";
 
 	return (
-		<Dialog
-			open={open}
-			onOpenChange={onOpenChange}
-		>
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
 					<div className="flex items-center gap-4">
@@ -99,10 +96,7 @@ export function TeamMemberDetailsDialog({
 				<dl className="mt-2">
 					{isUser ? (
 						<>
-							<DetailRow
-								label="Email"
-								value={user!.email}
-							/>
+							<DetailRow label="Email" value={user!.email} />
 							<DetailRow
 								label="Role"
 								value={<UserRoleBadge role={user!.role} />}
@@ -130,15 +124,9 @@ export function TeamMemberDetailsDialog({
 						</>
 					) : (
 						<>
-							<DetailRow
-								label="Email"
-								value={invitation!.email}
-							/>
+							<DetailRow label="Email" value={invitation!.email} />
 							{invitation!.name?.trim() ? (
-								<DetailRow
-									label="Name"
-									value={invitation!.name}
-								/>
+								<DetailRow label="Name" value={invitation!.name} />
 							) : null}
 							<DetailRow
 								label="Role"

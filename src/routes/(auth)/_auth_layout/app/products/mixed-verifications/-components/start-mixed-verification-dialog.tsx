@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-
+import type { V2AxiosError } from "#/api/http/shared";
 import { useStartMixedVerificationV2Mutation } from "#/api/http/v2/verifications/verifications.hooks";
 import type {
 	MixedVerification,
 	VerificationRequest,
 } from "#/api/http/v2/verifications/verifications.types";
-import type { V2AxiosError } from "#/api/http/shared";
 import { Button } from "#/components/ui/button";
 import {
 	Dialog,
@@ -86,10 +85,7 @@ export function StartMixedVerificationDialog({
 	}
 
 	return (
-		<Dialog
-			open={open}
-			onOpenChange={onOpenChange}
-		>
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle className="font-semibold">
@@ -99,7 +95,11 @@ export function StartMixedVerificationDialog({
 				</DialogHeader>
 
 				{startMutation.isPending ? (
-					<div className="space-y-4" aria-busy="true" aria-label="Starting mixed verification">
+					<div
+						className="space-y-4"
+						aria-busy="true"
+						aria-label="Starting mixed verification"
+					>
 						<div className="space-y-2">
 							<Skeleton className="h-4 w-28" />
 							<Skeleton className="h-10 w-full" />

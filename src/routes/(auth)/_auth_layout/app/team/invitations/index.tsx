@@ -49,7 +49,11 @@ import {
 } from "../-components/team-member-details-dialog";
 import { TeamTableShell } from "../-components/team-table-shell";
 import { TeamTableSkeleton } from "../-components/team-table-skeleton";
-import { TEAM_PAGE_SIZE, useCurrentTenant, type TenantUserRole } from "../-data";
+import {
+	TEAM_PAGE_SIZE,
+	type TenantUserRole,
+	useCurrentTenant,
+} from "../-data";
 import {
 	InvitationRoleBadge,
 	InvitationStatusBadge,

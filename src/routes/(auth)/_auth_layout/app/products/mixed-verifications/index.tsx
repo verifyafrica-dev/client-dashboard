@@ -13,17 +13,17 @@ import {
 	buildLinkResult,
 	type HostedLinkResult,
 } from "#/lib/verification-links";
-import { VerificationResultDialog } from "../-components/verification-result-dialog";
 import { useCurrentTenant } from "../../team/-data";
+import { VerificationResultDialog } from "../-components/verification-result-dialog";
 import { getProduct } from "../-data";
-import {
-	groupMixedVerifications,
-	MIXED_VERIFICATIONS_LIST_PARAMS,
-} from "./-data";
 import { CustomVerificationDialog } from "./-components/custom-verification-dialog";
 import { DeleteCustomVerificationDialog } from "./-components/delete-custom-verification-dialog";
 import { MixedVerificationCard } from "./-components/mixed-verification-card";
 import { StartMixedVerificationDialog } from "./-components/start-mixed-verification-dialog";
+import {
+	groupMixedVerifications,
+	MIXED_VERIFICATIONS_LIST_PARAMS,
+} from "./-data";
 
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/products/mixed-verifications/",
@@ -31,7 +31,11 @@ export const Route = createFileRoute(
 	component: MixedVerificationsPage,
 });
 
-function MixedVerificationSectionCardsSkeleton({ count = 2 }: { count?: number }) {
+function MixedVerificationSectionCardsSkeleton({
+	count = 2,
+}: {
+	count?: number;
+}) {
 	return (
 		<div className="grid gap-4 md:grid-cols-2">
 			{Array.from({ length: count }).map((_, index) => (

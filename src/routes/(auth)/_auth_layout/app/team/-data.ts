@@ -1,6 +1,6 @@
-import type { TenantRole } from "#/api/http/v2/tenants/tenants.types";
 import type { UserTenantMembership } from "#/api/http/v1/tenants/tenants.types";
 import type { UserDetail } from "#/api/http/v1/users/users.types";
+import type { TenantRole } from "#/api/http/v2/tenants/tenants.types";
 import { useAuthStore } from "#/stores/auth-store";
 
 export type TenantUserRole = TenantRole;

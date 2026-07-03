@@ -48,12 +48,8 @@ export function MixedVerificationCard({
 							<h3 className="text-base font-semibold leading-tight">
 								{template.name}
 							</h3>
-							<Badge >
-								{isCustom ? "Custom" : "Platform"}
-							</Badge>
-							{!template.is_active && (
-								<Badge variant="outline">Disabled</Badge>
-							)}
+							<Badge>{isCustom ? "Custom" : "Platform"}</Badge>
+							{!template.is_active && <Badge variant="outline">Disabled</Badge>}
 						</div>
 						<p className="text-sm text-muted-foreground">
 							{template.description?.trim() || "No description provided."}

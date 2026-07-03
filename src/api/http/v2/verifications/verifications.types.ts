@@ -6,10 +6,10 @@ import type {
 	V2SuccessResponse,
 } from "#/api/http/shared";
 import {
-	VerificationStatusSchema,
-	VerificationTypeSchema,
 	type VerificationStatus,
+	VerificationStatusSchema,
 	type VerificationType,
+	VerificationTypeSchema,
 } from "#/api/http/v1/verifications/verifications.types";
 
 export type { VerificationStatus, VerificationType };
@@ -222,7 +222,8 @@ export interface VerificationSendEmailData {
 	email_sent_at: string | null;
 }
 
-export type VerificationRequestResponse = V2SuccessResponse<VerificationRequest>;
+export type VerificationRequestResponse =
+	V2SuccessResponse<VerificationRequest>;
 export type VerificationRequestDetailResponse =
 	V2SuccessResponse<VerificationRequestDetail>;
 export type VerificationBatchResponse = V2SuccessResponse<VerificationBatch>;

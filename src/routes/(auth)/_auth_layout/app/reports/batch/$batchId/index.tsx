@@ -1,6 +1,6 @@
 import { ArrowLeftIcon, EyeIcon } from "@phosphor-icons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState, type ReactNode } from "react";
+import { type ReactNode, useMemo, useState } from "react";
 
 import {
 	useTenantVerificationRequestsV2Query,
@@ -84,15 +84,8 @@ function BatchVerificationReportDetailPage() {
 	return (
 		<div className="flex min-w-0 flex-col gap-6">
 			<div className="flex flex-col gap-3">
-				<Button
-					variant="ghost"
-					className="w-fit px-4"
-					asChild
-				>
-					<Link
-						to="/app/reports"
-						search={{ tab: "batch" }}
-					>
+				<Button variant="ghost" className="w-fit px-4" asChild>
+					<Link to="/app/reports" search={{ tab: "batch" }}>
 						<ArrowLeftIcon />
 						Back to Reports
 					</Link>
@@ -110,10 +103,7 @@ function BatchVerificationReportDetailPage() {
 			{batchQuery.isPending ? (
 				<div className="grid gap-4 md:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, index) => (
-						<Skeleton
-							key={index}
-							className="h-28 w-full rounded-xl"
-						/>
+						<Skeleton key={index} className="h-28 w-full rounded-xl" />
 					))}
 				</div>
 			) : batchQuery.isError || !batch ? (
@@ -130,10 +120,7 @@ function BatchVerificationReportDetailPage() {
 						</StatCard>
 						<StatCard label="Total Count">{batch.total_count}</StatCard>
 						<StatCard label="Successful">
-							<BatchCountBadge
-								count={batch.success_count}
-								variant="success"
-							/>
+							<BatchCountBadge count={batch.success_count} variant="success" />
 						</StatCard>
 						<StatCard label="Success Rate">
 							<div className="flex items-center gap-2">
