@@ -3,7 +3,7 @@ import {
 	CloudArrowUpIcon,
 	XIcon,
 } from "@phosphor-icons/react";
-import { format, isValid, parse } from "date-fns";
+import { format, isValid, parse, startOfDay } from "date-fns";
 import { useMemo, useState } from "react";
 import { Button } from "#/components/ui/button";
 import { Calendar } from "#/components/ui/calendar";
@@ -131,13 +131,23 @@ export function CountrySelect({
 	const countryOptions = useMemo(() => getCountrySelectOptions(), []);
 
 	return (
-		<Select value={value} onValueChange={onValueChange} disabled={disabled}>
-			<SelectTrigger id={id} className="w-full">
+		<Select
+			value={value}
+			onValueChange={onValueChange}
+			disabled={disabled}
+		>
+			<SelectTrigger
+				id={id}
+				className="w-full"
+			>
 				<SelectValue placeholder={placeholder} />
 			</SelectTrigger>
 			<SelectContent className="max-h-60">
 				{countryOptions.map((country) => (
-					<SelectItem key={country.value} value={country.value}>
+					<SelectItem
+						key={country.value}
+						value={country.value}
+					>
 						{country.label}
 					</SelectItem>
 				))}
@@ -165,18 +175,31 @@ export function KycDatePicker({
 	onChange,
 	placeholder = "dd/mm/yyyy",
 	disabled,
+	disablePastDates,
+	disableFutureDates,
 }: {
 	id?: string;
 	value?: string | Date;
 	onChange?: (date: Date | undefined) => void;
 	placeholder?: string;
 	disabled?: boolean;
+	disablePastDates?: boolean;
+	disableFutureDates?: boolean;
 }) {
 	const [open, setOpen] = useState(false);
 	const selectedDate = parseKycDateValue(value);
+	const disabledPastDays = disablePastDates
+		? [{ before: startOfDay(new Date()) }]
+		: undefined;
 
+	const disabledFutureDays = disableFutureDates
+		? [{ after: startOfDay(new Date()) }]
+		: undefined;
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
+		<Popover
+			open={open}
+			onOpenChange={setOpen}
+		>
 			<PopoverTrigger asChild>
 				<Button
 					id={id}
@@ -192,10 +215,14 @@ export function KycDatePicker({
 					<CalendarBlankIcon className="size-4" />
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-auto p-0" align="start">
+			<PopoverContent
+				className="w-auto p-0"
+				align="start"
+			>
 				<Calendar
 					mode="single"
 					selected={selectedDate}
+					disabled={disabledPastDays || disabledFutureDays}
 					onSelect={(date) => {
 						onChange?.(date);
 						setOpen(false);
@@ -269,7 +296,11 @@ export function KycFileUpload({
 							<FileUploadItemPreview className="size-8" />
 							<FileUploadItemMetadata size="sm" />
 							<FileUploadItemDelete asChild>
-								<Button variant="ghost" size="icon" className="size-6">
+								<Button
+									variant="ghost"
+									size="icon"
+									className="size-6"
+								>
 									<XIcon className="size-3" />
 								</Button>
 							</FileUploadItemDelete>

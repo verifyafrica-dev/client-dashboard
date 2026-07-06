@@ -134,6 +134,22 @@ const optionalUrlSchema = z
 		message: "Please enter a valid URL",
 	});
 
+function isTodayOrFutureISODate(value: string, disableFuture:boolean = true) {
+	if (!isISODate(value)) {
+		return false;
+	}
+
+	const selectedDate = new Date(`${value}T00:00:00`);
+	selectedDate.setHours(0, 0, 0, 0);
+
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+
+	console.log(selectedDate, today, disableFuture);
+
+	return disableFuture ? selectedDate < today : selectedDate > today;
+}
+
 export const KycBasicInformationFormSchema = z.object({
 	legalName: z.string().trim().min(1, "Legal name is required"),
 	tradingName: z.string().optional(),
@@ -146,7 +162,11 @@ export const KycBasicInformationFormSchema = z.object({
 		.string()
 		.trim()
 		.min(1, "Date of incorporation is required")
-		.refine(isISODate, "Please enter a valid date (YYYY-MM-DD)"),
+		.refine(isISODate, "Please enter a valid date (YYYY-MM-DD)")
+		.refine(
+			(value) => isTodayOrFutureISODate(value),
+			"Date of incorporation cannot be earlier than today",
+		),
 	registeredAddress: z.string().trim().min(1, "Registered address is required"),
 	registeredPostalCode: z.string().trim().min(1, "Postal code is required"),
 	registeredCountry: z.string().trim().min(1, "Country is required"),
@@ -188,7 +208,11 @@ export const KycDirectorFormSchema = z.object({
 		.string()
 		.trim()
 		.min(1, "Date of birth is required")
-		.refine(isISODate, "Please enter a valid date (YYYY-MM-DD)"),
+		.refine(isISODate, "Please enter a valid date (YYYY-MM-DD)")
+		.refine(
+			(value) => isTodayOrFutureISODate(value),
+			"Date of birth cannot be earlier than today",
+		),
 	nationality: z.string().trim().min(1, "Nationality is required"),
 	address: KycDirectorAddressSchema,
 	id_number: z.string().trim().min(1, "ID number is required"),
@@ -196,7 +220,7 @@ export const KycDirectorFormSchema = z.object({
 
 export const KycUboFormSchema = z.object({
 	name: z.string().trim().min(1, "Full name is required"),
-	ownership_percentage: z.coerce
+	ownership_percentage: z
 		.number()
 		.gt(0, "Ownership percentage must be greater than 0")
 		.max(100, "Ownership percentage cannot exceed 100%"),
@@ -289,7 +313,8 @@ export const KycAuthorizedSignatureFormSchema = z.object({
 		.string()
 		.trim()
 		.min(1, "Date is required")
-		.refine(isISODate, "Please enter a valid date (YYYY-MM-DD)"),
+		.refine(isISODate, "Please enter a valid date (YYYY-MM-DD)")
+		.refine(isTodayOrFutureISODate, "Date cannot be earlier than today"),
 	signature: z.string().trim().min(1, "Signature is required"),
 });
 

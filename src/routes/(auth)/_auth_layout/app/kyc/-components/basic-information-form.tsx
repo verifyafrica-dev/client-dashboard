@@ -91,6 +91,7 @@ export function BasicInformationForm() {
 			className="flex flex-col gap-6"
 			onSubmit={(event) => {
 				event.preventDefault();
+				console.log(form.state.values);
 				form.handleSubmit();
 			}}
 		>
@@ -103,7 +104,10 @@ export function BasicInformationForm() {
 				<KycFormGrid>
 					<form.Field name="legalName">
 						{(field) => (
-							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="legalName">
 									Legal Name <span className="text-destructive">*</span>
 								</FieldLabel>
@@ -122,7 +126,10 @@ export function BasicInformationForm() {
 					</form.Field>
 					<form.Field name="tradingName">
 						{(field) => (
-							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="tradingName">Trading Name</FieldLabel>
 								<Input
 									id="tradingName"
@@ -141,7 +148,10 @@ export function BasicInformationForm() {
 				<KycFormGrid>
 					<form.Field name="countryOfIncorporation">
 						{(field) => (
-							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="countryOfIncorporation">
 									Country of Incorporation{" "}
 									<span className="text-destructive">*</span>
@@ -158,7 +168,10 @@ export function BasicInformationForm() {
 					</form.Field>
 					<form.Field name="registrationNumber">
 						{(field) => (
-							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="registrationNumber">
 									Registration Number{" "}
 									<span className="text-destructive">*</span>
@@ -180,7 +193,10 @@ export function BasicInformationForm() {
 				<KycFormGrid>
 					<form.Field name="dateOfIncorporation">
 						{(field) => (
-							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="dateOfIncorporation">
 									Date of Incorporation{" "}
 									<span className="text-destructive">*</span>
@@ -188,10 +204,9 @@ export function BasicInformationForm() {
 								<KycDatePicker
 									id="dateOfIncorporation"
 									value={field.state.value}
+									disableFutureDates
 									onChange={(date) =>
-										field.handleChange(
-											date ? format(date, "yyyy-MM-dd") : "",
-										)
+										field.handleChange(date ? format(date, "yyyy-MM-dd") : "")
 									}
 									disabled={isReadOnly}
 								/>
@@ -201,7 +216,10 @@ export function BasicInformationForm() {
 					</form.Field>
 					<form.Field name="website">
 						{(field) => (
-							<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
+							<Field
+								className="gap-1.5"
+								data-invalid={field.state.meta.errors.length > 0}
+							>
 								<FieldLabel htmlFor="website">Website</FieldLabel>
 								<Input
 									id="website"
@@ -223,7 +241,10 @@ export function BasicInformationForm() {
 
 			<form.Field name="registeredAddress">
 				{(field) => (
-					<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
+					<Field
+						className="gap-1.5"
+						data-invalid={field.state.meta.errors.length > 0}
+					>
 						<FieldLabel htmlFor="registeredAddress">
 							Registered Address <span className="text-destructive">*</span>
 						</FieldLabel>
@@ -244,7 +265,11 @@ export function BasicInformationForm() {
 			<KycFormGrid>
 				<form.Field name="registeredPostalCode">
 					{(field) => (
-						<KycFormField id="registeredPostalCode" label="Postal Code" required>
+						<KycFormField
+							id="registeredPostalCode"
+							label="Postal Code"
+							required
+						>
 							<Input
 								id="registeredPostalCode"
 								value={field.state.value}
@@ -259,7 +284,11 @@ export function BasicInformationForm() {
 				</form.Field>
 				<form.Field name="registeredCountry">
 					{(field) => (
-						<KycFormField id="registeredCountry" label="Country" required>
+						<KycFormField
+							id="registeredCountry"
+							label="Country"
+							required
+						>
 							<CountrySelect
 								id="registeredCountry"
 								value={field.state.value}
@@ -276,7 +305,10 @@ export function BasicInformationForm() {
 
 			<form.Field name="businessAddress">
 				{(field) => (
-					<Field className="gap-1.5" data-invalid={field.state.meta.errors.length > 0}>
+					<Field
+						className="gap-1.5"
+						data-invalid={field.state.meta.errors.length > 0}
+					>
 						<FieldLabel htmlFor="businessAddress">Business Address</FieldLabel>
 						<Textarea
 							id="businessAddress"
@@ -295,7 +327,10 @@ export function BasicInformationForm() {
 			<KycFormGrid>
 				<form.Field name="businessPostalCode">
 					{(field) => (
-						<KycFormField id="businessPostalCode" label="Postal Code">
+						<KycFormField
+							id="businessPostalCode"
+							label="Postal Code"
+						>
 							<Input
 								id="businessPostalCode"
 								value={field.state.value ?? ""}
@@ -309,7 +344,10 @@ export function BasicInformationForm() {
 				</form.Field>
 				<form.Field name="businessCountry">
 					{(field) => (
-						<KycFormField id="businessCountry" label="Country">
+						<KycFormField
+							id="businessCountry"
+							label="Country"
+						>
 							<CountrySelect
 								id="businessCountry"
 								value={field.state.value}
@@ -323,7 +361,10 @@ export function BasicInformationForm() {
 
 			<form.Field name="taxIdVatNumber">
 				{(field) => (
-					<KycFormField id="taxIdVatNumber" label="Tax ID / VAT Number">
+					<KycFormField
+						id="taxIdVatNumber"
+						label="Tax ID / VAT Number"
+					>
 						<Input
 							id="taxIdVatNumber"
 							value={field.state.value}

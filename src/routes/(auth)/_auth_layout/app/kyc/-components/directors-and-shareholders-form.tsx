@@ -79,7 +79,7 @@ export function DirectorsAndShareholdersForm() {
 	const form = useForm({
 		defaultValues: getDefaultValues(kycData),
 		validators: {
-			onSubmit: KycDirectorsAndShareholdersFormSchema,
+			onSubmit: KycDirectorsAndShareholdersFormSchema as never,
 		},
 		onSubmit: async ({ value }) => {
 			await saveSection("directors-and-shareholders", value, {
@@ -157,6 +157,7 @@ export function DirectorsAndShareholdersForm() {
 													</FieldLabel>
 													<KycDatePicker
 														value={field.state.value}
+														disablePastDates
 														onChange={(date) =>
 															field.handleChange(
 																date ? format(date, "yyyy-MM-dd") : "",
