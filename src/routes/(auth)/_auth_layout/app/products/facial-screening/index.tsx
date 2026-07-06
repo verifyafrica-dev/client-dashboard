@@ -9,6 +9,12 @@ import { FacialScreeningInfoPanel } from "./-components/facial-screening-info-pa
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/products/facial-screening/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Facial Screening | VerifyAfrica" },
+			{ name: "description", content: "Run facial checks to validate identity and prevent impersonation." },
+		],
+	}),
 	component: FacialScreeningPage,
 });
 

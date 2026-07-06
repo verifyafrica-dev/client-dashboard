@@ -33,6 +33,12 @@ import { AuthPageShell } from "../-components";
 export const Route = createFileRoute(
 	"/(unguarded)/_unguarded_layout/activate-account/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Activate Account | VerifyAfrica" },
+			{ name: "description", content: "Activate your account to start using VerifyAfrica services." },
+		],
+	}),
 	validateSearch: UserActivateAccountSearchSchema,
 	component: ActivateAccountPage,
 });

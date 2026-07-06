@@ -9,6 +9,12 @@ import { DocumentVerificationInfoPanel } from "./-components/document-verificati
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/products/document-verification/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Document Verification | VerifyAfrica" },
+			{ name: "description", content: "Validate identity documents for authenticity and fraud detection." },
+		],
+	}),
 	component: DocumentVerificationPage,
 });
 

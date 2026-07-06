@@ -25,6 +25,12 @@ const loginSearchSchema = z.object({
 });
 
 export const Route = createFileRoute("/(unguarded)/_unguarded_layout/login/")({
+	head: () => ({
+		meta: [
+			{ title: "Login | VerifyAfrica" },
+			{ name: "description", content: "Sign in to access your VerifyAfrica account and tools." },
+		],
+	}),
 	validateSearch: loginSearchSchema,
 	component: LoginPage,
 });

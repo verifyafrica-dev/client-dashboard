@@ -8,6 +8,12 @@ import { Spinner } from "#/components/ui/spinner";
 export const Route = createFileRoute(
 	"/(unguarded)/_unguarded_layout/verify/$link/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Verification Link | VerifyAfrica" },
+			{ name: "description", content: "Complete identity verification securely using your unique link." },
+		],
+	}),
 	component: VerifyLinkPage,
 });
 

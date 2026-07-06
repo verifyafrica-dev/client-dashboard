@@ -9,6 +9,12 @@ import { BusinessAmlScreeningInfoPanel } from "./-components/business-aml-screen
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/products/business-aml-screening/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Business AML Screening | VerifyAfrica" },
+			{ name: "description", content: "Screen businesses for AML, sanctions, and compliance risks." },
+		],
+	}),
 	component: BusinessAmlScreeningPage,
 });
 

@@ -39,6 +39,12 @@ import { AuthPageShell } from "../-components";
 import { PasswordField } from "../-components/password-field";
 
 export const Route = createFileRoute("/(unguarded)/_unguarded_layout/invite/")({
+	head: () => ({
+		meta: [
+			{ title: "Accept Invitation | VerifyAfrica" },
+			{ name: "description", content: "Accept your team invitation and join your organization workspace." },
+		],
+	}),
 	validateSearch: AcceptInvitationSearchSchema,
 	component: AcceptInvitationPage,
 });

@@ -9,6 +9,12 @@ import { CryptoWalletScreeningInfoPanel } from "./-components/crypto-wallet-scre
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/products/crypto-wallet-screening/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Crypto Wallet Screening | VerifyAfrica" },
+			{ name: "description", content: "Assess crypto wallet risk using blockchain intelligence signals." },
+		],
+	}),
 	component: CryptoWalletScreeningPage,
 });
 

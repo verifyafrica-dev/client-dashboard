@@ -81,6 +81,12 @@ const ACTIVE_USER_TABLE_COLUMNS = [
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/team/active-users/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Active Users | VerifyAfrica" },
+			{ name: "description", content: "View currently active team users and recent access activity." },
+		],
+	}),
 	component: ActiveUsersPage,
 });
 

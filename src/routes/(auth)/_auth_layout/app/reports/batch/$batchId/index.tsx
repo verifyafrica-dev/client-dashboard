@@ -46,6 +46,12 @@ const VERIFICATION_COLUMNS = [
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/reports/batch/$batchId/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Batch Report Details | VerifyAfrica" },
+			{ name: "description", content: "Inspect verification results for a submitted report batch." },
+		],
+	}),
 	component: BatchVerificationReportDetailPage,
 });
 

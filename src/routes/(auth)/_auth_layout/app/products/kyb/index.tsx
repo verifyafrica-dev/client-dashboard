@@ -7,6 +7,12 @@ import { KybVerificationForm } from "./-components/kyb-verification-form";
 import { KybVerificationInfoPanel } from "./-components/kyb-verification-info-panel";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/products/kyb/")({
+	head: () => ({
+		meta: [
+			{ title: "KYB | VerifyAfrica" },
+			{ name: "description", content: "Verify businesses with Know Your Business compliance checks." },
+		],
+	}),
 	component: KybPage,
 });
 

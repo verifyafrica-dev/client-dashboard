@@ -9,6 +9,12 @@ import { RiskAssessmentInfoPanel } from "./-components/risk-assessment-info-pane
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/products/risk-assessment/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Risk Assessment | VerifyAfrica" },
+			{ name: "description", content: "Evaluate customer and business risk with configurable scoring." },
+		],
+	}),
 	component: RiskAssessmentPage,
 });
 

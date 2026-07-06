@@ -26,6 +26,12 @@ const userMenuLinks = [
 ] as const;
 
 export const Route = createFileRoute("/(auth)/_auth_layout")({
+	head: () => ({
+		meta: [
+			{ title: "Workspace | VerifyAfrica" },
+			{ name: "description", content: "Access authenticated pages for your VerifyAfrica organization." },
+		],
+	}),
 	component: AuthLayout,
 });
 

@@ -34,6 +34,12 @@ import { AuthPageShell } from "../-components";
 export const Route = createFileRoute(
 	"/(unguarded)/_unguarded_layout/reset-password/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Reset Password | VerifyAfrica" },
+			{ name: "description", content: "Set a new password and recover access to your account." },
+		],
+	}),
 	validateSearch: UserResetPasswordSearchSchema,
 	component: ResetPasswordPage,
 });

@@ -54,6 +54,12 @@ import {
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/profile/")(
 	{
+	head: () => ({
+		meta: [
+			{ title: "Profile | VerifyAfrica" },
+			{ name: "description", content: "Manage your profile information, security, and preferences." },
+		],
+	}),
 		validateSearch: profileSearchSchema,
 		component: ProfilePage,
 	},

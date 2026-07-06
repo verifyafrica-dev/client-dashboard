@@ -7,6 +7,12 @@ import { PRODUCTS } from "./-data";
 import { MIXED_VERIFICATIONS_LIST_PARAMS } from "./mixed-verifications/-data";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/products/")({
+	head: () => ({
+		meta: [
+			{ title: "Products | VerifyAfrica" },
+			{ name: "description", content: "Explore VerifyAfrica verification products and available checks." },
+		],
+	}),
 	component: ProductsPage,
 });
 

@@ -9,6 +9,12 @@ import { AmlScreeningInfoPanel } from "./-components/aml-screening-info-panel";
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/products/aml-screening/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "AML Screening | VerifyAfrica" },
+			{ name: "description", content: "Screen individuals against AML and sanctions watchlists." },
+		],
+	}),
 	component: AmlScreeningPage,
 });
 

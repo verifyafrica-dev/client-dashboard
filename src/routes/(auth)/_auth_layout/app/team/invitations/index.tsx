@@ -81,6 +81,12 @@ const INVITATION_TABLE_COLUMNS = [
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/team/invitations/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Invitations | VerifyAfrica" },
+			{ name: "description", content: "Manage pending invitations and invite new team members." },
+		],
+	}),
 	component: InvitationsPage,
 });
 

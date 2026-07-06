@@ -33,6 +33,12 @@ type RegisterFormValues = z.infer<typeof RegisterFormSchema>;
 export const Route = createFileRoute(
 	"/(unguarded)/_unguarded_layout/register/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Register | VerifyAfrica" },
+			{ name: "description", content: "Create a VerifyAfrica account for your organization." },
+		],
+	}),
 	component: RegisterPage,
 });
 

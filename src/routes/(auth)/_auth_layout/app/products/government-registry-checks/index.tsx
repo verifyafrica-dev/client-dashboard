@@ -9,6 +9,12 @@ import { GovernmentRegistryChecksInfoPanel } from "./-components/government-regi
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/products/government-registry-checks/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Government Registry Checks | VerifyAfrica" },
+			{ name: "description", content: "Validate business and identity data against government registries." },
+		],
+	}),
 	component: GovernmentRegistryChecksPage,
 });
 

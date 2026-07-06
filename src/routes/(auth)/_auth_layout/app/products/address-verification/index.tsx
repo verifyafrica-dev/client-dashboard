@@ -9,6 +9,12 @@ import { AddressVerificationInfoPanel } from "./-components/address-verification
 export const Route = createFileRoute(
 	"/(auth)/_auth_layout/app/products/address-verification/",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Address Verification | VerifyAfrica" },
+			{ name: "description", content: "Verify customer addresses for onboarding and compliance checks." },
+		],
+	}),
 	component: AddressVerificationPage,
 });
 

@@ -21,6 +21,12 @@ import {
 const REPORTS_COUNTRIES = Object.values(COUNTRY_CODE_MAP).sort();
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/")({
+	head: () => ({
+		meta: [
+			{ title: "Reports | VerifyAfrica" },
+			{ name: "description", content: "View verification reports and export compliance data." },
+		],
+	}),
 	validateSearch: reportsSearchSchema,
 	component: ReportsPage,
 });

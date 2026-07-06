@@ -7,6 +7,12 @@ import { Card, CardContent } from "#/components/ui/card";
 export const Route = createFileRoute(
 	"/(unguarded)/_unguarded_layout/verify/result",
 )({
+	head: () => ({
+		meta: [
+			{ title: "Verification Result | VerifyAfrica" },
+			{ name: "description", content: "Review the result of your submitted verification process." },
+		],
+	}),
 	component: VerifyResultPage,
 });
 

@@ -38,6 +38,12 @@ import { formatApiKeyDate, getApiKeyPreview, maskApiKey } from "./-data";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/apikeys/")(
 	{
+	head: () => ({
+		meta: [
+			{ title: "API Keys | VerifyAfrica" },
+			{ name: "description", content: "Create and manage API keys for VerifyAfrica integrations." },
+		],
+	}),
 		component: ApiKeysPage,
 	},
 );

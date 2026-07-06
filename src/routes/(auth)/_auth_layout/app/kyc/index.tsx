@@ -34,6 +34,12 @@ const kycSearchSchema = z.object({
 });
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/kyc/")({
+	head: () => ({
+		meta: [
+			{ title: "KYC | VerifyAfrica" },
+			{ name: "description", content: "Submit and track Know Your Customer verification checks." },
+		],
+	}),
 	validateSearch: kycSearchSchema,
 	component: KycPage,
 });

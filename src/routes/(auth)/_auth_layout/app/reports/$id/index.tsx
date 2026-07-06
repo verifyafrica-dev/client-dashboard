@@ -23,6 +23,12 @@ import { VerificationProofsSection } from "../-components/verification-proofs-se
 import { VerificationResultPanel } from "../-components/verification-result-panel";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/$id/")({
+	head: () => ({
+		meta: [
+			{ title: "Report Details | VerifyAfrica" },
+			{ name: "description", content: "Review full details and outcomes for a specific report." },
+		],
+	}),
 	component: VerificationReportDetailPage,
 });
 
