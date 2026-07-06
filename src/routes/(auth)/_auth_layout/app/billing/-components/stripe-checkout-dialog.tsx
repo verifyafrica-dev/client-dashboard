@@ -3,11 +3,9 @@ import {
 	EmbeddedCheckoutProvider,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { XIcon } from "@phosphor-icons/react";
 import type { ComponentProps } from "react";
 
 import { env } from "#/config/env";
-import { Button } from "#/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -40,20 +38,13 @@ export function StripeCheckoutDialog({
 	};
 
 	return (
-		<Dialog open={open} onOpenChange={handleOpenChange}>
+		<Dialog
+			open={open}
+			onOpenChange={handleOpenChange}
+		>
 			<DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
-				<DialogHeader className="flex flex-row items-center justify-between border-b px-4 py-3">
-					<DialogTitle>Complete Payment</DialogTitle>
-					<Button
-						type="button"
-						variant="ghost"
-						size="icon-sm"
-						className="cursor-pointer"
-						onClick={() => handleOpenChange(false)}
-						aria-label="Close payment window"
-					>
-						<XIcon className="size-4" />
-					</Button>
+				<DialogHeader className="flex flex-row items-center justify-between border-b px-4 py-4">
+					<DialogTitle className="font-semibold">Complete Payment</DialogTitle>
 				</DialogHeader>
 
 				<div className="min-h-[420px] overflow-y-auto p-4">
@@ -72,7 +63,7 @@ export function StripeCheckoutDialog({
 							stripe={stripePromise}
 							options={{ clientSecret }}
 						>
-							<EmbeddedCheckout />
+							<EmbeddedCheckout className="bg-white" />
 						</EmbeddedCheckoutProvider>
 					)}
 				</div>

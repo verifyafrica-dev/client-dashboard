@@ -1,13 +1,17 @@
 import { CurrencyDollarIcon, WalletIcon } from "@phosphor-icons/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
-import { type ComponentProps, useCallback, useEffect, useRef, useState } from "react";
+import {
+	type ComponentProps,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 
-import {
-	BILLING_V2_QUERY_KEYS,
-} from "#/api/http/v2/billing/billing.hooks";
+import { BILLING_V2_QUERY_KEYS } from "#/api/http/v2/billing/billing.hooks";
 import {
 	useTopUpCreateSessionV2Mutation,
 	WALLET_V2_QUERY_KEYS,
@@ -37,7 +41,7 @@ import {
 } from "../-data";
 import { StripeCheckoutDialog } from "./stripe-checkout-dialog";
 
-const TOP_UP_VERIFY_INTERVAL_MS = 3_000;
+const TOP_UP_VERIFY_INTERVAL_MS = 5_000;
 const TOP_UP_VERIFY_TIMEOUT_MS = 300_000;
 
 type TopUpFormValues = {
@@ -103,6 +107,7 @@ export function AddCreditsDialog({
 	const [clientSecret, setClientSecret] = useState<string | null>(null);
 	const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 	const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const lastOpenRef = useRef(open);
 
 	const clearVerificationTimers = useCallback(() => {
 		if (pollIntervalRef.current) {
@@ -177,6 +182,12 @@ export function AddCreditsDialog({
 	});
 
 	useEffect(() => {
+		if (lastOpenRef.current === open) {
+			return;
+		}
+
+		lastOpenRef.current = open;
+
 		if (open) {
 			form.reset();
 			return;
@@ -185,7 +196,10 @@ export function AddCreditsDialog({
 		resetPaymentState();
 	}, [open, form, resetPaymentState]);
 
-	const startPaymentVerification = (sessionId: string, requestedAmount: number) => {
+	const startPaymentVerification = (
+		sessionId: string,
+		requestedAmount: number,
+	) => {
 		if (!tenantId) {
 			return;
 		}
@@ -200,7 +214,9 @@ export function AddCreditsDialog({
 						sessionId,
 					);
 
-					if (isTopUpComplete(response.amount, requestedAmount, response.status)) {
+					if (
+						isTopUpComplete(response.amount, requestedAmount, response.status)
+					) {
 						clearVerificationTimers();
 						setShowStripeCheckout(false);
 						toast.success(
@@ -280,7 +296,10 @@ export function AddCreditsDialog({
 				<DialogContent className="sm:max-w-md">
 					<DialogHeader>
 						<DialogTitle className="flex items-center gap-2">
-							<WalletIcon className="size-5 text-primary" weight="duotone" />
+							<WalletIcon
+								className="size-5 text-primary"
+								weight="duotone"
+							/>
 							Add Credits
 						</DialogTitle>
 					</DialogHeader>
@@ -364,8 +383,8 @@ export function AddCreditsDialog({
 
 						<Alert>
 							<AlertDescription>
-								A secure payment window will open. Credits are added after payment
-								confirmation.
+								A secure payment window will open. Credits are added after
+								payment confirmation.
 							</AlertDescription>
 						</Alert>
 

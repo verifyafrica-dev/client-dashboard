@@ -57,17 +57,19 @@ import {
 	type Transaction,
 } from "./-data";
 
-export const Route = createFileRoute("/(auth)/_auth_layout/app/billing/")(
-	{
+export const Route = createFileRoute("/(auth)/_auth_layout/app/billing/")({
 	head: () => ({
 		meta: [
 			{ title: "Billing | VerifyAfrica" },
-			{ name: "description", content: "Review subscription plans, invoices, and account billing usage." },
+			{
+				name: "description",
+				content:
+					"Review subscription plans, invoices, and account billing usage.",
+			},
 		],
 	}),
-		component: BillingPage,
-	},
-);
+	component: BillingPage,
+});
 
 function BillingPage() {
 	const queryClient = useQueryClient();
