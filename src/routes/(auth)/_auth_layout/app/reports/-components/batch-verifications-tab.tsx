@@ -197,7 +197,10 @@ export function BatchVerificationsTab({
 									</TableRow>
 								) : (
 									batchVerifications.map((batch) => (
-										<BatchVerificationRow key={batch.id} batch={batch} />
+										<BatchVerificationRow
+											key={batch.id}
+											batch={batch}
+										/>
 									))
 								)}
 							</TableBody>
@@ -241,10 +244,16 @@ function BatchVerificationRow({ batch }: { batch: BatchVerificationReport }) {
 				{batch.total_count}
 			</TableCell>
 			<TableCell>
-				<BatchCountBadge count={batch.success_count} variant="success" />
+				<BatchCountBadge
+					count={batch.success_count}
+					variant="success"
+				/>
 			</TableCell>
 			<TableCell>
-				<BatchCountBadge count={batch.failed_count} variant="error" />
+				<BatchCountBadge
+					count={batch.failed_count}
+					variant="error"
+				/>
 			</TableCell>
 			<TableCell>
 				<div className="flex items-center gap-2 whitespace-nowrap">
@@ -274,10 +283,13 @@ function BatchVerificationRow({ batch }: { batch: BatchVerificationReport }) {
 					type="button"
 					variant="outline"
 					size="sm"
-					className="cursor-pointer uppercase tracking-wide"
+					className="cursor-pointer tracking-wide"
 					asChild
 				>
-					<Link to="/app/reports/batch/$batchId" params={{ batchId: batch.id }}>
+					<Link
+						to="/app/reports/batch/$batchId"
+						params={{ batchId: batch.id }}
+					>
 						<EyeIcon className="size-4" />
 						View
 					</Link>

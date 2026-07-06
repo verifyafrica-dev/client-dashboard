@@ -266,10 +266,13 @@ function IndividualVerificationRow({
 					type="button"
 					variant="outline"
 					size="sm"
-					className="cursor-pointer uppercase tracking-wide"
+					className="cursor-pointer tracking-wide"
 					asChild
 				>
-					<Link to="/app/reports/$id" params={{ id: verification.id }}>
+					<Link
+						to="/app/reports/$id"
+						params={{ id: verification.id }}
+					>
 						<EyeIcon className="size-4" />
 						View
 					</Link>

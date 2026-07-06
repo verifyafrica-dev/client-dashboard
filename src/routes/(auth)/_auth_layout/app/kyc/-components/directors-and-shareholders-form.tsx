@@ -105,7 +105,10 @@ export function DirectorsAndShareholdersForm() {
 				description="Provide your directors and shareholders details."
 			/>
 
-			<form.Field name="directors" mode="array">
+			<form.Field
+				name="directors"
+				mode="array"
+			>
 				{(directorsField) => (
 					<section className="flex flex-col gap-4">
 						<h3 className="text-base font-semibold">Directors</h3>
@@ -127,8 +130,7 @@ export function DirectorsAndShareholdersForm() {
 												data-invalid={field.state.meta.errors.length > 0}
 											>
 												<FieldLabel>
-													Full Name{" "}
-													<span className="text-destructive">*</span>
+													Full Name <span className="text-destructive">*</span>
 												</FieldLabel>
 												<Input
 													value={field.state.value}
@@ -194,8 +196,7 @@ export function DirectorsAndShareholdersForm() {
 												data-invalid={field.state.meta.errors.length > 0}
 											>
 												<FieldLabel>
-													Address{" "}
-													<span className="text-destructive">*</span>
+													Address <span className="text-destructive">*</span>
 												</FieldLabel>
 												<Textarea
 													value={field.state.value}
@@ -211,7 +212,9 @@ export function DirectorsAndShareholdersForm() {
 										)}
 									</form.Field>
 									<KycFormGrid>
-										<form.Field name={`directors[${index}].address.postal_code`}>
+										<form.Field
+											name={`directors[${index}].address.postal_code`}
+										>
 											{(field) => (
 												<Field
 													className="gap-1.5"
@@ -240,8 +243,7 @@ export function DirectorsAndShareholdersForm() {
 													data-invalid={field.state.meta.errors.length > 0}
 												>
 													<FieldLabel>
-														Country{" "}
-														<span className="text-destructive">*</span>
+														Country <span className="text-destructive">*</span>
 													</FieldLabel>
 													<CountrySelect
 														value={field.state.value}
@@ -260,8 +262,7 @@ export function DirectorsAndShareholdersForm() {
 												data-invalid={field.state.meta.errors.length > 0}
 											>
 												<FieldLabel>
-													ID Number{" "}
-													<span className="text-destructive">*</span>
+													ID Number <span className="text-destructive">*</span>
 												</FieldLabel>
 												<Input
 													value={field.state.value}
@@ -282,7 +283,7 @@ export function DirectorsAndShareholdersForm() {
 							<Button
 								type="button"
 								variant="outline"
-								className="uppercase tracking-wide"
+								className="tracking-wide"
 								onClick={() =>
 									directorsField.pushValue({
 										name: "",
@@ -293,7 +294,10 @@ export function DirectorsAndShareholdersForm() {
 									})
 								}
 							>
-								<PlusIcon className="size-4" weight="bold" />
+								<PlusIcon
+									className="size-4"
+									weight="bold"
+								/>
 								Add Another Director
 							</Button>
 						)}
@@ -301,7 +305,10 @@ export function DirectorsAndShareholdersForm() {
 				)}
 			</form.Field>
 
-			<form.Field name="ubos" mode="array">
+			<form.Field
+				name="ubos"
+				mode="array"
+			>
 				{(ubosField) => (
 					<section className="space-y-4">
 						<h3 className="text-base font-semibold">
@@ -325,8 +332,7 @@ export function DirectorsAndShareholdersForm() {
 												data-invalid={field.state.meta.errors.length > 0}
 											>
 												<FieldLabel>
-													Full Name{" "}
-													<span className="text-destructive">*</span>
+													Full Name <span className="text-destructive">*</span>
 												</FieldLabel>
 												<Input
 													value={field.state.value}
@@ -373,9 +379,9 @@ export function DirectorsAndShareholdersForm() {
 													data-invalid={field.state.meta.errors.length > 0}
 												>
 													<FieldLabel>
-													ID Number{" "}
-													<span className="text-destructive">*</span>
-												</FieldLabel>
+														ID Number{" "}
+														<span className="text-destructive">*</span>
+													</FieldLabel>
 													<Input
 														value={field.state.value}
 														onBlur={field.handleBlur}
@@ -396,7 +402,7 @@ export function DirectorsAndShareholdersForm() {
 							<Button
 								type="button"
 								variant="outline"
-								className="uppercase tracking-wide"
+								className="tracking-wide"
 								onClick={() =>
 									ubosField.pushValue({
 										name: "",
@@ -405,7 +411,10 @@ export function DirectorsAndShareholdersForm() {
 									})
 								}
 							>
-								<PlusIcon className="size-4" weight="bold" />
+								<PlusIcon
+									className="size-4"
+									weight="bold"
+								/>
 								Add Another UBO
 							</Button>
 						)}

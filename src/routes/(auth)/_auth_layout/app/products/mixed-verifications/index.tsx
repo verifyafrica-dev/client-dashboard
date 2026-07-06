@@ -32,7 +32,10 @@ export const Route = createFileRoute(
 	head: () => ({
 		meta: [
 			{ title: "Mixed Verifications | VerifyAfrica" },
-			{ name: "description", content: "Combine multiple verification products in one workflow." },
+			{
+				name: "description",
+				content: "Combine multiple verification products in one workflow.",
+			},
 		],
 	}),
 	component: MixedVerificationsPage,
@@ -46,7 +49,10 @@ function MixedVerificationSectionCardsSkeleton({
 	return (
 		<div className="grid gap-4 md:grid-cols-2">
 			{createSkeletonKeys(count, "mixed-verification-card").map((key) => (
-				<Skeleton key={key} className="h-56 w-full rounded-xl" />
+				<Skeleton
+					key={key}
+					className="h-56 w-full rounded-xl"
+				/>
 			))}
 		</div>
 	);
@@ -167,7 +173,11 @@ function MixedVerificationsPage() {
 
 	return (
 		<div className="flex flex-col gap-6">
-			<Button variant="ghost" className="w-fit px-4" asChild>
+			<Button
+				variant="ghost"
+				className="w-fit px-4"
+				asChild
+			>
 				<Link to="/app/products">
 					<ArrowLeftIcon />
 					Back to Products
@@ -188,10 +198,13 @@ function MixedVerificationsPage() {
 				{isTenantAdmin && tenantId && (
 					<Button
 						type="button"
-						className="cursor-pointer uppercase tracking-wide"
+						className="cursor-pointer tracking-wide"
 						onClick={openCreateDialog}
 					>
-						<PlusIcon className="size-4" weight="bold" />
+						<PlusIcon
+							className="size-4"
+							weight="bold"
+						/>
 						Create Custom Verification
 					</Button>
 				)}

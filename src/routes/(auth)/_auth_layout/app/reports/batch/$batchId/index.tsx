@@ -49,7 +49,10 @@ export const Route = createFileRoute(
 	head: () => ({
 		meta: [
 			{ title: "Batch Report Details | VerifyAfrica" },
-			{ name: "description", content: "Inspect verification results for a submitted report batch." },
+			{
+				name: "description",
+				content: "Inspect verification results for a submitted report batch.",
+			},
 		],
 	}),
 	component: BatchVerificationReportDetailPage,
@@ -91,8 +94,15 @@ function BatchVerificationReportDetailPage() {
 	return (
 		<div className="flex min-w-0 flex-col gap-6">
 			<div className="flex flex-col gap-3">
-				<Button variant="ghost" className="w-fit px-4" asChild>
-					<Link to="/app/reports" search={{ tab: "batch" }}>
+				<Button
+					variant="ghost"
+					className="w-fit px-4"
+					asChild
+				>
+					<Link
+						to="/app/reports"
+						search={{ tab: "batch" }}
+					>
 						<ArrowLeftIcon />
 						Back to Reports
 					</Link>
@@ -110,7 +120,10 @@ function BatchVerificationReportDetailPage() {
 			{batchQuery.isPending ? (
 				<div className="grid gap-4 md:grid-cols-4">
 					{createSkeletonKeys(4, "batch-stat").map((key) => (
-						<Skeleton key={key} className="h-28 w-full rounded-xl" />
+						<Skeleton
+							key={key}
+							className="h-28 w-full rounded-xl"
+						/>
 					))}
 				</div>
 			) : batchQuery.isError || !batch ? (
@@ -127,7 +140,10 @@ function BatchVerificationReportDetailPage() {
 						</StatCard>
 						<StatCard label="Total Count">{batch.total_count}</StatCard>
 						<StatCard label="Successful">
-							<BatchCountBadge count={batch.success_count} variant="success" />
+							<BatchCountBadge
+								count={batch.success_count}
+								variant="success"
+							/>
 						</StatCard>
 						<StatCard label="Success Rate">
 							<div className="flex items-center gap-2">
@@ -224,7 +240,7 @@ function BatchVerificationReportDetailPage() {
 																	type="button"
 																	variant="outline"
 																	size="sm"
-																	className="cursor-pointer uppercase tracking-wide"
+																	className="cursor-pointer tracking-wide"
 																	asChild
 																>
 																	<Link

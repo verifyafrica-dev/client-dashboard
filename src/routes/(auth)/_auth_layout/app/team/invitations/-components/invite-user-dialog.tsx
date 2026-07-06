@@ -118,7 +118,10 @@ export function InviteUserDialog({
 	const isSubmitting = inviteMutation.isPending;
 
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
+		<Dialog
+			open={open}
+			onOpenChange={onOpenChange}
+		>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Invite New User</DialogTitle>
@@ -181,12 +184,18 @@ export function InviteUserDialog({
 											}
 											disabled={isSubmitting}
 										>
-											<SelectTrigger id="invite-role" className="w-full pl-10">
+											<SelectTrigger
+												id="invite-role"
+												className="w-full pl-10"
+											>
 												<SelectValue />
 											</SelectTrigger>
 											<SelectContent>
 												{INVITATION_ROLES.map((option) => (
-													<SelectItem key={option} value={option}>
+													<SelectItem
+														key={option}
+														value={option}
+													>
 														{ROLE_LABELS[option]}
 													</SelectItem>
 												))}
@@ -212,7 +221,7 @@ export function InviteUserDialog({
 						<Button
 							type="submit"
 							disabled={isSubmitting || !tenantId}
-							className="cursor-pointer uppercase tracking-wide"
+							className="cursor-pointer tracking-wide"
 						>
 							{isSubmitting ? "Sending..." : "Send Invitation"}
 						</Button>

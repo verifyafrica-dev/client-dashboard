@@ -37,7 +37,10 @@ export const Route = createFileRoute("/(auth)/_auth_layout/app/kyc/")({
 	head: () => ({
 		meta: [
 			{ title: "KYC | VerifyAfrica" },
-			{ name: "description", content: "Submit and track Know Your Customer verification checks." },
+			{
+				name: "description",
+				content: "Submit and track Know Your Customer verification checks.",
+			},
 		],
 	}),
 	validateSearch: kycSearchSchema,
@@ -74,7 +77,10 @@ function KycPageSkeleton() {
 			<Skeleton className="h-4 w-full max-w-xl" />
 			<div className="space-y-3">
 				{sections.slice(0, 4).map((section) => (
-					<Skeleton key={section.path} className="h-24 w-full" />
+					<Skeleton
+						key={section.path}
+						className="h-24 w-full"
+					/>
 				))}
 			</div>
 		</div>
@@ -90,7 +96,10 @@ function KycStatusBadge({ status }: { status: keyof typeof STATUS_BADGE }) {
 			variant="outline"
 			className={cn("gap-1.5 px-3 py-1", config.className)}
 		>
-			<Icon className="size-3.5" weight="fill" />
+			<Icon
+				className="size-3.5"
+				weight="fill"
+			/>
 			{config.label}
 		</Badge>
 	);
@@ -127,11 +136,14 @@ function KycPageInner({
 					<Button
 						variant="outline"
 						size="sm"
-						className="w-fit cursor-pointer uppercase tracking-wide"
+						className="w-fit cursor-pointer tracking-wide"
 						asChild
 					>
 						<Link to="/app/kyc">
-							<ArrowLeftIcon className="size-4" weight="bold" />
+							<ArrowLeftIcon
+								className="size-4"
+								weight="bold"
+							/>
 							Back to KYC
 						</Link>
 					</Button>
@@ -205,7 +217,10 @@ function KycPage() {
 			tenant={tenant}
 			onNavigateToSection={navigateToSection}
 		>
-			<KycPageInner activeSection={activeSection} tenant={tenant} />
+			<KycPageInner
+				activeSection={activeSection}
+				tenant={tenant}
+			/>
 		</KycProvider>
 	);
 }

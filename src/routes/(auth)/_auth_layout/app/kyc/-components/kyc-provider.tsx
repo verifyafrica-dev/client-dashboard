@@ -17,6 +17,7 @@ import {
 import type {
 	KycComplianceSection,
 	KycSectionUpdatePayload,
+	SectionRejectedReason,
 	KycSummary,
 	TenantDetail,
 } from "#/api/http/v2/tenants/tenants.types";
@@ -35,6 +36,7 @@ type KycContextValue = {
 	tenantId: string;
 	kycData: KYBApplication;
 	kyc: KycSummary;
+	sectionRejectedReason: SectionRejectedReason;
 	isReadOnly: boolean;
 	isSaving: boolean;
 	completionStatus: KycCompletionStatus;
@@ -120,6 +122,7 @@ export function KycProvider({
 			tenantId,
 			kycData,
 			kyc,
+			sectionRejectedReason: tenant.section_rejected_reason,
 			isReadOnly,
 			isSaving: saveMutation.isPending,
 			completionStatus,
@@ -131,6 +134,7 @@ export function KycProvider({
 			tenantId,
 			kycData,
 			kyc,
+			tenant.section_rejected_reason,
 			isReadOnly,
 			saveMutation.isPending,
 			completionStatus,

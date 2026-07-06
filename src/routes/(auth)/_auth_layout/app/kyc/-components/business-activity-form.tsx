@@ -43,7 +43,8 @@ function getDefaultValues(
 
 	return {
 		nature_of_business: activity.nature_of_business ?? "",
-		description_of_products_services: activity.description_of_products_services ?? "",
+		description_of_products_services:
+			activity.description_of_products_services ?? "",
 		expected_monthly_verification_volume:
 			activity.expected_monthly_verification_volume ?? "",
 		main_geographies_of_clients: activity.main_geographies_of_clients?.length
@@ -72,7 +73,8 @@ export function BusinessActivityForm() {
 		form.reset(getDefaultValues(kycData));
 	}, [form, kycData]);
 
-	const selectedGeography = form.state.values.main_geographies_of_clients[0] ?? "";
+	const selectedGeography =
+		form.state.values.main_geographies_of_clients[0] ?? "";
 
 	return (
 		<form
@@ -148,12 +150,18 @@ export function BusinessActivityForm() {
 									onValueChange={field.handleChange}
 									disabled={isReadOnly}
 								>
-									<SelectTrigger id="verificationVolume" className="w-full">
+									<SelectTrigger
+										id="verificationVolume"
+										className="w-full"
+									>
 										<SelectValue placeholder="Select volume range" />
 									</SelectTrigger>
 									<SelectContent>
 										{KYC_VERIFICATION_VOLUMES.map((volume) => (
-											<SelectItem key={volume} value={volume}>
+											<SelectItem
+												key={volume}
+												value={volume}
+											>
 												{volume}
 											</SelectItem>
 										))}
@@ -179,12 +187,18 @@ export function BusinessActivityForm() {
 									onValueChange={(value) => field.handleChange([value])}
 									disabled={isReadOnly}
 								>
-									<SelectTrigger id="clientGeographies" className="w-full">
+									<SelectTrigger
+										id="clientGeographies"
+										className="w-full"
+									>
 										<SelectValue placeholder="Select geography" />
 									</SelectTrigger>
 									<SelectContent>
 										{KYC_CLIENT_GEOGRAPHIES.map((geography) => (
-											<SelectItem key={geography} value={geography}>
+											<SelectItem
+												key={geography}
+												value={geography}
+											>
 												{geography}
 											</SelectItem>
 										))}
@@ -197,7 +211,10 @@ export function BusinessActivityForm() {
 				</KycFormGrid>
 			</FieldGroup>
 
-			<form.Field name="regulatory_licenses_held" mode="array">
+			<form.Field
+				name="regulatory_licenses_held"
+				mode="array"
+			>
 				{(licensesField) => (
 					<section className="space-y-4">
 						<div className="flex flex-wrap items-center justify-between gap-3">
@@ -209,7 +226,7 @@ export function BusinessActivityForm() {
 									type="button"
 									variant="outline"
 									size="sm"
-									className="uppercase tracking-wide"
+									className="tracking-wide"
 									onClick={() =>
 										licensesField.pushValue({
 											license_name: "",
@@ -218,7 +235,10 @@ export function BusinessActivityForm() {
 										})
 									}
 								>
-									<PlusIcon className="size-4" weight="bold" />
+									<PlusIcon
+										className="size-4"
+										weight="bold"
+									/>
 									Add License
 								</Button>
 							)}

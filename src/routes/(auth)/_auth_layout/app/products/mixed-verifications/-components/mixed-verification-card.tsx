@@ -56,7 +56,10 @@ export function MixedVerificationCard({
 						</p>
 					</div>
 					<div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-secondary/10 text-secondary">
-						<StackIcon className="size-5" weight="duotone" />
+						<StackIcon
+							className="size-5"
+							weight="duotone"
+						/>
 					</div>
 				</div>
 			</CardHeader>
@@ -106,11 +109,14 @@ export function MixedVerificationCard({
 				<Button
 					type="button"
 					size="sm"
-					className="cursor-pointer uppercase tracking-wide"
+					className="cursor-pointer tracking-wide"
 					disabled={!template.is_active}
 					onClick={() => onStart(template)}
 				>
-					<PlayIcon className="size-4" weight="fill" />
+					<PlayIcon
+						className="size-4"
+						weight="fill"
+					/>
 					Start
 				</Button>
 			</CardFooter>
