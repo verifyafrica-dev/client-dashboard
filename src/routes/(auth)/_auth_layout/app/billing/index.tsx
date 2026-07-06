@@ -1,7 +1,6 @@
 import {
 	ArrowsClockwiseIcon,
 	BuildingsIcon,
-	DownloadSimpleIcon,
 	EyeIcon,
 	PencilSimpleIcon,
 } from "@phosphor-icons/react";
@@ -300,7 +299,7 @@ function BillingPage() {
 										/>
 										Refresh
 									</Button>
-									<Button
+									{/* <Button
 										type="button"
 										variant="outline"
 										className="cursor-pointer"
@@ -309,7 +308,7 @@ function BillingPage() {
 									>
 										<DownloadSimpleIcon className="size-4" />
 										Export
-									</Button>
+									</Button> */}
 								</div>
 							</div>
 
