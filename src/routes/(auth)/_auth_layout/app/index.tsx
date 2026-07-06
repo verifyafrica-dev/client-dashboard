@@ -82,7 +82,7 @@ const typeChartConfig = {
 } satisfies ChartConfig;
 
 function DashboardPage() {
-	const [timeRange, setTimeRange] = useState<TimeRange>("all");
+	const [timeRange, setTimeRange] = useState<TimeRange>("30d");
 	const { tenantId } = useCurrentTenant();
 	const tenantQuery = useTenantV2DetailQuery(tenantId, Boolean(tenantId));
 	const isKycVerified = tenantQuery.data?.kyc.kyc_verified ?? false;
