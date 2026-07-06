@@ -10,7 +10,15 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import type { ComponentType } from "react";
 import { useMemo, useState } from "react";
-import { Area, AreaChart, CartesianGrid, Pie, PieChart, XAxis } from "recharts";
+import {
+	Area,
+	AreaChart,
+	CartesianGrid,
+	Pie,
+	PieChart,
+	XAxis,
+	YAxis,
+} from "recharts";
 import { useTenantAnalyticsV2Query } from "#/api/http/v2/analytics/analytics.hooks";
 import { useTenantV2DetailQuery } from "#/api/http/v2/tenants/tenants.hooks";
 import { Button } from "#/components/ui/button";
@@ -45,7 +53,11 @@ export const Route = createFileRoute("/(auth)/_auth_layout/app/")({
 	head: () => ({
 		meta: [
 			{ title: "Dashboard | VerifyAfrica" },
-			{ name: "description", content: "View your organization overview and recent verification activity." },
+			{
+				name: "description",
+				content:
+					"View your organization overview and recent verification activity.",
+			},
 		],
 	}),
 	component: DashboardPage,
@@ -341,6 +353,31 @@ function DashboardContent({
 	typeData,
 	chartKey,
 }: DashboardContentProps) {
+	const trendLegend = (
+		Object.entries(trendChartConfig) as Array<
+			[
+				keyof typeof trendChartConfig,
+				(typeof trendChartConfig)[keyof typeof trendChartConfig],
+			]
+		>
+	).filter(([key]) =>
+		trendData.some((entry) => typeof entry[key] === "number"),
+	);
+
+	const verificationTypeLegend = (
+		Object.entries(typeChartConfig) as Array<
+			[
+				keyof typeof typeChartConfig,
+				(typeof typeChartConfig)[keyof typeof typeChartConfig],
+			]
+		>
+	).map(([typeKey, config]) => ({
+		type: typeKey,
+		label: config.label,
+		color: config.color,
+		count: typeData.find((entry) => entry.type === typeKey)?.count ?? 0,
+	}));
+
 	return (
 		<>
 			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
@@ -374,18 +411,8 @@ function DashboardContent({
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between space-y-0">
 						<CardTitle className="font-semibold">Verification Trends</CardTitle>
-						<div className="flex items-center gap-4 text-xs text-muted-foreground">
-							<span className="flex items-center gap-1.5">
-								<span className="size-2 rounded-full bg-[oklch(0.55_0.15_250)]" />
-								Total
-							</span>
-							<span className="flex items-center gap-1.5">
-								<span className="size-2 rounded-full bg-[oklch(0.65_0.15_155)]" />
-								Successful
-							</span>
-						</div>
 					</CardHeader>
-					<CardContent>
+					<CardContent className="flex-1 flex flex-col justify-between">
 						<ChartContainer
 							key={chartKey}
 							config={trendChartConfig}
@@ -401,6 +428,11 @@ function DashboardContent({
 								/>
 								<XAxis
 									dataKey="label"
+									tickLine={false}
+									axisLine={false}
+									tickMargin={8}
+								/>
+								<YAxis
 									tickLine={false}
 									axisLine={false}
 									tickMargin={8}
@@ -424,6 +456,20 @@ function DashboardContent({
 								/>
 							</AreaChart>
 						</ChartContainer>
+						<div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+							{trendLegend.map(([key, config]) => (
+								<div
+									key={key}
+									className="flex items-center gap-2 text-xs text-muted-foreground"
+								>
+									<span
+										className="size-2 rounded-full"
+										style={{ backgroundColor: config.color }}
+									/>
+									<span>{config.label}</span>
+								</div>
+							))}
+						</div>
 					</CardContent>
 				</Card>
 
@@ -452,29 +498,24 @@ function DashboardContent({
 									nameKey="type"
 									innerRadius={60}
 									outerRadius={100}
-									paddingAngle={2}
 								/>
 							</PieChart>
 						</ChartContainer>
-						<div className="mt-4 grid grid-cols-2 gap-2">
-							{typeData.map((entry) => (
-								<div
-									key={entry.type}
-									className="flex items-center justify-between gap-2 text-sm"
-								>
-									<span className="flex items-center gap-2 text-muted-foreground">
+						<div className="mt-4 space-y-2">
+							<div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+								{verificationTypeLegend.map((entry) => (
+									<div
+										key={entry.type}
+										className="flex items-center gap-2 text-xs text-muted-foreground"
+									>
 										<span
 											className="size-2 shrink-0 rounded-full"
-											style={{ backgroundColor: entry.fill }}
+											style={{ backgroundColor: entry.color }}
 										/>
-										{typeChartConfig[entry.type as keyof typeof typeChartConfig]
-											?.label ?? entry.type}
-									</span>
-									<span className="font-medium tabular-nums">
-										{entry.count.toLocaleString()}
-									</span>
-								</div>
-							))}
+										<span>{entry.label}</span>
+									</div>
+								))}
+							</div>
 						</div>
 					</CardContent>
 				</Card>
@@ -482,7 +523,7 @@ function DashboardContent({
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Financial Summary (Last 30 Days)</CardTitle>
+					<CardTitle className="font-semibold">Financial Summary</CardTitle>
 				</CardHeader>
 				<CardContent>
 					<div className="grid gap-6 sm:grid-cols-3">
