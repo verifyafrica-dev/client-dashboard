@@ -346,8 +346,8 @@ function BillingPage() {
 												<TableHead>Description</TableHead>
 												<TableHead>Amount</TableHead>
 												<TableHead>Type</TableHead>
-												<TableHead>Balance Before</TableHead>
-												<TableHead>Balance After</TableHead>
+												{/* <TableHead>Balance Before</TableHead>
+												<TableHead>Balance After</TableHead> */}
 												<TableHead>Actions</TableHead>
 											</TableRow>
 										</TableHeader>
@@ -402,7 +402,7 @@ function BillingPage() {
 																	{transaction.type}
 																</Badge>
 															</TableCell>
-															<TableCell>
+															{/* <TableCell>
 																{formatSignedAmount(
 																	transaction.balanceBefore,
 																	transaction.currency,
@@ -413,7 +413,7 @@ function BillingPage() {
 																	transaction.balanceAfter,
 																	transaction.currency,
 																)}
-															</TableCell>
+															</TableCell> */}
 															<TableCell
 																onClick={(event) => event.stopPropagation()}
 															>
