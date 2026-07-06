@@ -216,9 +216,8 @@ export function formatMoney(amount: number) {
 }
 
 export function formatSignedAmount(amount: number, currency = "USD") {
-	const sign = amount < 0 ? "-" : "+";
 	const formatted = getCurrencyFormatter(currency).format(Math.abs(amount));
-	return `${sign}${formatted}`;
+	return formatted;
 }
 
 export function formatIsoDate(date: Date) {
