@@ -4,7 +4,7 @@ import {
 	DownloadSimpleIcon,
 } from "@phosphor-icons/react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import { toast } from "sonner";
 
 import {
@@ -14,7 +14,7 @@ import {
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Skeleton } from "#/components/ui/skeleton";
-import { generatePDFWithColorSupport } from "#/lib/pdfHelpers";
+import { useBrandedPdfDownload } from "#/hooks/use-branded-pdf-download";
 import { createSkeletonKeys } from "#/lib/skeleton-keys";
 import { cn } from "#/lib/utils.ts";
 import { isPlainObject } from "#/lib/validators";
@@ -29,7 +29,7 @@ export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/$id/")({
 function VerificationReportDetailPage() {
 	const { id } = Route.useParams();
 	const reportRef = useRef<HTMLDivElement>(null);
-	const [isDownloading, setIsDownloading] = useState(false);
+	const { downloadPdf, isDownloading } = useBrandedPdfDownload(reportRef);
 
 	const verificationQuery = useVerificationRequestDetailV2Query(
 		id,
@@ -87,21 +87,11 @@ function VerificationReportDetailPage() {
 	}
 
 	async function handleDownloadPdf() {
-		if (!verification || !reportRef.current) {
+		if (!verification) {
 			return;
 		}
 
-		setIsDownloading(true);
-
-		try {
-			await generatePDFWithColorSupport(reportRef, {
-				filename: `verification-${verification.id}.pdf`,
-			});
-		} catch {
-			toast.error("Failed to download PDF. Please try again.");
-		} finally {
-			setIsDownloading(false);
-		}
+		await downloadPdf({ filename: `verification-${verification.id}.pdf` });
 	}
 
 	return (

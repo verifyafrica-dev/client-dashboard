@@ -191,6 +191,7 @@ export const generatePDFWithColorSupport = async (
 	targetRef: React.RefObject<HTMLElement | null>,
 	options?: {
 		filename?: string;
+		onClone?: (clone: HTMLElement) => void;
 	},
 ): Promise<void> => {
 	if (!targetRef.current) {
@@ -198,6 +199,7 @@ export const generatePDFWithColorSupport = async (
 	}
 
 	const clone = createPdfClone(targetRef.current);
+	options?.onClone?.(clone);
 	document.body.appendChild(clone);
 
 	const contentWidth = clone.offsetWidth;
