@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { VerificationStatus } from "../verifications/verifications.types";
 
 export const AnalyticsDateRangeQuerySchema = z.object({
 	from_date: z.string().optional(),
@@ -14,6 +15,7 @@ export type AnalyticsDateRangeQuery = z.infer<
 export interface AnalyticsVolumePoint {
 	date: string;
 	count: number;
+	status_counts: Record<VerificationStatus, number>;
 }
 
 export interface AnalyticsTopUps {

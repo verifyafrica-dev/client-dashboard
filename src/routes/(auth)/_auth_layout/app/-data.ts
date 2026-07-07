@@ -3,6 +3,7 @@ import type {
 	AnalyticsPayload,
 	TenantAnalyticsData,
 } from "#/api/http/v2/analytics/analytics.types";
+import { VerificationTypeSchema } from "#/api/http/v2/verifications/verifications.types";
 
 export type TimeRange = "all" | "7d" | "30d" | "90d";
 
@@ -54,12 +55,14 @@ export function getAnalyticsDateRange(
 
 export type TrendPoint = {
 	label: string;
-	total: number;
 	successful: number;
+	failed: number;
+	error: number;
 };
 
 export type VerificationTypePoint = {
 	type: string;
+	label: string;
 	count: number;
 	fill: string;
 };
@@ -83,24 +86,22 @@ export type DashboardData = {
 	typeData: VerificationTypePoint[];
 };
 
-type DashboardVerificationTypeKey = "id" | "passport" | "faceMatch" | "address";
+const CHART_COLORS = [
+	"var(--chart-1)",
+	"var(--chart-2)",
+	"var(--chart-3)",
+	"var(--chart-4)",
+	"var(--chart-5)",
+	"#3B82F6",
+	"#EC4899",
+] as const;
 
-function mapVerificationTypeToChartKey(
-	type: string,
-): DashboardVerificationTypeKey {
-	if (type.includes("face_match")) {
-		return "faceMatch";
-	}
+const VERIFICATION_TYPE_KEYS = VerificationTypeSchema.options;
 
-	if (type.includes("address")) {
-		return "address";
-	}
-
-	if (type.includes("passport")) {
-		return "passport";
-	}
-
-	return "id";
+function formatLabel(value: string) {
+	return value
+		.replace(/_/g, " ")
+		.replace(/\b\w/g, (character) => character.toUpperCase());
 }
 
 function getSuccessRate(statusDistribution: Record<string, number>) {
@@ -120,17 +121,11 @@ function getSuccessRate(statusDistribution: Record<string, number>) {
 function mapTypeDistribution(
 	typeDistribution: Record<string, number>,
 ): VerificationTypePoint[] {
-	const grouped = new Map<DashboardVerificationTypeKey, number>();
-
-	for (const [type, count] of Object.entries(typeDistribution)) {
-		const chartKey = mapVerificationTypeToChartKey(type);
-		grouped.set(chartKey, (grouped.get(chartKey) ?? 0) + count);
-	}
-
-	return Array.from(grouped.entries()).map(([type, count]) => ({
+	return VERIFICATION_TYPE_KEYS.map((type, index) => ({
 		type,
-		count,
-		fill: `var(--color-${type})`,
+		label: formatLabel(type),
+		count: typeDistribution[type] ?? 0,
+		fill: CHART_COLORS[index % CHART_COLORS.length],
 	}));
 }
 
@@ -142,8 +137,9 @@ function mapTrendData(
 
 	return verificationVolume.map((point) => ({
 		label: chartDateFormatter.format(new Date(point.date)),
-		total: point.count,
-		successful: Math.round(point.count * successRate),
+		successful: point.status_counts.SUCCESS ?? Math.round(point.count * successRate),
+		failed: point.status_counts.FAILED ?? 0,
+		error: point.status_counts.ERROR ?? 0,
 	}));
 }
 

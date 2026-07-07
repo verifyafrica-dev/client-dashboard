@@ -64,21 +64,18 @@ export const Route = createFileRoute("/(auth)/_auth_layout/app/")({
 });
 
 const trendChartConfig = {
-	total: {
-		label: "Total",
-		color: "oklch(0.55 0.15 250)",
-	},
 	successful: {
 		label: "Successful",
 		color: "oklch(0.65 0.15 155)",
 	},
-} satisfies ChartConfig;
-
-const typeChartConfig = {
-	id: { label: "National ID", color: "var(--chart-1)" },
-	passport: { label: "Passport", color: "var(--chart-2)" },
-	faceMatch: { label: "Face Match", color: "var(--chart-3)" },
-	address: { label: "Address", color: "var(--chart-4)" },
+	failed: {
+		label: "Failed",
+		color: "oklch(0.62 0.2 28)",
+	},
+	error: {
+		label: "Error",
+		color: "oklch(0.57 0.22 12)",
+	},
 } satisfies ChartConfig;
 
 function DashboardPage() {
@@ -360,23 +357,21 @@ function DashboardContent({
 				(typeof trendChartConfig)[keyof typeof trendChartConfig],
 			]
 		>
-	).filter(([key]) =>
-		trendData.some((entry) => typeof entry[key] === "number"),
-	);
-
-	const verificationTypeLegend = (
-		Object.entries(typeChartConfig) as Array<
-			[
-				keyof typeof typeChartConfig,
-				(typeof typeChartConfig)[keyof typeof typeChartConfig],
-			]
-		>
-	).map(([typeKey, config]) => ({
-		type: typeKey,
+	).map(([key, config]) => ({
+		key,
 		label: config.label,
 		color: config.color,
-		count: typeData.find((entry) => entry.type === typeKey)?.count ?? 0,
+		count: trendData.reduce((sum, entry) => sum + (entry[key] ?? 0), 0),
 	}));
+
+	const typeChartData = typeData.filter((entry) => entry.count > 0);
+	const verificationTypeLegend = typeData;
+	const typeChartConfig = Object.fromEntries(
+		typeData.map((entry) => [
+			entry.type,
+			{ label: entry.label, color: entry.fill },
+		]),
+	) satisfies ChartConfig;
 
 	return (
 		<>
@@ -440,33 +435,41 @@ function DashboardContent({
 								<ChartTooltip content={<ChartTooltipContent />} />
 								<Area
 									type="monotone"
-									dataKey="total"
-									stroke="var(--color-total)"
-									fill="var(--color-total)"
-									fillOpacity={0.15}
-									strokeWidth={2}
-								/>
-								<Area
-									type="monotone"
 									dataKey="successful"
 									stroke="var(--color-successful)"
 									fill="var(--color-successful)"
 									fillOpacity={0.15}
 									strokeWidth={2}
 								/>
+								<Area
+									type="monotone"
+									dataKey="failed"
+									stroke="var(--color-failed)"
+									fill="var(--color-failed)"
+									fillOpacity={0.15}
+									strokeWidth={2}
+								/>
+								<Area
+									type="monotone"
+									dataKey="error"
+									stroke="var(--color-error)"
+									fill="var(--color-error)"
+									fillOpacity={0.15}
+									strokeWidth={2}
+								/>
 							</AreaChart>
 						</ChartContainer>
 						<div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
-							{trendLegend.map(([key, config]) => (
+							{trendLegend.map((entry) => (
 								<div
-									key={key}
+									key={entry.key}
 									className="flex items-center gap-2 text-xs text-muted-foreground"
 								>
 									<span
 										className="size-2 rounded-full"
-										style={{ backgroundColor: config.color }}
+										style={{ backgroundColor: entry.color }}
 									/>
-									<span>{config.label}</span>
+									<span>{entry.label} ({entry.count})</span>
 								</div>
 							))}
 						</div>
@@ -493,7 +496,7 @@ function DashboardContent({
 									}
 								/>
 								<Pie
-									data={typeData}
+									data={typeChartData}
 									dataKey="count"
 									nameKey="type"
 									innerRadius={60}
@@ -510,9 +513,9 @@ function DashboardContent({
 									>
 										<span
 											className="size-2 shrink-0 rounded-full"
-											style={{ backgroundColor: entry.color }}
+											style={{ backgroundColor: entry.fill }}
 										/>
-										<span>{entry.label}</span>
+										<span>{entry.label} ({entry.count})</span>
 									</div>
 								))}
 							</div>
