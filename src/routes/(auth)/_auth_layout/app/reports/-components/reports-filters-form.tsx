@@ -17,6 +17,7 @@ import {
 	type ReportsFiltersFormValues,
 	type ReportsListFilterScope,
 } from "../-filter-utils";
+import { formatCountryOptionLabel } from "#/lib/country-state-city";
 
 type ReportsFiltersFormProps = {
 	scope: ReportsListFilterScope;
@@ -168,7 +169,7 @@ export function ReportsFiltersForm({
 											<SelectItem value="all">All Countries</SelectItem>
 											{countries.map((country) => (
 												<SelectItem key={country} value={country}>
-													{country}
+													{formatCountryOptionLabel(country)}
 												</SelectItem>
 											))}
 										</SelectContent>

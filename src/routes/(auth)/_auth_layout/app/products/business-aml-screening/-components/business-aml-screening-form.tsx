@@ -43,6 +43,7 @@ import { VerificationResultDialog } from "../../-components/verification-result-
 import { useTenantSupportedCountries } from "../../-countries";
 import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import type { SupportedCountry } from "#/api/http/v2/tenants/tenants.types";
+import { formatCountryOptionLabel } from "#/lib/country-state-city";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
 	VERIFICATION_MODES,
@@ -584,7 +585,7 @@ function ScreeningCountryField({
 				<SelectContent className="max-h-60">
 					{countries.map((country) => (
 						<SelectItem key={country.code} value={country.code}>
-							{country.name}
+							{formatCountryOptionLabel(country.name, country.code)}
 						</SelectItem>
 					))}
 				</SelectContent>

@@ -45,6 +45,7 @@ import {
 	getRegistryVerificationTypes,
 	requiresLastNameField,
 } from "../-data";
+import { formatCountryOptionLabel } from "#/lib/country-state-city";
 
 const baseFormSchema = z.object({
 	country: z.string().min(1, "Country is required"),
@@ -271,7 +272,10 @@ export function GovernmentRegistryChecksForm() {
 													key={countryOption.code}
 													value={countryOption.code}
 												>
-													{countryOption.name}
+													{formatCountryOptionLabel(
+														countryOption.name,
+														countryOption.code,
+													)}
 												</SelectItem>
 											))}
 										</SelectContent>

@@ -24,6 +24,7 @@ import { verificationConsentSchema } from "../../../-components/VerificationCons
 import { useTenantSupportedCountries } from "../../-countries";
 import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import { buildKybVerificationPayload } from "../-data";
+import { formatCountryOptionLabel } from "#/lib/country-state-city";
 
 const kybFormSchema = z.object({
 	email: z.email("Enter a valid email address"),
@@ -137,7 +138,10 @@ export function KybVerificationForm() {
 										<SelectContent className="max-h-60">
 											{countries.map((country) => (
 												<SelectItem key={country.code} value={country.code}>
-													{country.name}
+													{formatCountryOptionLabel(
+														country.name,
+														country.code,
+													)}
 												</SelectItem>
 											))}
 										</SelectContent>

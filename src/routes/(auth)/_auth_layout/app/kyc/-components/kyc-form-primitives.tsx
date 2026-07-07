@@ -33,7 +33,7 @@ import {
 } from "#/components/ui/select";
 import { Separator } from "#/components/ui/separator";
 import { Textarea } from "#/components/ui/textarea";
-import { getCountrySelectOptions } from "#/lib/country-state-city";
+import { getCountryCode, getCountrySelectOptions } from "#/lib/country-state-city";
 import { cn } from "#/lib/utils.ts";
 
 export function KycSectionHeader({
@@ -129,10 +129,11 @@ export function CountrySelect({
 	disabled?: boolean;
 }) {
 	const countryOptions = useMemo(() => getCountrySelectOptions(), []);
+	const countryCode = getCountryCode(value);
 
 	return (
 		<Select
-			value={value}
+			value={countryCode || undefined}
 			onValueChange={onValueChange}
 			disabled={disabled}
 		>

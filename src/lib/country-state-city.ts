@@ -8,6 +8,32 @@ const sortedCountries = Country.getAllCountries().sort((left, right) =>
 	left.name.localeCompare(right.name),
 );
 
+type CountryRecord = (typeof sortedCountries)[number];
+
+type CountrySelectOption = {
+	value: string;
+	label: string;
+	name: string;
+	isoCode: string;
+	flag: string;
+};
+
+const COUNTRY_BY_ISO_CODE = sortedCountries.reduce<Record<string, CountryRecord>>(
+	(acc, country) => {
+		acc[country.isoCode.toUpperCase()] = country;
+		return acc;
+	},
+	{},
+);
+
+const COUNTRY_BY_NAME = sortedCountries.reduce<Record<string, CountryRecord>>(
+	(acc, country) => {
+		acc[country.name.toLowerCase()] = country;
+		return acc;
+	},
+	{},
+);
+
 export const COUNTRY_NAME_BY_ISO_CODE = sortedCountries.reduce<
 	Record<string, string>
 >((acc, country) => {
@@ -15,24 +41,38 @@ export const COUNTRY_NAME_BY_ISO_CODE = sortedCountries.reduce<
 	return acc;
 }, {});
 
-export function getSortedCountries() {
-	return sortedCountries;
+function getFlagEmojiFromIsoCode(isoCode: string) {
+	const normalizedIsoCode = isoCode.trim().toUpperCase();
+
+	if (!/^[A-Z]{2}$/.test(normalizedIsoCode)) {
+		return "";
+	}
+
+	return normalizedIsoCode
+		.split("")
+		.map((character) =>
+			String.fromCodePoint(127397 + character.charCodeAt(0)),
+		)
+		.join("");
 }
 
-export function getCountrySelectOptions() {
-	return sortedCountries.map((country) => ({
-		value: country.name,
-		label: country.name,
-	}));
+export function getCountryByCode(countryCode?: string | null) {
+	if (!countryCode) {
+		return undefined;
+	}
+
+	return COUNTRY_BY_ISO_CODE[countryCode.trim().toUpperCase()];
 }
 
-export function getCountryIsoCodeByName(name: string) {
-	return (
-		sortedCountries.find((country) => country.name === name)?.isoCode ?? ""
-	);
+export function getCountryByName(name?: string | null) {
+	if (!name) {
+		return undefined;
+	}
+
+	return COUNTRY_BY_NAME[name.trim().toLowerCase()];
 }
 
-export function normalizeCountryName(value?: string | null) {
+export function getCountryCode(value?: string | null) {
 	if (!value) {
 		return "";
 	}
@@ -43,23 +83,83 @@ export function normalizeCountryName(value?: string | null) {
 		return "";
 	}
 
-	const fromIsoCode = COUNTRY_NAME_BY_ISO_CODE[trimmed.toUpperCase()];
+	const countryByCode = getCountryByCode(trimmed);
 
-	if (fromIsoCode) {
-		return fromIsoCode;
+	if (countryByCode) {
+		return countryByCode.isoCode.toUpperCase();
 	}
 
-	const exactMatch = sortedCountries.find(
-		(country) => country.name === trimmed,
-	);
+	const countryByName = getCountryByName(trimmed);
+	return countryByName?.isoCode.toUpperCase() ?? "";
+}
 
-	if (exactMatch) {
-		return exactMatch.name;
+export function getCountryName(value?: string | null) {
+	if (!value) {
+		return "";
 	}
 
-	const caseInsensitiveMatch = sortedCountries.find(
-		(country) => country.name.toLowerCase() === trimmed.toLowerCase(),
-	);
+	const trimmed = value.trim();
 
-	return caseInsensitiveMatch?.name ?? trimmed;
+	if (!trimmed) {
+		return "";
+	}
+
+	const countryByCode = getCountryByCode(trimmed);
+
+	if (countryByCode) {
+		return countryByCode.name;
+	}
+
+	const countryByName = getCountryByName(trimmed);
+	return countryByName?.name ?? trimmed;
+}
+
+export function getCountryFlag(value?: string | null) {
+	const countryCode = getCountryCode(value);
+
+	if (!countryCode) {
+		return "";
+	}
+
+	return getFlagEmojiFromIsoCode(countryCode);
+}
+
+export function formatCountryOptionLabel(name: string, countryCode?: string | null) {
+	const countryIsoCode = countryCode
+		? getCountryCode(countryCode)
+		: getCountryCode(name);
+	const flag = getCountryFlag(countryIsoCode);
+
+	return flag ? `${flag} ${name}` : name;
+}
+
+export function getSortedCountries() {
+	return sortedCountries;
+}
+
+export function getCountrySelectOptions() {
+	return sortedCountries.map<CountrySelectOption>((country) => {
+		const isoCode = country.isoCode.toUpperCase();
+		const flag = getCountryFlag(isoCode);
+
+		return {
+			value: isoCode,
+			label: formatCountryOptionLabel(country.name, isoCode),
+			name: country.name,
+			isoCode,
+			flag,
+		};
+	});
+}
+
+export function getCountryIsoCodeByName(name: string) {
+	return getCountryCode(name);
+}
+
+export function normalizeCountryCode(value?: string | null) {
+	return getCountryCode(value);
+}
+
+export function normalizeCountryName(value?: string | null) {
+	return getCountryName(value);
 }

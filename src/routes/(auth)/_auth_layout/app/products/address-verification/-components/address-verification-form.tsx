@@ -33,6 +33,7 @@ import { ProductProofUpload } from "../../-components/product-proof-upload";
 import { VerificationResultDialog } from "../../-components/verification-result-dialog";
 import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import { PRODUCT_UPLOAD_FOLDERS } from "../../-upload-utils";
+import { formatCountryOptionLabel } from "#/lib/country-state-city";
 import {
 	buildAddressVerificationDirectPayload,
 	buildAddressVerificationLinkPayload,
@@ -237,7 +238,10 @@ export function AddressVerificationForm() {
 											<SelectContent className="max-h-60">
 												{countries.map((country) => (
 													<SelectItem key={country.code} value={country.code}>
-														{country.name}
+														{formatCountryOptionLabel(
+															country.name,
+															country.code,
+														)}
 													</SelectItem>
 												))}
 											</SelectContent>
@@ -347,7 +351,10 @@ export function AddressVerificationForm() {
 												<SelectContent className="max-h-60">
 													{countries.map((country) => (
 														<SelectItem key={country.code} value={country.code}>
-															{country.name}
+															{formatCountryOptionLabel(
+																country.name,
+																country.code,
+															)}
 														</SelectItem>
 													))}
 												</SelectContent>

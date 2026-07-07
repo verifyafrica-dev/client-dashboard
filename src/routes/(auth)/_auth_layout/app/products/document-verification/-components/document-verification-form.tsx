@@ -13,6 +13,7 @@ import type { VerificationRequest } from "#/api/http/v2/verifications/verificati
 import type { V2AxiosError } from "#/api/http/shared";
 import type { HostedLinkResult } from "#/lib/verification-links";
 import { buildLinkResult } from "#/lib/verification-links";
+import { formatCountryOptionLabel } from "#/lib/country-state-city";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Input } from "#/components/ui/input";
@@ -359,7 +360,10 @@ export function DocumentVerificationForm() {
 											<SelectContent className="max-h-60">
 												{countries.map((country) => (
 													<SelectItem key={country.code} value={country.code}>
-														{country.name}
+														{formatCountryOptionLabel(
+															country.name,
+															country.code,
+														)}
 													</SelectItem>
 												))}
 											</SelectContent>

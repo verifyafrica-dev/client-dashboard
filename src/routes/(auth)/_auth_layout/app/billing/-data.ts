@@ -9,7 +9,7 @@ import type {
 	Invoice,
 } from "#/api/http/v2/billing/billing.types";
 import type { WalletTransaction } from "#/api/http/v2/wallet/wallet.types";
-import { normalizeCountryName } from "#/lib/country-state-city";
+import { normalizeCountryCode } from "#/lib/country-state-city";
 import { pickChangedFields } from "#/lib/pick-changed-fields";
 
 export type BillingFormState = {
@@ -46,7 +46,7 @@ export function getBillingFormState(
 		billing_city: billingInfo.billing_city ?? "",
 		billing_state: billingInfo.billing_state ?? "",
 		billing_postal_code: billingInfo.billing_postal_code ?? "",
-		billing_country: normalizeCountryName(billingInfo.billing_country),
+		billing_country: normalizeCountryCode(billingInfo.billing_country),
 	};
 }
 

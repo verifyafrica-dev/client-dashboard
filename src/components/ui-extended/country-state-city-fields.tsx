@@ -12,7 +12,7 @@ import {
 	SelectValue,
 } from "#/components/ui/select";
 import {
-	getCountryIsoCodeByName,
+	getCountryCode,
 	getCountrySelectOptions,
 } from "#/lib/country-state-city";
 import { cn } from "#/lib/utils.ts";
@@ -83,7 +83,7 @@ export function CountryStateCityFields({
 	className,
 }: CountryStateCityFieldsProps) {
 	const countryCode = useMemo(
-		() => getCountryIsoCodeByName(country),
+		() => getCountryCode(country),
 		[country],
 	);
 
@@ -146,7 +146,7 @@ export function CountryStateCityFields({
 				<div className="relative">
 					<GlobeHemisphereWestIcon className="pointer-events-none absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
 					<Select
-						value={country}
+						value={countryCode}
 						onValueChange={handleCountryChange}
 						disabled={disabled}
 					>
