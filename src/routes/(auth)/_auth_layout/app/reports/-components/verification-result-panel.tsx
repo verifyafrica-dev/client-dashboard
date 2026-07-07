@@ -58,7 +58,9 @@ function renderPrimitiveValue(value: unknown) {
 		);
 	}
 
-	return String(value);
+	return (
+		<p className="text-sm capitalize">{String(value).split("_").join(" ")}</p>
+	);
 }
 
 function ResultFieldGrid({ data }: { data: Record<string, unknown> }) {
@@ -81,7 +83,10 @@ function ResultFieldGrid({ data }: { data: Record<string, unknown> }) {
 					const nestedData = value as Record<string, unknown>;
 
 					return (
-						<div key={key} className="sm:col-span-2">
+						<div
+							key={key}
+							className="sm:col-span-2"
+						>
 							<Card className="border-dashed bg-muted/20 shadow-none">
 								<CardHeader className="pb-3">
 									<CardTitle className="text-sm font-semibold">
@@ -98,14 +103,17 @@ function ResultFieldGrid({ data }: { data: Record<string, unknown> }) {
 
 				if (Array.isArray(value)) {
 					return (
-						<div key={key} className="sm:col-span-2">
+						<div
+							key={key}
+							className="sm:col-span-2"
+						>
 							<Card className="border-dashed bg-muted/20 shadow-none">
 								<CardHeader className="pb-3">
 									<CardTitle className="text-sm font-semibold">
 										{formatFieldLabel(key)}
 									</CardTitle>
 								</CardHeader>
-								<CardContent className="space-y-4">
+								<CardContent className="flex flex-row gap-2">
 									{value.length === 0 ? (
 										<p className="text-sm text-muted-foreground">No items.</p>
 									) : (
@@ -122,7 +130,10 @@ function ResultFieldGrid({ data }: { data: Record<string, unknown> }) {
 											}
 
 											return (
-												<p key={getResultItemKey(key, item)} className="text-sm">
+												<p
+													key={getResultItemKey(key, item)}
+													className="text-sm"
+												>
 													{renderPrimitiveValue(item)}
 												</p>
 											);

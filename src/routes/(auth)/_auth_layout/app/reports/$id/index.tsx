@@ -55,9 +55,9 @@ function VerificationReportDetailPage() {
 		? amlDownload.isDownloading
 		: standardDownload.isDownloading;
 
-	const resultData = useMemo(() => {
+	const { resultData, infoData } = useMemo(() => {
 		if (!verification?.response_data) {
-			return null;
+			return { resultData: null, infoData: null };
 		}
 
 		const responseData = verification.response_data;
@@ -70,11 +70,14 @@ function VerificationReportDetailPage() {
 		}
 
 		if (!data) {
-			return null;
+			return { resultData: null, infoData: null };
 		}
 
-		const { proofs: _proofs, ...rest } = data;
-		return rest;
+		const info = isPlainObject(data.info)
+			? (data.info as Record<string, unknown>)
+			: null;
+		const { proofs: _proofs, info: _info, ...rest } = data;
+		return { resultData: rest, infoData: info };
 	}, [verification?.response_data]);
 
 	const isRefreshEligible = useMemo(() => {
@@ -225,6 +228,13 @@ function VerificationReportDetailPage() {
 					/>
 					{verification.proofs_available ? (
 						<VerificationProofsSection proofs={verification.proofs} />
+					) : null}
+					{!isAmlScreening && infoData ? (
+						<VerificationResultPanel
+							title="Info"
+							data={infoData}
+							verification={verification}
+						/>
 					) : null}
 				</div>
 			)}

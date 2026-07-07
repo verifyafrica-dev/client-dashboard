@@ -95,7 +95,7 @@ export function VerificationMetadataCard({
 									href={verificationUrl}
 									target="_blank"
 									rel="noopener noreferrer"
-									className="min-w-0 flex-1 break-all font-mono text-xs text-primary hover:underline"
+									className="min-w-0 flex-1 break-all font-mono text-xs text-foreground hover:underline"
 								>
 									{verificationUrl}
 								</a>
