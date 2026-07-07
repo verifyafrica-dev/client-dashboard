@@ -163,6 +163,44 @@ export interface VerificationRequestDetail extends VerificationRequest {
 	proofs: VerificationProofs;
 }
 
+export const VERIFICATION_TYPES_BY_PRODUCT = {
+	governmentRegistryChecks: [
+		"za_said_verification",
+		"ng_bvn_verification",
+		"ng_nin_verification",
+		"ng_virtual_nin_verification",
+		"ng_advanced_phone_number_verification",
+		"ng_phone_number_lookup",
+		"ng_cac_lookup",
+		"ng_passport_verification",
+		"gh_passport_lookup",
+		"gh_voter_card_lookup",
+		"gh_ssnit_lookup",
+		"gh_drivers_license_lookup",
+		"ke_passport_lookup",
+		"ke_national_id_lookup",
+		"ke_phone_number_lookup",
+		"ke_tax_pin_verification",
+	],
+	documentVerification: ["id_document"],
+	facialScreening: ["face_match"],
+	addressVerification: ["address_verification"],
+	amlScreening: [
+		"aml_screening",
+	],
+	businessAmlScreening: [
+		"business_aml_screening",
+	],
+	cryptoWalletScreening: [
+		"crypto_wallet_screening",
+	],
+	kyb: ["kyb_screening"],
+	riskAssessment: ["risk_assessment"],
+	ageVerification: ["age_verification"],
+	twoFaVerification: ["two_fa_verification"],
+	mixedVerification: ["mixed_verification"],
+} as const satisfies Record<string, readonly VerificationType[]>;
+
 export interface VerificationBatch {
 	id: string;
 	tenant: string;

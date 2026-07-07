@@ -1,8 +1,6 @@
 import type { VerificationRequestDetail } from "#/api/http/v2/verifications/verifications.types";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { isPlainObject } from "#/lib/validators";
-import { isAmlScreeningVerificationDetail } from "../-report-detail-types";
-import { AmlScreeningReport } from "./aml-screening-report";
 import { ReportDetailField } from "./report-detail-field";
 
 type VerificationResultPanelProps = {
@@ -162,12 +160,8 @@ export function VerificationResultPanel({
 	title = "Verification Result",
 	data,
 	emptyMessage = "Verification results are not available yet.",
-	verification,
+	verification: _verification,
 }: VerificationResultPanelProps) {
-	if (verification && isAmlScreeningVerificationDetail(verification)) {
-		return <AmlScreeningReport verification={verification} />;
-	}
-
 	const hasData = data && Object.keys(data).length > 0;
 
 	return (

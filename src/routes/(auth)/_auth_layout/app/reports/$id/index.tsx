@@ -17,13 +17,28 @@ import { Skeleton } from "#/components/ui/skeleton";
 import { useBrandedPdfDownload } from "#/hooks/use-branded-pdf-download";
 import { createSkeletonKeys } from "#/lib/skeleton-keys";
 import { cn } from "#/lib/utils.ts";
-import { isPlainObject } from "#/lib/validators";
+import {
+	type VerificationRequestDetail,
+	VERIFICATION_TYPES_BY_PRODUCT,
+} from "#/api/http/v2/verifications/verifications.types";
+import { AmlScreeningReport } from "../-components/aml-screening-report";
+import { AddressVerificationReport } from "../-components/address-verification-report";
+import { BusinessAmlScreeningReport } from "../-components/business-aml-screening-report";
+import { CryptoWalletScreeningReport } from "../-components/crypto-wallet-screening-report";
 import { AmlScreeningDownloadReport } from "../-components/download-aml-screening/aml-screening-download-report";
+import { DocumentVerificationReport } from "../-components/document-verification-report";
+import { FacialScreeningReport } from "../-components/facial-screening-report";
+import { GovernmentRegistryChecksReport } from "../-components/government-registry-checks-report";
+import { KybReport } from "../-components/kyb-report";
+import { RiskAssessmentReport } from "../-components/risk-assessment-report";
 import { VerificationMetadataCard } from "../-components/verification-metadata-card";
 import { VerificationProofsSection } from "../-components/verification-proofs-section";
-import { VerificationResultPanel } from "../-components/verification-result-panel";
+import { GenericVerificationDetailReport } from "../-components/generic-verification-detail-report";
 import { VerificationStatusSchema } from "#/api/http/v1/verifications/verifications.types";
-import { isAmlScreeningVerificationDetail } from "../-report-detail-types";
+import {
+	isAmlScreeningVerificationDetail,
+	type AmlScreeningVerificationRequestDetail,
+} from "../-report-detail-types";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/$id/")({
 	head: () => ({
@@ -60,34 +75,88 @@ function VerificationReportDetailPage() {
 		? amlDownload.isDownloading
 		: standardDownload.isDownloading;
 
-	const { resultData, infoData } = useMemo(() => {
-		if (!verification?.response_data) {
-			return { resultData: null, infoData: null };
-		}
-
-		const responseData = verification.response_data;
-		let data: Record<string, unknown> | null = null;
-
-		if (isPlainObject(responseData.data)) {
-			data = responseData.data as Record<string, unknown>;
-		} else if (isPlainObject(responseData)) {
-			data = responseData as Record<string, unknown>;
-		}
-
-		if (!data) {
-			return { resultData: null, infoData: null };
-		}
-
-		const info = isPlainObject(data.info)
-			? (data.info as Record<string, unknown>)
-			: null;
-		const { proofs: _proofs, info: _info, ...rest } = data;
-		return { resultData: rest, infoData: info };
-	}, [verification?.response_data]);
-
 	const isRefreshEligible = useMemo(() => {
 		return verification?.status === VerificationStatusSchema.enum.PENDING;
 	}, [verification]);
+	const isInProductGroup = (
+		group: readonly string[],
+		verificationType: string,
+	) => group.includes(verificationType);
+
+	function renderVerificationDetail(
+		verificationData: VerificationRequestDetail,
+	) {
+		const verificationType = verificationData.verification_type;
+
+		switch (true) {
+			case isInProductGroup(
+				VERIFICATION_TYPES_BY_PRODUCT.amlScreening,
+				verificationType,
+			): {
+				return (
+					<AmlScreeningReport
+						verification={
+							verificationData as AmlScreeningVerificationRequestDetail
+						}
+					/>
+				);
+			}
+			case isInProductGroup(
+				VERIFICATION_TYPES_BY_PRODUCT.businessAmlScreening,
+				verificationType,
+			): {
+				return <BusinessAmlScreeningReport verification={verificationData} />;
+			}
+			case isInProductGroup(
+				VERIFICATION_TYPES_BY_PRODUCT.cryptoWalletScreening,
+				verificationType,
+			): {
+				return <CryptoWalletScreeningReport verification={verificationData} />;
+			}
+			case isInProductGroup(
+				VERIFICATION_TYPES_BY_PRODUCT.documentVerification,
+				verificationType,
+			):
+			case verificationType === "document_verification":
+				return <DocumentVerificationReport verification={verificationData} />;
+			case isInProductGroup(
+				VERIFICATION_TYPES_BY_PRODUCT.addressVerification,
+				verificationType,
+			):
+				return <AddressVerificationReport verification={verificationData} />;
+			case isInProductGroup(
+				VERIFICATION_TYPES_BY_PRODUCT.facialScreening,
+				verificationType,
+			):
+			case verificationType === "facial_screening":
+				return <FacialScreeningReport verification={verificationData} />;
+			case isInProductGroup(
+				VERIFICATION_TYPES_BY_PRODUCT.kyb,
+				verificationType,
+			):
+			case verificationType === "kyb":
+				return <KybReport verification={verificationData} />;
+			case isInProductGroup(
+				VERIFICATION_TYPES_BY_PRODUCT.governmentRegistryChecks,
+				verificationType,
+			):
+			case verificationType === "government_registry_checks":
+			case verificationType === "government-registry-checks":
+				return (
+					<GovernmentRegistryChecksReport verification={verificationData} />
+				);
+			case isInProductGroup(
+				VERIFICATION_TYPES_BY_PRODUCT.riskAssessment,
+				verificationType,
+			):
+			case verificationType === "risk-assessment":
+				return <RiskAssessmentReport verification={verificationData} />;
+			default:
+				return (
+					<GenericVerificationDetailReport verification={verificationData} />
+				);
+		}
+	}
 
 	async function handleRefresh() {
 		if (!verification) {
@@ -227,19 +296,9 @@ function VerificationReportDetailPage() {
 					className="flex flex-col gap-6"
 				>
 					<VerificationMetadataCard verification={verification} />
-					<VerificationResultPanel
-						data={resultData}
-						verification={verification}
-					/>
+					{renderVerificationDetail(verification)}
 					{verification.proofs_available ? (
 						<VerificationProofsSection proofs={verification.proofs} />
-					) : null}
-					{!isAmlScreening && infoData ? (
-						<VerificationResultPanel
-							title="Info"
-							data={infoData}
-							verification={verification}
-						/>
 					) : null}
 				</div>
 			)}
