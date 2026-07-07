@@ -1,8 +1,12 @@
-import type { VerificationRequestDetail } from "#/api/http/v2/verifications/verifications.types";
 import { Badge } from "#/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { cn } from "#/lib/utils.ts";
 import { isPlainObject } from "#/lib/validators";
+import type {
+	AmlScreeningResponsePayload,
+	AmlScreeningVerificationRequestDetail,
+} from "../../-report-detail-types";
+import { ReportOverviewCard } from "../report-overview-card";
 import { ReportDetailField } from "../report-detail-field";
 
 type AmlHit = Record<string, unknown>;
@@ -254,10 +258,11 @@ function HitDownloadCard({ hit, index }: { hit: AmlHit; index: number }) {
 export function AmlScreeningDownloadReport({
 	verification,
 }: {
-	verification: VerificationRequestDetail;
+	verification: AmlScreeningVerificationRequestDetail;
 }) {
 	const responseData = asRecord(verification.response_data) ?? {};
-	const responsePayload = asRecord(responseData.data) ?? responseData;
+	const responsePayload = (asRecord(responseData.data) ??
+		responseData) as AmlScreeningResponsePayload;
 	const verificationData = asRecord(responsePayload.verification_data) ?? {};
 	const backgroundChecksData =
 		asRecord(verificationData.background_checks) ??
@@ -298,29 +303,32 @@ export function AmlScreeningDownloadReport({
 
 	return (
 		<div className="space-y-6">
-			<Card>
-				<CardHeader>
-					<CardTitle className="text-base font-semibold">AML Screening</CardTitle>
-				</CardHeader>
-				<CardContent className="grid gap-4 sm:grid-cols-2">
-					<ReportDetailField
-						label="Status"
-						value={verification.status}
-					/>
-					<ReportDetailField
-						label="Verification Type"
-						value={formatLabel(verification.verification_type)}
-					/>
-					<ReportDetailField
-						label="Reference"
-						value={verification.reference ?? "N/A"}
-					/>
-					<ReportDetailField
-						label="Created At"
-						value={new Date(verification.created_at).toLocaleString()}
-					/>
-				</CardContent>
-			</Card>
+			<ReportOverviewCard
+				status={verification.status}
+				verificationType={formatLabel(verification.verification_type)}
+				reference={verification.reference}
+				createdAt={new Date(verification.created_at).toLocaleString()}
+				verificationEvent={
+					typeof responsePayload.event === "string"
+						? responsePayload.event
+						: undefined
+				}
+				customerEmail={
+					typeof responsePayload.email === "string"
+						? responsePayload.email
+						: undefined
+				}
+				customerUniqueId={
+					typeof responsePayload.customer_unique_id === "string"
+						? responsePayload.customer_unique_id
+						: undefined
+				}
+				country={
+					typeof responsePayload.country === "string"
+						? responsePayload.country
+						: undefined
+				}
+			/>
 
 			<Card>
 				<CardHeader>

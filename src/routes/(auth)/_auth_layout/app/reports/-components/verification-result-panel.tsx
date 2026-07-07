@@ -1,6 +1,7 @@
 import type { VerificationRequestDetail } from "#/api/http/v2/verifications/verifications.types";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { isPlainObject } from "#/lib/validators";
+import { isAmlScreeningVerificationDetail } from "../-report-detail-types";
 import { AmlScreeningReport } from "./aml-screening-report";
 import { ReportDetailField } from "./report-detail-field";
 
@@ -163,13 +164,8 @@ export function VerificationResultPanel({
 	emptyMessage = "Verification results are not available yet.",
 	verification,
 }: VerificationResultPanelProps) {
-	if (verification) {
-		switch (verification.verification_type) {
-			case "aml_screening":
-				return <AmlScreeningReport verification={verification} />;
-			default:
-				break;
-		}
+	if (verification && isAmlScreeningVerificationDetail(verification)) {
+		return <AmlScreeningReport verification={verification} />;
 	}
 
 	const hasData = data && Object.keys(data).length > 0;

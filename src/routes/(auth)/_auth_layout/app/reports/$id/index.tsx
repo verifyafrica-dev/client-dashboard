@@ -23,6 +23,7 @@ import { VerificationMetadataCard } from "../-components/verification-metadata-c
 import { VerificationProofsSection } from "../-components/verification-proofs-section";
 import { VerificationResultPanel } from "../-components/verification-result-panel";
 import { VerificationStatusSchema } from "#/api/http/v1/verifications/verifications.types";
+import { isAmlScreeningVerificationDetail } from "../-report-detail-types";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/$id/")({
 	head: () => ({
@@ -50,7 +51,11 @@ function VerificationReportDetailPage() {
 	);
 	const refreshMutation = useRefreshVerificationStatusV2Mutation();
 	const verification = verificationQuery.data;
-	const isAmlScreening = verification?.verification_type === "aml_screening";
+	const amlVerification =
+		verification && isAmlScreeningVerificationDetail(verification)
+			? verification
+			: null;
+	const isAmlScreening = Boolean(amlVerification);
 	const isDownloading = isAmlScreening
 		? amlDownload.isDownloading
 		: standardDownload.isDownloading;
@@ -239,7 +244,7 @@ function VerificationReportDetailPage() {
 				</div>
 			)}
 
-			{verification && isAmlScreening ? (
+			{amlVerification ? (
 				<div
 					aria-hidden
 					className="pointer-events-none fixed top-0 left-[-200vw] w-[1024px] opacity-0"
@@ -248,8 +253,8 @@ function VerificationReportDetailPage() {
 						ref={amlDownloadRef}
 						className="flex flex-col gap-6 bg-background"
 					>
-						<VerificationMetadataCard verification={verification} />
-						<AmlScreeningDownloadReport verification={verification} />
+						<VerificationMetadataCard verification={amlVerification} />
+						<AmlScreeningDownloadReport verification={amlVerification} />
 					</div>
 				</div>
 			) : null}

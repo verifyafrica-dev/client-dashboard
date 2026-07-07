@@ -5,7 +5,6 @@ import {
 } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 
-import type { VerificationRequestDetail } from "#/api/http/v2/verifications/verifications.types";
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
@@ -14,6 +13,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { useClipboard } from "#/hooks/use-clipboard";
 import { cn } from "#/lib/utils.ts";
 import { isPlainObject } from "#/lib/validators";
+import type {
+	AmlScreeningResponsePayload,
+	AmlScreeningVerificationRequestDetail,
+} from "../-report-detail-types";
+import { ReportOverviewCard } from "./report-overview-card";
 import { ReportDetailField } from "./report-detail-field";
 
 type AmlHit = Record<string, unknown>;
@@ -559,14 +563,15 @@ function HitDetail({ hit, onBack }: HitDetailProps) {
 export function AmlScreeningReport({
 	verification,
 }: {
-	verification: VerificationRequestDetail;
+	verification: AmlScreeningVerificationRequestDetail;
 }) {
 	const [selectedHitIndex, setSelectedHitIndex] = useState<number | null>(null);
 	const [filterText, setFilterText] = useState("");
 	const [scoreFilter, setScoreFilter] = useState<ScoreFilter>("all");
 
 	const responseData = asRecord(verification.response_data) ?? {};
-	const responsePayload = asRecord(responseData.data) ?? responseData;
+	const responsePayload = (asRecord(responseData.data) ??
+		responseData) as AmlScreeningResponsePayload;
 	const verificationData = asRecord(responsePayload.verification_data) ?? {};
 	const backgroundChecksData =
 		asRecord(verificationData.background_checks) ??
@@ -647,66 +652,33 @@ export function AmlScreeningReport({
 
 	return (
 		<div className="space-y-6">
-			<Card>
-				<CardHeader>
-					<CardTitle className="text-base font-semibold">Overview</CardTitle>
-				</CardHeader>
-				<CardContent className="grid gap-4 sm:grid-cols-2">
-					<ReportDetailField
-						label="Status"
-						value={<StatusPill status={verification.status} />}
-					/>
-					<ReportDetailField
-						label="Verification Type"
-						value={formatLabel(verification.verification_type)}
-					/>
-					<ReportDetailField
-						label="Reference"
-						value={
-							<div className="flex items-center gap-1">
-								<span className="font-mono text-xs">
-									{verification.reference ?? "N/A"}
-								</span>
-								<CopyValueButton value={verification.reference ?? ""} />
-							</div>
-						}
-					/>
-					<ReportDetailField
-						label="Created At"
-						value={new Date(verification.created_at).toLocaleString()}
-					/>
-					{typeof responsePayload.event === "string" ? (
-						<ReportDetailField
-							label="Verification Event"
-							value={responsePayload.event}
-						/>
-					) : null}
-					{typeof responsePayload.email === "string" ? (
-						<ReportDetailField
-							label="Customer Email"
-							value={
-								<div className="flex items-center gap-1">
-									<span>{responsePayload.email}</span>
-									<CopyValueButton value={responsePayload.email} />
-								</div>
-							}
-						/>
-					) : null}
-					{typeof responsePayload.customer_unique_id === "string" ? (
-						<ReportDetailField
-							label="Customer Unique ID"
-							value={
-								<div className="flex items-center gap-1">
-									<span className="font-mono text-xs">
-										{responsePayload.customer_unique_id}
-									</span>
-									<CopyValueButton value={responsePayload.customer_unique_id} />
-								</div>
-							}
-						/>
-					) : null}
-				</CardContent>
-			</Card>
+			<ReportOverviewCard
+				status={<StatusPill status={verification.status} />}
+				verificationType={formatLabel(verification.verification_type)}
+				reference={verification.reference}
+				createdAt={new Date(verification.created_at).toLocaleString()}
+				verificationEvent={
+					typeof responsePayload.event === "string"
+						? responsePayload.event
+						: undefined
+				}
+				customerEmail={
+					typeof responsePayload.email === "string"
+						? responsePayload.email
+						: undefined
+				}
+				customerUniqueId={
+					typeof responsePayload.customer_unique_id === "string"
+						? responsePayload.customer_unique_id
+						: undefined
+				}
+				country={
+					typeof responsePayload.country === "string"
+						? responsePayload.country
+						: undefined
+				}
+				renderCopyButton={(value) => <CopyValueButton value={value} />}
+			/>
 
 			<Card>
 				<CardHeader>
