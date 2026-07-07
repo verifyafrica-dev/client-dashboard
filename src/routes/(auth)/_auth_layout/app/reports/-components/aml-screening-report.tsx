@@ -17,7 +17,7 @@ import type {
 	AmlScreeningResponsePayload,
 	AmlScreeningVerificationRequestDetail,
 } from "../-report-detail-types";
-import { AmlScreeningDownloadReport } from "./download-aml-screening/aml-screening-download-report";
+import { AmlScreeningDownloadReport } from "./aml-screening/aml-screening-download-report";
 import { ReportOverviewCard } from "./report-overview-card";
 import { ReportDetailField } from "./report-detail-field";
 import { VerificationMetadataCard } from "./verification-metadata-card";

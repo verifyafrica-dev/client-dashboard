@@ -21,11 +21,11 @@ import {
 	type VerificationRequestDetail,
 	VERIFICATION_TYPES_BY_PRODUCT,
 } from "#/api/http/v2/verifications/verifications.types";
-import { AmlScreeningReport } from "../-components/aml-screening-report";
+import { AmlScreeningReport } from "../-components/aml-screening/aml-screening-report";
 import { AddressVerificationReport } from "../-components/address-verification-report";
 import { BusinessAmlScreeningReport } from "../-components/business-aml-screening-report";
 import { CryptoWalletScreeningReport } from "../-components/crypto-wallet-screening-report";
-import { DocumentVerificationReport } from "../-components/document-verification-report";
+import { DocumentVerificationReport } from "../-components/document-verification/document-verification-report";
 import { FacialScreeningReport } from "../-components/facial-screening-report";
 import { GovernmentRegistryChecksReport } from "../-components/government-registry-checks-report";
 import { KybReport } from "../-components/kyb-report";

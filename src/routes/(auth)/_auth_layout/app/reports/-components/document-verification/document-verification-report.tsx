@@ -1,6 +1,7 @@
-import type { DocumentVerificationRequestDetail } from "../-report-detail-types";
+import type { DocumentVerificationRequestDetail } from "../../-report-detail-types";
 import { DocumentVerificationIdentityCard } from "./document-verification-identity-card";
-import { ReportOverviewCard } from "./report-overview-card";
+import { DocumentVerificationOutcome } from "./document-verification-outcome";
+import { ReportOverviewCard } from "../report-overview-card";
 
 function formatVerificationType(value: string) {
 	return value
@@ -14,7 +15,8 @@ export function DocumentVerificationReport({
 }: {
 	verification: DocumentVerificationRequestDetail;
 }) {
-	console.log(verification);
+	const proof = verification.response_data.additional_data?.document?.proof;
+
 	return (
 		<div className="flex flex-col gap-6">
 			<ReportOverviewCard
@@ -32,26 +34,19 @@ export function DocumentVerificationReport({
 
 			<DocumentVerificationIdentityCard
 				identity={{
-					fullName:
-						verification.response_data.additional_data?.document?.proof
-							?.first_name,
-					firstName:
-						verification.response_data.additional_data?.document?.proof
-							?.first_name,
-					lastName:
-						verification.response_data.additional_data?.document?.proof
-							?.last_name,
-					dateOfBirth:
-						verification.response_data.additional_data?.document?.proof?.dob,
-					gender:
-						verification.response_data.additional_data?.document?.proof?.gender,
-					nationality: verification.response_data.additional_data?.document
-						?.proof?.country as string,
-					placeOfBirth:
-						verification.response_data.additional_data?.document?.proof
-							?.place_of_birth,
+					fullName: proof?.full_name ?? proof?.first_name,
+					firstName: proof?.first_name,
+					lastName: proof?.last_name,
+					dateOfBirth: proof?.dob,
+					gender: proof?.gender,
+					nationality:
+						(proof?.nationality as string | undefined) ??
+						(proof?.country as string | undefined),
+					placeOfBirth: proof?.place_of_birth,
 				}}
 			/>
+
+			<DocumentVerificationOutcome responseData={verification.response_data} />
 		</div>
 	);
 }

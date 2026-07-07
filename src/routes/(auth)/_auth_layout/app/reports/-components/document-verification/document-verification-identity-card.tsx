@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
-import { ReportDetailField } from "./report-detail-field";
+import { ReportDetailField } from "../report-detail-field";
 
 type DocumentIdentity = {
 	fullName?: string;
