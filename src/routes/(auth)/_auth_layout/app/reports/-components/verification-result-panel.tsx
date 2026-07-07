@@ -1,11 +1,14 @@
+import type { VerificationRequestDetail } from "#/api/http/v2/verifications/verifications.types";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { isPlainObject } from "#/lib/validators";
+import { AmlScreeningReport } from "./aml-screening-report";
 import { ReportDetailField } from "./report-detail-field";
 
 type VerificationResultPanelProps = {
 	title?: string;
 	data: Record<string, unknown> | null | undefined;
 	emptyMessage?: string;
+	verification?: VerificationRequestDetail | null;
 };
 
 function getResultItemKey(parentKey: string, item: unknown) {
@@ -147,7 +150,17 @@ export function VerificationResultPanel({
 	title = "Verification Result",
 	data,
 	emptyMessage = "Verification results are not available yet.",
+	verification,
 }: VerificationResultPanelProps) {
+	if (verification) {
+		switch (verification.verification_type) {
+			case "aml_screening":
+				return <AmlScreeningReport verification={verification} />;
+			default:
+				break;
+		}
+	}
+
 	const hasData = data && Object.keys(data).length > 0;
 
 	return (

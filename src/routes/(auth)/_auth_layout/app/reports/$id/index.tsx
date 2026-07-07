@@ -18,6 +18,7 @@ import { useBrandedPdfDownload } from "#/hooks/use-branded-pdf-download";
 import { createSkeletonKeys } from "#/lib/skeleton-keys";
 import { cn } from "#/lib/utils.ts";
 import { isPlainObject } from "#/lib/validators";
+import { AmlScreeningDownloadReport } from "../-components/download-aml-screening/aml-screening-download-report";
 import { VerificationMetadataCard } from "../-components/verification-metadata-card";
 import { VerificationProofsSection } from "../-components/verification-proofs-section";
 import { VerificationResultPanel } from "../-components/verification-result-panel";
@@ -35,7 +36,9 @@ export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/$id/")({
 function VerificationReportDetailPage() {
 	const { id } = Route.useParams();
 	const reportRef = useRef<HTMLDivElement>(null);
-	const { downloadPdf, isDownloading } = useBrandedPdfDownload(reportRef);
+	const amlDownloadRef = useRef<HTMLDivElement>(null);
+	const standardDownload = useBrandedPdfDownload(reportRef);
+	const amlDownload = useBrandedPdfDownload(amlDownloadRef);
 
 	const verificationQuery = useVerificationRequestDetailV2Query(
 		id,
@@ -43,6 +46,10 @@ function VerificationReportDetailPage() {
 	);
 	const refreshMutation = useRefreshVerificationStatusV2Mutation();
 	const verification = verificationQuery.data;
+	const isAmlScreening = verification?.verification_type === "aml_screening";
+	const isDownloading = isAmlScreening
+		? amlDownload.isDownloading
+		: standardDownload.isDownloading;
 
 	const resultData = useMemo(() => {
 		if (!verification?.response_data) {
@@ -97,7 +104,10 @@ function VerificationReportDetailPage() {
 			return;
 		}
 
-		await downloadPdf({ filename: `verification-${verification.id}.pdf` });
+		const downloader = isAmlScreening
+			? amlDownload.downloadPdf
+			: standardDownload.downloadPdf;
+		await downloader({ filename: `verification-${verification.id}.pdf` });
 	}
 
 	return (
@@ -204,12 +214,24 @@ function VerificationReportDetailPage() {
 			) : (
 				<div ref={reportRef} className="flex flex-col gap-6">
 					<VerificationMetadataCard verification={verification} />
-					<VerificationResultPanel data={resultData} />
+					<VerificationResultPanel data={resultData} verification={verification} />
 					{verification.proofs_available ? (
 						<VerificationProofsSection proofs={verification.proofs} />
 					) : null}
 				</div>
 			)}
+
+			{verification && isAmlScreening ? (
+				<div
+					aria-hidden
+					className="pointer-events-none fixed top-0 left-[-200vw] w-[1024px] opacity-0"
+				>
+					<div ref={amlDownloadRef} className="flex flex-col gap-6 bg-background">
+						<VerificationMetadataCard verification={verification} />
+						<AmlScreeningDownloadReport verification={verification} />
+					</div>
+				</div>
+			) : null}
 		</div>
 	);
 }
