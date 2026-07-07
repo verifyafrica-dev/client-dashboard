@@ -22,7 +22,9 @@ function withCopyButton(
 ) {
 	const copyButton = renderCopyButton?.(value);
 	if (!copyButton) {
-		return <span className={mono ? "font-mono text-xs" : undefined}>{value}</span>;
+		return (
+			<span className={mono ? "font-mono text-xs" : undefined}>{value}</span>
+		);
 	}
 
 	return (
@@ -47,7 +49,9 @@ export function ReportOverviewCard({
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle className="text-base font-semibold">Overview</CardTitle>
+				<CardTitle className="text-base font-semibold">
+					Report Overview
+				</CardTitle>
 			</CardHeader>
 			<CardContent className="grid gap-4 sm:grid-cols-2">
 				<ReportDetailField

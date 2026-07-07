@@ -3,7 +3,7 @@ import {
 	CopyIcon,
 	MagnifyingGlassIcon,
 } from "@phosphor-icons/react";
-import { useMemo, useState } from "react";
+import { type RefObject, useMemo, useState } from "react";
 
 import { Badge } from "#/components/ui/badge";
 import { Button } from "#/components/ui/button";
@@ -17,8 +17,10 @@ import type {
 	AmlScreeningResponsePayload,
 	AmlScreeningVerificationRequestDetail,
 } from "../-report-detail-types";
+import { AmlScreeningDownloadReport } from "./download-aml-screening/aml-screening-download-report";
 import { ReportOverviewCard } from "./report-overview-card";
 import { ReportDetailField } from "./report-detail-field";
+import { VerificationMetadataCard } from "./verification-metadata-card";
 
 type AmlHit = Record<string, unknown>;
 
@@ -562,8 +564,10 @@ function HitDetail({ hit, onBack }: HitDetailProps) {
 
 export function AmlScreeningReport({
 	verification,
+	downloadRef,
 }: {
 	verification: AmlScreeningVerificationRequestDetail;
+	downloadRef?: RefObject<HTMLDivElement | null>;
 }) {
 	const [selectedHitIndex, setSelectedHitIndex] = useState<number | null>(null);
 	const [filterText, setFilterText] = useState("");
@@ -875,6 +879,21 @@ export function AmlScreeningReport({
 			</Card>
 
 			<RawResponseCard data={responsePayload} />
+
+			{downloadRef ? (
+				<div
+					aria-hidden
+					className="pointer-events-none fixed top-0 left-[-200vw] w-[1024px] opacity-0"
+				>
+					<div
+						ref={downloadRef}
+						className="flex flex-col gap-6 bg-background"
+					>
+						<VerificationMetadataCard verification={verification} />
+						<AmlScreeningDownloadReport verification={verification} />
+					</div>
+				</div>
+			) : null}
 		</div>
 	);
 }

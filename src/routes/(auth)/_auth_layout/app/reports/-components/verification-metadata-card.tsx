@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { VerificationStatusSchema } from "#/api/http/v1/verifications/verifications.types";
 import type { VerificationRequestDetail } from "#/api/http/v2/verifications/verifications.types";
 import { Button } from "#/components/ui/button";
-import { Card, CardContent } from "#/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { extractHostedVerificationUrl } from "#/lib/verification-links";
 import {
 	formatReportDate,
@@ -47,6 +47,11 @@ export function VerificationMetadataCard({
 
 	return (
 		<Card className="bg-muted/20">
+			<CardHeader>
+				<CardTitle className="text-base font-semibold">
+					Verification Overview
+				</CardTitle>
+			</CardHeader>
 			<CardContent className="grid gap-4 pt-0 sm:grid-cols-2">
 				<ReportDetailField
 					label="Verification ID"

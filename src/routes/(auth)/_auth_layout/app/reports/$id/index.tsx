@@ -25,7 +25,6 @@ import { AmlScreeningReport } from "../-components/aml-screening-report";
 import { AddressVerificationReport } from "../-components/address-verification-report";
 import { BusinessAmlScreeningReport } from "../-components/business-aml-screening-report";
 import { CryptoWalletScreeningReport } from "../-components/crypto-wallet-screening-report";
-import { AmlScreeningDownloadReport } from "../-components/download-aml-screening/aml-screening-download-report";
 import { DocumentVerificationReport } from "../-components/document-verification-report";
 import { FacialScreeningReport } from "../-components/facial-screening-report";
 import { GovernmentRegistryChecksReport } from "../-components/government-registry-checks-report";
@@ -38,6 +37,7 @@ import { VerificationStatusSchema } from "#/api/http/v1/verifications/verificati
 import {
 	isAmlScreeningVerificationDetail,
 	type AmlScreeningVerificationRequestDetail,
+	type DocumentVerificationRequestDetail,
 } from "../-report-detail-types";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/$id/")({
@@ -98,6 +98,7 @@ function VerificationReportDetailPage() {
 						verification={
 							verificationData as AmlScreeningVerificationRequestDetail
 						}
+						downloadRef={amlDownloadRef}
 					/>
 				);
 			}
@@ -118,7 +119,11 @@ function VerificationReportDetailPage() {
 				verificationType,
 			):
 			case verificationType === "document_verification":
-				return <DocumentVerificationReport verification={verificationData} />;
+				return (
+					<DocumentVerificationReport
+						verification={verificationData as DocumentVerificationRequestDetail}
+					/>
+				);
 			case isInProductGroup(
 				VERIFICATION_TYPES_BY_PRODUCT.addressVerification,
 				verificationType,
@@ -303,20 +308,6 @@ function VerificationReportDetailPage() {
 				</div>
 			)}
 
-			{amlVerification ? (
-				<div
-					aria-hidden
-					className="pointer-events-none fixed top-0 left-[-200vw] w-[1024px] opacity-0"
-				>
-					<div
-						ref={amlDownloadRef}
-						className="flex flex-col gap-6 bg-background"
-					>
-						<VerificationMetadataCard verification={amlVerification} />
-						<AmlScreeningDownloadReport verification={amlVerification} />
-					</div>
-				</div>
-			) : null}
 		</div>
 	);
 }
