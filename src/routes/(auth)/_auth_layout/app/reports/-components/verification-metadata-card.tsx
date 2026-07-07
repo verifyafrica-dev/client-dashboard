@@ -1,5 +1,12 @@
+import { CheckIcon, CopyIcon } from "@phosphor-icons/react";
+import { useState } from "react";
+import { toast } from "sonner";
+
+import { VerificationStatusSchema } from "#/api/http/v1/verifications/verifications.types";
 import type { VerificationRequestDetail } from "#/api/http/v2/verifications/verifications.types";
+import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
+import { extractHostedVerificationUrl } from "#/lib/verification-links";
 import {
 	formatReportDate,
 	formatVerificationType,
@@ -16,7 +23,27 @@ type VerificationMetadataCardProps = {
 export function VerificationMetadataCard({
 	verification,
 }: VerificationMetadataCardProps) {
+	const [copiedVerificationUrl, setCopiedVerificationUrl] = useState(false);
 	const report = mapVerificationRequestToReport(verification, "live");
+	const verificationUrl = extractHostedVerificationUrl(verification);
+	const showVerificationLink =
+		verification.status === VerificationStatusSchema.enum.PENDING &&
+		Boolean(verificationUrl);
+
+	async function handleCopyVerificationUrl() {
+		if (!verificationUrl) {
+			return;
+		}
+
+		try {
+			await navigator.clipboard.writeText(verificationUrl);
+			setCopiedVerificationUrl(true);
+			setTimeout(() => setCopiedVerificationUrl(false), 2000);
+			toast.success("Verification link copied.");
+		} catch {
+			toast.error("Unable to copy verification link.");
+		}
+	}
 
 	return (
 		<Card className="bg-muted/20">
@@ -56,6 +83,38 @@ export function VerificationMetadataCard({
 						label="Reference"
 						value={verification.reference}
 						mono
+					/>
+				) : null}
+				{showVerificationLink ? (
+					<ReportDetailField
+						label="Verification Link"
+						className="sm:col-span-2"
+						value={
+							<div className="flex items-start gap-2 rounded-md border bg-background p-3">
+								<a
+									href={verificationUrl}
+									target="_blank"
+									rel="noopener noreferrer"
+									className="min-w-0 flex-1 break-all font-mono text-xs text-primary hover:underline"
+								>
+									{verificationUrl}
+								</a>
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon-sm"
+									className="shrink-0"
+									onClick={() => void handleCopyVerificationUrl()}
+									aria-label="Copy verification link"
+								>
+									{copiedVerificationUrl ? (
+										<CheckIcon className="size-4 text-emerald-600" />
+									) : (
+										<CopyIcon className="size-4" />
+									)}
+								</Button>
+							</div>
+						}
 					/>
 				) : null}
 			</CardContent>

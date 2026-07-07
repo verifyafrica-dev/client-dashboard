@@ -22,12 +22,16 @@ import { AmlScreeningDownloadReport } from "../-components/download-aml-screenin
 import { VerificationMetadataCard } from "../-components/verification-metadata-card";
 import { VerificationProofsSection } from "../-components/verification-proofs-section";
 import { VerificationResultPanel } from "../-components/verification-result-panel";
+import { VerificationStatusSchema } from "#/api/http/v1/verifications/verifications.types";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/$id/")({
 	head: () => ({
 		meta: [
 			{ title: "Report Details | VerifyAfrica" },
-			{ name: "description", content: "Review full details and outcomes for a specific report." },
+			{
+				name: "description",
+				content: "Review full details and outcomes for a specific report.",
+			},
 		],
 	}),
 	component: VerificationReportDetailPage,
@@ -74,16 +78,7 @@ function VerificationReportDetailPage() {
 	}, [verification?.response_data]);
 
 	const isRefreshEligible = useMemo(() => {
-		if (!verification?.source?.toLowerCase().includes("shufti")) {
-			return false;
-		}
-
-		const createdAtMs = new Date(verification.created_at).getTime();
-		if (Number.isNaN(createdAtMs)) {
-			return false;
-		}
-
-		return Date.now() - createdAtMs < 24 * 60 * 60 * 1000;
+		return verification?.status === VerificationStatusSchema.enum.PENDING;
 	}, [verification]);
 
 	async function handleRefresh() {
@@ -114,7 +109,11 @@ function VerificationReportDetailPage() {
 		<div className="flex min-w-0 flex-col gap-6">
 			<div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
 				<div className="flex flex-col gap-3">
-					<Button variant="ghost" className="w-fit px-4" asChild>
+					<Button
+						variant="ghost"
+						className="w-fit px-4"
+						asChild
+					>
 						<Link to="/app/reports">
 							<ArrowLeftIcon />
 							Back to Reports
@@ -166,7 +165,10 @@ function VerificationReportDetailPage() {
 							<Skeleton className="h-6 w-48" />
 							<div className="grid gap-4 sm:grid-cols-2">
 								{createSkeletonKeys(6, "report-metadata-field").map((key) => (
-									<Skeleton key={key} className="h-14 w-full" />
+									<Skeleton
+										key={key}
+										className="h-14 w-full"
+									/>
 								))}
 							</div>
 						</CardContent>
@@ -212,9 +214,15 @@ function VerificationReportDetailPage() {
 					</CardContent>
 				</Card>
 			) : (
-				<div ref={reportRef} className="flex flex-col gap-6">
+				<div
+					ref={reportRef}
+					className="flex flex-col gap-6"
+				>
 					<VerificationMetadataCard verification={verification} />
-					<VerificationResultPanel data={resultData} verification={verification} />
+					<VerificationResultPanel
+						data={resultData}
+						verification={verification}
+					/>
 					{verification.proofs_available ? (
 						<VerificationProofsSection proofs={verification.proofs} />
 					) : null}
@@ -226,7 +234,10 @@ function VerificationReportDetailPage() {
 					aria-hidden
 					className="pointer-events-none fixed top-0 left-[-200vw] w-[1024px] opacity-0"
 				>
-					<div ref={amlDownloadRef} className="flex flex-col gap-6 bg-background">
+					<div
+						ref={amlDownloadRef}
+						className="flex flex-col gap-6 bg-background"
+					>
 						<VerificationMetadataCard verification={verification} />
 						<AmlScreeningDownloadReport verification={verification} />
 					</div>
