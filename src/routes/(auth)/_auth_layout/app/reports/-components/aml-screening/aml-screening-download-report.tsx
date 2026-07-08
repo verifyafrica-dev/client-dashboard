@@ -6,6 +6,7 @@ import type {
 	AmlScreeningResponsePayload,
 	AmlScreeningVerificationRequestDetail,
 } from "../../-report-detail-types";
+import { asRecord } from "../../-utils";
 import { ReportOverviewCard } from "../report-overview-card";
 import { ReportDetailField } from "../report-detail-field";
 
@@ -16,10 +17,6 @@ function getHitRenderKey(hit: AmlHit) {
 	const score = String(hit.score ?? "na");
 	const fields = JSON.stringify(hit.fields ?? {});
 	return `${name}-${score}-${fields}`;
-}
-
-function asRecord(value: unknown): Record<string, unknown> | undefined {
-	return isPlainObject(value) ? (value as Record<string, unknown>) : undefined;
 }
 
 function asArray(value: unknown): unknown[] {
@@ -182,7 +179,12 @@ function HitDownloadCard({ hit, index }: { hit: AmlHit; index: number }) {
 					<ReportDetailField
 						label="Risk Level"
 						value={
-							<span className={cn("font-semibold capitalize", getRiskClassName(level))}>
+							<span
+								className={cn(
+									"font-semibold capitalize",
+									getRiskClassName(level),
+								)}
+							>
 								{level}
 							</span>
 						}
@@ -198,7 +200,10 @@ function HitDownloadCard({ hit, index }: { hit: AmlHit; index: number }) {
 							matchTypes.length > 0 ? (
 								<div className="flex flex-wrap gap-1">
 									{matchTypes.map((type) => (
-										<Badge key={type} variant="outline">
+										<Badge
+											key={type}
+											variant="outline"
+										>
 											{formatLabel(type)}
 										</Badge>
 									))}
@@ -270,7 +275,9 @@ export function AmlScreeningDownloadReport({
 		{};
 
 	const amlData = asRecord(backgroundChecksData.aml_data) ?? {};
-	const hits = asArray(amlData.hits).filter((hit) => isPlainObject(hit)) as AmlHit[];
+	const hits = asArray(amlData.hits).filter((hit) =>
+		isPlainObject(hit),
+	) as AmlHit[];
 
 	const appliedFilters = normalizeTextList(backgroundChecksData.filters).map(
 		(filter) => formatLabel(filter),
@@ -362,7 +369,10 @@ export function AmlScreeningDownloadReport({
 							appliedFilters.length > 0 ? (
 								<div className="flex flex-wrap gap-1">
 									{appliedFilters.map((filter) => (
-										<Badge key={filter} variant="outline">
+										<Badge
+											key={filter}
+											variant="outline"
+										>
 											{filter}
 										</Badge>
 									))}

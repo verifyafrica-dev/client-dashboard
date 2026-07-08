@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
+import { displayValue } from "../../-utils";
 import { ReportDetailField } from "../report-detail-field";
 
 type DocumentIdentity = {
@@ -14,10 +15,6 @@ type DocumentIdentity = {
 type DocumentVerificationIdentityCardProps = {
 	identity: DocumentIdentity;
 };
-
-function displayValue(value?: string) {
-	return value && value.trim().length > 0 ? value : "N/A";
-}
 
 export function DocumentVerificationIdentityCard({
 	identity,

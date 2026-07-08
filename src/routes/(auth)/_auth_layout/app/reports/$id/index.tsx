@@ -20,6 +20,10 @@ import { cn } from "#/lib/utils.ts";
 import {
 	type VerificationRequestDetail,
 	VERIFICATION_TYPES_BY_PRODUCT,
+	isAmlScreeningVerificationDetail,
+	type AmlScreeningVerificationRequestDetail,
+	type DocumentVerificationRequestDetail,
+	type GovernmentRegistryChecksVerificationRequestDetail,
 } from "#/api/http/v2/verifications/verifications.types";
 import { AmlScreeningReport } from "../-components/aml-screening/aml-screening-report";
 import { AddressVerificationReport } from "../-components/address-verification-report";
@@ -31,14 +35,9 @@ import { GovernmentRegistryChecksReport } from "../-components/government-regist
 import { KybReport } from "../-components/kyb-report";
 import { RiskAssessmentReport } from "../-components/risk-assessment-report";
 import { VerificationMetadataCard } from "../-components/verification-metadata-card";
-import { VerificationProofsSection } from "../-components/verification-proofs-section";
+import { VerificationProofsSection } from "../-components/verification-proofs/verification-proofs-section";
 import { GenericVerificationDetailReport } from "../-components/generic-verification-detail-report";
 import { VerificationStatusSchema } from "#/api/http/v1/verifications/verifications.types";
-import {
-	isAmlScreeningVerificationDetail,
-	type AmlScreeningVerificationRequestDetail,
-	type DocumentVerificationRequestDetail,
-} from "../-report-detail-types";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/reports/$id/")({
 	head: () => ({
@@ -148,7 +147,11 @@ function VerificationReportDetailPage() {
 			case verificationType === "government_registry_checks":
 			case verificationType === "government-registry-checks":
 				return (
-					<GovernmentRegistryChecksReport verification={verificationData} />
+					<GovernmentRegistryChecksReport
+						verification={
+							verificationData as GovernmentRegistryChecksVerificationRequestDetail
+						}
+					/>
 				);
 			case isInProductGroup(
 				VERIFICATION_TYPES_BY_PRODUCT.riskAssessment,
@@ -307,7 +310,6 @@ function VerificationReportDetailPage() {
 					) : null}
 				</div>
 			)}
-
 		</div>
 	);
 }

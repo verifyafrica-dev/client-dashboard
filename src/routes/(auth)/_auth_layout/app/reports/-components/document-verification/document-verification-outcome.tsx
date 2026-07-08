@@ -2,17 +2,8 @@ import { Badge } from "#/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { cn } from "#/lib/utils.ts";
 import type { DocumentVerificationResponsePayload } from "../../-report-detail-types";
+import { asRecord } from "../../-utils";
 import { ReportDetailField } from "../report-detail-field";
-
-type UnknownRecord = Record<string, unknown>;
-
-function asRecord(value: unknown): UnknownRecord | undefined {
-	if (value && typeof value === "object" && !Array.isArray(value)) {
-		return value as UnknownRecord;
-	}
-
-	return undefined;
-}
 
 function asStringArray(value: unknown): string[] {
 	if (!Array.isArray(value)) {
@@ -31,7 +22,9 @@ function formatLabel(value: string) {
 		.replace(/\b\w/g, (char) => char.toUpperCase());
 }
 
-function getResultValueLabel(value: unknown): "Passed" | "Failed" | "Not available" {
+function getResultValueLabel(
+	value: unknown,
+): "Passed" | "Failed" | "Not available" {
 	if (value === null || value === undefined || value === "") {
 		return "Not available";
 	}
@@ -82,7 +75,8 @@ function ResultBadge({ value }: { value: unknown }) {
 				"capitalize",
 				label === "Passed" && "border-emerald-200 bg-emerald-500 text-white",
 				label === "Failed" && "border-red-200 bg-red-500 text-white",
-				label === "Not available" && "border-slate-300 bg-slate-100 text-slate-700",
+				label === "Not available" &&
+					"border-slate-300 bg-slate-100 text-slate-700",
 			)}
 		>
 			{label}

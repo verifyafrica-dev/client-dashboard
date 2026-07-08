@@ -13,14 +13,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { useClipboard } from "#/hooks/use-clipboard";
 import { cn } from "#/lib/utils.ts";
 import { isPlainObject } from "#/lib/validators";
-import type {
-	AmlScreeningResponsePayload,
-	AmlScreeningVerificationRequestDetail,
-} from "../-report-detail-types";
+import { asRecord } from "../-utils";
 import { AmlScreeningDownloadReport } from "./aml-screening/aml-screening-download-report";
 import { ReportOverviewCard } from "./report-overview-card";
 import { ReportDetailField } from "./report-detail-field";
 import { VerificationMetadataCard } from "./verification-metadata-card";
+import type {
+	AmlScreeningResponsePayload,
+	AmlScreeningVerificationRequestDetail,
+} from "#/api/http/v2/verifications/verifications.types";
 
 type AmlHit = Record<string, unknown>;
 
@@ -31,10 +32,6 @@ function getHitRenderKey(hit: AmlHit) {
 	const score = String(hit.score ?? "na");
 	const fields = JSON.stringify(hit.fields ?? {});
 	return `${name}-${score}-${fields}`;
-}
-
-function asRecord(value: unknown): Record<string, unknown> | undefined {
-	return isPlainObject(value) ? (value as Record<string, unknown>) : undefined;
 }
 
 function asArray(value: unknown): unknown[] {

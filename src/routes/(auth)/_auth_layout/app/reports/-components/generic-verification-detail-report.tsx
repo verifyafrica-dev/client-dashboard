@@ -1,11 +1,7 @@
 import type { VerificationRequestDetail } from "#/api/http/v2/verifications/verifications.types";
-import { isPlainObject } from "#/lib/validators";
+import { asRecord } from "../-utils";
 import { ReportOverviewCard } from "./report-overview-card";
 import { VerificationResultPanel } from "./verification-result-panel";
-
-function asRecord(value: unknown): Record<string, unknown> | null {
-	return isPlainObject(value) ? (value as Record<string, unknown>) : null;
-}
 
 function formatVerificationType(value: string) {
 	return value
@@ -20,10 +16,8 @@ export function GenericVerificationDetailReport({
 	verification: VerificationRequestDetail;
 }) {
 	const responseData = asRecord(verification.response_data) ?? {};
-	const responsePayload = (asRecord(responseData.data) ?? responseData) as Record<
-		string,
-		unknown
-	>;
+	const responsePayload = (asRecord(responseData.data) ??
+		responseData) as Record<string, unknown>;
 
 	const infoData = asRecord(responsePayload.info);
 	const { proofs: _proofs, info: _info, ...resultData } = responsePayload;
@@ -46,7 +40,9 @@ export function GenericVerificationDetailReport({
 		<div className="space-y-6">
 			<ReportOverviewCard
 				status={verification.status}
-				verificationType={formatVerificationType(verification.verification_type)}
+				verificationType={formatVerificationType(
+					verification.verification_type,
+				)}
 				reference={verification.reference}
 				createdAt={new Date(verification.created_at).toLocaleString()}
 				verificationEvent={

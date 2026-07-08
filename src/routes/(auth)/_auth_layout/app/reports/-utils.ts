@@ -1,4 +1,25 @@
 import type { VerificationProofs } from "#/api/http/v2/verifications/verifications.types";
+import { isPlainObject } from "#/lib/validators";
+
+export type UnknownRecord = Record<string, unknown>;
+
+export function asRecord(value: unknown): UnknownRecord | null {
+	return isPlainObject(value) ? (value as UnknownRecord) : null;
+}
+
+export function displayValue(value: unknown): string {
+	if (value === null || value === undefined || value === "") {
+		return "N/A";
+	}
+
+	if (typeof value === "string" && value.trim().length === 0) {
+		return "N/A";
+	}
+
+	return String(value);
+}
+
+ 
 
 export const PROOF_LABELS = {
 	address: "Address Proof",

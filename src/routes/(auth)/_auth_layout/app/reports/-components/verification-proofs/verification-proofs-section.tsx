@@ -6,13 +6,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Skeleton } from "#/components/ui/skeleton";
 import { createSkeletonKeys } from "#/lib/skeleton-keys";
 import { cn } from "#/lib/utils.ts";
+import { ReportDetailField } from "../report-detail-field";
+import { ProofImagePreviewDialog } from "./proof-image-preview-dialog";
 import {
 	getVisibleProofEntries,
-	PROOF_KINDS,
-	PROOF_LABELS,
 	type ProofDisplayKey,
-} from "../-proof-utils";
-import { ReportDetailField } from "./report-detail-field";
+	PROOF_LABELS,
+	PROOF_KINDS,
+} from "../../-utils";
 
 type VerificationProofsSectionProps = {
 	proofs?: VerificationProofs;
@@ -27,7 +28,10 @@ function VerificationProofsSkeleton({ count }: { count: number }) {
 	return (
 		<div className="grid gap-4 sm:grid-cols-2">
 			{createSkeletonKeys(count, "verification-proof").map((key) => (
-				<div key={key} className="flex flex-col gap-2 sm:col-span-2">
+				<div
+					key={key}
+					className="flex flex-col gap-2 sm:col-span-2"
+				>
 					<Skeleton className="h-3 w-32" />
 					<Skeleton className="h-40 w-full max-w-xs rounded-md" />
 				</div>
@@ -141,16 +145,24 @@ export function VerificationProofsSection({
 											>
 												<track kind="captions" />
 											</video>
-										) : (
-											<img
+										) : asset.mimeType.startsWith("image/") ? (
+											<ProofImagePreviewDialog
 												src={asset.url}
 												alt={PROOF_LABELS[key]}
-												className={cn(
+												label={PROOF_LABELS[key]}
+												thumbnailClassName={cn(
 													"max-h-40 rounded-md border object-cover",
-													asset.mimeType === "application/pdf" &&
-														"object-contain",
 												)}
 											/>
+										) : (
+											<a
+												href={asset.url}
+												target="_blank"
+												rel="noreferrer"
+												className="inline-flex rounded-md border px-3 py-2 text-sm text-primary underline-offset-4 hover:underline"
+											>
+												Open file
+											</a>
 										)
 									}
 								/>
