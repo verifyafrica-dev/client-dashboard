@@ -70,7 +70,7 @@ const trendChartConfig = {
 	},
 	failed: {
 		label: "Failed",
-		color: "oklch(0.62 0.2 28)",
+		color: "oklch(0.769 0.165 70.1)",
 	},
 	error: {
 		label: "Error",
