@@ -14,6 +14,7 @@ import { toast } from "sonner";
 
 import {
 	useReplaceTenantApiKeyV2Mutation,
+	useTenantV2DetailQuery,
 	useTenantApiKeyV2Query,
 	useUpdateTenantApiKeyV2Mutation,
 } from "#/api/http/v2/tenants/tenants.hooks";
@@ -33,6 +34,8 @@ import { Skeleton } from "#/components/ui/skeleton";
 import { Switch } from "#/components/ui/switch";
 import { useClipboard } from "#/hooks/use-clipboard";
 import { cn } from "#/lib/utils.ts";
+import { DashboardOnboarding } from "../-components/dashboard-onboarding";
+import { shouldShowDashboardOnboarding } from "../-data";
 import { useCurrentTenant } from "../team/-data";
 import { formatApiKeyDate, getApiKeyPreview, maskApiKey } from "./-data";
 
@@ -53,11 +56,18 @@ function ApiKeysPage() {
 	const { copied, copy } = useClipboard();
 	const { tenantId } = useCurrentTenant();
 
+	const tenantQuery = useTenantV2DetailQuery(tenantId, Boolean(tenantId));
 	const apiKeyQuery = useTenantApiKeyV2Query(tenantId, Boolean(tenantId));
 	const updateApiKeyMutation = useUpdateTenantApiKeyV2Mutation(tenantId ?? "");
 	const rotateApiKeyMutation = useReplaceTenantApiKeyV2Mutation(tenantId ?? "");
 
 	const apiKey = apiKeyQuery.data;
+	const isKycVerified = tenantQuery.data?.kyc.kyc_verified ?? false;
+	const isKycLoading = tenantQuery.isPending || tenantQuery.isFetching;
+	const showOnboarding =
+		!tenantQuery.isError &&
+		!isKycLoading &&
+		shouldShowDashboardOnboarding(isKycVerified);
 
 	const isLoading = apiKeyQuery.isPending || apiKeyQuery.isFetching;
 	const isMutating =
@@ -106,6 +116,7 @@ function ApiKeysPage() {
 		return (
 			<div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
 				<ApiKeysHeader />
+				{showOnboarding && <DashboardOnboarding />}
 				<Card>
 					<CardContent className="py-10 text-center text-sm text-muted-foreground">
 						Failed to load API key. Please try again.
@@ -118,6 +129,7 @@ function ApiKeysPage() {
 	return (
 		<div className="mx-auto flex w-full max-w-4xl flex-col gap-6">
 			<ApiKeysHeader />
+			{showOnboarding && <DashboardOnboarding />}
 
 			{isLoading || !apiKey ? (
 				<ApiKeyCardSkeleton />

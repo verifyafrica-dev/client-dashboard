@@ -164,7 +164,7 @@ export interface VerificationRequestDetail extends VerificationRequest {
 }
 
 export const VERIFICATION_TYPES_BY_PRODUCT = {
-	governmentRegistryChecks: [
+	"Government Registry Checks": [
 		"za_said_verification",
 		"ng_bvn_verification",
 		"ng_nin_verification",
@@ -182,23 +182,23 @@ export const VERIFICATION_TYPES_BY_PRODUCT = {
 		"ke_phone_number_lookup",
 		"ke_tax_pin_verification",
 	],
-	documentVerification: ["id_document"],
-	facialScreening: ["face_match"],
-	addressVerification: ["address_verification"],
-	amlScreening: [
+	"Document Verification": ["id_document"],
+	"Facial Screening": ["face_match"],
+	"Address Verification": ["address_verification"],
+	"AML Screening": [
 		"aml_screening",
 	],
-	businessAmlScreening: [
+	"Business AML Screening": [
 		"business_aml_screening",
 	],
-	cryptoWalletScreening: [
+	"Crypto Wallet Screening": [
 		"crypto_wallet_screening",
 	],
-	kyb: ["kyb_screening"],
-	riskAssessment: ["risk_assessment"],
-	ageVerification: ["age_verification"],
-	twoFaVerification: ["two_fa_verification"],
-	mixedVerification: ["mixed_verification"],
+	"KYB Screening": ["kyb_screening"],
+	"Risk Assessment": ["risk_assessment"],
+	"Age Verification": ["age_verification"],
+	"2FA Verification": ["two_fa_verification"],
+	"Mixed Verification": ["mixed_verification"],
 } as const satisfies Record<string, readonly VerificationType[]>;
 
 export interface VerificationBatch {
@@ -518,7 +518,7 @@ export function isDocumentVerificationDetail(
 }
 
 type GovernmentRegistryChecksVerificationType =
-	(typeof VERIFICATION_TYPES_BY_PRODUCT.governmentRegistryChecks)[number] |
+	(typeof VERIFICATION_TYPES_BY_PRODUCT["Government Registry Checks"])[number] |
 		"government_registry_checks" |
 		"government-registry-checks";
 
@@ -553,7 +553,7 @@ export type GovernmentRegistryChecksVerificationRequestDetail = Omit<
 };
 
 const GOVERNMENT_REGISTRY_CHECKS_TYPES = [
-	...VERIFICATION_TYPES_BY_PRODUCT.governmentRegistryChecks,
+	...VERIFICATION_TYPES_BY_PRODUCT["Government Registry Checks"],
 	"government_registry_checks",
 	"government-registry-checks",
 ] as const;

@@ -7,7 +7,10 @@ import {
 } from "@phosphor-icons/react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { useTenantUsersV2Query } from "#/api/http/v2/tenants/tenants.hooks";
+import {
+	useTenantUsersV2Query,
+	useTenantV2DetailQuery,
+} from "#/api/http/v2/tenants/tenants.hooks";
 import {
 	TablePagination,
 	TablePaginationSkeleton,
@@ -34,6 +37,8 @@ import {
 } from "#/components/ui/table";
 import { useDebouncedValue } from "#/hooks/use-debounced-value";
 import { cn } from "#/lib/utils.ts";
+import { DashboardOnboarding } from "../../-components/dashboard-onboarding";
+import { shouldShowDashboardOnboarding } from "../../-data";
 import {
 	DeleteUserDialog,
 	type DeleteUserDialogTarget,
@@ -92,6 +97,7 @@ export const Route = createFileRoute(
 
 function ActiveUsersPage() {
 	const { user, tenantId, isTenantAdmin } = useCurrentTenant();
+	const tenantQuery = useTenantV2DetailQuery(tenantId, Boolean(tenantId));
 	const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [userToDelete, setUserToDelete] = useState<ActiveUser | null>(null);
@@ -111,6 +117,12 @@ function ActiveUsersPage() {
 		null,
 	);
 	const debouncedSearch = useDebouncedValue(search, 300);
+	const isKycVerified = tenantQuery.data?.kyc.kyc_verified ?? false;
+	const isKycLoading = tenantQuery.isPending || tenantQuery.isFetching;
+	const showOnboarding =
+		!tenantQuery.isError &&
+		!isKycLoading &&
+		shouldShowDashboardOnboarding(isKycVerified);
 
 	const userListQuery = useMemo(
 		() => ({
@@ -194,6 +206,8 @@ function ActiveUsersPage() {
 					Invite User
 				</Button>
 			</div>
+
+			{showOnboarding && <DashboardOnboarding />}
 
 			<Card className="gap-0 py-4 sm:py-6">
 				<CardHeader className="border-b">

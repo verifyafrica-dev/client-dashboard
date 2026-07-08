@@ -3,7 +3,7 @@ import type {
 	AnalyticsPayload,
 	TenantAnalyticsData,
 } from "#/api/http/v2/analytics/analytics.types";
-import { VerificationTypeSchema } from "#/api/http/v2/verifications/verifications.types";
+import { VERIFICATION_TYPES_BY_PRODUCT } from "#/api/http/v2/verifications/verifications.types";
 
 export type TimeRange = "all" | "7d" | "30d" | "90d";
 
@@ -96,13 +96,9 @@ const CHART_COLORS = [
 	"#EC4899",
 ] as const;
 
-const VERIFICATION_TYPE_KEYS = VerificationTypeSchema.options;
-
-function formatLabel(value: string) {
-	return value
-		.replace(/_/g, " ")
-		.replace(/\b\w/g, (character) => character.toUpperCase());
-}
+const VERIFICATION_PRODUCT_ENTRIES = Object.entries(
+	VERIFICATION_TYPES_BY_PRODUCT,
+) as Array<[string, readonly string[]]>;
 
 function getSuccessRate(statusDistribution: Record<string, number>) {
 	const total = Object.values(statusDistribution).reduce(
@@ -121,10 +117,13 @@ function getSuccessRate(statusDistribution: Record<string, number>) {
 function mapTypeDistribution(
 	typeDistribution: Record<string, number>,
 ): VerificationTypePoint[] {
-	return VERIFICATION_TYPE_KEYS.map((type, index) => ({
-		type,
-		label: formatLabel(type),
-		count: typeDistribution[type] ?? 0,
+	return VERIFICATION_PRODUCT_ENTRIES.map(([productLabel, verificationTypes], index) => ({
+		type: productLabel,
+		label: productLabel,
+		count: verificationTypes.reduce(
+			(sum, verificationType) => sum + (typeDistribution[verificationType] ?? 0),
+			0,
+		),
 		fill: CHART_COLORS[index % CHART_COLORS.length],
 	}));
 }

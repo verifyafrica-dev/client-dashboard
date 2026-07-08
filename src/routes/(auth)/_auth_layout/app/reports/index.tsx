@@ -3,11 +3,14 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useCallback, useMemo, useState } from "react";
 
+import { useTenantV2DetailQuery } from "#/api/http/v2/tenants/tenants.hooks";
 import { VERIFICATIONS_V2_QUERY_KEYS } from "#/api/http/v2/verifications/verifications.hooks";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "#/components/ui/tabs";
 import { cn } from "#/lib/utils.ts";
+import { DashboardOnboarding } from "../-components/dashboard-onboarding";
+import { shouldShowDashboardOnboarding } from "../-data";
 import { useCurrentTenant } from "../team/-data";
 import { BatchVerificationsTab } from "./-components/batch-verifications-tab";
 import { IndividualVerificationsTab } from "./-components/individual-verifications-tab";
@@ -36,9 +39,16 @@ function ReportsPage() {
 	const navigate = useNavigate({ from: Route.fullPath });
 	const urlSearch = Route.useSearch();
 	const { tenantId } = useCurrentTenant();
+	const tenantQuery = useTenantV2DetailQuery(tenantId, Boolean(tenantId));
 	const [isRefreshing, setIsRefreshing] = useState(false);
 
 	const activeTab = urlSearch.tab ?? "individual";
+	const isKycVerified = tenantQuery.data?.kyc.kyc_verified ?? false;
+	const isKycLoading = tenantQuery.isPending || tenantQuery.isFetching;
+	const showOnboarding =
+		!tenantQuery.isError &&
+		!isKycLoading &&
+		shouldShowDashboardOnboarding(isKycVerified);
 
 	const updateSearchParams = useCallback(
 		(patch: Partial<ReportsSearchParams>) => {
@@ -131,6 +141,8 @@ function ReportsPage() {
 					</Button>
 				</div>
 			</div>
+
+			{showOnboarding && <DashboardOnboarding />}
 
 			<Card className="min-w-0 overflow-visible">
 				<CardContent className="min-w-0 pt-0">

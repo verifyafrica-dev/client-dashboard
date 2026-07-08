@@ -89,7 +89,7 @@ function VerificationReportDetailPage() {
 
 		switch (true) {
 			case isInProductGroup(
-				VERIFICATION_TYPES_BY_PRODUCT.amlScreening,
+				VERIFICATION_TYPES_BY_PRODUCT["AML Screening"],
 				verificationType,
 			): {
 				return (
@@ -102,19 +102,19 @@ function VerificationReportDetailPage() {
 				);
 			}
 			case isInProductGroup(
-				VERIFICATION_TYPES_BY_PRODUCT.businessAmlScreening,
+				VERIFICATION_TYPES_BY_PRODUCT["Business AML Screening"],
 				verificationType,
 			): {
 				return <BusinessAmlScreeningReport verification={verificationData} />;
 			}
 			case isInProductGroup(
-				VERIFICATION_TYPES_BY_PRODUCT.cryptoWalletScreening,
+				VERIFICATION_TYPES_BY_PRODUCT["Crypto Wallet Screening"],
 				verificationType,
 			): {
 				return <CryptoWalletScreeningReport verification={verificationData} />;
 			}
 			case isInProductGroup(
-				VERIFICATION_TYPES_BY_PRODUCT.documentVerification,
+				VERIFICATION_TYPES_BY_PRODUCT["Document Verification"],
 				verificationType,
 			):
 			case verificationType === "document_verification":
@@ -124,24 +124,24 @@ function VerificationReportDetailPage() {
 					/>
 				);
 			case isInProductGroup(
-				VERIFICATION_TYPES_BY_PRODUCT.addressVerification,
+				VERIFICATION_TYPES_BY_PRODUCT["Address Verification"],
 				verificationType,
 			):
 				return <AddressVerificationReport verification={verificationData} />;
 			case isInProductGroup(
-				VERIFICATION_TYPES_BY_PRODUCT.facialScreening,
+				VERIFICATION_TYPES_BY_PRODUCT["Facial Screening"],
 				verificationType,
 			):
 			case verificationType === "facial_screening":
 				return <FacialScreeningReport verification={verificationData} />;
 			case isInProductGroup(
-				VERIFICATION_TYPES_BY_PRODUCT.kyb,
+				VERIFICATION_TYPES_BY_PRODUCT["KYB Screening"],
 				verificationType,
 			):
 			case verificationType === "kyb":
 				return <KybReport verification={verificationData} />;
 			case isInProductGroup(
-				VERIFICATION_TYPES_BY_PRODUCT.governmentRegistryChecks,
+				VERIFICATION_TYPES_BY_PRODUCT["Government Registry Checks"],
 				verificationType,
 			):
 			case verificationType === "government_registry_checks":
@@ -154,7 +154,7 @@ function VerificationReportDetailPage() {
 					/>
 				);
 			case isInProductGroup(
-				VERIFICATION_TYPES_BY_PRODUCT.riskAssessment,
+				VERIFICATION_TYPES_BY_PRODUCT["Risk Assessment"],
 				verificationType,
 			):
 			case verificationType === "risk-assessment":

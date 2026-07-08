@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useTenantV2DetailQuery } from "#/api/http/v2/tenants/tenants.hooks";
 import { useTenantMixedVerificationsV2Query } from "#/api/http/v2/verifications/verifications.hooks";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent } from "#/components/ui/card";
+import { DashboardOnboarding } from "../-components/dashboard-onboarding";
+import { shouldShowDashboardOnboarding } from "../-data";
 import { useCurrentTenant } from "../team/-data";
 import { PRODUCTS } from "./-data";
 import { MIXED_VERIFICATIONS_LIST_PARAMS } from "./mixed-verifications/-data";
@@ -18,6 +21,13 @@ export const Route = createFileRoute("/(auth)/_auth_layout/app/products/")({
 
 function ProductsPage() {
 	const { tenantId } = useCurrentTenant();
+	const tenantQuery = useTenantV2DetailQuery(tenantId, Boolean(tenantId));
+	const isKycVerified = tenantQuery.data?.kyc.kyc_verified ?? false;
+	const isKycLoading = tenantQuery.isPending || tenantQuery.isFetching;
+	const showOnboarding =
+		!tenantQuery.isError &&
+		!isKycLoading &&
+		shouldShowDashboardOnboarding(isKycVerified);
 
 	useTenantMixedVerificationsV2Query(
 		tenantId,
@@ -33,6 +43,8 @@ function ProductsPage() {
 					Explore our suite of verification and compliance products.
 				</p>
 			</div>
+
+			{showOnboarding && <DashboardOnboarding />}
 
 			<div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
 				{PRODUCTS.map((product) => {

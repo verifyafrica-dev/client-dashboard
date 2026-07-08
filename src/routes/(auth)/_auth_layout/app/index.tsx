@@ -365,7 +365,7 @@ function DashboardContent({
 	}));
 
 	const typeChartData = typeData.filter((entry) => entry.count > 0);
-	const verificationTypeLegend = typeData;
+	const verificationTypeLegend = typeChartData;
 	const typeChartConfig = Object.fromEntries(
 		typeData.map((entry) => [
 			entry.type,
