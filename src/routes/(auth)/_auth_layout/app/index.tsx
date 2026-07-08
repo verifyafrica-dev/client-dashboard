@@ -518,7 +518,7 @@ function DashboardContent({
 											style={{ backgroundColor: entry.fill }}
 										/>
 										<span>
-											{entry.label} d({entry.count})
+											{entry.label} ({entry.count})
 										</span>
 									</div>
 								))}
