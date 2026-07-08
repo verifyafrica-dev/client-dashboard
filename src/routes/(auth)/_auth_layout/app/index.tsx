@@ -469,7 +469,9 @@ function DashboardContent({
 										className="size-2 rounded-full"
 										style={{ backgroundColor: entry.color }}
 									/>
-									<span>{entry.label} ({entry.count})</span>
+									<span>
+										{entry.label} ({entry.count})
+									</span>
 								</div>
 							))}
 						</div>
@@ -515,7 +517,9 @@ function DashboardContent({
 											className="size-2 shrink-0 rounded-full"
 											style={{ backgroundColor: entry.fill }}
 										/>
-										<span>{entry.label} ({entry.count})</span>
+										<span>
+											{entry.label} d({entry.count})
+										</span>
 									</div>
 								))}
 							</div>
