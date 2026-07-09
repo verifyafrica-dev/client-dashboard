@@ -151,6 +151,20 @@ function isNotFutureISODate(value: string) {
 	return isTodayOrFutureISODate(value, true);
 }
 
+function isTodayISODate(value: string) {
+	if (!isISODate(value)) {
+		return false;
+	}
+
+	const selectedDate = new Date(`${value}T00:00:00`);
+	selectedDate.setHours(0, 0, 0, 0);
+
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+
+	return selectedDate.getTime() === today.getTime();
+}
+
 export const KycBasicInformationFormSchema = z.object({
 	legalName: z.string().trim().min(1, "Legal name is required"),
 	tradingName: z.string().optional(),
@@ -326,7 +340,7 @@ export const KycAuthorizedSignatureFormSchema = z.object({
 		.trim()
 		.min(1, "Date is required")
 		.refine(isISODate, "Please enter a valid date (YYYY-MM-DD)")
-		.refine(isTodayOrFutureISODate, "Date cannot be earlier than today"),
+		.refine(isTodayISODate, "Date must be today's date"),
 	signature: z.string().trim().min(1, "Signature is required"),
 });
 
