@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const envSchema = z.object({
-	VITE_API_BASE_URL: z.url().default("http://localhost:8300/api"),
+	VITE_API_BASE_URL: z.url(),
 	VITE_APP_NAME: z.string().default("Verify Africa"),
 	VITE_APP_ENVIRONMENT: z.string().default("development"),
 	VITE_SITE_TYPE: z.enum(["public", "client", "admin", "dashboard"]).optional(),

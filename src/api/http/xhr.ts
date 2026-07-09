@@ -38,6 +38,8 @@ const getBrowserHost = () => (isBrowser ? window.location.host : "");
 const getTokenPrefix = (): string => {
 	const host = getBrowserHost();
 	if (host.includes("localhost")) return "local:";
+	if (host.includes("test.dashboard.verifyafrica.io")) return "test-dashboard:";
+	if (host.includes("test.admin.verifyafrica.io")) return "test-admin:";
 	if (host.includes("dashboard.verifyafrica.io")) return "dashboard:";
 	if (host.includes("admin.verifyafrica.io")) return "admin:";
 	return "local:";
