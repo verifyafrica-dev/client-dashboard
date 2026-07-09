@@ -12,28 +12,28 @@ const isBrowser = typeof window !== "undefined";
 
 const getBrowserHost = () => (isBrowser ? window.location.host : "");
 
-const getBaseUrlForNetworkOrHost = () => {
-	if (isMobilePhoneBrowser()) {
-		return `${window.location.origin}/api`;
-	}
+// const getBaseUrlForNetworkOrHost = () => {
+// 	if (isMobilePhoneBrowser()) {
+// 		return `${window.location.origin}/api`;
+// 	}
 
-	return env.apiBaseUrl;
-};
+// 	return env.apiBaseUrl;
+// };
 
-const isMobilePhoneBrowser = () => {
-	if (typeof window === "undefined") return false;
+// const isMobilePhoneBrowser = () => {
+// 	if (typeof window === "undefined") return false;
 
-	// Modern Chromium signal (best when available)
-	const uaDataMobile = (navigator as Navigator & { userAgentData?: { mobile?: boolean } })
-		.userAgentData?.mobile;
-	if (typeof uaDataMobile === "boolean") return uaDataMobile;
+// 	// Modern Chromium signal (best when available)
+// 	const uaDataMobile = (navigator as Navigator & { userAgentData?: { mobile?: boolean } })
+// 		.userAgentData?.mobile;
+// 	if (typeof uaDataMobile === "boolean") return uaDataMobile;
 
-	// Fallback for Safari/Firefox/older browsers
-	const ua = navigator.userAgent || "";
-	const isPhoneUA = /iPhone|Android.*Mobile|Windows Phone|IEMobile|Opera Mini/i.test(ua);
+// 	// Fallback for Safari/Firefox/older browsers
+// 	const ua = navigator.userAgent || "";
+// 	const isPhoneUA = /iPhone|Android.*Mobile|Windows Phone|IEMobile|Opera Mini/i.test(ua);
 
-	return isPhoneUA;
-};
+// 	return isPhoneUA;
+// };
 
 const getTokenPrefix = (): string => {
 	const host = getBrowserHost();
@@ -78,7 +78,7 @@ const clearTokensAndLogout = () => {
 };
 
 const $http = axios.create({
-	baseURL: getBaseUrlForNetworkOrHost(),
+	baseURL: env.apiBaseUrl,
 	timeout: 30000,
 	headers: {
 		"Content-Type": "application/json",
@@ -118,7 +118,7 @@ const shouldUseAccessToken = (url: string) => {
 const refreshAccessToken = async () => {
 	const response = await axios.post<
 		V2SuccessResponse<{ access_token: string }>
-	>(`${getBaseUrlForNetworkOrHost()}${REFRESH_TOKEN_ENDPOINT}`, undefined, {
+	>(`${env.apiBaseUrl}${REFRESH_TOKEN_ENDPOINT}`, undefined, {
 		withCredentials: true,
 	});
 
