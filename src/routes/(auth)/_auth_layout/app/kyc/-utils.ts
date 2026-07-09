@@ -62,7 +62,6 @@ export function getKycCompletionStatus(kycData: KYBApplication): KycCompletionSt
 		average_client_transaction_size_eur: 0,
 		high_risk_jurisdictions_fatf_exposure: "",
 		main_banking_payment_partners: "",
-		kyc_kyb_process: "",
 	};
 	const authorizedSignature = kycData.authorized_signature ?? {
 		full_name: "",

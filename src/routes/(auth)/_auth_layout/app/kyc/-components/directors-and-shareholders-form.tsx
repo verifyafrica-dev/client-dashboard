@@ -1,5 +1,5 @@
 import { PlusIcon } from "@phosphor-icons/react";
-import { useForm } from "@tanstack/react-form";
+import { revalidateLogic, useForm } from "@tanstack/react-form";
 import { format } from "date-fns";
 import { useEffect } from "react";
 
@@ -78,8 +78,11 @@ export function DirectorsAndShareholdersForm() {
 
 	const form = useForm({
 		defaultValues: getDefaultValues(kycData),
+		validationLogic: revalidateLogic(),
 		validators: {
-			onSubmit: KycDirectorsAndShareholdersFormSchema as never,
+			// Revalidate on change after the first submit so form-level errors
+			// (e.g. ownership total) clear and canSubmit can recover.
+			onDynamic: KycDirectorsAndShareholdersFormSchema as never,
 		},
 		onSubmit: async ({ value }) => {
 			await saveSection("directors-and-shareholders", value, {
@@ -157,7 +160,7 @@ export function DirectorsAndShareholdersForm() {
 													</FieldLabel>
 													<KycDatePicker
 														value={field.state.value}
-														disablePastDates
+														disableFutureDates
 														onChange={(date) =>
 															field.handleChange(
 																date ? format(date, "yyyy-MM-dd") : "",
@@ -312,9 +315,14 @@ export function DirectorsAndShareholdersForm() {
 			>
 				{(ubosField) => (
 					<section className="space-y-4">
-						<h3 className="text-base font-semibold">
-							Ultimate Beneficial Owners (UBOs)
-						</h3>
+						<div className="space-y-1">
+							<h3 className="text-base font-semibold">
+								Ultimate Beneficial Owners (UBOs)
+							</h3>
+							{ubosField.state.meta.errors.length > 0 && (
+								<FieldError errors={ubosField.state.meta.errors} />
+							)}
+						</div>
 						{ubosField.state.value.map((ubo, index) => (
 							<KycEntryCard
 								key={`ubo-${ubo.name}`}

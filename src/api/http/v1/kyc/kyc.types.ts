@@ -98,7 +98,6 @@ export interface OnboardingQuestionnaire {
 		name: string;
 		email: string;
 	};
-	kyc_kyb_process: string;
 }
 
 export interface ComplianceDeclarations {
@@ -134,7 +133,7 @@ const optionalUrlSchema = z
 		message: "Please enter a valid URL",
 	});
 
-function isTodayOrFutureISODate(value: string, disableFuture:boolean = true) {
+function isTodayOrFutureISODate(value: string, disableFuture: boolean = true) {
 	if (!isISODate(value)) {
 		return false;
 	}
@@ -145,9 +144,11 @@ function isTodayOrFutureISODate(value: string, disableFuture:boolean = true) {
 	const today = new Date();
 	today.setHours(0, 0, 0, 0);
 
-	console.log(selectedDate, today, disableFuture);
+	return disableFuture ? selectedDate <= today : selectedDate >= today;
+}
 
-	return disableFuture ? selectedDate < today : selectedDate > today;
+function isNotFutureISODate(value: string) {
+	return isTodayOrFutureISODate(value, true);
 }
 
 export const KycBasicInformationFormSchema = z.object({
@@ -209,10 +210,7 @@ export const KycDirectorFormSchema = z.object({
 		.trim()
 		.min(1, "Date of birth is required")
 		.refine(isISODate, "Please enter a valid date (YYYY-MM-DD)")
-		.refine(
-			(value) => isTodayOrFutureISODate(value),
-			"Date of birth cannot be earlier than today",
-		),
+		.refine(isNotFutureISODate, "Date of birth cannot be in the future"),
 	nationality: z.string().trim().min(1, "Nationality is required"),
 	address: KycDirectorAddressSchema,
 	id_number: z.string().trim().min(1, "ID number is required"),
@@ -227,12 +225,27 @@ export const KycUboFormSchema = z.object({
 	id_number: z.string().trim().min(1, "ID number is required"),
 });
 
-export const KycDirectorsAndShareholdersFormSchema = z.object({
-	directors: z
-		.array(KycDirectorFormSchema)
-		.min(1, "At least one director is required"),
-	ubos: z.array(KycUboFormSchema).min(1, "At least one UBO is required"),
-});
+export const KycDirectorsAndShareholdersFormSchema = z
+	.object({
+		directors: z
+			.array(KycDirectorFormSchema)
+			.min(1, "At least one director is required"),
+		ubos: z.array(KycUboFormSchema).min(1, "At least one UBO is required"),
+	})
+	.superRefine((values, context) => {
+		const totalOwnership = values.ubos.reduce(
+			(sum, ubo) => sum + ubo.ownership_percentage,
+			0,
+		);
+
+		if (Math.abs(totalOwnership - 100) > 0.01) {
+			context.addIssue({
+				code: "custom",
+				path: ["ubos"],
+				message: `Ownership percentages must equal 100% (currently ${totalOwnership}%)`,
+			});
+		}
+	});
 
 export type KycDirectorsAndShareholdersFormValues = z.infer<
 	typeof KycDirectorsAndShareholdersFormSchema
@@ -280,7 +293,6 @@ export const KycOnboardingQuestionnaireFormSchema = z.object({
 		.min(1, "Main banking/payment partners is required"),
 	amlCtfOfficerName: z.string().trim().min(1, "AML/CTF Officer name is required"),
 	amlCtfOfficerEmail: z.email("Please enter a valid email address"),
-	kyc_kyb_process: z.string().trim().min(1, "KYC/KYB process is required"),
 });
 
 export type KycOnboardingQuestionnaireFormValues = z.infer<
@@ -437,7 +449,6 @@ export function createEmptyKYBApplication(): KYBApplication {
 			average_client_transaction_size_eur: 0,
 			high_risk_jurisdictions_fatf_exposure: "",
 			main_banking_payment_partners: "",
-			kyc_kyb_process: "",
 		},
 		compliance_declarations: {
 			not_engaged_in_prohibited_activities: false,
@@ -678,11 +689,6 @@ export function normalizeComplianceData(data: unknown): KYBApplication {
 							),
 						}
 					: undefined,
-			kyc_kyb_process: String(
-				onboardingQuestionnaireRaw.kyc_kyb_process ??
-					onboardingQuestionnaireRaw.kycKybProcess ??
-					"",
-			),
 		},
 		compliance_declarations:
 			complianceDeclarationsRaw === true

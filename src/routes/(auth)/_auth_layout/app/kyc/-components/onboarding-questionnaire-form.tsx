@@ -44,7 +44,6 @@ function getDefaultValues(
 		main_banking_payment_partners: questionnaire.main_banking_payment_partners ?? "",
 		amlCtfOfficerName: questionnaire.aml_ctf_officer?.name ?? "",
 		amlCtfOfficerEmail: questionnaire.aml_ctf_officer?.email ?? "",
-		kyc_kyb_process: questionnaire.kyc_kyb_process ?? "",
 	};
 }
 
@@ -71,7 +70,6 @@ export function OnboardingQuestionnaireForm() {
 						name: value.amlCtfOfficerName,
 						email: value.amlCtfOfficerEmail,
 					},
-					kyc_kyb_process: value.kyc_kyb_process,
 				},
 				{ currentSection: SECTION_NAMES.ONBOARDING_QUESTIONNAIRE },
 			);
@@ -264,28 +262,6 @@ export function OnboardingQuestionnaireForm() {
 						</form.Field>
 					</KycFormGrid>
 				</div>
-
-				<form.Field name="kyc_kyb_process">
-					{(field) => (
-						<Field
-							className="gap-1.5"
-							data-invalid={field.state.meta.errors.length > 0}
-						>
-							<FieldLabel htmlFor="kycKybProcess">
-								KYC/KYB Process <span className="text-destructive">*</span>
-							</FieldLabel>
-							<Textarea
-								id="kycKybProcess"
-								value={field.state.value}
-								onBlur={field.handleBlur}
-								onChange={(event) => field.handleChange(event.target.value)}
-								rows={4}
-								disabled={isReadOnly}
-							/>
-							<FieldError errors={field.state.meta.errors} />
-						</Field>
-					)}
-				</form.Field>
 			</FieldGroup>
 
 			{!isReadOnly && <KycSaveButton isSaving={isSaving} />}
