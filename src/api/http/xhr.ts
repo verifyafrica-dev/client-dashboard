@@ -45,6 +45,10 @@ const getTokenPrefix = (): string => {
 	return "local:";
 };
 
+/** App scope for the HttpOnly refresh cookie on the API host (`dashboard:refresh_token`). */
+export const AUTH_APP = "dashboard" as const;
+export const AUTH_APP_HEADER = "X-Auth-App";
+
 export const getAccessTokenKey = (): string => `${getTokenPrefix()}accessToken`;
 const ACCESS_TOKEN_COOKIE_EXPIRES_DAYS = env.isDevelopment
 	? 1
@@ -84,6 +88,7 @@ const $http = axios.create({
 	timeout: 30000,
 	headers: {
 		"Content-Type": "application/json",
+		[AUTH_APP_HEADER]: AUTH_APP,
 	},
 	withCredentials: true,
 });
@@ -122,6 +127,9 @@ const refreshAccessToken = async () => {
 		V2SuccessResponse<{ access_token: string }>
 	>(`${env.apiBaseUrl}${REFRESH_TOKEN_ENDPOINT}`, undefined, {
 		withCredentials: true,
+		headers: {
+			[AUTH_APP_HEADER]: AUTH_APP,
+		},
 	});
 
 	return response.data.data.access_token;
