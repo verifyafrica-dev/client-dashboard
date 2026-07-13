@@ -49,7 +49,6 @@ export const VerificationRequestsListQuerySchema = z.object({
 	has_batch: z.boolean().optional(),
 	status: VerificationStatusSchema.optional(),
 	verification_type: VerificationTypeSchema.optional(),
-	is_test: z.boolean().optional(),
 	format: z.enum(["json", "json-html"]).optional(),
 	offset: z.number().int().nonnegative().optional(),
 	page_size: z.number().int().positive().optional(),
@@ -61,7 +60,6 @@ export type VerificationRequestsListQuery = z.infer<
 
 export const VerificationBatchesListQuerySchema = z.object({
 	tenant_id: z.string().uuid(),
-	is_test: z.boolean().optional(),
 	format: z.enum(["json", "json-html"]).optional(),
 	offset: z.number().int().nonnegative().optional(),
 	page_size: z.number().int().positive().optional(),

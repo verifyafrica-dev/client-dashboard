@@ -90,7 +90,6 @@ export function CustomVerificationDialog({
 						payload: {
 							...buildCustomVerificationPayload(value),
 							is_custom: true,
-							is_test: false,
 						},
 						tenantId,
 					});

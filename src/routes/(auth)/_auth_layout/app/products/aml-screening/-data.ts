@@ -85,12 +85,10 @@ function buildBackgroundChecks(
 export function buildAmlScreeningLinkPayload(
 	values: AmlLinkFormValues,
 	options: AmlScreeningOptions,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: AML_SCREENING_TYPE,
 		method_type: "onsite",
-		is_test: isTest,
 		input_data: {
 			country: values.screeningCountry.trim().toUpperCase(),
 			language: "EN",
@@ -104,12 +102,10 @@ export function buildAmlScreeningLinkPayload(
 export function buildAmlScreeningDirectPayload(
 	values: AmlDirectFormValues,
 	options: AmlScreeningOptions,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: AML_SCREENING_TYPE,
 		method_type: "offsite",
-		is_test: isTest,
 		input_data: {
 			country: values.screeningCountry.trim().toUpperCase(),
 			language: "EN",

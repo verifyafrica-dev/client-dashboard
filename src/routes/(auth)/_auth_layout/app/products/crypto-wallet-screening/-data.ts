@@ -40,12 +40,10 @@ export function isValidWalletAddress(walletAddress: string | null | undefined) {
 
 export function buildCryptoWalletScreeningPayload(
 	values: CryptoWalletFormValues,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: CRYPTO_WALLET_SCREENING_TYPE,
 		method_type: "onsite",
-		is_test: isTest,
 		input_data: {
 			email: values.email.trim(),
 			is_crypto_request: true,

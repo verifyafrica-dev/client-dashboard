@@ -33,8 +33,8 @@ const VERIFICATIONS_V2_STALE_TIME = 60_000;
 
 export const VERIFICATIONS_V2_QUERY_KEYS = {
 	all: ["verifications-v2"] as const,
-	types: (tenantId?: string, params?: Pick<VerificationListQuery, "is_test">) =>
-		["verifications-v2", "types", tenantId ?? "global", params ?? {}] as const,
+	types: (tenantId?: string) =>
+		["verifications-v2", "types", tenantId ?? "global"] as const,
 	allRequests: (params?: VerificationListQuery) =>
 		["verifications-v2", "requests", "all", params ?? {}] as const,
 	tenantRequests: (tenantId: string, params?: VerificationListQuery) =>
@@ -67,12 +67,11 @@ export const VERIFICATIONS_V2_QUERY_KEYS = {
 
 export const useVerificationTypesV2Query = (
 	tenantId?: string,
-	params?: Pick<VerificationListQuery, "is_test">,
 	enabled = true,
 ): UseQueryResult<VerificationTypeDefinition[]> =>
 	useQuery<VerificationTypeDefinition[]>({
-		queryKey: VERIFICATIONS_V2_QUERY_KEYS.types(tenantId, params),
-		queryFn: () => VERIFICATIONS_V2_API.TYPES(tenantId, params),
+		queryKey: VERIFICATIONS_V2_QUERY_KEYS.types(tenantId),
+		queryFn: () => VERIFICATIONS_V2_API.TYPES(tenantId),
 		enabled,
 		staleTime: VERIFICATIONS_V2_STALE_TIME,
 	});

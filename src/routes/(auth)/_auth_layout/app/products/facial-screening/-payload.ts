@@ -45,12 +45,10 @@ function buildFaceBlock(options?: { proof?: string; verificationMode?: string })
 
 export function buildFacialScreeningLinkPayload(
 	values: LinkFormValues,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: FACIAL_VERIFICATION_TYPE,
 		method_type: "onsite",
-		is_test: isTest,
 		input_data: {
 			language: "EN",
 			email: values.email.trim(),
@@ -65,12 +63,10 @@ export function buildFacialScreeningLinkPayload(
 export function buildFacialScreeningDirectPayload(
 	values: DirectFormValues,
 	proof: string,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: FACIAL_VERIFICATION_TYPE,
 		method_type: "offsite",
-		is_test: isTest,
 		input_data: {
 			language: "EN",
 			email: values.email.trim(),

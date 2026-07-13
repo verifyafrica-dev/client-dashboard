@@ -43,12 +43,10 @@ function buildDocumentBlock(direct?: {
 
 export function buildDocumentVerificationLinkPayload(
 	values: LinkFormValues,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: DOCUMENT_VERIFICATION_TYPE,
 		method_type: "onsite",
-		is_test: isTest,
 		input_data: {
 			language: "EN",
 			email: values.email.trim(),
@@ -61,12 +59,10 @@ export function buildDocumentVerificationLinkPayload(
 export function buildDocumentVerificationDirectPayload(
 	values: DirectFormValues,
 	proof: string,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: DOCUMENT_VERIFICATION_TYPE,
 		method_type: "offsite",
-		is_test: isTest,
 		input_data: {
 			country: values.country.trim().toUpperCase(),
 			language: "EN",

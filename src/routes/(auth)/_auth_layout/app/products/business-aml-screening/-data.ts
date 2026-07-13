@@ -63,12 +63,10 @@ function buildBusinessAmlBlock(
 export function buildBusinessAmlScreeningLinkPayload(
 	values: BusinessAmlLinkFormValues,
 	options: BusinessAmlScreeningOptions,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: BUSINESS_AML_SCREENING_TYPE,
 		method_type: "onsite",
-		is_test: isTest,
 		input_data: {
 			country: values.screeningCountry.trim().toUpperCase(),
 			language: "EN",
@@ -82,12 +80,10 @@ export function buildBusinessAmlScreeningLinkPayload(
 export function buildBusinessAmlScreeningDirectPayload(
 	values: BusinessAmlDirectFormValues,
 	options: BusinessAmlScreeningOptions,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: BUSINESS_AML_SCREENING_TYPE,
 		method_type: "offsite",
-		is_test: isTest,
 		input_data: {
 			country: values.screeningCountry.trim().toUpperCase(),
 			language: "EN",

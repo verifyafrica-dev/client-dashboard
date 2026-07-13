@@ -272,7 +272,6 @@ type GovernmentRegistryFormValues = {
 export function buildGovernmentRegistryPayload(
 	values: GovernmentRegistryFormValues,
 	options?: { selfieProofUrl?: string | null },
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	const inputField = getPrimaryInputParameter(values.verificationType);
 	if (!inputField) {
@@ -300,7 +299,6 @@ export function buildGovernmentRegistryPayload(
 	return {
 		verification_type: values.verificationType as VerificationType,
 		method_type: "offsite",
-		is_test: isTest,
 		input_data: inputData,
 	};
 }

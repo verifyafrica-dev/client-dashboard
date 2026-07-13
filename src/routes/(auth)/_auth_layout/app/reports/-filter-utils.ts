@@ -35,7 +35,6 @@ type BuildReportsListQueryOptions = {
 	page: number;
 	perPage: number;
 	scope: ReportsListFilterScope;
-	isTest?: boolean;
 };
 
 function appendOptionalString(
@@ -128,7 +127,6 @@ export function buildReportsListQuery(
 	const query: Record<string, unknown> = {
 		page: options.page,
 		per_page: options.perPage,
-		is_test: options.isTest ?? false,
 	};
 
 	appendOptionalString(query, "search", filters.search);

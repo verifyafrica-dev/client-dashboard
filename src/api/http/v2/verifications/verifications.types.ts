@@ -19,7 +19,6 @@ export const VerificationListQuerySchema = z.object({
 	page: z.number().int().positive().optional(),
 	per_page: z.number().int().positive().optional(),
 	total_in_page: z.number().int().positive().optional(),
-	is_test: z.boolean().optional(),
 	batch_id: z.string().uuid().optional(),
 	status: VerificationStatusSchema.optional(),
 	verification_type: VerificationTypeSchema.optional(),
@@ -35,7 +34,6 @@ export const VerificationBatchListQuerySchema = z.object({
 	page: z.number().int().positive().optional(),
 	per_page: z.number().int().positive().optional(),
 	total_in_page: z.number().int().positive().optional(),
-	is_test: z.boolean().optional(),
 	status: VerificationStatusSchema.optional(),
 	search: z.string().optional(),
 	tenant_id: z.string().uuid().optional(),
@@ -66,7 +64,6 @@ export type VerificationProofKey = z.infer<typeof VerificationProofKeySchema>;
 export const VerificationRequestCreateSchema = z.object({
 	verification_type: VerificationTypeSchema,
 	input_data: z.record(z.string(), z.unknown()),
-	is_test: z.boolean().optional(),
 	method_type: z.string().optional(),
 	notification_email: z.string().email().optional(),
 });
@@ -83,7 +80,6 @@ export const BulkVerificationItemSchema = z.object({
 
 export const BulkVerificationCreateSchema = z.object({
 	items: z.array(BulkVerificationItemSchema).min(1),
-	is_test: z.boolean().optional(),
 });
 
 export type BulkVerificationCreatePayload = z.infer<
@@ -96,7 +92,6 @@ export const MixedVerificationStartSchema = z.object({
 	verification_id: z.string().uuid(),
 	full_address: z.string().optional(),
 	reference: z.string().optional(),
-	is_test: z.boolean().optional(),
 	notification_email: z.string().email().optional(),
 });
 
@@ -110,7 +105,6 @@ export const MixedVerificationUpsertSchema = z.object({
 	verifications: z.array(z.string()).min(1),
 	price: z.string().optional(),
 	is_active: z.boolean().optional(),
-	is_test: z.boolean().optional(),
 	is_custom: z.boolean().optional(),
 	journey_id: z.string().optional(),
 });
@@ -228,7 +222,6 @@ export interface MixedVerification {
 	price: string | null;
 	calculated_price: string | null;
 	is_active: boolean;
-	is_test: boolean;
 	is_custom: boolean;
 	journey_id: string | null;
 	deleted_at: string | null;

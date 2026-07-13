@@ -70,12 +70,10 @@ type RiskAssessmentFormValues = {
 
 export function buildRiskAssessmentPayload(
 	values: RiskAssessmentFormValues,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: RISK_ASSESSMENT_TYPE,
 		method_type: "onsite",
-		is_test: isTest,
 		input_data: {
 			email: values.email.trim(),
 			language: "EN",

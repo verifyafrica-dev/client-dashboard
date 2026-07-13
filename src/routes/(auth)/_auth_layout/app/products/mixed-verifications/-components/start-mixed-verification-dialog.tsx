@@ -72,7 +72,6 @@ export function StartMixedVerificationDialog({
 					email: email.trim(),
 					is_mixed: true,
 					verification_id: template.id,
-					is_test: false,
 					full_address: requiresAddress ? fullAddress.trim() : undefined,
 				},
 			});

@@ -20,12 +20,10 @@ type DirectFormValues = {
 
 export function buildAddressVerificationLinkPayload(
 	values: LinkFormValues,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: ADDRESS_VERIFICATION_TYPE,
 		method_type: "onsite",
-		is_test: isTest,
 		input_data: {
 			country: values.country.trim().toUpperCase(),
 			language: "EN",
@@ -43,12 +41,10 @@ export function buildAddressVerificationLinkPayload(
 export function buildAddressVerificationDirectPayload(
 	values: DirectFormValues,
 	proof: string,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: ADDRESS_VERIFICATION_TYPE,
 		method_type: "offsite",
-		is_test: isTest,
 		input_data: {
 			country: values.country.trim().toUpperCase(),
 			language: "EN",

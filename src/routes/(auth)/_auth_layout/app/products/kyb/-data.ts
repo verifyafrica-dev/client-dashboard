@@ -14,12 +14,10 @@ type KybFormValues = {
 
 export function buildKybVerificationPayload(
 	values: KybFormValues,
-	isTest = false,
 ): VerificationRequestCreatePayload {
 	return {
 		verification_type: KYB_VERIFICATION_TYPE,
 		method_type: "offsite",
-		is_test: isTest,
 		input_data: {
 			country: "",
 			language: "EN",

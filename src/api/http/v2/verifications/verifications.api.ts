@@ -92,11 +92,9 @@ export const fetchShuftiProofAsset = async (
 export const VERIFICATIONS_V2_API = {
 	TYPES: async (
 		tenantId?: string,
-		params?: Pick<VerificationListQuery, "is_test">,
 	): Promise<VerificationTypeDefinition[]> =>
 		await $http
 			.get(VERIFICATIONS_V2_ENDPOINTS.types, {
-				params,
 				...withOptionalTenantHeader(tenantId),
 			})
 			.then((res) => unwrapV2Data<VerificationTypeDefinition[]>(res)),

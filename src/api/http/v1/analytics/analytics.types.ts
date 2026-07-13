@@ -4,7 +4,6 @@ import type { VerificationStatus } from "../verifications/verifications.types";
 export const AnalyticsDateRangeQuerySchema = z.object({
 	from_date: z.string().optional(),
 	to_date: z.string().optional(),
-	is_test: z.boolean().optional(),
 	format: z.enum(["json", "json-html"]).optional(),
 });
 

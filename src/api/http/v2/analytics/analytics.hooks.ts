@@ -25,7 +25,6 @@ export const ANALYTICS_V2_QUERY_KEYS = {
 			tenantId,
 			params?.from_date ?? null,
 			params?.to_date ?? null,
-			params?.is_test ?? null,
 		] as const,
 	statements: (params?: AnalyticsStatementsListQuery, tenantId?: string) =>
 		[
