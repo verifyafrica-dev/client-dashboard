@@ -5,6 +5,8 @@ import {
 	type UseQueryResult,
 } from "@tanstack/react-query";
 
+import type { V2AxiosError } from "#/api/http/shared";
+
 import { TENANTS_V2_API } from "./tenants.api";
 import type {
 	KycComplianceSection,
@@ -38,6 +40,19 @@ import type {
 	SupportedCountry,
 	TenantDetail,
 } from "./tenants.types";
+
+function isTenantWebhookNotFoundError(error: unknown) {
+	const axiosError = error as V2AxiosError | null;
+
+	if (axiosError?.response?.status === 404) {
+		return true;
+	}
+
+	const errors = axiosError?.response?.data?.errors ?? [];
+	return errors.some((entry) =>
+		entry.toLowerCase().includes("tenantwebhook"),
+	);
+}
 
 const TENANTS_V2_STALE_TIME = 60_000;
 
@@ -128,18 +143,33 @@ export const useTenantApiKeyV2Query = (
 export const useTenantWebhookV2Query = (
 	tenantId: string | undefined,
 	enabled = true,
-): UseQueryResult<TenantWebhook> =>
-	useQuery<TenantWebhook>({
+): UseQueryResult<TenantWebhook | null> =>
+	useQuery<TenantWebhook | null>({
 		queryKey: TENANTS_V2_QUERY_KEYS.webhook(tenantId ?? ""),
-		queryFn: () => {
+		queryFn: async () => {
 			if (!tenantId) {
 				throw new Error("Tenant ID is required");
 			}
 
-			return TENANTS_V2_API.WEBHOOK(tenantId);
+			try {
+				return await TENANTS_V2_API.WEBHOOK(tenantId);
+			} catch (error) {
+				if (isTenantWebhookNotFoundError(error)) {
+					return null;
+				}
+
+				throw error;
+			}
 		},
 		enabled: enabled && Boolean(tenantId),
 		staleTime: TENANTS_V2_STALE_TIME,
+		retry: (failureCount, error) => {
+			if (isTenantWebhookNotFoundError(error)) {
+				return false;
+			}
+
+			return failureCount < 3;
+		},
 	});
 
 export const useTenantInvitationsV2Query = (

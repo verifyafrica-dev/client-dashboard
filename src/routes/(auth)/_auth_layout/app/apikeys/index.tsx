@@ -16,6 +16,7 @@ import {
 	useReplaceTenantApiKeyV2Mutation,
 	useTenantV2DetailQuery,
 	useTenantApiKeyV2Query,
+	useTenantWebhookV2Query,
 	useUpdateTenantApiKeyV2Mutation,
 } from "#/api/http/v2/tenants/tenants.hooks";
 import { Badge } from "#/components/ui/badge";
@@ -37,14 +38,19 @@ import { cn } from "#/lib/utils.ts";
 import { DashboardOnboarding } from "../-components/dashboard-onboarding";
 import { shouldShowDashboardOnboarding } from "../-data";
 import { useCurrentTenant } from "../team/-data";
-import { formatApiKeyDate, getApiKeyPreview, maskApiKey } from "./-data";
+import { WebhookFormCard } from "./-components/webhook-form-card";
+import { formatApiKeyDate, getApiKeyPreview, getWebhookTokenPreview, maskApiKey } from "./-data";
 
 export const Route = createFileRoute("/(auth)/_auth_layout/app/apikeys/")(
 	{
 	head: () => ({
 		meta: [
 			{ title: "API Keys | VerifyAfrica" },
-			{ name: "description", content: "Create and manage API keys for VerifyAfrica integrations." },
+			{
+				name: "description",
+				content:
+					"Manage your API key and webhook URL for VerifyAfrica integrations.",
+			},
 		],
 	}),
 		component: ApiKeysPage,
@@ -58,6 +64,7 @@ function ApiKeysPage() {
 
 	const tenantQuery = useTenantV2DetailQuery(tenantId, Boolean(tenantId));
 	const apiKeyQuery = useTenantApiKeyV2Query(tenantId, Boolean(tenantId));
+	const webhookQuery = useTenantWebhookV2Query(tenantId, Boolean(tenantId));
 	const updateApiKeyMutation = useUpdateTenantApiKeyV2Mutation(tenantId ?? "");
 	const rotateApiKeyMutation = useReplaceTenantApiKeyV2Mutation(tenantId ?? "");
 
@@ -267,7 +274,14 @@ function ApiKeysPage() {
 				</Card>
 			)}
 
-			<UsageInstructionsCard keyPreview={getApiKeyPreview(apiKey?.key)} />
+			<WebhookFormCard />
+
+			<UsageInstructionsCard
+				keyPreview={getApiKeyPreview(apiKey?.key)}
+				webhookTokenPreview={getWebhookTokenPreview(
+					webhookQuery.data?.auth_token,
+				)}
+			/>
 		</div>
 	);
 }
@@ -280,10 +294,11 @@ function ApiKeysHeader() {
 			</div>
 			<div className="flex flex-col gap-1">
 				<h1 className="text-2xl font-semibold tracking-tight">
-					API Access Key
+					API Access
 				</h1>
 				<p className="text-sm text-muted-foreground">
-					Manage your API key to authenticate requests to the VerifyAfrica API.
+					Manage your API key and webhook URL to integrate with the
+					VerifyAfrica API.
 				</p>
 			</div>
 		</div>
@@ -323,7 +338,13 @@ function ApiKeyCardSkeleton() {
 	);
 }
 
-function UsageInstructionsCard({ keyPreview }: { keyPreview: string }) {
+function UsageInstructionsCard({
+	keyPreview,
+	webhookTokenPreview,
+}: {
+	keyPreview: string;
+	webhookTokenPreview: string;
+}) {
 	return (
 		<Card>
 			<CardHeader>
@@ -376,6 +397,34 @@ function UsageInstructionsCard({ keyPreview }: { keyPreview: string }) {
 								<li>Rotate keys periodically or when compromised</li>
 								<li>Deactivate keys when not in use</li>
 							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div className="rounded-lg border bg-muted/20 p-4">
+					<div className="flex flex-col items-start gap-3 sm:flex-row">
+						<div className="flex items-center gap-2">
+							<div className="flex size-7 shrink-0 items-center justify-center rounded-md bg-primary/10 text-sm font-semibold text-primary">
+								3
+							</div>
+							<h3 className="block font-medium sm:hidden">Webhook Events</h3>
+						</div>
+						<div className="flex min-w-0 flex-1 flex-col gap-2">
+							<h3 className="hidden font-medium sm:block">Webhook Events</h3>
+							<p className="text-sm text-muted-foreground">
+								When a verification completes, we POST a JSON payload to your
+								saved webhook URL with your webhook token in the Authorization
+								header:
+							</p>
+							<pre className="min-w-full overflow-x-auto rounded-lg bg-zinc-900 px-4 py-3 text-sm text-emerald-400">
+								<code className="break-all whitespace-pre-wrap">{`Authorization: Bearer ${webhookTokenPreview}
+
+{
+  "status": "success",
+  "event": "verification.completed",
+  "data": { ... }
+}`}</code>
+							</pre>
 						</div>
 					</div>
 				</div>
