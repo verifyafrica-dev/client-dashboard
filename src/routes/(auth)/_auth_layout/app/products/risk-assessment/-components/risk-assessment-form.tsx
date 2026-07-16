@@ -219,7 +219,9 @@ export function RiskAssessmentForm() {
 								>
 									<DialogContent className="sm:max-w-md">
 										<DialogHeader>
-											<DialogTitle>Select check</DialogTitle>
+											<DialogTitle className="font-semibold">
+												Select check
+											</DialogTitle>
 										</DialogHeader>
 										<div className="flex flex-col gap-2">
 											{RISK_ASSESSMENT_CHECKS.map((check) => (
@@ -228,13 +230,12 @@ export function RiskAssessmentForm() {
 													type="button"
 													variant={
 														field.state.value === check.risk_reference
-															? "secondary"
+															? "default"
 															: "outline"
 													}
 													className="h-auto justify-start px-4 py-3"
 													onClick={() => {
 														field.handleChange(check.risk_reference);
-														setIsCheckDialogOpen(false);
 													}}
 												>
 													<ChartBarIcon className="size-4" />
@@ -254,7 +255,10 @@ export function RiskAssessmentForm() {
 						defaultValue="advanced"
 						className="rounded-lg border px-4"
 					>
-						<AccordionItem value="advanced" className="border-none">
+						<AccordionItem
+							value="advanced"
+							className="border-none"
+						>
 							<AccordionTrigger className="py-4 hover:no-underline">
 								<div className="flex items-center gap-3 text-left">
 									<SlidersHorizontalIcon className="size-5 shrink-0 text-secondary" />
@@ -294,7 +298,10 @@ export function RiskAssessmentForm() {
 									<FieldLabel>Filters</FieldLabel>
 									<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
 										{AML_SCREENING_FILTERS.map((filter) => (
-											<div key={filter.key} className="flex items-center gap-2">
+											<div
+												key={filter.key}
+												className="flex items-center gap-2"
+											>
 												<Checkbox
 													id={`risk-assessment-filter-${filter.key}`}
 													checked={filters[filter.key]}
@@ -374,7 +381,10 @@ function RiskRangeRow({
 					onCheckedChange={(enabled) => onChange({ enabled })}
 					aria-label={`Toggle ${label} risk range`}
 				/>
-				<Badge variant="outline" className={badgeClassName}>
+				<Badge
+					variant="outline"
+					className={badgeClassName}
+				>
 					{label}
 				</Badge>
 			</div>
