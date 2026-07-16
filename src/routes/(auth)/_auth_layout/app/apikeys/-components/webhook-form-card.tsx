@@ -180,7 +180,7 @@ export function WebhookFormCard() {
 						<CardTitle className="font-semibold">Webhook URL</CardTitle>
 						<CardDescription>
 							{isConfigured
-								? "Receive verification.completed events at your endpoint"
+								? "Receive verification.completed and verification.failed events at your endpoint"
 								: "Add an endpoint to receive verification events"}
 						</CardDescription>
 					</div>

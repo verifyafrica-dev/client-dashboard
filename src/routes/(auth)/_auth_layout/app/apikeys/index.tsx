@@ -412,16 +412,18 @@ function UsageInstructionsCard({
 						<div className="flex min-w-0 flex-1 flex-col gap-2">
 							<h3 className="hidden font-medium sm:block">Webhook Events</h3>
 							<p className="text-sm text-muted-foreground">
-								When a verification completes, we POST a JSON payload to your
-								saved webhook URL with your webhook token in the Authorization
-								header:
+								When a verification reaches a terminal status, we POST a JSON
+								payload to your saved webhook URL with your webhook token in the
+								Authorization header. Successful checks use{" "}
+								<code>verification.completed</code>; failed checks use{" "}
+								<code>verification.failed</code>:
 							</p>
 							<pre className="min-w-full overflow-x-auto rounded-lg bg-zinc-900 px-4 py-3 text-sm text-emerald-400">
 								<code className="break-all whitespace-pre-wrap">{`Authorization: Bearer ${webhookTokenPreview}
 
 {
-  "status": "success",
-  "event": "verification.completed",
+  "status": "success" | "failure",
+  "event": "verification.completed" | "verification.failed",
   "data": { ... }
 }`}</code>
 							</pre>
