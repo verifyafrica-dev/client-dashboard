@@ -21,6 +21,7 @@ import { Route as unguardedUnguarded_layoutForgotPasswordIndexRouteImport } from
 import { Route as unguardedUnguarded_layoutActivateAccountIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/activate-account/index'
 import { Route as authAuth_layoutAppIndexRouteImport } from './routes/(auth)/_auth_layout/app/index'
 import { Route as unguardedUnguarded_layoutVerifyResultRouteImport } from './routes/(unguarded)/_unguarded_layout/verify/result'
+import { Route as unguardedUnguarded_layoutVerificationResultRouteImport } from './routes/(unguarded)/_unguarded_layout/verification/result'
 import { Route as unguardedUnguarded_layoutVerifyLinkIndexRouteImport } from './routes/(unguarded)/_unguarded_layout/verify/$link/index'
 import { Route as authAuth_layoutAppTeamIndexRouteImport } from './routes/(auth)/_auth_layout/app/team/index'
 import { Route as authAuth_layoutAppReportsIndexRouteImport } from './routes/(auth)/_auth_layout/app/reports/index'
@@ -108,6 +109,12 @@ const unguardedUnguarded_layoutVerifyResultRoute =
   unguardedUnguarded_layoutVerifyResultRouteImport.update({
     id: '/verify/result',
     path: '/verify/result',
+    getParentRoute: () => unguardedUnguarded_layoutRoute,
+  } as any)
+const unguardedUnguarded_layoutVerificationResultRoute =
+  unguardedUnguarded_layoutVerificationResultRouteImport.update({
+    id: '/verification/result',
+    path: '/verification/result',
     getParentRoute: () => unguardedUnguarded_layoutRoute,
   } as any)
 const unguardedUnguarded_layoutVerifyLinkIndexRoute =
@@ -246,6 +253,7 @@ const authAuth_layoutAppReportsBatchBatchIdIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/verification/result': typeof unguardedUnguarded_layoutVerificationResultRoute
   '/verify/result': typeof unguardedUnguarded_layoutVerifyResultRoute
   '/app/': typeof authAuth_layoutAppIndexRoute
   '/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
@@ -280,6 +288,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/verification/result': typeof unguardedUnguarded_layoutVerificationResultRoute
   '/verify/result': typeof unguardedUnguarded_layoutVerifyResultRoute
   '/app': typeof authAuth_layoutAppIndexRoute
   '/activate-account': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
@@ -317,6 +326,7 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/(auth)/_auth_layout': typeof authAuth_layoutRouteWithChildren
   '/(unguarded)/_unguarded_layout': typeof unguardedUnguarded_layoutRouteWithChildren
+  '/(unguarded)/_unguarded_layout/verification/result': typeof unguardedUnguarded_layoutVerificationResultRoute
   '/(unguarded)/_unguarded_layout/verify/result': typeof unguardedUnguarded_layoutVerifyResultRoute
   '/(auth)/_auth_layout/app/': typeof authAuth_layoutAppIndexRoute
   '/(unguarded)/_unguarded_layout/activate-account/': typeof unguardedUnguarded_layoutActivateAccountIndexRoute
@@ -353,6 +363,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/$'
+    | '/verification/result'
     | '/verify/result'
     | '/app/'
     | '/activate-account/'
@@ -387,6 +398,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/verification/result'
     | '/verify/result'
     | '/app'
     | '/activate-account'
@@ -423,6 +435,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/(auth)/_auth_layout'
     | '/(unguarded)/_unguarded_layout'
+    | '/(unguarded)/_unguarded_layout/verification/result'
     | '/(unguarded)/_unguarded_layout/verify/result'
     | '/(auth)/_auth_layout/app/'
     | '/(unguarded)/_unguarded_layout/activate-account/'
@@ -546,6 +559,13 @@ declare module '@tanstack/react-router' {
       path: '/verify/result'
       fullPath: '/verify/result'
       preLoaderRoute: typeof unguardedUnguarded_layoutVerifyResultRouteImport
+      parentRoute: typeof unguardedUnguarded_layoutRoute
+    }
+    '/(unguarded)/_unguarded_layout/verification/result': {
+      id: '/(unguarded)/_unguarded_layout/verification/result'
+      path: '/verification/result'
+      fullPath: '/verification/result'
+      preLoaderRoute: typeof unguardedUnguarded_layoutVerificationResultRouteImport
       parentRoute: typeof unguardedUnguarded_layoutRoute
     }
     '/(unguarded)/_unguarded_layout/verify/$link/': {
@@ -773,6 +793,7 @@ const authAuth_layoutRouteWithChildren = authAuth_layoutRoute._addFileChildren(
 )
 
 interface unguardedUnguarded_layoutRouteChildren {
+  unguardedUnguarded_layoutVerificationResultRoute: typeof unguardedUnguarded_layoutVerificationResultRoute
   unguardedUnguarded_layoutVerifyResultRoute: typeof unguardedUnguarded_layoutVerifyResultRoute
   unguardedUnguarded_layoutActivateAccountIndexRoute: typeof unguardedUnguarded_layoutActivateAccountIndexRoute
   unguardedUnguarded_layoutForgotPasswordIndexRoute: typeof unguardedUnguarded_layoutForgotPasswordIndexRoute
@@ -785,6 +806,8 @@ interface unguardedUnguarded_layoutRouteChildren {
 
 const unguardedUnguarded_layoutRouteChildren: unguardedUnguarded_layoutRouteChildren =
   {
+    unguardedUnguarded_layoutVerificationResultRoute:
+      unguardedUnguarded_layoutVerificationResultRoute,
     unguardedUnguarded_layoutVerifyResultRoute:
       unguardedUnguarded_layoutVerifyResultRoute,
     unguardedUnguarded_layoutActivateAccountIndexRoute:
