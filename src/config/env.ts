@@ -21,6 +21,8 @@ const envSchema = z.object({
 	VITE_R2_SECRET_ACCESS_KEY: z.string().default(""),
 	VITE_R2_BUCKET_NAME: z.string().default(""),
 	VITE_R2_PUBLIC_URL: z.string().default(""),
+	/** R2 jurisdiction for the bucket: "" (default), "eu", or "fedramp" */
+	VITE_R2_JURISDICTION: z.string().default(""),
 });
 
 const parsed = envSchema.safeParse(import.meta.env);
@@ -52,6 +54,7 @@ export const env = {
 		secretAccessKey: data.VITE_R2_SECRET_ACCESS_KEY,
 		bucketName: data.VITE_R2_BUCKET_NAME,
 		publicUrl: data.VITE_R2_PUBLIC_URL.replace(/\/$/, ""),
+		jurisdiction: data.VITE_R2_JURISDICTION,
 	},
 	// Computed runtime values
 	isDevelopment: import.meta.env.DEV,

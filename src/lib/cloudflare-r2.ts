@@ -14,7 +14,13 @@ export function isR2Configured() {
 }
 
 export function getR2Endpoint() {
-	return `https://${env.r2.accountId}.r2.cloudflarestorage.com`;
+	// Jurisdictional buckets (e.g. EU) must use the jurisdiction-specific
+	// S3 API host. Hitting the default host returns errors without CORS
+	// headers, which browsers surface as a CORS failure.
+	const jurisdiction = env.r2.jurisdiction.trim().toLowerCase();
+	const jurisdictionSegment = jurisdiction ? `${jurisdiction}.` : "";
+
+	return `https://${env.r2.accountId}.${jurisdictionSegment}r2.cloudflarestorage.com`;
 }
 
 export function getR2BucketName() {
