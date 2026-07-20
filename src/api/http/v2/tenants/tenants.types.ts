@@ -1,16 +1,14 @@
 import { z } from "zod";
-
-import type {
-	BillingInformationStatus,
-	BillingPlan,
-} from "#/api/http/v2/billing/billing.types";
-
 import type {
 	V2AxiosError,
 	V2MessageSuccessResponse,
 	V2PaginatedSuccessResponse,
 	V2SuccessResponse,
 } from "#/api/http/shared";
+import type {
+	BillingInformationStatus,
+	BillingPlan,
+} from "#/api/http/v2/billing/billing.types";
 
 export type { SupportedCountry } from "#/api/http/v1/tenants/tenants.types";
 
@@ -239,6 +237,20 @@ export interface TenantWebhook {
 	updated_at: string;
 }
 
+export type WebhookDeliveryStatus = "pending" | "success" | "failure";
+
+export interface TenantWebhookEvent {
+	id: string;
+	created_at: string;
+	retry_count: number;
+	status: WebhookDeliveryStatus;
+	event: string;
+	payload: Record<string, unknown> | null;
+	verification_request_id: string;
+}
+
+export type TenantWebhookEventListQuery = TenantListQuery;
+
 export interface TenantInvitation {
 	id: string;
 	email: string;
@@ -366,7 +378,9 @@ export const TenantAPIKeyUpdateSchema = z.object({
 	expires_at: z.string().nullable().optional(),
 });
 
-export type TenantAPIKeyUpdatePayload = z.infer<typeof TenantAPIKeyUpdateSchema>;
+export type TenantAPIKeyUpdatePayload = z.infer<
+	typeof TenantAPIKeyUpdateSchema
+>;
 
 export const TenantAPIKeyPutUpdateSchema = z.object({
 	key: z.string().optional(),
@@ -513,7 +527,8 @@ export type KycSectionUpdatePayload = Record<string, unknown>;
 
 export type TenantDetailResponse = V2SuccessResponse<TenantDetail>;
 export type TenantListResponse = V2PaginatedSuccessResponse<TenantListItem>;
-export type TenantAllListResponse = V2PaginatedSuccessResponse<TenantAllListItem>;
+export type TenantAllListResponse =
+	V2PaginatedSuccessResponse<TenantAllListItem>;
 export type TenantInvitationListResponse =
 	V2PaginatedSuccessResponse<TenantInvitation>;
 export type TenantUserListResponse = V2PaginatedSuccessResponse<TenantUser>;
@@ -522,6 +537,8 @@ export type SupportedCountryListResponse = V2SuccessResponse<
 >;
 export type TenantAPIKeyResponse = V2SuccessResponse<TenantAPIKey>;
 export type TenantWebhookResponse = V2SuccessResponse<TenantWebhook>;
+export type TenantWebhookEventListResponse =
+	V2PaginatedSuccessResponse<TenantWebhookEvent>;
 export type TenantInvitationResponse = V2SuccessResponse<TenantInvitation>;
 export type TenantComplianceDataResponse =
 	V2SuccessResponse<TenantComplianceDataPayload>;
@@ -559,6 +576,12 @@ export interface PaginatedTenantInvitationListResult {
 export interface PaginatedTenantUserListResult {
 	items: TenantUser[];
 	meta: NonNullable<TenantUserListResponse["meta"]>;
+	message: string;
+}
+
+export interface PaginatedTenantWebhookEventListResult {
+	items: TenantWebhookEvent[];
+	meta: NonNullable<TenantWebhookEventListResponse["meta"]>;
 	message: string;
 }
 

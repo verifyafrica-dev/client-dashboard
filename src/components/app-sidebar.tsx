@@ -4,11 +4,11 @@ import {
 	CreditCardIcon,
 	HouseIcon,
 	type IconWeight,
-	KeyIcon,
 	ShieldCheckIcon,
 	SquaresFourIcon,
 	UserCircleIcon,
 	UsersThreeIcon,
+	WebhooksLogoIcon,
 } from "@phosphor-icons/react";
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ComponentType, SVGProps } from "react";
@@ -67,9 +67,9 @@ const navItems = [
 		icon: ShieldCheckIcon,
 	},
 	{
-		title: "API Keys",
-		to: "/app/apikeys",
-		icon: KeyIcon,
+		title: "Webhooks",
+		to: "/app/webhooks",
+		icon: WebhooksLogoIcon,
 	},
 	{
 		title: "Billing",

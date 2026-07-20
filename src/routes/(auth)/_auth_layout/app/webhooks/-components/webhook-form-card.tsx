@@ -31,8 +31,8 @@ import { Separator } from "#/components/ui/separator";
 import { Skeleton } from "#/components/ui/skeleton";
 import { Switch } from "#/components/ui/switch";
 import { useClipboard } from "#/hooks/use-clipboard";
-import { cn } from "#/lib/utils.ts";
 import { hasChangedFields } from "#/lib/pick-changed-fields";
+import { cn } from "#/lib/utils.ts";
 import { useCurrentTenant } from "../../team/-data";
 import {
 	EMPTY_WEBHOOK_FORM,
@@ -53,18 +53,19 @@ export function WebhookFormCard() {
 	const { copied, copy } = useClipboard();
 	const { tenantId } = useCurrentTenant();
 	const webhookQuery = useTenantWebhookV2Query(tenantId, Boolean(tenantId));
-	const createWebhookMutation = useCreateTenantWebhookV2Mutation(tenantId ?? "");
-	const updateWebhookMutation = useUpdateTenantWebhookV2Mutation(tenantId ?? "");
+	const createWebhookMutation = useCreateTenantWebhookV2Mutation(
+		tenantId ?? "",
+	);
+	const updateWebhookMutation = useUpdateTenantWebhookV2Mutation(
+		tenantId ?? "",
+	);
 
 	const webhook = webhookQuery.data;
 	const isConfigured = webhook !== null && webhook !== undefined;
 	const webhookToken = webhook?.auth_token ?? "";
 
 	const [form, setForm] = useState<WebhookFormState>(EMPTY_WEBHOOK_FORM);
-	const originalForm = useMemo(
-		() => getWebhookFormState(webhook),
-		[webhook],
-	);
+	const originalForm = useMemo(() => getWebhookFormState(webhook), [webhook]);
 	const hasChanges = isConfigured ? hasChangedFields(originalForm, form) : true;
 
 	const isLoading = webhookQuery.isPending || webhookQuery.isFetching;
@@ -116,9 +117,7 @@ export function WebhookFormCard() {
 
 		const urlResult = webhookUrlSchema.safeParse(form.url.trim());
 		if (!urlResult.success) {
-			toast.error(
-				urlResult.error.issues[0]?.message ?? "Invalid webhook URL",
-			);
+			toast.error(urlResult.error.issues[0]?.message ?? "Invalid webhook URL");
 			return;
 		}
 
@@ -200,10 +199,7 @@ export function WebhookFormCard() {
 			</CardHeader>
 
 			<CardContent>
-				<form
-					className="flex flex-col gap-6"
-					onSubmit={handleSubmit}
-				>
+				<form className="flex flex-col gap-6" onSubmit={handleSubmit}>
 					<div className="space-y-1.5">
 						<Label htmlFor="webhook-url">Endpoint URL</Label>
 						<Input
@@ -266,8 +262,8 @@ export function WebhookFormCard() {
 								</Button>
 							</div>
 							<p className="text-xs text-muted-foreground">
-								Verify incoming requests using the Authorization Bearer token
-								we include on every webhook delivery.
+								Verify incoming requests using the Authorization Bearer token we
+								include on every webhook delivery.
 							</p>
 						</div>
 					) : (
@@ -275,7 +271,8 @@ export function WebhookFormCard() {
 							<p className="text-sm font-medium">Webhook token</p>
 							<p className="mt-1 text-xs text-muted-foreground">
 								A secure token is generated automatically when you save your
-								webhook URL. Use it to verify that events came from VerifyAfrica.
+								webhook URL. Use it to verify that events came from
+								VerifyAfrica.
 							</p>
 						</div>
 					)}

@@ -1,8 +1,8 @@
 import {
+	type UseQueryResult,
 	useMutation,
 	useQuery,
 	useQueryClient,
-	type UseQueryResult,
 } from "@tanstack/react-query";
 
 import type { V2AxiosError } from "#/api/http/shared";
@@ -15,30 +15,32 @@ import type {
 	PaginatedTenantInvitationListResult,
 	PaginatedTenantListResult,
 	PaginatedTenantUserListResult,
+	PaginatedTenantWebhookEventListResult,
+	SupportedCountry,
+	TenantAllListQuery,
+	TenantAPIKey,
 	TenantAPIKeyPutUpdatePayload,
 	TenantAPIKeyUpdatePayload,
-	TenantComplianceDocumentRegisterPayload,
 	TenantComplianceDocumentDeletePayload,
+	TenantComplianceDocumentRegisterPayload,
 	TenantCreatePayload,
+	TenantDetail,
 	TenantInvitationAcceptPayload,
 	TenantInvitationCreatePayload,
 	TenantInvitationCreateUserPayload,
-	TenantInvitationVerifyPayload,
-	TenantAllListQuery,
 	TenantInvitationListQuery,
+	TenantInvitationVerifyPayload,
 	TenantListQuery,
-	TenantUserListQuery,
 	TenantUpdatePayload,
+	TenantUserListQuery,
 	TenantUserMembershipUpdatePayload,
 	TenantUserRoleUpdatePayload,
-	TenantVerificationConfigUpdatePayload,
-	TenantWebhookCreatePayload,
-	TenantWebhookUpdatePayload,
 	TenantVerificationConfigListData,
+	TenantVerificationConfigUpdatePayload,
 	TenantWebhook,
-	TenantAPIKey,
-	SupportedCountry,
-	TenantDetail,
+	TenantWebhookCreatePayload,
+	TenantWebhookEventListQuery,
+	TenantWebhookUpdatePayload,
 } from "./tenants.types";
 
 function isTenantWebhookNotFoundError(error: unknown) {
@@ -49,9 +51,7 @@ function isTenantWebhookNotFoundError(error: unknown) {
 	}
 
 	const errors = axiosError?.response?.data?.errors ?? [];
-	return errors.some((entry) =>
-		entry.toLowerCase().includes("tenantwebhook"),
-	);
+	return errors.some((entry) => entry.toLowerCase().includes("tenantwebhook"));
 }
 
 const TENANTS_V2_STALE_TIME = 60_000;
@@ -66,6 +66,8 @@ export const TENANTS_V2_QUERY_KEYS = {
 	countries: ["tenants-v2", "countries"] as const,
 	apiKey: (tenantId: string) => ["tenants-v2", "api-key", tenantId] as const,
 	webhook: (tenantId: string) => ["tenants-v2", "webhook", tenantId] as const,
+	webhookEvents: (tenantId: string, params?: TenantWebhookEventListQuery) =>
+		["tenants-v2", "webhook-events", tenantId, params ?? {}] as const,
 	invitations: (tenantId: string, params?: TenantInvitationListQuery) =>
 		["tenants-v2", "invitations", tenantId, params ?? {}] as const,
 	users: (tenantId: string, params?: TenantUserListQuery) =>
@@ -170,6 +172,24 @@ export const useTenantWebhookV2Query = (
 
 			return failureCount < 3;
 		},
+	});
+
+export const useTenantWebhookEventsV2Query = (
+	tenantId: string | undefined,
+	params?: TenantWebhookEventListQuery,
+	enabled = true,
+): UseQueryResult<PaginatedTenantWebhookEventListResult> =>
+	useQuery<PaginatedTenantWebhookEventListResult>({
+		queryKey: TENANTS_V2_QUERY_KEYS.webhookEvents(tenantId ?? "", params),
+		queryFn: () => {
+			if (!tenantId) {
+				throw new Error("Tenant ID is required");
+			}
+
+			return TENANTS_V2_API.WEBHOOK_EVENTS_LIST(tenantId, params);
+		},
+		enabled: enabled && Boolean(tenantId),
+		staleTime: TENANTS_V2_STALE_TIME,
 	});
 
 export const useTenantInvitationsV2Query = (

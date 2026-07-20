@@ -1,9 +1,33 @@
+import { z } from "zod";
+
 import type {
 	TenantWebhook,
 	TenantWebhookCreatePayload,
 	TenantWebhookUpdatePayload,
+	WebhookDeliveryStatus,
 } from "#/api/http/v2/tenants/tenants.types";
 import { pickChangedFields } from "#/lib/pick-changed-fields";
+
+export const webhooksSearchSchema = z.object({
+	tab: z.enum(["configuration", "deliveries"]).optional(),
+});
+
+export type WebhooksSearchParams = z.infer<typeof webhooksSearchSchema>;
+
+export function mergeWebhooksSearchParams(
+	current: WebhooksSearchParams,
+	patch: Partial<WebhooksSearchParams>,
+): WebhooksSearchParams {
+	const nextTab = patch.tab ?? current.tab ?? "configuration";
+
+	if (nextTab === "configuration") {
+		return {};
+	}
+
+	return { tab: nextTab };
+}
+
+export const WEBHOOK_EVENTS_PAGE_SIZE = 20;
 
 export type WebhookFormState = {
 	url: string;
@@ -88,6 +112,10 @@ export function formatApiKeyDate(value: string | null) {
 	return apiKeyDateFormatter.format(new Date(value));
 }
 
+export function formatWebhookEventDate(value: string) {
+	return apiKeyDateFormatter.format(new Date(value));
+}
+
 export function maskApiKey(key: string, isVisible: boolean) {
 	if (isVisible) {
 		return key;
@@ -103,4 +131,32 @@ export function getApiKeyPreview(key: string | undefined) {
 	}
 
 	return key.length > 20 ? `${key.slice(0, 20)}...` : key;
+}
+
+export function getWebhookDeliveryStatusLabel(status: WebhookDeliveryStatus) {
+	switch (status) {
+		case "success":
+			return "Success";
+		case "failure":
+			return "Failure";
+		case "pending":
+			return "Pending";
+		default:
+			return status;
+	}
+}
+
+export function getWebhookDeliveryStatusClassName(
+	status: WebhookDeliveryStatus,
+) {
+	switch (status) {
+		case "success":
+			return "border-emerald-200 bg-emerald-50 text-emerald-700";
+		case "failure":
+			return "border-red-200 bg-red-50 text-red-700";
+		case "pending":
+			return "border-amber-200 bg-amber-50 text-amber-700";
+		default:
+			return "border-muted bg-muted text-muted-foreground";
+	}
 }

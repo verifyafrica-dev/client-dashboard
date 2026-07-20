@@ -12,14 +12,16 @@ import type {
 	PaginatedTenantInvitationListResult,
 	PaginatedTenantListResult,
 	PaginatedTenantUserListResult,
+	PaginatedTenantWebhookEventListResult,
+	TenantAllListQuery,
 	TenantAPIKey,
 	TenantAPIKeyPutUpdatePayload,
 	TenantAPIKeyUpdatePayload,
 	TenantComplianceDataPayload,
-	TenantComplianceDocumentRegisterData,
-	TenantComplianceDocumentRegisterPayload,
 	TenantComplianceDocumentDeleteData,
 	TenantComplianceDocumentDeletePayload,
+	TenantComplianceDocumentRegisterData,
+	TenantComplianceDocumentRegisterPayload,
 	TenantCreatePayload,
 	TenantDetail,
 	TenantInvitation,
@@ -27,20 +29,20 @@ import type {
 	TenantInvitationAcceptPayload,
 	TenantInvitationCreatePayload,
 	TenantInvitationCreateUserPayload,
+	TenantInvitationListQuery,
 	TenantInvitationVerifyData,
 	TenantInvitationVerifyPayload,
-	TenantAllListQuery,
-	TenantInvitationListQuery,
 	TenantListQuery,
-	TenantUserListQuery,
 	TenantUpdatePayload,
 	TenantUser,
+	TenantUserListQuery,
 	TenantUserMembershipUpdatePayload,
 	TenantUserRoleUpdatePayload,
 	TenantVerificationConfigListData,
 	TenantVerificationConfigUpdatePayload,
 	TenantWebhook,
 	TenantWebhookCreatePayload,
+	TenantWebhookEventListQuery,
 	TenantWebhookUpdatePayload,
 } from "./tenants.types";
 
@@ -64,11 +66,11 @@ const TENANTS_V2_ENDPOINTS = {
 	verifyInvitation: "/v2/tenants/verify-invitation/",
 	users: "/v2/tenants/users/",
 	userDetail: (userId: string) => `/v2/tenants/users/${userId}/`,
-	userMembership: (userId: string) =>
-		`/v2/tenants/users/${userId}/membership/`,
+	userMembership: (userId: string) => `/v2/tenants/users/${userId}/membership/`,
 	userRole: (userId: string) => `/v2/tenants/users/${userId}/role/`,
 	verificationConfigs: "/v2/tenants/verification-configs/",
 	webhook: "/v2/tenants/webhook/",
+	webhookEvents: "/v2/tenants/webhook/events/",
 } as const;
 
 const withTenantHeader = (tenantId: string) => ({
@@ -285,10 +287,7 @@ export const TENANTS_V2_API = {
 		tenantId: string,
 	): Promise<TenantVerificationConfigListData> =>
 		await $http
-			.get(
-				TENANTS_V2_ENDPOINTS.verificationConfigs,
-				withTenantHeader(tenantId),
-			)
+			.get(TENANTS_V2_ENDPOINTS.verificationConfigs, withTenantHeader(tenantId))
 			.then((res) => unwrapV2Data<TenantVerificationConfigListData>(res)),
 
 	REPLACE_VERIFICATION_CONFIGS: async (
@@ -335,4 +334,15 @@ export const TENANTS_V2_API = {
 		await $http
 			.patch(TENANTS_V2_ENDPOINTS.webhook, data, withTenantHeader(tenantId))
 			.then((res) => unwrapV2Data<TenantWebhook>(res)),
+
+	WEBHOOK_EVENTS_LIST: async (
+		tenantId: string,
+		params?: TenantWebhookEventListQuery,
+	): Promise<PaginatedTenantWebhookEventListResult> =>
+		await $http
+			.get(TENANTS_V2_ENDPOINTS.webhookEvents, {
+				...withTenantHeader(tenantId),
+				params,
+			})
+			.then((res) => unwrapV2Paginated(res)),
 };
