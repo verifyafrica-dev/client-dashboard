@@ -46,7 +46,7 @@ export function ProductProofUpload({
 	disabled = false,
 	onUploadingChange,
 }: ProductProofUploadProps) {
-	const { tenantSlug } = useCurrentTenant();
+	const { tenantId, tenantSlug } = useCurrentTenant();
 	const [files, setFiles] = useState<File[]>([]);
 	const [isUploading, setIsUploading] = useState(false);
 
@@ -84,7 +84,7 @@ export function ProductProofUpload({
 						return;
 					}
 
-					if (!tenantSlug) {
+					if (!tenantId || !tenantSlug) {
 						toast.error("Tenant is required to upload files.");
 						setFiles([]);
 						onProofUrlChange(null);
@@ -95,6 +95,7 @@ export function ProductProofUpload({
 					try {
 						const url = await uploadProductProofFile({
 							file,
+							tenantId,
 							tenantSlug,
 							verificationName,
 							onProgress: (progress) => {

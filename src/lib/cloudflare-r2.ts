@@ -1,85 +1,10 @@
-import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-import { env } from "#/config/env";
-
-let r2Client: S3Client | null = null;
-
-const PRESIGNED_URL_EXPIRES_IN_SECONDS = 60 * 60 * 24 * 7; // 7 days
-
-export function isR2Configured() {
-	const { accountId, accessKeyId, secretAccessKey, bucketName } = env.r2;
-
-	return Boolean(accountId && accessKeyId && secretAccessKey && bucketName);
-}
-
-export function getR2Endpoint() {
-	// Jurisdictional buckets (e.g. EU) must use the jurisdiction-specific
-	// S3 API host. Hitting the default host returns errors without CORS
-	// headers, which browsers surface as a CORS failure.
-	const jurisdiction = env.r2.jurisdiction.trim().toLowerCase();
-	const jurisdictionSegment = jurisdiction ? `${jurisdiction}.` : "";
-
-	return `https://${env.r2.accountId}.${jurisdictionSegment}r2.cloudflarestorage.com`;
-}
-
-export function getR2BucketName() {
-	if (!isR2Configured()) {
-		throw new Error(
-			"Cloudflare R2 is not configured. Set VITE_R2_* environment variables.",
-		);
-	}
-
-	return env.r2.bucketName;
-}
-
-export function getR2Client() {
-	if (!isR2Configured()) {
-		throw new Error(
-			"Cloudflare R2 is not configured. Set VITE_R2_* environment variables.",
-		);
-	}
-
-	if (!r2Client) {
-		r2Client = new S3Client({
-			region: "auto",
-			endpoint: getR2Endpoint(),
-			credentials: {
-				accessKeyId: env.r2.accessKeyId,
-				secretAccessKey: env.r2.secretAccessKey,
-			},
-		});
-	}
-
-	return r2Client;
-}
-
-function encodeObjectPath(filePath: string) {
-	return filePath
-		.split("/")
-		.map((segment) => encodeURIComponent(segment))
-		.join("/");
-}
-
 /**
- * Returns a fetchable object URL.
- * Prefer VITE_R2_PUBLIC_URL (r2.dev or custom domain). Falls back to a
- * signed GET URL when public access is not configured.
+ * Client-side R2 helpers. Credentials live on the backend; the browser only
+ * talks to our API for presigned URLs, then PUTs directly to R2.
  */
-export async function getR2ObjectUrl(filePath: string) {
-	const publicBase = env.r2.publicUrl;
 
-	if (publicBase) {
-		return `${publicBase}/${encodeObjectPath(filePath)}`;
-	}
-
-	const client = getR2Client();
-	const command = new GetObjectCommand({
-		Bucket: getR2BucketName(),
-		Key: filePath,
-	});
-
-	return getSignedUrl(client, command, {
-		expiresIn: PRESIGNED_URL_EXPIRES_IN_SECONDS,
-	});
+export function isR2UploadEnabled() {
+	// Uploads go through the authenticated backend. Always attempt that path;
+	// callers fall back to data URLs only when the API reports R2 is unset.
+	return true;
 }

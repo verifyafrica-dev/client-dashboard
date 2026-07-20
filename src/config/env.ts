@@ -16,13 +16,6 @@ const envSchema = z.object({
 	VITE_POSTHOG_HOST: z.string().url().optional().default("https://us.i.posthog.com"),
 	VITE_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
 	VITE_PUBLIC_SUPABASE_URL: z.string().url().optional(),
-	VITE_R2_ACCOUNT_ID: z.string().default(""),
-	VITE_R2_ACCESS_KEY_ID: z.string().default(""),
-	VITE_R2_SECRET_ACCESS_KEY: z.string().default(""),
-	VITE_R2_BUCKET_NAME: z.string().default(""),
-	VITE_R2_PUBLIC_URL: z.string().default(""),
-	/** R2 jurisdiction for the bucket: "" (default), "eu", or "fedramp" */
-	VITE_R2_JURISDICTION: z.string().default(""),
 });
 
 const parsed = envSchema.safeParse(import.meta.env);
@@ -48,14 +41,6 @@ export const env = {
 	sentryDsn: data.VITE_SENTRY_DSN,
 	stripePublishableKey: data.VITE_STRIPE_PUBLISHABLE_KEY,
 	logRocketKey: data.VITE_LOGROCKET_KEY,
-	r2: {
-		accountId: data.VITE_R2_ACCOUNT_ID,
-		accessKeyId: data.VITE_R2_ACCESS_KEY_ID,
-		secretAccessKey: data.VITE_R2_SECRET_ACCESS_KEY,
-		bucketName: data.VITE_R2_BUCKET_NAME,
-		publicUrl: data.VITE_R2_PUBLIC_URL.replace(/\/$/, ""),
-		jurisdiction: data.VITE_R2_JURISDICTION,
-	},
 	// Computed runtime values
 	isDevelopment: import.meta.env.DEV,
 	isProduction: import.meta.env.PROD,

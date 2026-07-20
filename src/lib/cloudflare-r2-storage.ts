@@ -1,16 +1,10 @@
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
-import { Upload } from "@aws-sdk/lib-storage";
-
-import {
-	getR2BucketName,
-	getR2Client,
-	getR2ObjectUrl,
-} from "#/lib/cloudflare-r2";
+import type { V2AxiosError } from "#/api/http/shared";
+import { UPLOADS_V2_API } from "#/api/http/v2/uploads/uploads.api";
+import type { R2PresignUploadResult } from "#/api/http/v2/uploads/uploads.types";
 
 export interface R2UploadOptions {
+	tenantId: string;
 	folder?: string;
-	customFileName?: string;
-	metadata?: Record<string, string>;
 	onProgress?: (progress: number) => void;
 }
 
@@ -22,92 +16,142 @@ export interface R2UploadResult {
 	contentType: string;
 }
 
-function generateStorageFileName(originalName: string) {
-	const timestamp = Date.now();
-	const extension = originalName.includes(".")
-		? originalName.slice(originalName.lastIndexOf("."))
-		: "";
-	const nameWithoutExtension = extension
-		? originalName.slice(0, originalName.lastIndexOf("."))
-		: originalName;
-	const sanitizedName = nameWithoutExtension.replace(/[^a-zA-Z0-9]/g, "_");
+function getUploadErrorMessage(error: unknown) {
+	const axiosError = error as V2AxiosError | null;
+	const apiMessage = axiosError?.response?.data?.message;
+	if (apiMessage) {
+		return apiMessage;
+	}
 
-	return `${sanitizedName}_${timestamp}${extension}`;
+	const apiErrors = axiosError?.response?.data?.errors;
+	if (apiErrors?.length) {
+		return apiErrors.join(" ");
+	}
+
+	if (error instanceof Error && error.message) {
+		return error.message;
+	}
+
+	return "Failed to upload file to Cloudflare R2.";
 }
 
-function buildUploadMetadata(
-	file: File,
-	metadata?: Record<string, string>,
-): Record<string, string> {
-	return {
-		originalname: file.name,
-		uploadedat: new Date().toISOString(),
-		...metadata,
-	};
+function putFileToPresignedUrl({
+	uploadUrl,
+	file,
+	headers,
+	onProgress,
+}: {
+	uploadUrl: string;
+	file: File;
+	headers: Record<string, string>;
+	onProgress?: (progress: number) => void;
+}) {
+	return new Promise<void>((resolve, reject) => {
+		const xhr = new XMLHttpRequest();
+		xhr.open("PUT", uploadUrl);
+		xhr.withCredentials = false;
+
+		for (const [key, value] of Object.entries(headers)) {
+			xhr.setRequestHeader(key, value);
+		}
+
+		xhr.upload.onprogress = (event) => {
+			if (!onProgress || !event.lengthComputable || event.total <= 0) {
+				return;
+			}
+
+			onProgress(Math.min(100, (event.loaded / event.total) * 100));
+		};
+
+		xhr.onload = () => {
+			if (xhr.status >= 200 && xhr.status < 300) {
+				onProgress?.(100);
+				resolve();
+				return;
+			}
+
+			reject(
+				new Error(
+					`Failed to upload file to Cloudflare R2 (HTTP ${xhr.status}).`,
+				),
+			);
+		};
+
+		xhr.onerror = () => {
+			reject(new Error("Failed to upload file to Cloudflare R2."));
+		};
+
+		xhr.send(file);
+	});
 }
 
 export async function uploadFileToR2(
 	file: File,
-	options: R2UploadOptions = {},
+	options: R2UploadOptions,
 ): Promise<R2UploadResult> {
-	const { folder = "uploads", customFileName, metadata, onProgress } = options;
-	const fileName = customFileName ?? generateStorageFileName(file.name);
-	const filePath = folder ? `${folder}/${fileName}` : fileName;
-	const client = getR2Client();
-	const bucket = getR2BucketName();
-	const uploadMetadata = buildUploadMetadata(file, metadata);
+	const { tenantId, folder = "uploads", onProgress } = options;
+
+	if (!tenantId) {
+		throw new Error("Tenant is required to upload files.");
+	}
 
 	onProgress?.(0);
 
-	const upload = new Upload({
-		client,
-		params: {
-			Bucket: bucket,
-			Key: filePath,
-			Body: file,
-			ContentType: file.type,
-			Metadata: uploadMetadata,
-		},
-	});
+	const contentType = file.type || "application/octet-stream";
 
-	upload.on("httpUploadProgress", (progress) => {
-		if (!onProgress || !progress.total || progress.total <= 0) {
-			return;
-		}
+	let presign: R2PresignUploadResult;
+	try {
+		presign = await UPLOADS_V2_API.PRESIGN(tenantId, {
+			file_name: file.name,
+			content_type: contentType,
+			folder,
+			file_size: file.size,
+		});
+	} catch (error) {
+		throw new Error(getUploadErrorMessage(error));
+	}
 
-		onProgress(
-			Math.min(100, ((progress.loaded ?? 0) / progress.total) * 100),
-		);
-	});
+	const putHeaders = {
+		"Content-Type": contentType,
+		...presign.headers,
+	};
 
 	try {
-		await upload.done();
-		onProgress?.(100);
-
-		const url = await getR2ObjectUrl(filePath);
-
-		return {
-			url,
-			path: filePath,
-			name: fileName,
-			size: file.size,
-			contentType: file.type,
-		};
+		await putFileToPresignedUrl({
+			uploadUrl: presign.upload_url,
+			file,
+			headers: putHeaders,
+			onProgress,
+		});
 	} catch (error) {
 		throw error instanceof Error
 			? error
 			: new Error("Failed to upload file to Cloudflare R2.");
 	}
+
+	return {
+		url: presign.url,
+		path: presign.storage_path,
+		name: file.name,
+		size: file.size,
+		contentType,
+	};
 }
 
-export async function deleteFileFromR2(filePath: string): Promise<void> {
-	const client = getR2Client();
-	const bucket = getR2BucketName();
+export async function deleteFileFromR2({
+	tenantId,
+	filePath,
+}: {
+	tenantId: string;
+	filePath: string;
+}): Promise<void> {
+	if (!tenantId) {
+		throw new Error("Tenant is required to delete files.");
+	}
 
-	await client.send(
-		new DeleteObjectCommand({
-			Bucket: bucket,
-			Key: filePath,
-		}),
-	);
+	try {
+		await UPLOADS_V2_API.DELETE(tenantId, { storage_path: filePath });
+	} catch (error) {
+		throw new Error(getUploadErrorMessage(error));
+	}
 }

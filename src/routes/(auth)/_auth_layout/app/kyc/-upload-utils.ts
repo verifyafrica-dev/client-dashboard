@@ -53,16 +53,18 @@ export function createUploadedDocument({
 
 export async function uploadKycFileToStorage({
 	file,
+	tenantId,
 	tenantSlug,
 	author,
 	onProgress,
 }: {
 	file: File;
+	tenantId: string;
 	tenantSlug: string;
 	author?: string;
 	onProgress?: (progress: number) => void;
 }) {
-	if (!tenantSlug) {
+	if (!tenantId || !tenantSlug) {
 		throw new Error("Tenant is required to upload files.");
 	}
 
@@ -70,6 +72,7 @@ export async function uploadKycFileToStorage({
 	const uploadedFile = await uploadFileToStorage({
 		file,
 		folder,
+		tenantId,
 		onProgress,
 	});
 
@@ -82,8 +85,14 @@ export async function uploadKycFileToStorage({
 	});
 }
 
-export async function deleteKycFileFromStorage(storagePath: string) {
-	await deleteUploadedFile(storagePath);
+export async function deleteKycFileFromStorage({
+	tenantId,
+	storagePath,
+}: {
+	tenantId: string;
+	storagePath: string;
+}) {
+	await deleteUploadedFile({ tenantId, storagePath });
 }
 
 export function isDataUrlSignature(value: string) {

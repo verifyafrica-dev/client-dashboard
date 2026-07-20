@@ -1,5 +1,5 @@
 import type { VERIFICATION_TYPES_BY_PRODUCT } from "#/api/http/v2/verifications/verifications.types";
-import { isR2Configured } from "#/lib/cloudflare-r2";
+import { isR2UploadEnabled } from "#/lib/cloudflare-r2";
 import {
 	deleteFileFromR2,
 	uploadFileToR2,
@@ -75,9 +75,7 @@ export function readFileAsDataUrl(
 				return;
 			}
 
-			onProgress(
-				Math.min(100, (event.loaded / event.total) * 100),
-			);
+			onProgress(Math.min(100, (event.loaded / event.total) * 100));
 		};
 
 		reader.onload = () => {
@@ -108,17 +106,27 @@ function buildUploadedFileResult({
 	};
 }
 
+function isR2UnavailableError(error: unknown) {
+	if (!(error instanceof Error)) {
+		return false;
+	}
+
+	return /r2 is not configured/i.test(error.message);
+}
+
 export async function uploadFileToStorage({
 	file,
 	folder,
+	tenantId,
 	onProgress,
 }: {
 	file: File;
 	folder: string;
+	tenantId: string;
 	onProgress?: (progress: number) => void;
 }): Promise<UploadedFileResult> {
-	if (!isR2Configured()) {
-		console.warn("R2 is not configured, using base64 data URL for upload");
+	if (!isR2UploadEnabled()) {
+		console.warn("R2 uploads disabled, using base64 data URL for upload");
 
 		const dataUrl = await readFileAsDataUrl(file, onProgress);
 
@@ -129,24 +137,51 @@ export async function uploadFileToStorage({
 		});
 	}
 
-	const uploadResult = await uploadFileToR2(file, {
-		folder,
-		onProgress,
-	});
+	try {
+		const uploadResult = await uploadFileToR2(file, {
+			tenantId,
+			folder,
+			onProgress,
+		});
 
-	return buildUploadedFileResult({
-		file,
-		url: uploadResult.url,
-		folder,
-		storagePath: uploadResult.path,
-	});
+		return buildUploadedFileResult({
+			file,
+			url: uploadResult.url,
+			folder,
+			storagePath: uploadResult.path,
+		});
+	} catch (error) {
+		if (!isR2UnavailableError(error)) {
+			throw error;
+		}
+
+		console.warn("R2 is not configured on the server, using base64 data URL");
+
+		const dataUrl = await readFileAsDataUrl(file, onProgress);
+
+		return buildUploadedFileResult({
+			file,
+			url: dataUrl,
+			folder,
+		});
+	}
 }
 
-export async function deleteUploadedFile(storagePath: string) {
-	if (!isR2Configured()) {
-		console.warn("R2 is not configured, skipping file deletion");
-		return;
-	}
+export async function deleteUploadedFile({
+	tenantId,
+	storagePath,
+}: {
+	tenantId: string;
+	storagePath: string;
+}) {
+	try {
+		await deleteFileFromR2({ tenantId, filePath: storagePath });
+	} catch (error) {
+		if (isR2UnavailableError(error)) {
+			console.warn("R2 is not configured on the server, skipping file deletion");
+			return;
+		}
 
-	await deleteFileFromR2(storagePath);
+		throw error;
+	}
 }

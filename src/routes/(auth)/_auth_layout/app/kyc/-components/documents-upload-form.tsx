@@ -59,6 +59,7 @@ export function DocumentsUploadForm() {
 			try {
 				const uploadedDocument = await uploadKycFileToStorage({
 					file,
+					tenantId,
 					tenantSlug,
 					author: user?.email,
 					onProgress: (progress) => onProgress(file, progress),
@@ -98,7 +99,10 @@ export function DocumentsUploadForm() {
 		try {
 			if (document?.storage_path) {
 				try {
-					await deleteKycFileFromStorage(document.storage_path);
+					await deleteKycFileFromStorage({
+						tenantId,
+						storagePath: document.storage_path,
+					});
 				} catch {
 					// Metadata removal should still proceed if storage cleanup fails.
 				}
