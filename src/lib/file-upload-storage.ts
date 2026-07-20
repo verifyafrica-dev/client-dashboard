@@ -1,9 +1,9 @@
-import { env } from "#/config/env";
-import { isFirebaseConfigured } from "#/lib/firebase";
+import type { VERIFICATION_TYPES_BY_PRODUCT } from "#/api/http/v2/verifications/verifications.types";
+import { isR2Configured } from "#/lib/cloudflare-r2";
 import {
-	deleteFileFromFirebase,
-	uploadFileToFirebase,
-} from "#/lib/firebase-storage";
+	deleteFileFromR2,
+	uploadFileToR2,
+} from "#/lib/cloudflare-r2-storage";
 
 export const UPLOAD_ALLOWED_MIME_TYPES = [
 	"image/jpeg",
@@ -19,6 +19,9 @@ export const IMAGE_UPLOAD_MIME_TYPES = [
 ] as const;
 
 export const UPLOAD_MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+export type VerificationStorageName =
+	keyof typeof VERIFICATION_TYPES_BY_PRODUCT;
 
 export interface UploadedFileResult {
 	url: string;
@@ -49,17 +52,15 @@ export function validateUploadFile(
 	return { valid: true as const };
 }
 
-export function shouldUseFirebaseStorage() {
-	if (!isFirebaseConfigured()) {
-		return false;
-	}
+export function buildVerificationStorageFolder(
+	tenantSlug: string,
+	verificationName: VerificationStorageName,
+) {
+	return `tenants/${tenantSlug}/verifications/${verificationName}`;
+}
 
-	if (env.isProduction) {
-		return true;
-	}
-
-	const useFirebaseInDev = import.meta.env.VITE_USE_FIREBASE_STORAGE;
-	return useFirebaseInDev === "true" || useFirebaseInDev === true;
+export function buildKycStorageFolder(tenantSlug: string) {
+	return `tenants/${tenantSlug}/kyc`;
 }
 
 export function readFileAsDataUrl(
@@ -116,7 +117,9 @@ export async function uploadFileToStorage({
 	folder: string;
 	onProgress?: (progress: number) => void;
 }): Promise<UploadedFileResult> {
-	if (!shouldUseFirebaseStorage()) {
+	if (!isR2Configured()) {
+		console.warn("R2 is not configured, using base64 data URL for upload");
+
 		const dataUrl = await readFileAsDataUrl(file, onProgress);
 
 		return buildUploadedFileResult({
@@ -126,7 +129,7 @@ export async function uploadFileToStorage({
 		});
 	}
 
-	const uploadResult = await uploadFileToFirebase(file, {
+	const uploadResult = await uploadFileToR2(file, {
 		folder,
 		onProgress,
 	});
@@ -140,9 +143,10 @@ export async function uploadFileToStorage({
 }
 
 export async function deleteUploadedFile(storagePath: string) {
-	if (!shouldUseFirebaseStorage()) {
+	if (!isR2Configured()) {
+		console.warn("R2 is not configured, skipping file deletion");
 		return;
 	}
 
-	await deleteFileFromFirebase(storagePath);
+	await deleteFileFromR2(storagePath);
 }

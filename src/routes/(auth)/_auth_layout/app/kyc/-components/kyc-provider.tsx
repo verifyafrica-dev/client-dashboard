@@ -34,6 +34,7 @@ import {
 
 type KycContextValue = {
 	tenantId: string;
+	tenantSlug: string;
 	kycData: KYBApplication;
 	kyc: KycSummary;
 	sectionRejectedReason: SectionRejectedReason;
@@ -120,6 +121,7 @@ export function KycProvider({
 	const value = useMemo<KycContextValue>(
 		() => ({
 			tenantId,
+			tenantSlug: tenant.slug,
 			kycData,
 			kyc,
 			sectionRejectedReason: tenant.section_rejected_reason,
@@ -132,6 +134,7 @@ export function KycProvider({
 		}),
 		[
 			tenantId,
+			tenant.slug,
 			kycData,
 			kyc,
 			tenant.section_rejected_reason,

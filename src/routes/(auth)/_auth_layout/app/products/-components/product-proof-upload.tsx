@@ -14,9 +14,10 @@ import {
 	FileUploadTrigger,
 } from "#/components/ui/file-upload";
 import { Field, FieldLabel } from "@/components/ui/field";
+import { useCurrentTenant } from "../../team/-data";
 
 import {
-	type ProductUploadFolder,
+	type VerificationStorageName,
 	UPLOAD_MAX_FILE_SIZE,
 	uploadProductProofFile,
 	validateUploadFile,
@@ -24,7 +25,7 @@ import {
 
 type ProductProofUploadProps = {
 	label: string;
-	folder: ProductUploadFolder;
+	verificationName: VerificationStorageName;
 	proofUrl: string | null;
 	onProofUrlChange: (url: string | null) => void;
 	accept?: string;
@@ -36,7 +37,7 @@ type ProductProofUploadProps = {
 
 export function ProductProofUpload({
 	label,
-	folder,
+	verificationName,
 	proofUrl,
 	onProofUrlChange,
 	accept = "image/*,application/pdf",
@@ -45,6 +46,7 @@ export function ProductProofUpload({
 	disabled = false,
 	onUploadingChange,
 }: ProductProofUploadProps) {
+	const { tenantSlug } = useCurrentTenant();
 	const [files, setFiles] = useState<File[]>([]);
 	const [isUploading, setIsUploading] = useState(false);
 
@@ -82,11 +84,19 @@ export function ProductProofUpload({
 						return;
 					}
 
+					if (!tenantSlug) {
+						toast.error("Tenant is required to upload files.");
+						setFiles([]);
+						onProofUrlChange(null);
+						return;
+					}
+
 					setIsUploading(true);
 					try {
 						const url = await uploadProductProofFile({
 							file,
-							folder,
+							tenantSlug,
+							verificationName,
 							onProgress: (progress) => {
 								onProgress(file, progress);
 							},

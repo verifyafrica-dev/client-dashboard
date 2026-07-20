@@ -168,6 +168,7 @@ export interface KycUploadedDocument {
 export interface TenantDetail {
 	id: string;
 	name: string;
+	slug: string;
 	created_at: string;
 	compliance_data: ComplianceData | Record<string, unknown>;
 	enabled_countries: string[] | Record<string, unknown>;
@@ -176,17 +177,16 @@ export interface TenantDetail {
 	section_rejected_reason: SectionRejectedReason;
 	stripe_customer_id?: string;
 	email: string;
-	tenant_id: string;
 }
 
 export interface TenantListItem {
 	id: string;
 	name: string;
+	slug: string;
 	email: string;
 	enabled_countries: string[] | Record<string, unknown>;
 	kyc_verified: boolean;
 	stripe_customer_id?: string;
-	tenant_id: string;
 	created_at: string;
 	role: TenantRole;
 	membership_active: boolean;
@@ -211,12 +211,12 @@ export interface TenantAllListBilling {
 export interface TenantAllListItem {
 	id: string;
 	name: string;
+	slug: string;
 	email: string;
 	enabled_countries: string[] | Record<string, unknown>;
 	kyc_verified: boolean;
 	kyc_status: KycStatus;
 	stripe_customer_id?: string;
-	tenant_id: string;
 	created_at: string;
 	billing: TenantAllListBilling | null;
 }

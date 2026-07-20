@@ -36,7 +36,7 @@ import { VerificationConsentCheckbox } from "../../../-components/VerificationCo
 import { useTenantSupportedCountries } from "../../-countries";
 import { ProductProofUpload } from "../../-components/product-proof-upload";
 import { VerificationResultDialog } from "../../-components/verification-result-dialog";
-import { PRODUCT_UPLOAD_FOLDERS } from "../../-upload-utils";
+import { PRODUCT_UPLOAD_VERIFICATIONS } from "../../-upload-utils";
 import { useCurrentTenant } from "../../../team/-data";
 import {
 	buildDocumentVerificationDirectPayload,
@@ -416,7 +416,9 @@ export function DocumentVerificationForm() {
 
 							<ProductProofUpload
 								label="Document"
-								folder={PRODUCT_UPLOAD_FOLDERS.documentVerification}
+								verificationName={
+									PRODUCT_UPLOAD_VERIFICATIONS.documentVerification
+								}
 								proofUrl={documentProofUrl}
 								onProofUrlChange={setDocumentProofUrl}
 								onUploadingChange={setIsDocumentUploading}

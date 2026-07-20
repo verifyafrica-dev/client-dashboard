@@ -1,9 +1,9 @@
 import type { UploadedDocument } from "#/api/http/v1/kyc/kyc.types";
 import {
+	buildKycStorageFolder,
 	deleteUploadedFile,
 	IMAGE_UPLOAD_MIME_TYPES,
 	readFileAsDataUrl,
-	shouldUseFirebaseStorage,
 	UPLOAD_ALLOWED_MIME_TYPES,
 	UPLOAD_MAX_FILE_SIZE,
 	uploadFileToStorage,
@@ -14,10 +14,7 @@ export const KYC_ALLOWED_MIME_TYPES = UPLOAD_ALLOWED_MIME_TYPES;
 export const KYC_SIGNATURE_MIME_TYPES = IMAGE_UPLOAD_MIME_TYPES;
 export const KYC_MAX_FILE_SIZE = UPLOAD_MAX_FILE_SIZE;
 
-export {
-	readFileAsDataUrl,
-	shouldUseFirebaseStorage,
-};
+export { readFileAsDataUrl };
 
 export function validateKycFile(
 	file: File,
@@ -56,15 +53,20 @@ export function createUploadedDocument({
 
 export async function uploadKycFileToStorage({
 	file,
-	folder,
+	tenantSlug,
 	author,
 	onProgress,
 }: {
 	file: File;
-	folder: string;
+	tenantSlug: string;
 	author?: string;
 	onProgress?: (progress: number) => void;
 }) {
+	if (!tenantSlug) {
+		throw new Error("Tenant is required to upload files.");
+	}
+
+	const folder = buildKycStorageFolder(tenantSlug);
 	const uploadedFile = await uploadFileToStorage({
 		file,
 		folder,

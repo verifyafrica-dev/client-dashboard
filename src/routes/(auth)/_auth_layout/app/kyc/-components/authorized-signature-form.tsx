@@ -55,7 +55,7 @@ function getDefaultValues(
 }
 
 export function AuthorizedSignatureForm() {
-	const { tenantId, kycData, isReadOnly, isSaving, saveSection } = useKyc();
+	const { tenantSlug, kycData, isReadOnly, isSaving, saveSection } = useKyc();
 	const user = useAuthStore((state) => state.user);
 	const [signatureMethod, setSignatureMethod] = useState<KycSignatureMethod>(
 		() =>
@@ -255,7 +255,7 @@ export function AuthorizedSignatureForm() {
 												const uploadedDocument =
 													await uploadKycFileToStorage({
 														file,
-														folder: `kyc-documents/${tenantId}/authorized-signature`,
+														tenantSlug,
 														author: user?.email,
 														onProgress: (progress) => {
 															setUploadProgress({

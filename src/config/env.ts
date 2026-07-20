@@ -16,13 +16,11 @@ const envSchema = z.object({
 	VITE_POSTHOG_HOST: z.string().url().optional().default("https://us.i.posthog.com"),
 	VITE_PUBLIC_SUPABASE_ANON_KEY: z.string().optional(),
 	VITE_PUBLIC_SUPABASE_URL: z.string().url().optional(),
-	VITE_USE_FIREBASE_STORAGE: z.enum(["true", "false"]).optional().default("false"),
-	VITE_FIREBASE_API_KEY: z.string().default(""),
-	VITE_FIREBASE_AUTH_DOMAIN: z.string().default(""),
-	VITE_FIREBASE_PROJECT_ID: z.string().default(""),
-	VITE_FIREBASE_STORAGE_BUCKET: z.string().default(""),
-	VITE_FIREBASE_MESSAGING_SENDER_ID: z.string().default(""),
-	VITE_FIREBASE_APP_ID: z.string().default(""),
+	VITE_R2_ACCOUNT_ID: z.string().default(""),
+	VITE_R2_ACCESS_KEY_ID: z.string().default(""),
+	VITE_R2_SECRET_ACCESS_KEY: z.string().default(""),
+	VITE_R2_BUCKET_NAME: z.string().default(""),
+	VITE_R2_PUBLIC_URL: z.string().default(""),
 });
 
 const parsed = envSchema.safeParse(import.meta.env);
@@ -48,14 +46,12 @@ export const env = {
 	sentryDsn: data.VITE_SENTRY_DSN,
 	stripePublishableKey: data.VITE_STRIPE_PUBLISHABLE_KEY,
 	logRocketKey: data.VITE_LOGROCKET_KEY,
-	useFirebaseStorage: data.VITE_USE_FIREBASE_STORAGE === "true",
-	firebase: {
-		apiKey: data.VITE_FIREBASE_API_KEY,
-		authDomain: data.VITE_FIREBASE_AUTH_DOMAIN,
-		projectId: data.VITE_FIREBASE_PROJECT_ID,
-		storageBucket: data.VITE_FIREBASE_STORAGE_BUCKET,
-		messagingSenderId: data.VITE_FIREBASE_MESSAGING_SENDER_ID,
-		appId: data.VITE_FIREBASE_APP_ID,
+	r2: {
+		accountId: data.VITE_R2_ACCOUNT_ID,
+		accessKeyId: data.VITE_R2_ACCESS_KEY_ID,
+		secretAccessKey: data.VITE_R2_SECRET_ACCESS_KEY,
+		bucketName: data.VITE_R2_BUCKET_NAME,
+		publicUrl: data.VITE_R2_PUBLIC_URL.replace(/\/$/, ""),
 	},
 	// Computed runtime values
 	isDevelopment: import.meta.env.DEV,

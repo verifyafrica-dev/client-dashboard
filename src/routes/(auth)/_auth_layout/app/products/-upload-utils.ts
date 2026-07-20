@@ -1,40 +1,49 @@
 import {
+	buildVerificationStorageFolder,
 	IMAGE_UPLOAD_MIME_TYPES,
 	UPLOAD_ALLOWED_MIME_TYPES,
 	UPLOAD_MAX_FILE_SIZE,
 	uploadFileToStorage,
 	validateUploadFile,
+	type VerificationStorageName,
 } from "#/lib/file-upload-storage";
 
-export const PRODUCT_UPLOAD_FOLDERS = {
-	documentVerification: "product-uploads/document-verification",
-	addressVerification: "product-uploads/address-verification",
-	facialScreening: "product-uploads/facial-screening",
-	governmentRegistryChecks: "product-uploads/government-registry-checks",
-} as const;
+export const PRODUCT_UPLOAD_VERIFICATIONS = {
+	documentVerification: "Document Verification",
+	addressVerification: "Address Verification",
+	facialScreening: "Facial Screening",
+	governmentRegistryChecks: "Government Registry Checks",
+} as const satisfies Record<string, VerificationStorageName>;
 
-export type ProductUploadFolder =
-	(typeof PRODUCT_UPLOAD_FOLDERS)[keyof typeof PRODUCT_UPLOAD_FOLDERS];
+export type ProductUploadVerification =
+	(typeof PRODUCT_UPLOAD_VERIFICATIONS)[keyof typeof PRODUCT_UPLOAD_VERIFICATIONS];
 
 export {
 	IMAGE_UPLOAD_MIME_TYPES,
 	UPLOAD_ALLOWED_MIME_TYPES,
 	UPLOAD_MAX_FILE_SIZE,
 	validateUploadFile,
+	type VerificationStorageName,
 };
 
 export async function uploadProductProofFile({
 	file,
-	folder,
+	tenantSlug,
+	verificationName,
 	onProgress,
 }: {
 	file: File;
-	folder: ProductUploadFolder;
+	tenantSlug: string;
+	verificationName: VerificationStorageName;
 	onProgress?: (progress: number) => void;
 }) {
+	if (!tenantSlug) {
+		throw new Error("Tenant is required to upload files.");
+	}
+
 	const uploadedFile = await uploadFileToStorage({
 		file,
-		folder,
+		folder: buildVerificationStorageFolder(tenantSlug, verificationName),
 		onProgress,
 	});
 

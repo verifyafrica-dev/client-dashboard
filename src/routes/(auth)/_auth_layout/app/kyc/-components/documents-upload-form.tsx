@@ -35,6 +35,7 @@ type KycUploadCallbacks = {
 export function DocumentsUploadForm() {
 	const {
 		tenantId,
+		tenantSlug,
 		kycData,
 		isReadOnly,
 		isSaving,
@@ -58,7 +59,7 @@ export function DocumentsUploadForm() {
 			try {
 				const uploadedDocument = await uploadKycFileToStorage({
 					file,
-					folder: `kyc-documents/${tenantId}/${categoryKey}`,
+					tenantSlug,
 					author: user?.email,
 					onProgress: (progress) => onProgress(file, progress),
 				});

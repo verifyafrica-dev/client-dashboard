@@ -144,7 +144,7 @@ export interface Invoice {
 	tenant: string;
 	tenant_name?: string;
 	tenant_email?: string;
-	tenant_tenant_id?: string;
+	tenant_slug?: string;
 	tenant_stripe_customer_id?: string;
 	tenant_kyc_verified?: boolean;
 	stripe_invoice_id?: string;

@@ -32,7 +32,7 @@ import { useTenantSupportedCountries } from "../../-countries";
 import { ProductProofUpload } from "../../-components/product-proof-upload";
 import { VerificationResultDialog } from "../../-components/verification-result-dialog";
 import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
-import { PRODUCT_UPLOAD_FOLDERS } from "../../-upload-utils";
+import { PRODUCT_UPLOAD_VERIFICATIONS } from "../../-upload-utils";
 import { formatCountryOptionLabel } from "#/lib/country-state-city";
 import {
 	buildAddressVerificationDirectPayload,
@@ -386,7 +386,9 @@ export function AddressVerificationForm() {
 
 							<ProductProofUpload
 								label="Proof of Address"
-								folder={PRODUCT_UPLOAD_FOLDERS.addressVerification}
+								verificationName={
+									PRODUCT_UPLOAD_VERIFICATIONS.addressVerification
+								}
 								proofUrl={proofOfAddressUrl}
 								onProofUrlChange={setProofOfAddressUrl}
 								onUploadingChange={setIsProofUploading}

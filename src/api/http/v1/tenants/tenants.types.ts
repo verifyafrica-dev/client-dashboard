@@ -37,18 +37,19 @@ export interface PaginatedResponse<T> {
 export interface Tenant {
 	id: string;
 	name: string;
+	slug?: string;
 	created_at: string;
 	compliance_data?: Record<string, unknown>;
 	enabled_countries?: string[] | Record<string, unknown>;
 	kyc_verified?: boolean;
 	stripe_customer_id?: string;
 	email?: string;
-	tenant_id?: string;
 }
 
 export interface UserTenantMembership {
 	id: string;
 	name: string;
+	slug?: string;
 	enabled_countries: string[];
 	role: TenantRole;
 	date_added: string;
@@ -84,11 +85,11 @@ export interface BillingInformation {
 export interface TenantCreateAndUpdate {
 	id: string;
 	name: string;
+	slug?: string;
 	email: string;
 	compliance_data?: Record<string, unknown>;
 	enabled_countries?: string[];
 	kyc_verified?: boolean;
-	tenant_id?: string;
 	created_at: string;
 	compliance_status?: TenantComplianceStatus;
 	reject_reason?: string;

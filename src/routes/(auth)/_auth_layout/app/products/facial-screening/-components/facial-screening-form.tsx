@@ -32,7 +32,7 @@ import { VerificationResultDialog } from "../../-components/verification-result-
 import { useProductVerificationSubmit } from "../../-use-product-verification-submit";
 import {
 	IMAGE_UPLOAD_MIME_TYPES,
-	PRODUCT_UPLOAD_FOLDERS,
+	PRODUCT_UPLOAD_VERIFICATIONS,
 } from "../../-upload-utils";
 import {
 	DEFAULT_VERIFICATION_URL_LIMIT,
@@ -317,7 +317,7 @@ export function FacialScreeningForm() {
 
 							<ProductProofUpload
 								label="Face Photo"
-								folder={PRODUCT_UPLOAD_FOLDERS.facialScreening}
+								verificationName={PRODUCT_UPLOAD_VERIFICATIONS.facialScreening}
 								proofUrl={facePhotoUrl}
 								onProofUrlChange={setFacePhotoUrl}
 								onUploadingChange={setIsProofUploading}
