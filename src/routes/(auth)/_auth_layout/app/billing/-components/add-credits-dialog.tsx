@@ -41,9 +41,6 @@ import {
 } from "../-data";
 import { StripeCheckoutDialog } from "./stripe-checkout-dialog";
 
-const TOP_UP_VERIFY_INTERVAL_MS = 5_000;
-const TOP_UP_VERIFY_TIMEOUT_MS = 300_000;
-
 type TopUpFormValues = {
 	amount: string;
 };
@@ -72,22 +69,6 @@ function createTopUpFormSchema(minAmount: number) {
 	});
 }
 
-function isTopUpComplete(
-	verifyAmount: string | number | null | undefined,
-	requestedAmount: number,
-	status?: string,
-) {
-	if (status === "success" || status === "already_credited") {
-		return true;
-	}
-
-	if (verifyAmount == null) {
-		return false;
-	}
-
-	return Number.parseFloat(String(verifyAmount)) === requestedAmount;
-}
-
 export function AddCreditsDialog({
 	open,
 	onOpenChange,
@@ -105,36 +86,41 @@ export function AddCreditsDialog({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [showStripeCheckout, setShowStripeCheckout] = useState(false);
 	const [clientSecret, setClientSecret] = useState<string | null>(null);
-	const pollIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-	const pollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const [checkoutSessionId, setCheckoutSessionId] = useState<string | null>(
+		null,
+	);
+	const [requestedAmount, setRequestedAmount] = useState<number | null>(null);
+	const [paymentCompleted, setPaymentCompleted] = useState(false);
 	const lastOpenRef = useRef(open);
 
-	const clearVerificationTimers = useCallback(() => {
-		if (pollIntervalRef.current) {
-			clearInterval(pollIntervalRef.current);
-			pollIntervalRef.current = null;
-		}
-
-		if (pollTimeoutRef.current) {
-			clearTimeout(pollTimeoutRef.current);
-			pollTimeoutRef.current = null;
-		}
-	}, []);
-
 	const resetPaymentState = useCallback(() => {
-		clearVerificationTimers();
 		setSubmitError(null);
 		setIsSubmitting(false);
 		setShowStripeCheckout(false);
 		setClientSecret(null);
+		setCheckoutSessionId(null);
+		setRequestedAmount(null);
+		setPaymentCompleted(false);
 		createSessionMutation.reset();
-	}, [clearVerificationTimers, createSessionMutation]);
+	}, [createSessionMutation]);
 
-	useEffect(() => {
-		return () => {
-			clearVerificationTimers();
-		};
-	}, [clearVerificationTimers]);
+	const invalidateWalletQueries = useCallback(async () => {
+		if (!tenantId) {
+			return;
+		}
+
+		await Promise.all([
+			queryClient.invalidateQueries({
+				queryKey: WALLET_V2_QUERY_KEYS.balance(tenantId),
+			}),
+			queryClient.invalidateQueries({
+				queryKey: WALLET_V2_QUERY_KEYS.all,
+			}),
+			queryClient.invalidateQueries({
+				queryKey: BILLING_V2_QUERY_KEYS.all,
+			}),
+		]);
+	}, [queryClient, tenantId]);
 
 	const form = useForm({
 		defaultValues: {
@@ -149,15 +135,16 @@ export function AddCreditsDialog({
 				return;
 			}
 
-			const requestedAmount = Number.parseInt(value.amount, 10);
+			const amount = Number.parseInt(value.amount, 10);
 			setSubmitError(null);
 			setIsSubmitting(true);
+			setPaymentCompleted(false);
 
 			try {
 				const session = await createSessionMutation.mutateAsync({
 					tenantId,
 					payload: {
-						amount: requestedAmount,
+						amount,
 						currency: "USD",
 					},
 				});
@@ -166,9 +153,10 @@ export function AddCreditsDialog({
 					throw new Error("Failed to retrieve checkout session");
 				}
 
+				setRequestedAmount(amount);
+				setCheckoutSessionId(session.session_id);
 				setClientSecret(session.client_secret);
 				setShowStripeCheckout(true);
-				startPaymentVerification(session.session_id, requestedAmount);
 			} catch (error) {
 				const message =
 					error instanceof Error
@@ -196,80 +184,64 @@ export function AddCreditsDialog({
 		resetPaymentState();
 	}, [open, form, resetPaymentState]);
 
-	const startPaymentVerification = (
-		sessionId: string,
-		requestedAmount: number,
-	) => {
-		if (!tenantId) {
+	const handleCheckoutComplete = useCallback(async () => {
+		if (!tenantId || !checkoutSessionId || requestedAmount == null) {
 			return;
 		}
 
-		clearVerificationTimers();
+		setPaymentCompleted(true);
 
-		pollIntervalRef.current = setInterval(() => {
-			void (async () => {
-				try {
-					const response = await WALLET_V2_API.TOP_UP_VERIFY(
-						tenantId,
-						sessionId,
-					);
+		try {
+			const response = await WALLET_V2_API.TOP_UP_VERIFY(
+				tenantId,
+				checkoutSessionId,
+			);
 
-					if (
-						isTopUpComplete(response.amount, requestedAmount, response.status)
-					) {
-						clearVerificationTimers();
-						setShowStripeCheckout(false);
-						toast.success(
-							`Successfully added $${requestedAmount.toLocaleString()} to your account.`,
-						);
-						setIsSubmitting(false);
-						onOpenChange?.(false);
-
-						await Promise.all([
-							queryClient.invalidateQueries({
-								queryKey: WALLET_V2_QUERY_KEYS.balance(tenantId),
-							}),
-							queryClient.invalidateQueries({
-								queryKey: WALLET_V2_QUERY_KEYS.all,
-							}),
-							queryClient.invalidateQueries({
-								queryKey: BILLING_V2_QUERY_KEYS.all,
-							}),
-						]);
-
-						onSuccess?.();
-						return;
-					}
-
-					if (response.status === "failed") {
-						clearVerificationTimers();
-						setShowStripeCheckout(false);
-						setIsSubmitting(false);
-						toast.error("Payment was not completed. Please try again.");
-					}
-				} catch {
-					clearVerificationTimers();
-					setShowStripeCheckout(false);
-					setIsSubmitting(false);
-					toast.error("Payment verification failed. Please try again.");
-				}
-			})();
-		}, TOP_UP_VERIFY_INTERVAL_MS);
-
-		pollTimeoutRef.current = setTimeout(() => {
-			clearVerificationTimers();
 			setShowStripeCheckout(false);
 			setIsSubmitting(false);
-			toast.error(
-				"Payment verification timed out. Please check your account balance.",
+			onOpenChange?.(false);
+
+			if (
+				response.status === "success" ||
+				response.status === "already_credited"
+			) {
+				toast.success(
+					`Successfully added $${requestedAmount.toLocaleString()} to your account.`,
+				);
+			} else {
+				toast.success(
+					"Payment received. Your balance will update shortly.",
+				);
+			}
+
+			await invalidateWalletQueries();
+			onSuccess?.();
+		} catch {
+			setShowStripeCheckout(false);
+			setIsSubmitting(false);
+			onOpenChange?.(false);
+			toast.success(
+				"Payment received. Your balance will update shortly.",
 			);
-		}, TOP_UP_VERIFY_TIMEOUT_MS);
-	};
+			await invalidateWalletQueries();
+			onSuccess?.();
+		}
+	}, [
+		checkoutSessionId,
+		invalidateWalletQueries,
+		onOpenChange,
+		onSuccess,
+		requestedAmount,
+		tenantId,
+	]);
 
 	const handleStripeCheckoutClose = () => {
-		clearVerificationTimers();
 		setShowStripeCheckout(false);
 		setClientSecret(null);
+
+		if (paymentCompleted) {
+			return;
+		}
 
 		if (isSubmitting) {
 			setSubmitError("Payment was not completed. Please try again.");
@@ -277,6 +249,8 @@ export function AddCreditsDialog({
 		}
 
 		setIsSubmitting(false);
+		setCheckoutSessionId(null);
+		setRequestedAmount(null);
 	};
 
 	const amountHelperText = `Enter a whole dollar amount between ${formatTopUpAmountLabel(minAmount)} and ${formatTopUpAmountLabel(TOP_UP_MAX_AMOUNT)}`;
@@ -415,6 +389,9 @@ export function AddCreditsDialog({
 				onOpenChange={setShowStripeCheckout}
 				clientSecret={clientSecret}
 				onCloseCheckout={handleStripeCheckoutClose}
+				onComplete={() => {
+					void handleCheckoutComplete();
+				}}
 			/>
 		</>
 	);

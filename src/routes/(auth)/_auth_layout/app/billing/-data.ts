@@ -6,7 +6,7 @@ import type {
 	BillingInformation,
 	BillingInformationCreatePayload,
 	BillingInformationUpdatePayload,
-	Invoice,
+	InvoiceListItem,
 } from "#/api/http/v2/billing/billing.types";
 import type { WalletTransaction } from "#/api/http/v2/wallet/wallet.types";
 import { normalizeCountryCode } from "#/lib/country-state-city";
@@ -403,8 +403,30 @@ export function downloadTransactionsCsv(
 	URL.revokeObjectURL(url);
 }
 
-export function getInvoiceFilename(invoice: Invoice) {
+export function getInvoiceFilename(invoice: InvoiceListItem) {
 	return invoice.invoice_id ?? invoice.id;
+}
+
+export function getInvoicePaymentStatusBadgeClassName(status?: string | null) {
+	const normalized = (status ?? "unknown").toLowerCase();
+
+	if (normalized === "success" || normalized === "completed") {
+		return "border-transparent bg-emerald-600 text-white";
+	}
+
+	if (normalized === "failed" || normalized === "error") {
+		return "border-transparent bg-red-600 text-white";
+	}
+
+	if (normalized === "pending") {
+		return "border-transparent bg-amber-100 text-amber-800";
+	}
+
+	if (normalized === "due") {
+		return "border-transparent bg-sky-100 text-sky-800";
+	}
+
+	return "border-transparent bg-muted text-muted-foreground";
 }
 
 export const TOP_UP_DEFAULT_MIN_AMOUNT = 1;

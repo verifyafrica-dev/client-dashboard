@@ -10,6 +10,7 @@ import { TablePagination } from "#/components/table-pagination";
 import { Button } from "#/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "#/components/ui/card";
 import { Skeleton } from "#/components/ui/skeleton";
+import { TypeBadge } from "#/components/type-badge";
 import {
 	Table,
 	TableBody,
@@ -25,7 +26,6 @@ import { ReportsTableShell } from "../../-components/reports-table-shell";
 import {
 	BatchCountBadge,
 	VerificationStatusBadge,
-	VerificationTypeBadge,
 } from "../../-components/verification-badges";
 import {
 	formatReportDate,
@@ -220,7 +220,7 @@ function BatchVerificationReportDetailPage() {
 																</p>
 															</TableCell>
 															<TableCell>
-																<VerificationTypeBadge
+																<TypeBadge
 																	label={formatVerificationType(verification)}
 																/>
 															</TableCell>

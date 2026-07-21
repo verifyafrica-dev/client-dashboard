@@ -39,6 +39,7 @@ import { cn } from "#/lib/utils.ts";
 import { useCurrentTenant } from "../team/-data";
 import { AddCreditsDialog } from "./-components/add-credits-dialog";
 import { ExportTransactionsDialog } from "./-components/export-transactions-dialog";
+import { InvoiceDetailsDialog } from "./-components/invoice-details-dialog";
 import { TransactionDetailsDialog } from "./-components/transaction-details-dialog";
 import { UpdateBillingDialog } from "./-components/update-billing-dialog";
 import {
@@ -48,6 +49,7 @@ import {
 	formatMoney,
 	formatSignedAmount,
 	getInvoiceFilename,
+	getInvoicePaymentStatusBadgeClassName,
 	INVOICES_PAGE_SIZE,
 	isBillingNotFoundError,
 	mapWalletTransaction,
@@ -86,6 +88,10 @@ function BillingPage() {
 	const [detailsOpen, setDetailsOpen] = useState(false);
 	const [selectedTransaction, setSelectedTransaction] =
 		useState<Transaction | null>(null);
+	const [invoiceDetailsOpen, setInvoiceDetailsOpen] = useState(false);
+	const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
+		null,
+	);
 
 	const walletBalanceQuery = useWalletBalanceV2Query(
 		tenantId,
@@ -154,6 +160,11 @@ function BillingPage() {
 	function openTransactionDetails(transaction: Transaction) {
 		setSelectedTransaction(transaction);
 		setDetailsOpen(true);
+	}
+
+	function openInvoiceDetails(invoiceId: string) {
+		setSelectedInvoiceId(invoiceId);
+		setInvoiceDetailsOpen(true);
 	}
 
 	async function handleRefresh() {
@@ -427,7 +438,7 @@ function BillingPage() {
 																	}
 																>
 																	<EyeIcon className="size-4" />
-																	View Details
+																	View
 																</Button>
 															</TableCell>
 														</TableRow>
@@ -478,6 +489,7 @@ function BillingPage() {
 											"Status",
 											"Created",
 											"Due",
+											"Actions",
 										]}
 									/>
 									<TablePaginationSkeleton />
@@ -489,7 +501,7 @@ function BillingPage() {
 									</p>
 								</div>
 							) : (
-								<div className="min-h-[320px] flex flex-col justify-between">
+								<div className="min-h-80 flex flex-col justify-between">
 									<Table
 										className={cn(invoices.length === 0 && "h-full flex-1")}
 									>
@@ -501,13 +513,14 @@ function BillingPage() {
 												<TableHead>Status</TableHead>
 												<TableHead>Created</TableHead>
 												<TableHead>Due</TableHead>
+												<TableHead>Actions</TableHead>
 											</TableRow>
 										</TableHeader>
 										<TableBody>
 											{invoices.length === 0 ? (
 												<TableRow>
 													<TableCell
-														colSpan={6}
+														colSpan={7}
 														className="h-24 text-center text-sm text-muted-foreground"
 													>
 														No invoices available yet.
@@ -515,7 +528,11 @@ function BillingPage() {
 												</TableRow>
 											) : (
 												invoices.map((invoice) => (
-													<TableRow key={invoice.id}>
+													<TableRow
+														key={invoice.id}
+														className="cursor-pointer"
+														onClick={() => openInvoiceDetails(invoice.id)}
+													>
 														<TableCell className="font-mono text-xs">
 															{getInvoiceFilename(invoice)}
 														</TableCell>
@@ -529,7 +546,12 @@ function BillingPage() {
 														<TableCell>
 															<Badge
 																variant="outline"
-																className="capitalize"
+																className={cn(
+																	"uppercase",
+																	getInvoicePaymentStatusBadgeClassName(
+																		invoice.payment_status,
+																	),
+																)}
 															>
 																{invoice.payment_status ?? "unknown"}
 															</Badge>
@@ -539,6 +561,20 @@ function BillingPage() {
 														</TableCell>
 														<TableCell>
 															{formatInvoiceDate(invoice.due_at)}
+														</TableCell>
+														<TableCell
+															onClick={(event) => event.stopPropagation()}
+														>
+															<Button
+																type="button"
+																variant="outline"
+																size="sm"
+																className="cursor-pointer"
+																onClick={() => openInvoiceDetails(invoice.id)}
+															>
+																<EyeIcon className="size-4" />
+																View
+															</Button>
 														</TableCell>
 													</TableRow>
 												))
@@ -590,6 +626,18 @@ function BillingPage() {
 					}
 				}}
 				transaction={selectedTransaction}
+			/>
+			<InvoiceDetailsDialog
+				open={invoiceDetailsOpen}
+				onOpenChange={(open) => {
+					setInvoiceDetailsOpen(open);
+					if (!open) {
+						setSelectedInvoiceId(null);
+					}
+				}}
+				tenantId={tenantId}
+				invoiceId={selectedInvoiceId}
+				fallbackCurrency={currency}
 			/>
 		</div>
 	);

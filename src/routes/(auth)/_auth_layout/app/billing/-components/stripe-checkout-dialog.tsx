@@ -21,6 +21,7 @@ const stripePromise = env.stripePublishableKey
 type StripeCheckoutDialogProps = ComponentProps<typeof Dialog> & {
 	clientSecret: string | null;
 	onCloseCheckout?: () => void;
+	onComplete?: () => void;
 };
 
 export function StripeCheckoutDialog({
@@ -28,6 +29,7 @@ export function StripeCheckoutDialog({
 	onOpenChange,
 	clientSecret,
 	onCloseCheckout,
+	onComplete,
 }: StripeCheckoutDialogProps) {
 	const handleOpenChange = (nextOpen: boolean) => {
 		if (!nextOpen) {
@@ -60,8 +62,14 @@ export function StripeCheckoutDialog({
 						</div>
 					) : (
 						<EmbeddedCheckoutProvider
+							key={clientSecret}
 							stripe={stripePromise}
-							options={{ clientSecret }}
+							options={{
+								clientSecret,
+								onComplete: () => {
+									onComplete?.();
+								},
+							}}
 						>
 							<EmbeddedCheckout className="bg-white" />
 						</EmbeddedCheckoutProvider>

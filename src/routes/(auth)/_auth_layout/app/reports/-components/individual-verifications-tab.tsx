@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTenantVerificationRequestsV2Query } from "#/api/http/v2/verifications/verifications.hooks";
 import { TablePagination } from "#/components/table-pagination";
+import { TypeBadge } from "#/components/type-badge";
 import { Button } from "#/components/ui/button";
 import {
 	Table,
@@ -36,10 +37,7 @@ import {
 	ReportsPaginationSkeleton,
 	ReportsTableSkeleton,
 } from "./reports-table-skeleton";
-import {
-	VerificationStatusBadge,
-	VerificationTypeBadge,
-} from "./verification-badges";
+import { VerificationStatusBadge } from "./verification-badges";
 
 const COLUMNS = [
 	"ID",
@@ -165,7 +163,7 @@ export function IndividualVerificationsTab({
 					<ReportsPaginationSkeleton />
 				</>
 			) : verificationRequestsQuery.isError ? (
-				<div className="flex min-h-[320px] items-center justify-center px-6 text-sm text-muted-foreground">
+				<div className="flex min-h-80 items-center justify-center px-6 text-sm text-muted-foreground">
 					Failed to load verifications. Please try again.
 				</div>
 			) : (
@@ -246,7 +244,7 @@ function IndividualVerificationRow({
 				</p>
 			</TableCell>
 			<TableCell>
-				<VerificationTypeBadge label={formatVerificationType(verification)} />
+				<TypeBadge label={formatVerificationType(verification)} />
 			</TableCell>
 			<TableCell>
 				<VerificationStatusBadge status={verification.status} />

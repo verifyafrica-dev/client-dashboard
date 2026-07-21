@@ -17,6 +17,7 @@ import type {
 	BillingPricingListQuery,
 	BillingPricingUpdatePayload,
 	Invoice,
+	InvoiceListItem,
 	PaginatedAllInvoiceListResult,
 	PaginatedBillingInformationListResult,
 	PaginatedBillingPricingListResult,
@@ -37,6 +38,8 @@ export const BILLING_V2_QUERY_KEYS = {
 		["billing-v2", "billing-pricing", "detail", id] as const,
 	tenantInvoices: (tenantId: string, params?: BillingListQuery) =>
 		["billing-v2", "invoices", tenantId, params ?? {}] as const,
+	tenantInvoiceDetail: (tenantId: string, invoiceId: string) =>
+		["billing-v2", "invoices", tenantId, "detail", invoiceId] as const,
 	allInvoicesList: (params?: AllInvoicesListQuery) =>
 		["billing-v2", "invoices", "all", params ?? {}] as const,
 	allInvoiceDetail: (id: string) =>
@@ -108,6 +111,27 @@ export const useTenantInvoicesV2Query = (
 			return BILLING_V2_API.TENANT_INVOICES(tenantId, params);
 		},
 		enabled: enabled && Boolean(tenantId),
+		staleTime: BILLING_V2_STALE_TIME,
+	});
+
+export const useTenantInvoiceDetailV2Query = (
+	tenantId: string | undefined,
+	invoiceId: string | undefined,
+	enabled = true,
+): UseQueryResult<Invoice> =>
+	useQuery<Invoice>({
+		queryKey: BILLING_V2_QUERY_KEYS.tenantInvoiceDetail(
+			tenantId ?? "",
+			invoiceId ?? "",
+		),
+		queryFn: () => {
+			if (!tenantId || !invoiceId) {
+				throw new Error("Tenant ID and invoice ID are required");
+			}
+
+			return BILLING_V2_API.TENANT_INVOICE_DETAIL(tenantId, invoiceId);
+		},
+		enabled: enabled && Boolean(tenantId) && Boolean(invoiceId),
 		staleTime: BILLING_V2_STALE_TIME,
 	});
 
@@ -234,6 +258,7 @@ export type {
 	BillingInformation,
 	BillingPricing,
 	Invoice,
+	InvoiceListItem,
 	PaginatedAllInvoiceListResult,
 	PaginatedBillingInformationListResult,
 	PaginatedBillingPricingListResult,

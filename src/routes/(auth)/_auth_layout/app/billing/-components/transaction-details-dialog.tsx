@@ -31,7 +31,7 @@ export function TransactionDetailsDialog({
 	const formattedAmount = transaction
 		? formatSignedAmount(transaction.amount, transaction.currency)
 		: "";
-	const metadataFields = getMetadataFields(transaction?.meta);
+	const _metadataFields = getMetadataFields(transaction?.meta);
 
 	return (
 		<Dialog
@@ -131,7 +131,7 @@ export function TransactionDetailsDialog({
 									valueClassName="font-semibold text-primary"
 								/>
 							</div>
-
+							{/* 
 							{metadataFields.length > 0 && (
 								<>
 									<Separator />
@@ -150,7 +150,7 @@ export function TransactionDetailsDialog({
 										))}
 									</div>
 								</>
-							)}
+							)} */}
 						</div>
 					</div>
 
@@ -190,7 +190,7 @@ function DetailRow({
 	);
 }
 
-function formatMetadataLabel(key: string) {
+function _formatMetadataLabel(key: string) {
 	return key
 		.replaceAll("_", " ")
 		.replace(/\b\w/g, (char) => char.toUpperCase());
@@ -205,7 +205,7 @@ function shouldFormatMetadataValue(value: string) {
 	return /^[a-z]+(_[a-z]+)*$/.test(value);
 }
 
-function formatMetadataValue(key: string, value: unknown) {
+function _formatMetadataValue(key: string, value: unknown) {
 	const raw = formatMetaValue(value);
 
 	if (raw === "—" || isMetadataIdKey(key) || !shouldFormatMetadataValue(raw)) {

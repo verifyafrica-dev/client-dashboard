@@ -29,14 +29,6 @@ export function VerificationStatusBadge({ status }: { status: string }) {
 	);
 }
 
-export function VerificationTypeBadge({ label }: { label: string }) {
-	return (
-		<span className="inline-flex whitespace-nowrap rounded-full border border-primary/30 px-2.5 py-0.5 text-xs font-medium text-primary">
-			{label}
-		</span>
-	);
-}
-
 export function BatchCountBadge({
 	count,
 	variant,

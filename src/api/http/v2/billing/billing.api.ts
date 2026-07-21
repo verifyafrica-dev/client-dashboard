@@ -124,6 +124,17 @@ export const BILLING_V2_API = {
 			})
 			.then((res) => unwrapV2Paginated(res)),
 
+	TENANT_INVOICE_DETAIL: async (
+		tenantId: string,
+		invoiceId: string,
+	): Promise<Invoice> =>
+		await $http
+			.get(BILLING_V2_ENDPOINTS.invoices, {
+				params: { id: invoiceId },
+				...withTenantHeader(tenantId),
+			})
+			.then((res) => unwrapV2Data<Invoice>(res)),
+
 	ALL_INVOICES_LIST: async (
 		params?: AllInvoicesListQuery,
 	): Promise<PaginatedAllInvoiceListResult> =>

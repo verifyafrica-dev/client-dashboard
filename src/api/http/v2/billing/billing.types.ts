@@ -139,14 +139,11 @@ export interface InvoiceItem {
 	updated_at: string;
 }
 
-export interface Invoice {
+/** Slim invoice row from list endpoints (no line items). */
+export interface InvoiceListItem {
 	id: string;
 	tenant: string;
-	tenant_name?: string;
-	tenant_email?: string;
-	tenant_slug?: string;
-	tenant_stripe_customer_id?: string;
-	tenant_kyc_verified?: boolean;
+	invoice_id?: string;
 	stripe_invoice_id?: string;
 	stripe_status?: string;
 	total_amount?: string;
@@ -159,8 +156,11 @@ export interface Invoice {
 	paid_amount?: string;
 	created_at: string;
 	updated_at: string;
+}
+
+/** Full invoice from detail endpoints (includes line items). */
+export interface Invoice extends InvoiceListItem {
 	items: InvoiceItem[];
-	invoice_id?: string;
 }
 
 export type BillingInformationResponse = V2SuccessResponse<BillingInformation>;
@@ -170,8 +170,10 @@ export type BillingInformationListResponse =
 	V2PaginatedSuccessResponse<BillingInformation>;
 export type BillingPricingListResponse =
 	V2PaginatedSuccessResponse<BillingPricing>;
-export type TenantInvoiceListResponse = V2PaginatedSuccessResponse<Invoice>;
-export type AllInvoiceListResponse = V2PaginatedSuccessResponse<Invoice>;
+export type TenantInvoiceListResponse =
+	V2PaginatedSuccessResponse<InvoiceListItem>;
+export type AllInvoiceListResponse =
+	V2PaginatedSuccessResponse<InvoiceListItem>;
 
 export interface PaginatedBillingInformationListResult {
 	items: BillingInformation[];
@@ -186,13 +188,13 @@ export interface PaginatedBillingPricingListResult {
 }
 
 export interface PaginatedTenantInvoiceListResult {
-	items: Invoice[];
+	items: InvoiceListItem[];
 	meta: NonNullable<TenantInvoiceListResponse["meta"]>;
 	message: string;
 }
 
 export interface PaginatedAllInvoiceListResult {
-	items: Invoice[];
+	items: InvoiceListItem[];
 	meta: NonNullable<AllInvoiceListResponse["meta"]>;
 	message: string;
 }
