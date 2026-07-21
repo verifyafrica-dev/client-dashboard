@@ -294,13 +294,15 @@ function BillingPage() {
 							value="transactions"
 							className="flex flex-col gap-4"
 						>
-							<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-								<h2 className="text-lg font-semibold">Transaction History</h2>
-								<div className="flex flex-wrap items-center gap-2">
+							<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+								<h2 className="text-lg font-semibold flex-1">
+									Transaction History
+								</h2>
+								<div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
 									<Button
 										type="button"
 										variant="outline"
-										className="cursor-pointer"
+										className="cursor-pointer w-full sm:w-auto"
 										disabled={isTransactionsLoading || isRefreshing}
 										onClick={() => void handleRefresh()}
 									>
@@ -462,25 +464,27 @@ function BillingPage() {
 							value="invoices"
 							className="flex flex-col gap-4"
 						>
-							<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-								<h2 className="text-lg font-semibold">Invoices</h2>
-								<Button
-									type="button"
-									variant="outline"
-									className="cursor-pointer"
-									disabled={isInvoicesLoading || isRefreshing}
-									onClick={() => void handleRefresh()}
-								>
-									<ArrowsClockwiseIcon
-										className={cn(isRefreshing && "animate-spin")}
-										weight="bold"
-									/>
-									Refresh
-								</Button>
+							<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+								<h2 className="text-lg font-semibold flex-1">Invoices</h2>
+								<div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+									<Button
+										type="button"
+										variant="outline"
+										className="cursor-pointer w-full sm:w-auto"
+										disabled={isInvoicesLoading || isRefreshing}
+										onClick={() => void handleRefresh()}
+									>
+										<ArrowsClockwiseIcon
+											className={cn(isRefreshing && "animate-spin")}
+											weight="bold"
+										/>
+										Refresh
+									</Button>
+								</div>
 							</div>
 
 							{isInvoicesLoading ? (
-								<div className="min-h-[320px] flex flex-col justify-between">
+								<div className="min-h-80 flex flex-col justify-between">
 									<TableSkeleton
 										columns={[
 											"Invoice",
